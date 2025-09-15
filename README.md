@@ -1,21 +1,21 @@
-# 🛒 Promomanía
+# Promomanía
 
 **Promomanía** es una plataforma web colaborativa que centraliza promociones reales de supermercados y tiendas en Colombia.  
 Los usuarios pueden publicar, validar y buscar descuentos de forma rápida, confiable y transparente.  
 
 ---
 
-## 🚀 Características
+## Características
 
-- 📌 Publicación de promociones con precio, ubicación, supermercado y foto.  
-- 🔎 Búsqueda y filtros por categoría, marca, ciudad o porcentaje de descuento.  
-- 👍 Validación comunitaria mediante votos y reseñas.  
-- 📢 Notificaciones y alertas sobre nuevas oportunidades de ahorro.  
-- 🌐 Comunidad activa de consumidores que fomenta el consumo inteligente.  
+- Publicación de promociones con precio, ubicación, supermercado y foto.  
+- Búsqueda y filtros por categoría, marca, ciudad o porcentaje de descuento.  
+- Validación comunitaria mediante votos y reseñas.  
+- Notificaciones y alertas sobre nuevas oportunidades de ahorro.  
+- Comunidad activa de consumidores que fomenta el consumo inteligente.  
 
 ---
 
-## 🛠️ Tecnologías utilizadas
+## 🛠Tecnologías utilizadas
 
 - **Frontend:** HTML, CSS, JavaScript  
 - **Backend:** Flask (Python)  
@@ -24,7 +24,7 @@ Los usuarios pueden publicar, validar y buscar descuentos de forma rápida, conf
 
 ---
 
-## 📂 Estructura del proyecto
+## Estructura del proyecto
 Promomania/
 │── static/ # Archivos estáticos (CSS, JS, imágenes)
 │── templates/ # Vistas HTML

@@ -7,11 +7,8 @@ def index():
 
 @app.route("/main")
 def main():
-    return render_template("vistas/dashboard.html")
+    return render_template("main/layout.html")
 
-@app.route("/tablas")
-def tables():
-    return render_template("vistas/tables.html")
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000, host='0.0.0.0')

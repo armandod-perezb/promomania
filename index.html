@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promomanía - Promociones Colaborativas</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <h1><i class="fas fa-tag"></i> Promomanía</h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="active">Inicio</a></li>
+                    <li><a href="search.html">Buscar</a></li>
+                    <li><a href="publish.html">Publicar</a></li>
+                    <li><a href="#" id="notifications-btn"><i class="fas fa-bell"></i> <span class="notification-count">3</span></a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="container">
+                <h2>Encuentra las mejores promociones en Colombia</h2>
+                <p>Plataforma colaborativa donde los usuarios comparten, validan y buscan promociones reales</p>
+                
+                <div class="search-box">
+                    <form id="quick-search" class="search-form">
+                        <input type="text" id="search-input" placeholder="Buscar promociones, marcas, supermercados..." required>
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                    <div class="quick-filters">
+                        <button class="filter-btn" data-category="alimentos">Alimentos</button>
+                        <button class="filter-btn" data-category="electronica">Electrónica</button>
+                        <button class="filter-btn" data-category="hogar">Hogar</button>
+                        <button class="filter-btn" data-category="personal">Cuidado Personal</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="promotions">
+            <div class="container">
+                <div class="section-header">
+                    <h3>Promociones Recientes</h3>
+                    <div class="sort-options">
+                        <select id="sort-select">
+                            <option value="recent">Más Recientes</option>
+                            <option value="discount">Mayor Descuento</option>
+                            <option value="popular">Más Populares</option>
+                            <option value="validated">Mejor Validadas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="promotions-grid" id="promotions-container">
+                    <!-- Promociones se cargarán dinámicamente -->
+                </div>
+
+                <div class="load-more">
+                    <button id="load-more-btn" class="btn btn-secondary">Cargar Más</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <i class="fas fa-tags"></i>
+                        <h4>1,247</h4>
+                        <p>Promociones Activas</p>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-users"></i>
+                        <h4>5,832</h4>
+                        <p>Usuarios Activos</p>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-percent"></i>
+                        <h4>65%</h4>
+                        <p>Ahorro Promedio</p>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-store"></i>
+                        <h4>127</h4>
+                        <p>Supermercados</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Promomanía</h4>
+                    <p>Plataforma colaborativa para promociones inteligentes en Colombia</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Enlaces</h4>
+                    <ul>
+                        <li><a href="search.html">Buscar Promociones</a></li>
+                        <li><a href="publish.html">Publicar Promoción</a></li>
+                        <li><a href="#about">Acerca de</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Comunidad</h4>
+                    <ul>
+                        <li><a href="#guidelines">Guías de Uso</a></li>
+                        <li><a href="#support">Soporte</a></li>
+                        <li><a href="#feedback">Feedback</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Promomanía. Construido con ❤️ para la comunidad colombiana.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notifications Panel -->
+    <div id="notifications-panel" class="notifications-panel hidden">
+        <div class="notifications-header">
+            <h4>Notificaciones</h4>
+            <button id="close-notifications"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="notifications-content" id="notifications-content">
+            <!-- Notificaciones se cargarán dinámicamente -->
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/promotions.js"></script>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Promociones - Promomanía</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/search.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <h1><a href="index.html"><i class="fas fa-tag"></i> Promomanía</a></h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="search.html" class="active">Buscar</a></li>
+                    <li><a href="publish.html">Publicar</a></li>
+                    <li><a href="#" id="notifications-btn"><i class="fas fa-bell"></i> <span class="notification-count">3</span></a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <section class="search-section">
+            <div class="container">
+                <div class="search-header">
+                    <h2><i class="fas fa-search"></i> Buscar Promociones</h2>
+                    <p>Encuentra las mejores ofertas usando nuestros filtros avanzados</p>
+                </div>
+
+                <div class="search-container">
+                    <div class="search-filters">
+                        <h3><i class="fas fa-filter"></i> Filtros</h3>
+                        
+                        <div class="filter-section">
+                            <h4>Búsqueda por Texto</h4>
+                            <div class="search-input-group">
+                                <input type="text" id="search-text" placeholder="Producto, marca, supermercado...">
+                                <button id="search-btn"><i class="fas fa-search"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="filter-section">
+                            <h4>Categoría</h4>
+                            <div class="filter-options">
+                                <label class="filter-option">
+                                    <input type="checkbox" name="category" value="alimentos">
+                                    <span>Alimentos y Bebidas</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="category" value="electronica">
+                                    <span>Electrónica</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="category" value="hogar">
+                                    <span>Hogar y Jardín</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="category" value="personal">
+                                    <span>Cuidado Personal</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="category" value="ropa">
+                                    <span>Ropa y Accesorios</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="category" value="deportes">
+                                    <span>Deportes</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="filter-section">
+                            <h4>Supermercado</h4>
+                            <div class="filter-options">
+                                <label class="filter-option">
+                                    <input type="checkbox" name="supermarket" value="exito">
+                                    <span>Éxito</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="supermarket" value="olimpica">
+                                    <span>Olímpica</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="supermarket" value="carrefour">
+                                    <span>Carrefour</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="supermarket" value="jumbo">
+                                    <span>Jumbo</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="supermarket" value="d1">
+                                    <span>D1</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="supermarket" value="ara">
+                                    <span>Ara</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="filter-section">
+                            <h4>Ciudad</h4>
+                            <select id="city-filter">
+                                <option value="">Todas las ciudades</option>
+                                <option value="bogota">Bogotá D.C.</option>
+                                <option value="medellin">Medellín</option>
+                                <option value="cali">Cali</option>
+                                <option value="barranquilla">Barranquilla</option>
+                                <option value="cartagena">Cartagena</option>
+                                <option value="bucaramanga">Bucaramanga</option>
+                                <option value="pereira">Pereira</option>
+                                <option value="manizales">Manizales</option>
+                                <option value="santa-marta">Santa Marta</option>
+                                <option value="ibague">Ibagué</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-section">
+                            <h4>Descuento Mínimo</h4>
+                            <div class="range-slider">
+                                <input type="range" id="discount-range" min="0" max="90" value="0" step="5">
+                                <div class="range-labels">
+                                    <span>0%</span>
+                                    <span id="discount-value">0%</span>
+                                    <span>90%+</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-section">
+                            <h4>Precio Máximo</h4>
+                            <div class="price-range">
+                                <input type="number" id="max-price" placeholder="$ Precio máximo" min="0" step="1000">
+                            </div>
+                        </div>
+
+                        <div class="filter-section">
+                            <h4>Validación</h4>
+                            <div class="filter-options">
+                                <label class="filter-option">
+                                    <input type="checkbox" name="validation" value="verified">
+                                    <span><i class="fas fa-check-circle"></i> Verificadas</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="validation" value="with-photos">
+                                    <span><i class="fas fa-camera"></i> Con Fotos</span>
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="validation" value="high-rating">
+                                    <span><i class="fas fa-star"></i> Bien Calificadas</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="filter-actions">
+                            <button id="apply-filters" class="btn btn-primary">Aplicar Filtros</button>
+                            <button id="clear-filters" class="btn btn-secondary">Limpiar</button>
+                        </div>
+                    </div>
+
+                    <div class="search-results">
+                        <div class="results-header">
+                            <div class="results-info">
+                                <span id="results-count">0 promociones encontradas</span>
+                            </div>
+                            <div class="sort-options">
+                                <label for="sort-by">Ordenar por:</label>
+                                <select id="sort-by">
+                                    <option value="relevance">Relevancia</option>
+                                    <option value="discount-desc">Mayor Descuento</option>
+                                    <option value="discount-asc">Menor Descuento</option>
+                                    <option value="price-asc">Menor Precio</option>
+                                    <option value="price-desc">Mayor Precio</option>
+                                    <option value="newest">Más Recientes</option>
+                                    <option value="rating">Mejor Calificadas</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="active-filters" id="active-filters">
+                            <!-- Filtros activos se mostrarán aquí -->
+                        </div>
+
+                        <div class="results-grid" id="results-container">
+                            <!-- Resultados se cargarán dinámicamente -->
+                        </div>
+
+                        <div class="pagination" id="pagination">
+                            <!-- Paginación se generará dinámicamente -->
+                        </div>
+
+                        <div class="no-results hidden" id="no-results">
+                            <i class="fas fa-search"></i>
+                            <h3>No se encontraron promociones</h3>
+                            <p>Intenta ajustar tus filtros o buscar términos diferentes</p>
+                            <button class="btn btn-primary" onclick="clearAllFilters()">Limpiar Filtros</button>
+                        </div>
+
+                        <div class="loading hidden" id="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Buscando promociones...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Promomanía</h4>
+                    <p>Plataforma colaborativa para promociones inteligentes en Colombia</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Promomanía. Construido con ❤️ para la comunidad colombiana.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Quick View Modal -->
+    <div id="quick-view-modal" class="modal hidden">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="modal-title"></h3>
+                <button class="modal-close" onclick="closeQuickView()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Contenido del modal se cargará dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/promotions.js"></script>
+</body>
+</html>

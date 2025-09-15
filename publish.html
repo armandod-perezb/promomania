@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicar Promoción - Promomanía</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/forms.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <h1><a href="index.html"><i class="fas fa-tag"></i> Promomanía</a></h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="search.html">Buscar</a></li>
+                    <li><a href="publish.html" class="active">Publicar</a></li>
+                    <li><a href="#" id="notifications-btn"><i class="fas fa-bell"></i> <span class="notification-count">3</span></a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <section class="publish-form">
+            <div class="container">
+                <div class="form-header">
+                    <h2><i class="fas fa-plus-circle"></i> Publicar Nueva Promoción</h2>
+                    <p>Comparte una promoción real que hayas encontrado y ayuda a la comunidad a ahorrar</p>
+                </div>
+
+                <form id="publish-promotion-form" class="promotion-form" enctype="multipart/form-data">
+                    <div class="form-section">
+                        <h3><i class="fas fa-info-circle"></i> Información Básica</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-name">Producto/Servicio *</label>
+                                <input type="text" id="product-name" name="productName" required placeholder="Ej: Aceite de Oliva Extra Virgen 500ml">
+                            </div>
+                            <div class="form-group">
+                                <label for="brand">Marca</label>
+                                <input type="text" id="brand" name="brand" placeholder="Ej: Carbonell, Goya, etc.">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="category">Categoría *</label>
+                                <select id="category" name="category" required>
+                                    <option value="">Seleccionar categoría</option>
+                                    <option value="alimentos">Alimentos y Bebidas</option>
+                                    <option value="electronica">Electrónica</option>
+                                    <option value="hogar">Hogar y Jardín</option>
+                                    <option value="personal">Cuidado Personal</option>
+                                    <option value="ropa">Ropa y Accesorios</option>
+                                    <option value="deportes">Deportes y Recreación</option>
+                                    <option value="mascotas">Mascotas</option>
+                                    <option value="farmacia">Farmacia y Salud</option>
+                                    <option value="otros">Otros</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="supermarket">Supermercado/Tienda *</label>
+                                <select id="supermarket" name="supermarket" required>
+                                    <option value="">Seleccionar tienda</option>
+                                    <option value="exito">Éxito</option>
+                                    <option value="olimpica">Olímpica</option>
+                                    <option value="carrefour">Carrefour</option>
+                                    <option value="jumbo">Jumbo</option>
+                                    <option value="d1">D1</option>
+                                    <option value="ara">Ara</option>
+                                    <option value="metro">Metro</option>
+                                    <option value="alkosto">Alkosto</option>
+                                    <option value="homecenter">Homecenter</option>
+                                    <option value="falabella">Falabella</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="other-supermarket-group" style="display: none;">
+                            <label for="other-supermarket">Especificar tienda</label>
+                            <input type="text" id="other-supermarket" name="otherSupermarket" placeholder="Nombre de la tienda">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-dollar-sign"></i> Precios</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="original-price">Precio Original *</label>
+                                <div class="price-input">
+                                    <span class="currency">$</span>
+                                    <input type="number" id="original-price" name="originalPrice" min="0" step="0.01" required placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="promo-price">Precio en Promoción *</label>
+                                <div class="price-input">
+                                    <span class="currency">$</span>
+                                    <input type="number" id="promo-price" name="promoPrice" min="0" step="0.01" required placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="discount-percentage">% Descuento</label>
+                                <div class="percentage-display">
+                                    <span id="discount-display">0%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="promo-details">Detalles de la Promoción</label>
+                            <textarea id="promo-details" name="promoDetails" rows="3" placeholder="Ej: 2x1, 50% descuento en segunda unidad, precio especial por tiempo limitado"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-map-marker-alt"></i> Ubicación</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city">Ciudad *</label>
+                                <select id="city" name="city" required>
+                                    <option value="">Seleccionar ciudad</option>
+                                    <option value="bogota">Bogotá D.C.</option>
+                                    <option value="medellin">Medellín</option>
+                                    <option value="cali">Cali</option>
+                                    <option value="barranquilla">Barranquilla</option>
+                                    <option value="cartagena">Cartagena</option>
+                                    <option value="bucaramanga">Bucaramanga</option>
+                                    <option value="pereira">Pereira</option>
+                                    <option value="manizales">Manizales</option>
+                                    <option value="santa-marta">Santa Marta</option>
+                                    <option value="ibague">Ibagué</option>
+                                    <option value="otra">Otra</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="neighborhood">Barrio/Zona</label>
+                                <input type="text" id="neighborhood" name="neighborhood" placeholder="Ej: Chapinero, El Poblado, etc.">
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="other-city-group" style="display: none;">
+                            <label for="other-city">Especificar ciudad</label>
+                            <input type="text" id="other-city" name="otherCity" placeholder="Nombre de la ciudad">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="store-address">Dirección de la Tienda</label>
+                            <input type="text" id="store-address" name="storeAddress" placeholder="Dirección específica (opcional)">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-calendar-alt"></i> Vigencia</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="start-date">Fecha de Inicio</label>
+                                <input type="date" id="start-date" name="startDate">
+                            </div>
+                            <div class="form-group">
+                                <label for="end-date">Fecha de Vencimiento</label>
+                                <input type="date" id="end-date" name="endDate">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="no-expiry" name="noExpiry">
+                                No tengo fecha de vencimiento exacta
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-camera"></i> Evidencia Fotográfica</h3>
+                        
+                        <div class="photo-upload">
+                            <div class="upload-area" id="photo-upload-area">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Arrastra las fotos aquí o haz clic para seleccionar</p>
+                                <p class="upload-hint">Sube fotos del producto, precio y promoción para validar la oferta</p>
+                                <input type="file" id="photo-input" name="photos" multiple accept="image/*" hidden>
+                            </div>
+                            
+                            <div class="photo-preview" id="photo-preview">
+                                <!-- Previews de fotos se mostrarán aquí -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-comment"></i> Información Adicional</h3>
+                        
+                        <div class="form-group">
+                            <label for="additional-notes">Notas Adicionales</label>
+                            <textarea id="additional-notes" name="additionalNotes" rows="4" placeholder="Cualquier información adicional que consideres importante para la comunidad"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="terms-agree" name="termsAgree" required>
+                                Declaro que esta información es veraz y que he verificado personalmente esta promoción
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Publicar Promoción
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Promomanía</h4>
+                    <p>Plataforma colaborativa para promociones inteligentes en Colombia</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Promomanía. Construido con ❤️ para la comunidad colombiana.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-check-circle"></i> ¡Promoción Publicada!</h3>
+            </div>
+            <div class="modal-body">
+                <p>Tu promoción ha sido publicada exitosamente y está siendo revisada por la comunidad.</p>
+                <p>Recibirás notificaciones sobre votos y comentarios.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="window.location.href='index.html'">Ver Promociones</button>
+                <button class="btn btn-secondary" onclick="location.reload()">Publicar Otra</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/publish.js"></script>
+</body>
+</html>

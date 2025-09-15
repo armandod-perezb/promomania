@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promoción - Promomanía</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/promotion.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <h1><a href="index.html"><i class="fas fa-tag"></i> Promomanía</a></h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="search.html">Buscar</a></li>
+                    <li><a href="publish.html">Publicar</a></li>
+                    <li><a href="#" id="notifications-btn"><i class="fas fa-bell"></i> <span class="notification-count">3</span></a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <section class="promotion-detail">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index.html">Inicio</a> > 
+                    <a href="search.html">Buscar</a> > 
+                    <span id="promotion-breadcrumb">Promoción</span>
+                </div>
+
+                <div class="promotion-content">
+                    <div class="promotion-main">
+                        <div class="promotion-gallery">
+                            <div class="main-image">
+                                <img id="main-image" src="https://via.placeholder.com/500x400?text=Imagen+Principal" alt="Imagen principal">
+                                <div class="image-controls">
+                                    <button class="prev-image"><i class="fas fa-chevron-left"></i></button>
+                                    <button class="next-image"><i class="fas fa-chevron-right"></i></button>
+                                </div>
+                            </div>
+                            <div class="thumbnail-gallery" id="thumbnail-gallery">
+                                <!-- Thumbnails se cargarán dinámicamente -->
+                            </div>
+                        </div>
+
+                        <div class="promotion-info">
+                            <div class="promotion-header">
+                                <h1 id="promotion-title">Aceite de Oliva Extra Virgen Carbonell 500ml</h1>
+                                <div class="promotion-meta">
+                                    <span class="category" id="promotion-category">Alimentos</span>
+                                    <span class="store" id="promotion-store">Éxito</span>
+                                    <span class="location" id="promotion-location">Bogotá, Chapinero</span>
+                                </div>
+                            </div>
+
+                            <div class="price-section">
+                                <div class="prices">
+                                    <span class="original-price" id="original-price">$15,900</span>
+                                    <span class="promo-price" id="promo-price">$9,540</span>
+                                    <span class="discount-badge" id="discount-badge">40% OFF</span>
+                                </div>
+                                <div class="savings">
+                                    <span class="savings-amount" id="savings-amount">Ahorras $6,360</span>
+                                </div>
+                            </div>
+
+                            <div class="promotion-description">
+                                <h3>Detalles de la Promoción</h3>
+                                <p id="promotion-details">Promoción especial 40% de descuento en aceite de oliva extra virgen Carbonell. Válida hasta agotar existencias.</p>
+                            </div>
+
+                            <div class="promotion-validity">
+                                <h3>Vigencia</h3>
+                                <div class="validity-info">
+                                    <span class="validity-dates" id="validity-dates">Del 15 Sep al 30 Sep 2024</span>
+                                    <span class="validity-status valid" id="validity-status">Vigente</span>
+                                </div>
+                            </div>
+
+                            <div class="store-info">
+                                <h3>Información de la Tienda</h3>
+                                <div class="store-details">
+                                    <p><i class="fas fa-store"></i> <span id="store-name">Éxito Chapinero</span></p>
+                                    <p><i class="fas fa-map-marker-alt"></i> <span id="store-address">Calle 63 #11-50, Chapinero, Bogotá</span></p>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button class="btn btn-primary" id="share-btn">
+                                    <i class="fas fa-share"></i> Compartir
+                                </button>
+                                <button class="btn btn-secondary" id="report-btn">
+                                    <i class="fas fa-flag"></i> Reportar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="promotion-sidebar">
+                        <div class="validation-section">
+                            <h3>Validación Comunitaria</h3>
+                            
+                            <div class="validation-stats">
+                                <div class="validation-score">
+                                    <span class="score" id="validation-score">4.2</span>
+                                    <div class="stars" id="validation-stars">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                    <span class="total-votes" id="total-votes">23 votos</span>
+                                </div>
+                            </div>
+
+                            <div class="voting-section">
+                                <h4>¿Esta promoción es real y actual?</h4>
+                                <div class="vote-buttons">
+                                    <button class="vote-btn vote-yes" id="vote-yes">
+                                        <i class="fas fa-thumbs-up"></i> Sí
+                                        <span class="vote-count" id="yes-count">18</span>
+                                    </button>
+                                    <button class="vote-btn vote-no" id="vote-no">
+                                        <i class="fas fa-thumbs-down"></i> No
+                                        <span class="vote-count" id="no-count">5</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="user-rating">
+                                <h4>Tu Calificación</h4>
+                                <div class="rating-stars" id="user-rating-stars">
+                                    <i class="far fa-star" data-rating="1"></i>
+                                    <i class="far fa-star" data-rating="2"></i>
+                                    <i class="far fa-star" data-rating="3"></i>
+                                    <i class="far fa-star" data-rating="4"></i>
+                                    <i class="far fa-star" data-rating="5"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="promotion-stats">
+                            <h3>Estadísticas</h3>
+                            <div class="stats-list">
+                                <div class="stat-item">
+                                    <span class="stat-label">Vistas:</span>
+                                    <span class="stat-value" id="view-count">347</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Publicada:</span>
+                                    <span class="stat-value" id="publish-date">Hace 2 días</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Actualizada:</span>
+                                    <span class="stat-value" id="update-date">Hace 1 hora</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="similar-promotions">
+                            <h3>Promociones Similares</h3>
+                            <div class="similar-list" id="similar-promotions-list">
+                                <!-- Promociones similares se cargarán dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comments-section">
+                    <h3>Comentarios y Reseñas</h3>
+                    
+                    <div class="comment-form">
+                        <h4>Agregar Comentario</h4>
+                        <form id="comment-form">
+                            <textarea id="comment-text" placeholder="Comparte tu experiencia con esta promoción..." rows="4" required></textarea>
+                            <div class="comment-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-comment"></i> Publicar Comentario
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="comments-list" id="comments-list">
+                        <!-- Comentarios se cargarán dinámicamente -->
+                    </div>
+
+                    <div class="load-more-comments">
+                        <button id="load-more-comments" class="btn btn-secondary">Cargar Más Comentarios</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Promomanía</h4>
+                    <p>Plataforma colaborativa para promociones inteligentes en Colombia</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Promomanía. Construido con ❤️ para la comunidad colombiana.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Share Modal -->
+    <div id="share-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-share"></i> Compartir Promoción</h3>
+                <button class="modal-close" onclick="closeModal('share-modal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="share-options">
+                    <button class="share-btn whatsapp" onclick="sharePromotion('whatsapp')">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </button>
+                    <button class="share-btn facebook" onclick="sharePromotion('facebook')">
+                        <i class="fab fa-facebook"></i> Facebook
+                    </button>
+                    <button class="share-btn twitter" onclick="sharePromotion('twitter')">
+                        <i class="fab fa-twitter"></i> Twitter
+                    </button>
+                    <button class="share-btn link" onclick="copyLink()">
+                        <i class="fas fa-link"></i> Copiar Enlace
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div id="report-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-flag"></i> Reportar Promoción</h3>
+                <button class="modal-close" onclick="closeModal('report-modal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="report-form">
+                    <div class="form-group">
+                        <label for="report-reason">Motivo del reporte:</label>
+                        <select id="report-reason" required>
+                            <option value="">Seleccionar motivo</option>
+                            <option value="expired">Promoción vencida</option>
+                            <option value="false">Información falsa</option>
+                            <option value="spam">Spam</option>
+                            <option value="inappropriate">Contenido inapropiado</option>
+                            <option value="other">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="report-details">Detalles adicionales:</label>
+                        <textarea id="report-details" rows="4" placeholder="Proporciona más información sobre el problema..."></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('report-modal')">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Enviar Reporte</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/promotion.js"></script>
+    <script src="js/comments.js"></script>
+</body>
+</html>

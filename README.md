@@ -15,7 +15,7 @@ Los usuarios pueden publicar, validar y buscar descuentos de forma rápida, conf
 
 ---
 
-## 🛠Tecnologías utilizadas
+## Tecnologías utilizadas
 
 - **Frontend:** HTML, CSS, JavaScript  
 - **Backend:** Flask (Python)  

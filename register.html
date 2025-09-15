@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrarse - Promomanía</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-light">
+  <!-- Header Navigation -->
+  <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+      <a class="navbar-brand fs-4 fw-bold" href="index.html">
+        Promo<span class="text-orange">manía</span>
+      </a>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <div class="d-flex ms-auto">
+          <a href="register.html" class="btn btn-orange me-2">Registrarse</a>
+          <a href="login.html" class="btn btn-outline-secondary">Iniciar Sesión</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Registration Form -->
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-7">
+        <div class="card shadow border-0 rounded-4 overflow-hidden">
+          <div class="card-header bg-gradient-custom text-white text-center py-4">
+            <h3 class="mb-0 fw-bold">Crear una cuenta</h3>
+          </div>
+          <div class="card-body p-4 p-md-5">
+            <div class="text-center mb-4">
+              <i class="fas fa-user-plus fa-3x text-orange mb-3"></i>
+              <p class="text-muted">Únete a nuestra comunidad para compartir y descubrir las mejores promociones</p>
+            </div>
+            
+            <form class="row g-3">
+              <div class="col-md-6">
+                <label for="firstName" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="firstName" required>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="lastName" class="form-label">Apellido</label>
+                <input type="text" class="form-control" id="lastName" required>
+              </div>
+              
+              <div class="col-md-12">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="email" required>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="password" class="form-label">Contraseña</label>
+                <div class="input-group">
+                  <input type="password" class="form-control" id="password" required>
+                  <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                    <i class="far fa-eye"></i>
+                  </button>
+                </div>
+                <div class="form-text">Mínimo 8 caracteres, una letra mayúscula y un número</div>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
+                <input type="password" class="form-control" id="confirmPassword" required>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="city" class="form-label">Ciudad</label>
+                <select class="form-select" id="city" required>
+                  <option value="" selected disabled>Seleccionar ciudad</option>
+                  <option value="Bogotá">Bogotá</option>
+                  <option value="Medellín">Medellín</option>
+                  <option value="Cali">Cali</option>
+                  <option value="Barranquilla">Barranquilla</option>
+                  <option value="Bucaramanga">Bucaramanga</option>
+                  <option value="Pereira">Pereira</option>
+                </select>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="phoneNumber" class="form-label">Teléfono (opcional)</label>
+                <input type="tel" class="form-control" id="phoneNumber">
+              </div>
+              
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                  <label class="form-check-label" for="agreeTerms">
+                    Acepto los <a href="#" class="text-orange">términos y condiciones</a> y la <a href="#" class="text-orange">política de privacidad</a>
+                  </label>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="newsletter">
+                  <label class="form-check-label" for="newsletter">
+                    Quiero recibir correos con promociones y novedades
+                  </label>
+                </div>
+              </div>
+              
+              <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-orange w-100 py-2">Registrarse</button>
+              </div>
+              
+              <div class="col-12 text-center">
+                <p>¿Ya tienes una cuenta? <a href="login.html" class="text-orange">Inicia sesión aquí</a></p>
+              </div>
+            </form>
+            
+            <hr class="my-4">
+            
+            <div class="text-center">
+              <p class="text-muted mb-3">O regístrate con</p>
+              <div class="d-flex justify-content-center gap-3">
+                <button class="btn btn-outline-secondary">
+                  <i class="fab fa-google"></i>
+                </button>
+                <button class="btn btn-outline-secondary">
+                  <i class="fab fa-facebook-f"></i>
+                </button>
+                <button class="btn btn-outline-secondary">
+                  <i class="fab fa-twitter"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white mt-5">
+    <div class="container py-4">
+      <div class="row">
+        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+          <h3 class="fs-5">
+            Promo<span class="text-orange">manía</span>
+          </h3>
+          <p class="text-secondary small">
+            La plataforma colaborativa de promociones más confiable de Colombia.
+          </p>
+        </div>
+        <div class="col-md-6 text-center text-md-end">
+          <ul class="list-inline mb-0">
+            <li class="list-inline-item"><a href="index.html" class="text-secondary text-decoration-none">Inicio</a></li>
+            <li class="list-inline-item ms-3"><a href="#" class="text-secondary text-decoration-none">Términos</a></li>
+            <li class="list-inline-item ms-3"><a href="#" class="text-secondary text-decoration-none">Privacidad</a></li>
+            <li class="list-inline-item ms-3"><a href="#" class="text-secondary text-decoration-none">Contacto</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-top border-secondary mt-3 pt-3 text-center text-secondary small">
+        © 2024 Promomanía. Todos los derechos reservados.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Password toggle visibility
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#password');
+    
+    togglePassword.addEventListener('click', function() {
+      // Toggle the type attribute
+      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+      password.setAttribute('type', type);
+      
+      // Toggle the icon
+      this.querySelector('i').classList.toggle('fa-eye');
+      this.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+  </script>
+</body>
+</html>

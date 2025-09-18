@@ -1,0 +1,191 @@
+CREATE DATABASE promomania;
+USE promomania;
+
+-- Tabla Usuario
+CREATE TABLE Usuario (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    correo VARCHAR(150) UNIQUE NOT NULL,
+    contraseña VARCHAR(255) NOT NULL,
+    ciudad VARCHAR(100),
+    rol ENUM('admin', 'usuario') DEFAULT 'usuario',
+    estado ENUM('activo', 'inactivo') DEFAULT 'activo'
+);
+
+-- Tabla Supermercado
+CREATE TABLE Supermercado (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(150) NOT NULL,
+    ciudad VARCHAR(100) NOT NULL,
+    ubicacion VARCHAR(255)
+);
+
+-- Tabla Categoria
+CREATE TABLE Categoria (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL
+);
+
+-- Tabla Promocion
+CREATE TABLE Promocion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(200) NOT NULL,
+    precio DECIMAL(10,2) NOT NULL,
+    ubicacion VARCHAR(255),
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE NOT NULL,
+    foto VARCHAR(255),
+    id_usuario INT,
+    id_supermercado INT,
+    id_categoria INT,
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id),
+    FOREIGN KEY (id_supermercado) REFERENCES Supermercado(id),
+    FOREIGN KEY (id_categoria) REFERENCES Categoria(id)
+);
+
+-- Tabla Comentario
+CREATE TABLE Comentario (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    contenido TEXT NOT NULL,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id_usuario INT,
+    id_promocion INT,
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id),
+    FOREIGN KEY (id_promocion) REFERENCES Promocion(id)
+);
+
+-- Tabla Valoracion
+CREATE TABLE Valoracion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tipo ENUM('positiva','negativa') NOT NULL,
+    id_usuario INT,
+    id_promocion INT,
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id),
+    FOREIGN KEY (id_promocion) REFERENCES Promocion(id),
+    UNIQUE (id_usuario, id_promocion) -- evita votos duplicados
+);
+
+-- Tabla Notificacion
+CREATE TABLE Notificacion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mensaje VARCHAR(255) NOT NULL,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    leida BOOLEAN DEFAULT FALSE,
+    id_usuario INT,
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id)
+);
+
+PROCEDIMIENTOS
+
+1)
+
+DELIMITER //
+CREATE PROCEDURE registrarPromocion (
+    IN p_titulo VARCHAR(200),
+    IN p_precio DECIMAL(10,2),
+    IN p_ubicacion VARCHAR(255),
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE,
+    IN p_foto VARCHAR(255),
+    IN p_id_usuario INT,
+    IN p_id_supermercado INT,
+    IN p_id_categoria INT
+)
+BEGIN
+    INSERT INTO Promocion (titulo, precio, ubicacion, fecha_inicio, fecha_fin, foto, id_usuario, id_supermercado, id_categoria)
+    VALUES (p_titulo, p_precio, p_ubicacion, p_fecha_inicio, p_fecha_fin, p_foto, p_id_usuario, p_id_supermercado, p_id_categoria);
+    
+    SELECT LAST_INSERT_ID() AS id_nueva_promocion;
+END //
+DELIMITER ;
+
+
+FUNCIONES 
+
+
+1)
+
+DELIMITER //
+CREATE FUNCTION totalValoraciones(p_id_promocion INT) RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE total INT;
+    SELECT COUNT(*) INTO total
+    FROM Valoracion
+    WHERE id_promocion = p_id_promocion;
+    RETURN total;
+END //
+DELIMITER ;
+
+2)
+
+DELIMITER //
+CREATE FUNCTION totalValoracionesPositivas(p_id_promocion INT) RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE total INT;
+    SELECT COUNT(*) INTO total
+    FROM Valoracion
+    WHERE id_promocion = p_id_promocion AND tipo = 'positiva';
+    RETURN total;
+END //
+DELIMITER ;
+
+3)
+
+DELIMITER //
+CREATE FUNCTION totalValoracionesNegativas(p_id_promocion INT) RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE total INT;
+    SELECT COUNT(*) INTO total
+    FROM Valoracion
+    WHERE id_promocion = p_id_promocion AND tipo = 'negativa';
+    RETURN total;
+END //
+DELIMITER ;
+
+
+
+TRIGGERS
+
+
+1)
+
+DELIMITER //
+
+CREATE TRIGGER notificarComentario
+AFTER INSERT ON Comentario
+FOR EACH ROW
+BEGIN
+    DECLARE promo_usuario INT;
+    SELECT id_usuario INTO promo_usuario FROM Promocion WHERE id = NEW.id_promocion;
+    
+    INSERT INTO Notificacion (mensaje, id_usuario)
+    VALUES (CONCAT('Tu promoción recibió un nuevo comentario: "', NEW.contenido, '"'), promo_usuario);
+END //
+
+
+DELIMITER ;
+
+
+2)
+
+DELIMITER //
+CREATE TRIGGER notificarValoracion
+AFTER INSERT ON Valoracion
+FOR EACH ROW
+BEGIN
+    DECLARE promo_usuario INT;
+    SELECT id_usuario INTO promo_usuario FROM Promocion WHERE id = NEW.id_promocion;
+    
+    INSERT INTO Notificacion (mensaje, id_usuario)
+    VALUES (CONCAT('Tu promoción recibió una valoración ', NEW.tipo), promo_usuario);
+END //
+DELIMITER ;
+
+
+Comando para ejecutar docker
+
+docker exec -it mysql_db mysql -u root -p
+

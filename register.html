@@ -3,195 +3,316 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registrarse - Promomanía</title>
-  
-  <!-- Bootstrap CSS -->
+  <title>Registrarse | Promomanía</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  
-  <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --orange-primary: #ff6b35;
+      --orange-dark: #e55a2b;
+      --gray-900: #1a1a1a;
+      --gray-800: #2d2d2d;
+      --gray-700: #404040;
+      --gray-600: #666666;
+      --gray-500: #808080;
+      --gray-300: #cccccc;
+      --gray-100: #f5f5f5;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(120deg, #f5f5f5 0%, #ece9e6 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .register-container {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    .register-card {
+      background: rgba(255,255,255,0.98);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(44,44,44,0.10);
+      border: 1px solid #eaeaea;
+      padding: 2.5rem 2rem;
+      max-width: 400px;
+      width: 100%;
+      position: relative;
+      transition: box-shadow 0.2s;
+    }
+    .register-card:hover {
+      box-shadow: 0 16px 48px rgba(44,44,44,0.13);
+    }
+    .register-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .logo {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 0.5rem;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--orange-primary), var(--orange-dark));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 8px rgba(255,107,53,0.08);
+    }
+    .welcome-text {
+      color: var(--gray-600);
+      font-size: 1rem;
+      font-weight: 400;
+    }
+    .form-floating {
+      position: relative;
+      margin-bottom: 1.3rem;
+    }
+    .form-control {
+      height: 48px;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--gray-800);
+      font-size: 1rem;
+      font-weight: 400;
+      padding: 0.75rem 1rem 0.75rem 2.7rem;
+      box-shadow: none;
+      transition: border-color 0.2s;
+    }
+    .form-control:focus {
+      border-color: var(--orange-primary);
+      outline: none;
+      box-shadow: 0 0 0 0.1rem rgba(255,107,53,0.07);
+    }
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-500);
+      font-size: 1rem;
+      z-index: 3;
+      transition: color 0.2s;
+    }
+    .form-control:focus + .input-icon {
+      color: var(--orange-primary);
+    }
+    .btn-primary {
+      width: 100%;
+      height: 48px;
+      background: linear-gradient(90deg, var(--orange-primary), var(--orange-dark));
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 1.08rem;
+      transition: background 0.2s, box-shadow 0.2s;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 2px 8px rgba(255,107,53,0.08);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(90deg, var(--orange-dark), var(--orange-primary));
+      box-shadow: 0 6px 18px rgba(255,107,53,0.13);
+    }
+    .register-footer {
+      text-align: center;
+      color: var(--gray-600);
+      font-size: 0.97rem;
+      margin-top: 1.2rem;
+    }
+    .register-footer a {
+      color: var(--orange-primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    .register-footer a:hover {
+      color: var(--orange-dark);
+      text-decoration: underline;
+    }
+    @media (max-width: 768px) {
+      .register-card {
+        margin: 1rem;
+        padding: 1.5rem 1rem;
+      }
+      .logo {
+        font-size: 1.3rem;
+      }
+    }
+    .btn-loading {
+      position: relative;
+      color: transparent !important;
+    }
+    .btn-loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    .success-checkmark {
+      display: none;
+      margin: 2rem auto;
+      width: 70px;
+      height: 70px;
+    }
+    .checkmark {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: block;
+      stroke-width: 3;
+      stroke: var(--orange-primary);
+      stroke-miterlimit: 10;
+      box-shadow: inset 0px 0px 0px var(--orange-primary);
+      animation: fill 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
+    }
+    .checkmark__circle {
+      stroke-dasharray: 166;
+      stroke-dashoffset: 166;
+      stroke-width: 3;
+      stroke-miterlimit: 10;
+      stroke: var(--orange-primary);
+      fill: none;
+      animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+    .checkmark__check {
+      transform-origin: 50% 50%;
+      stroke-dasharray: 48;
+      stroke-dashoffset: 48;
+      animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+    }
+    @keyframes stroke {
+      100% { stroke-dashoffset: 0; }
+    }
+    @keyframes scale {
+      0%, 100% { transform: none; }
+      50% { transform: scale3d(1.1, 1.1, 1); }
+    }
+    @keyframes fill {
+      100% { box-shadow: inset 0px 0px 0px 30px var(--orange-primary); }
+    }
+  </style>
 </head>
-<body class="bg-light">
-  <!-- Header Navigation -->
-  <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-    <div class="container">
-      <a class="navbar-brand fs-4 fw-bold" href="index.html">
-        Promo<span class="text-orange">manía</span>
-      </a>
-      
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      
-      <div class="collapse navbar-collapse" id="navbarContent">
-        <div class="d-flex ms-auto">
-          <a href="register.html" class="btn btn-orange me-2">Registrarse</a>
-          <a href="login.html" class="btn btn-outline-secondary">Iniciar Sesión</a>
+<body>
+  <div class="register-container">
+    <div class="register-card">
+      <div class="register-header">
+        <div class="logo">
+          <div class="logo-icon">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          Promo<span style="color: var(--orange-primary);">manía</span>
         </div>
+        <p class="welcome-text">Crea tu cuenta para comenzar</p>
       </div>
-    </div>
-  </header>
-
-  <!-- Registration Form -->
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-md-8 col-lg-7">
-        <div class="card shadow border-0 rounded-4 overflow-hidden">
-          <div class="card-header bg-gradient-custom text-white text-center py-4">
-            <h3 class="mb-0 fw-bold">Crear una cuenta</h3>
-          </div>
-          <div class="card-body p-4 p-md-5">
-            <div class="text-center mb-4">
-              <i class="fas fa-user-plus fa-3x text-orange mb-3"></i>
-              <p class="text-muted">Únete a nuestra comunidad para compartir y descubrir las mejores promociones</p>
-            </div>
-            
-            <form class="row g-3">
-              <div class="col-md-6">
-                <label for="firstName" class="form-label">Nombre</label>
-                <input type="text" class="form-control" id="firstName" required>
-              </div>
-              
-              <div class="col-md-6">
-                <label for="lastName" class="form-label">Apellido</label>
-                <input type="text" class="form-control" id="lastName" required>
-              </div>
-              
-              <div class="col-md-12">
-                <label for="email" class="form-label">Correo electrónico</label>
-                <input type="email" class="form-control" id="email" required>
-              </div>
-              
-              <div class="col-md-6">
-                <label for="password" class="form-label">Contraseña</label>
-                <div class="input-group">
-                  <input type="password" class="form-control" id="password" required>
-                  <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                    <i class="far fa-eye"></i>
-                  </button>
-                </div>
-                <div class="form-text">Mínimo 8 caracteres, una letra mayúscula y un número</div>
-              </div>
-              
-              <div class="col-md-6">
-                <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
-                <input type="password" class="form-control" id="confirmPassword" required>
-              </div>
-              
-              <div class="col-md-6">
-                <label for="city" class="form-label">Ciudad</label>
-                <select class="form-select" id="city" required>
-                  <option value="" selected disabled>Seleccionar ciudad</option>
-                  <option value="Bogotá">Bogotá</option>
-                  <option value="Medellín">Medellín</option>
-                  <option value="Cali">Cali</option>
-                  <option value="Barranquilla">Barranquilla</option>
-                  <option value="Bucaramanga">Bucaramanga</option>
-                  <option value="Pereira">Pereira</option>
-                </select>
-              </div>
-              
-              <div class="col-md-6">
-                <label for="phoneNumber" class="form-label">Teléfono (opcional)</label>
-                <input type="tel" class="form-control" id="phoneNumber">
-              </div>
-              
-              <div class="col-12">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="agreeTerms" required>
-                  <label class="form-check-label" for="agreeTerms">
-                    Acepto los <a href="#" class="text-orange">términos y condiciones</a> y la <a href="#" class="text-orange">política de privacidad</a>
-                  </label>
-                </div>
-              </div>
-              
-              <div class="col-12">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="newsletter">
-                  <label class="form-check-label" for="newsletter">
-                    Quiero recibir correos con promociones y novedades
-                  </label>
-                </div>
-              </div>
-              
-              <div class="col-12 mt-4">
-                <button type="submit" class="btn btn-orange w-100 py-2">Registrarse</button>
-              </div>
-              
-              <div class="col-12 text-center">
-                <p>¿Ya tienes una cuenta? <a href="login.html" class="text-orange">Inicia sesión aquí</a></p>
-              </div>
-            </form>
-            
-            <hr class="my-4">
-            
-            <div class="text-center">
-              <p class="text-muted mb-3">O regístrate con</p>
-              <div class="d-flex justify-content-center gap-3">
-                <button class="btn btn-outline-secondary">
-                  <i class="fab fa-google"></i>
-                </button>
-                <button class="btn btn-outline-secondary">
-                  <i class="fab fa-facebook-f"></i>
-                </button>
-                <button class="btn btn-outline-secondary">
-                  <i class="fab fa-twitter"></i>
-                </button>
-              </div>
-            </div>
-          </div>
+      <div class="success-checkmark">
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+          <circle class="checkmark__circle" fill="none" cx="26" cy="26" r="25" stroke="none"/>
+          <path class="checkmark__check" fill="none" d="M14.1,27.2 22.1,35.2 37.3,20"/>
+        </svg>
+      </div>
+      <form id="registerForm">
+        <div class="form-floating">
+          <input type="text" class="form-control" id="registerName" placeholder="Nombre completo" required>
+          <i class="fas fa-user input-icon"></i>
         </div>
+        <div class="form-floating">
+          <input type="email" class="form-control" id="registerEmail" placeholder="Correo electrónico" required>
+          <i class="fas fa-envelope input-icon"></i>
+        </div>
+        <div class="form-floating">
+          <input type="password" class="form-control" id="registerPassword" placeholder="Contraseña" required>
+          <i class="fas fa-lock input-icon"></i>
+          <button type="button" class="password-toggle" onclick="togglePassword()">
+            <i class="fas fa-eye" id="passwordIcon"></i>
+          </button>
+        </div>
+        <button type="submit" class="btn btn-primary" id="registerBtn">
+          Crear cuenta
+        </button>
+      </form>
+      <div class="register-footer">
+        ¿Ya tienes cuenta?
+        <a href="login.html">Inicia sesión</a>
       </div>
     </div>
   </div>
-
-  <!-- Footer -->
-  <footer class="bg-dark text-white mt-5">
-    <div class="container py-4">
-      <div class="row">
-        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-          <h3 class="fs-5">
-            Promo<span class="text-orange">manía</span>
-          </h3>
-          <p class="text-secondary small">
-            La plataforma colaborativa de promociones más confiable de Colombia.
-          </p>
-        </div>
-        <div class="col-md-6 text-center text-md-end">
-          <ul class="list-inline mb-0">
-            <li class="list-inline-item"><a href="index.html" class="text-secondary text-decoration-none">Inicio</a></li>
-            <li class="list-inline-item ms-3"><a href="#" class="text-secondary text-decoration-none">Términos</a></li>
-            <li class="list-inline-item ms-3"><a href="#" class="text-secondary text-decoration-none">Privacidad</a></li>
-            <li class="list-inline-item ms-3"><a href="#" class="text-secondary text-decoration-none">Contacto</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="border-top border-secondary mt-3 pt-3 text-center text-secondary small">
-        © 2024 Promomanía. Todos los derechos reservados.
-      </div>
-    </div>
-  </footer>
-
-  <!-- Bootstrap Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  
   <script>
-    // Password toggle visibility
-    const togglePassword = document.querySelector('#togglePassword');
-    const password = document.querySelector('#password');
-    
-    togglePassword.addEventListener('click', function() {
-      // Toggle the type attribute
-      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-      password.setAttribute('type', type);
-      
-      // Toggle the icon
-      this.querySelector('i').classList.toggle('fa-eye');
-      this.querySelector('i').classList.toggle('fa-eye-slash');
+    function togglePassword() {
+      const passwordInput = document.getElementById('registerPassword');
+      const passwordIcon = document.getElementById('passwordIcon');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        passwordIcon.classList.remove('fa-eye');
+        passwordIcon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        passwordIcon.classList.remove('fa-eye-slash');
+        passwordIcon.classList.add('fa-eye');
+      }
+    }
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const registerBtn = document.getElementById('registerBtn');
+      const originalText = registerBtn.innerHTML;
+      registerBtn.classList.add('btn-loading');
+      registerBtn.disabled = true;
+      setTimeout(() => {
+        registerBtn.classList.remove('btn-loading');
+        registerBtn.disabled = false;
+        registerBtn.innerHTML = originalText;
+        showSuccess();
+      }, 1800);
     });
+    function showSuccess() {
+      const form = document.getElementById('registerForm');
+      const successElement = document.querySelector('.success-checkmark');
+      const registerHeader = document.querySelector('.register-header');
+      form.style.display = 'none';
+      successElement.style.display = 'block';
+      registerHeader.innerHTML = `
+        <div class="logo">
+          <div class="logo-icon">
+            <i class="fas fa-check"></i>
+          </div>
+          ¡Registro exitoso!
+        </div>
+        <p class="welcome-text">Redirigiendo al inicio...</p>
+      `;
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 2200);
+    }
   </script>
 </body>
 </html>

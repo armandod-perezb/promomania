@@ -11,31 +11,412 @@
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="styles.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --orange-primary: #ff6b35;
+      --orange-light: #ff8559;
+      --orange-dark: #e55a2b;
+      --gray-900: #1a1a1a;
+      --gray-800: #2d2d2d;
+      --gray-700: #404040;
+      --gray-600: #666666;
+      --gray-500: #808080;
+      --gray-400: #a0a0a0;
+      --gray-300: #cccccc;
+      --gray-200: #e5e5e5;
+      --gray-100: #f5f5f5;
+      --success: #22c55e;
+      --danger: #ef4444;
+    }
+    
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    body {
+      background-color: #fafafa;
+      color: var(--gray-800);
+      line-height: 1.6;
+    }
+    
+    .text-orange { color: var(--orange-primary) !important; }
+    .bg-orange { background-color: var(--orange-primary) !important; }
+    .btn-orange {
+      background-color: var(--orange-primary);
+      border-color: var(--orange-primary);
+      color: white;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    .btn-orange:hover {
+      background-color: var(--orange-dark);
+      border-color: var(--orange-dark);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+    }
+    
+    /* Header improvements */
+    .navbar {
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.95) !important;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .navbar-brand {
+      color: var(--gray-900) !important;
+      font-weight: 700;
+      font-size: 1.5rem !important;
+    }
+    
+    .search-form {
+      width: 100%;
+      max-width: 400px;
+    }
+    
+    .search-form .form-control {
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      padding-right: 50px;
+      font-weight: 400;
+    }
+    
+    .search-form .form-control:focus {
+      border-color: var(--orange-primary);
+      box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.1);
+    }
+    
+    .search-form .btn {
+      background: none;
+      border: none;
+      color: var(--gray-600);
+      right: 8px !important;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    
+    /* Filters section */
+    .filters-section {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .form-select {
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      color: var(--gray-700);
+      font-weight: 400;
+    }
+    
+    .form-select:focus {
+      border-color: var(--orange-primary);
+      box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.1);
+    }
+    
+    /* Hero section - Complete redesign */
+    .hero-section {
+      background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-dark) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="90" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      opacity: 0.3;
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+    
+    .hero-section h1 {
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .hero-section p {
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 400;
+    }
+    
+    .stat-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .stat-card i {
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .stat-card .stat-number {
+      color: white;
+      font-weight: 700;
+      font-size: 2rem;
+    }
+    
+    .stat-card .stat-label {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 400;
+    }
+    
+    /* Cards improvements */
+    .promo-card {
+      border: none;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      background: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    .promo-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .promo-card img {
+      height: 200px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    .promo-card:hover img {
+      transform: scale(1.05);
+    }
+    
+    .promo-card .card-body {
+      padding: 1.25rem;
+    }
+    
+    .promo-card .card-title {
+      color: var(--gray-900);
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+    
+    .price-current {
+      color: var(--danger) !important;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    
+    .price-original {
+      color: var(--gray-500);
+      font-size: 1rem;
+      font-weight: 400;
+    }
+    
+    .discount-badge {
+      background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+      color: white;
+      font-weight: 600;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+    }
+    
+    .store-badge {
+      background: var(--gray-900);
+      color: white;
+      font-weight: 500;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+    }
+    
+    .category-badge {
+      background: var(--gray-100);
+      color: var(--gray-700);
+      font-weight: 500;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+    }
+    
+    .verified-badge i {
+      color: var(--success);
+      font-size: 1.25rem;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+    }
+    
+    .card-footer {
+      background: var(--gray-50);
+      border-top: 1px solid var(--gray-200);
+      padding: 1rem 1.25rem;
+    }
+    
+    .interaction-btn {
+      background: white;
+      border: 1px solid var(--gray-300);
+      color: var(--gray-600);
+      font-size: 0.875rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    
+    .interaction-btn:hover {
+      background: var(--gray-50);
+      border-color: var(--gray-400);
+      color: var(--gray-700);
+    }
+    
+    /* Results section */
+    .results-header h2 {
+      color: var(--gray-900);
+      font-weight: 700;
+    }
+    
+    .results-count {
+      color: var(--gray-600);
+      font-weight: 400;
+    }
+    
+    /* Footer improvements */
+    .footer {
+      background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+    }
+    
+    .footer h3, .footer h4 {
+      color: white;
+      font-weight: 600;
+    }
+    
+    .footer .text-secondary {
+      color: var(--gray-400) !important;
+    }
+    
+    .footer a {
+      color: var(--gray-400);
+      transition: color 0.3s ease;
+    }
+    
+    .footer a:hover {
+      color: var(--orange-light);
+    }
+    
+    /* Back to top button */
+    .back-to-top {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(255, 107, 53, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .back-to-top:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(255, 107, 53, 0.4);
+    }
+    
+    /* Modal improvements */
+    .modal-content {
+      border-radius: 16px;
+      border: none;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    .modal-header {
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+      border-radius: 16px 16px 0 0;
+    }
+    
+    .modal-title {
+      color: var(--gray-900);
+      font-weight: 600;
+    }
+    
+    /* Form improvements */
+    .form-label {
+      color: var(--gray-700);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-control {
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      color: var(--gray-700);
+      transition: all 0.2s ease;
+    }
+    
+    .form-control:focus {
+      border-color: var(--orange-primary);
+      box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.1);
+    }
+    
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+      .hero-section h1 {
+        font-size: 2.5rem;
+      }
+      
+      .hero-section p {
+        font-size: 1.1rem;
+      }
+      
+      .stat-card {
+        padding: 1rem;
+      }
+      
+      .stat-card .stat-number {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
   <!-- Header Navigation -->
-  <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+  <header class="navbar navbar-expand-lg sticky-top">
     <div class="container">
-      <a class="navbar-brand fs-4 fw-bold" href="#">
+      <a class="navbar-brand" href="#">
         Promo<span class="text-orange">manía</span>
       </a>
-      
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
         <span class="navbar-toggler-icon"></span>
       </button>
-      
       <div class="collapse navbar-collapse" id="navbarContent">
         <form class="d-flex mx-auto my-2 my-lg-0 position-relative search-form">
           <input class="form-control" type="search" placeholder="Buscar promociones..." aria-label="Search">
-          <button class="btn position-absolute end-0 border-0" type="submit">
+          <button class="btn position-absolute" type="submit">
             <i class="fa fa-search"></i>
           </button>
         </form>
-        
-        <div class="d-flex align-items-center ms-auto">
-          <button class="btn btn-orange d-none d-md-block">
+        <div class="d-flex align-items-center ms-auto gap-2">
+          <!-- Login/Register icons -->
+          <a href="login.html" class="btn btn-link px-2" title="Iniciar sesión">
+            <i class="fas fa-sign-in-alt fa-lg text-orange"></i>
+          </a>
+          <a href="register.html" class="btn btn-link px-2" title="Registrarse">
+            <i class="fas fa-user-plus fa-lg text-orange"></i>
+          </a>
+          <button class="btn btn-orange d-none d-md-block" data-bs-toggle="modal" data-bs-target="#addPromoModal">
             Agregar Promoción
           </button>
         </div>
@@ -44,7 +425,7 @@
   </header>
 
   <!-- Search Filters -->
-  <section class="bg-white py-3 shadow-sm">
+  <section class="filters-section py-3">
     <div class="container">
       <div class="row g-2">
         <div class="col-6 col-md-3">
@@ -91,7 +472,7 @@
         </div>
       </div>
       <div class="mt-2 text-end">
-        <button class="btn btn-sm btn-link text-secondary" id="clearFilters">
+        <button class="btn btn-sm btn-link" style="color: var(--gray-600); text-decoration: none;" id="clearFilters">
           Limpiar filtros
         </button>
       </div>
@@ -99,10 +480,10 @@
   </section>
 
   <!-- Hero Section -->
-  <section class="bg-gradient-custom text-white">
+  <section class="hero-section">
     <div class="container py-5">
-      <div class="text-center">
-        <h1 class="display-4 fw-bold mb-4">
+      <div class="text-center hero-content">
+        <h1 class="display-4 mb-4">
           Encuentra las mejores <span class="text-warning">promociones</span>
         </h1>
         <p class="fs-4 mb-5">
@@ -112,31 +493,31 @@
         <!-- Stats -->
         <div class="row row-cols-2 row-cols-md-4 g-4 mt-4">
           <div class="col">
-            <div class="text-center">
+            <div class="stat-card">
               <i class="fas fa-chart-line fs-1 mb-3"></i>
-              <div class="fs-3">$2,580,000</div>
-              <div class="text-light opacity-75">Total ahorrado</div>
+              <div class="stat-number">$2,580,000</div>
+              <div class="stat-label">Total ahorrado</div>
             </div>
           </div>
           <div class="col">
-            <div class="text-center">
+            <div class="stat-card">
               <i class="fas fa-shopping-bag fs-1 mb-3"></i>
-              <div class="fs-3">6</div>
-              <div class="text-light opacity-75">Promociones activas</div>
+              <div class="stat-number">6</div>
+              <div class="stat-label">Promociones activas</div>
             </div>
           </div>
           <div class="col">
-            <div class="text-center">
+            <div class="stat-card">
               <i class="fas fa-users fs-1 mb-3"></i>
-              <div class="fs-3">2,450</div>
-              <div class="text-light opacity-75">Usuarios activos</div>
+              <div class="stat-number">2,450</div>
+              <div class="stat-label">Usuarios activos</div>
             </div>
           </div>
           <div class="col">
-            <div class="text-center">
+            <div class="stat-card">
               <i class="fas fa-star fs-1 mb-3"></i>
-              <div class="fs-3">4.8</div>
-              <div class="text-light opacity-75">Calificación</div>
+              <div class="stat-number">4.8</div>
+              <div class="stat-label">Calificación</div>
             </div>
           </div>
         </div>
@@ -147,13 +528,13 @@
   <!-- Main Content -->
   <main class="container py-5">
     <!-- Results Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 results-header">
       <div>
         <h2 class="fs-2" id="resultsTitle">Promociones destacadas</h2>
-        <p class="text-secondary" id="resultsCount">6 promociones encontradas</p>
+        <p class="results-count" id="resultsCount">6 promociones encontradas</p>
       </div>
       
-      <button class="btn btn-orange d-inline-block">
+      <button class="btn btn-orange d-inline-block" data-bs-toggle="modal" data-bs-target="#addPromoModal">
         Agregar Promoción
       </button>
     </div>
@@ -162,38 +543,38 @@
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4" id="promotionsGrid">
       <!-- Promo Card 1 -->
       <div class="col">
-        <div class="card h-100 shadow-sm">
+        <div class="card promo-card h-100">
           <div class="position-relative">
             <img src="https://images.unsplash.com/photo-1621458472871-d8b6a409aba1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaWxrJTIwZGFpcnklMjBwcm9kdUNC2FjdGl2YXRpb258ZW58MXx8fHwxNzU3OTI3NDE2fDA&ixlib=rb-4.1.0&q=80&w=1080" 
                  class="card-img-top" alt="Leche Alpina Deslactosada">
-            <span class="badge rounded-pill position-absolute top-0 end-0 m-2 bg-danger">-33%</span>
-            <div class="badge bg-white text-dark position-absolute bottom-0 start-0 m-2">Éxito</div>
+            <span class="discount-badge position-absolute top-0 end-0 m-2">-33%</span>
+            <div class="store-badge position-absolute bottom-0 start-0 m-2">Éxito</div>
             <div class="verified-badge position-absolute top-0 start-0 m-2" title="Promoción verificada">
-              <i class="fas fa-check-circle text-primary"></i>
+              <i class="fas fa-check-circle"></i>
             </div>
           </div>
           <div class="card-body">
             <h5 class="card-title">Leche Alpina Deslactosada 1L</h5>
             <div class="d-flex align-items-center mb-2">
-              <span class="fs-4 fw-bold text-danger me-2">$3,500</span>
-              <span class="text-decoration-line-through text-muted">$5,200</span>
+              <span class="price-current me-2">$3,500</span>
+              <span class="text-decoration-line-through price-original">$5,200</span>
             </div>
             <div class="d-flex justify-content-between mb-2">
-              <span class="badge bg-light text-dark">Lácteos</span>
-              <small class="text-muted">Bogotá</small>
+              <span class="category-badge">Lácteos</span>
+              <small style="color: var(--gray-600); font-weight: 500;">Bogotá</small>
             </div>
-            <small class="text-muted d-block mb-3">Expira: 22 de enero, 2024</small>
+            <small style="color: var(--gray-500);" class="d-block mb-3">Expira: 22 de enero, 2025</small>
           </div>
-          <div class="card-footer bg-white d-flex justify-content-between">
+          <div class="card-footer d-flex justify-content-between">
             <div class="d-flex gap-2">
-              <button class="btn btn-sm btn-outline-secondary">
+              <button class="interaction-btn">
                 <i class="fas fa-thumbs-up me-1"></i> 24
               </button>
-              <button class="btn btn-sm btn-outline-secondary">
+              <button class="interaction-btn">
                 <i class="fas fa-thumbs-down me-1"></i> 2
               </button>
             </div>
-            <button class="btn btn-sm btn-outline-secondary">
+            <button class="interaction-btn">
               <i class="fas fa-comment me-1"></i> 8
             </button>
           </div>
@@ -202,151 +583,209 @@
       
       <!-- Promo Card 2 -->
       <div class="col">
-        <div class="card h-100 shadow-sm">
+        <div class="card promo-card h-100">
           <div class="position-relative">
             <img src="https://images.unsplash.com/photo-1685702563055-d1e74ffc53b3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjZXJlYWwlMjBicmVha2Zhc3R8ZW58MXx8fHwxNzU3ODk1MDAwfDA&ixlib=rb-4.1.0&q=80&w=1080" 
                  class="card-img-top" alt="Cereal Kellogg's">
-            <span class="badge rounded-pill position-absolute top-0 end-0 m-2 bg-danger">-30%</span>
-            <div class="badge bg-white text-dark position-absolute bottom-0 start-0 m-2">Carulla</div>
+            <span class="discount-badge position-absolute top-0 end-0 m-2">-30%</span>
+            <div class="store-badge position-absolute bottom-0 start-0 m-2">Carulla</div>
             <div class="verified-badge position-absolute top-0 start-0 m-2" title="Promoción verificada">
-              <i class="fas fa-check-circle text-primary"></i>
+              <i class="fas fa-check-circle"></i>
             </div>
           </div>
           <div class="card-body">
             <h5 class="card-title">Cereal Kellogg's Corn Flakes 500g</h5>
             <div class="d-flex align-items-center mb-2">
-              <span class="fs-4 fw-bold text-danger me-2">$8,400</span>
-              <span class="text-decoration-line-through text-muted">$12,000</span>
+              <span class="price-current me-2">$8,400</span>
+              <span class="text-decoration-line-through price-original">$12,000</span>
             </div>
             <div class="d-flex justify-content-between mb-2">
-              <span class="badge bg-light text-dark">Cereales</span>
-              <small class="text-muted">Medellín</small>
+              <span class="category-badge">Cereales</span>
+              <small style="color: var(--gray-600); font-weight: 500;">Medellín</small>
             </div>
-            <small class="text-muted d-block mb-3">Expira: 20 de enero, 2024</small>
+            <small style="color: var(--gray-500);" class="d-block mb-3">Expira: 20 de enero, 2025</small>
           </div>
-          <div class="card-footer bg-white d-flex justify-content-between">
+          <div class="card-footer d-flex justify-content-between">
             <div class="d-flex gap-2">
-              <button class="btn btn-sm btn-outline-secondary">
+              <button class="interaction-btn">
                 <i class="fas fa-thumbs-up me-1"></i> 18
               </button>
-              <button class="btn btn-sm btn-outline-secondary">
+              <button class="interaction-btn">
                 <i class="fas fa-thumbs-down me-1"></i> 1
               </button>
             </div>
-            <button class="btn btn-sm btn-outline-secondary">
+            <button class="interaction-btn">
               <i class="fas fa-comment me-1"></i> 5
             </button>
           </div>
         </div>
       </div>
       
-      <!-- More promo cards would go here -->
-      <!-- Add the remaining 4 promotion cards following the same structure -->
+      <!-- Promo Card 3 -->
+      <div class="col">
+        <div class="card promo-card h-100">
+          <div class="position-relative">
+            <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400" 
+                 class="card-img-top" alt="Frutas Frescas">
+            <span class="discount-badge position-absolute top-0 end-0 m-2">-25%</span>
+            <div class="store-badge position-absolute bottom-0 start-0 m-2">Jumbo</div>
+            <div class="verified-badge position-absolute top-0 start-0 m-2" title="Promoción verificada">
+              <i class="fas fa-check-circle"></i>
+            </div>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Manzanas Rojas x 1kg</h5>
+            <div class="d-flex align-items-center mb-2">
+              <span class="price-current me-2">$4,500</span>
+              <span class="text-decoration-line-through price-original">$6,000</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="category-badge">Frutas y Verduras</span>
+              <small style="color: var(--gray-600); font-weight: 500;">Cali</small>
+            </div>
+            <small style="color: var(--gray-500);" class="d-block mb-3">Expira: 25 de enero, 2025</small>
+          </div>
+          <div class="card-footer d-flex justify-content-between">
+            <div class="d-flex gap-2">
+              <button class="interaction-btn">
+                <i class="fas fa-thumbs-up me-1"></i> 32
+              </button>
+              <button class="interaction-btn">
+                <i class="fas fa-thumbs-down me-1"></i> 0
+              </button>
+            </div>
+            <button class="interaction-btn">
+              <i class="fas fa-comment me-1"></i> 12
+            </button>
+          </div>
+        </div>
+      </div>
 
+      <!-- Promo Card 4 -->
+      <div class="col">
+        <div class="card promo-card h-100">
+          <div class="position-relative">
+            <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400" 
+                 class="card-img-top" alt="Carne Premium">
+            <span class="discount-badge position-absolute top-0 end-0 m-2">-40%</span>
+            <div class="store-badge position-absolute bottom-0 start-0 m-2">Olímpica</div>
+            <div class="verified-badge position-absolute top-0 start-0 m-2" title="Promoción verificada">
+              <i class="fas fa-check-circle"></i>
+            </div>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Lomo de Res Premium x 500g</h5>
+            <div class="d-flex align-items-center mb-2">
+              <span class="price-current me-2">$18,000</span>
+              <span class="text-decoration-line-through price-original">$30,000</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="category-badge">Carnes</span>
+              <small style="color: var(--gray-600); font-weight: 500;">Barranquilla</small>
+            </div>
+            <small style="color: var(--gray-500);" class="d-block mb-3">Expira: 28 de enero, 2025</small>
+          </div>
+          <div class="card-footer d-flex justify-content-between">
+            <div class="d-flex gap-2">
+              <button class="interaction-btn">
+                <i class="fas fa-thumbs-up me-1"></i> 15
+              </button>
+              <button class="interaction-btn">
+                <i class="fas fa-thumbs-down me-1"></i> 1
+              </button>
+            </div>
+            <button class="interaction-btn">
+              <i class="fas fa-comment me-1"></i> 3
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-    
-    <!-- No results state (initially hidden) -->
+    <!-- No results state (mejorado) -->
     <div class="text-center py-5 d-none" id="noResultsMessage">
-      <i class="fas fa-shopping-bag fs-1 text-secondary mb-4"></i>
-      <h3 class="fs-4 text-secondary mb-3">No se encontraron promociones</h3>
-      <p class="text-muted mb-4">
+      <i class="fas fa-shopping-bag fs-1 mb-4" style="color: var(--gray-400);"></i>
+      <h3 class="fs-4 mb-3" style="color: var(--gray-700); font-weight:600;">No se encontraron promociones</h3>
+      <p class="mb-4" style="color: var(--gray-500);">
         Intenta ajustar tus filtros o buscar otros términos
       </p>
-      <button class="btn btn-outline-secondary" id="resetFiltersBtn">
+      <button class="btn btn-orange" id="resetFiltersBtn">
         Limpiar filtros
       </button>
     </div>
   </main>
-
   <!-- Add Promotion Modal -->
   <div class="modal fade" id="addPromoModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Agregar nueva promoción</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title">Agregar Nueva Promoción</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
           <form id="addPromoForm">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="promoTitle" class="form-label">Título de la promoción</label>
-                <input type="text" class="form-control" id="promoTitle" required>
-              </div>
-              <div class="col-md-6">
-                <label for="promoStore" class="form-label">Tienda</label>
-                <select class="form-select" id="promoStore" required>
-                  <option value="">Seleccionar tienda</option>
-                  <option value="Éxito">Éxito</option>
-                  <option value="Carulla">Carulla</option>
-                  <option value="Jumbo">Jumbo</option>
-                  <option value="Olímpica">Olímpica</option>
-                  <option value="D1">D1</option>
-                  <option value="Ara">Ara</option>
-                </select>
-              </div>
-              
-              <div class="col-md-6">
-                <label for="promoCategory" class="form-label">Categoría</label>
-                <select class="form-select" id="promoCategory" required>
-                  <option value="">Seleccionar categoría</option>
-                  <option value="Lácteos">Lácteos</option>
-                  <option value="Cereales">Cereales</option>
-                  <option value="Frutas y Verduras">Frutas y Verduras</option>
-                  <option value="Despensa">Despensa</option>
-                  <option value="Carnes">Carnes</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label for="promoLocation" class="form-label">Ciudad</label>
-                <select class="form-select" id="promoLocation" required>
-                  <option value="">Seleccionar ciudad</option>
-                  <option value="Bogotá">Bogotá</option>
-                  <option value="Medellín">Medellín</option>
-                  <option value="Cali">Cali</option>
-                  <option value="Barranquilla">Barranquilla</option>
-                  <option value="Bucaramanga">Bucaramanga</option>
-                  <option value="Pereira">Pereira</option>
-                </select>
-              </div>
-              
-              <div class="col-md-6">
-                <label for="promoOriginalPrice" class="form-label">Precio original</label>
-                <div class="input-group">
-                  <span class="input-group-text">$</span>
-                  <input type="number" class="form-control" id="promoOriginalPrice" required>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <label for="promoDiscountedPrice" class="form-label">Precio con descuento</label>
-                <div class="input-group">
-                  <span class="input-group-text">$</span>
-                  <input type="number" class="form-control" id="promoDiscountedPrice" required>
-                </div>
-              </div>
-              
-              <div class="col-12">
-                <label for="promoImageUrl" class="form-label">URL de la imagen</label>
-                <input type="url" class="form-control" id="promoImageUrl">
-              </div>
-              
-              <div class="col-md-6">
-                <label for="promoExpiresAt" class="form-label">Fecha de expiración</label>
-                <input type="date" class="form-control" id="promoExpiresAt" required>
-              </div>
+            <div class="mb-3">
+              <label for="promoTitle" class="form-label">Título de la promoción</label>
+              <input type="text" class="form-control" id="promoTitle" required>
             </div>
+            <div class="mb-3">
+              <label for="promoDescription" class="form-label">Descripción</label>
+              <textarea class="form-control" id="promoDescription" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="promoImage" class="form-label">Imagen de la promoción (URL)</label>
+              <input type="url" class="form-control" id="promoImage" required>
+            </div>
+            <div class="mb-3">
+              <label for="promoCategory" class="form-label">Categoría</label>
+              <select class="form-select" id="promoCategory" required>
+                <option value="">Seleccionar categoría</option>
+                <option value="Lácteos">Lácteos</option>
+                <option value="Cereales">Cereales</option>
+                <option value="Frutas y Verduras">Frutas y Verduras</option>
+                <option value="Despensa">Despensa</option>
+                <option value="Carnes">Carnes</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="promoStore" class="form-label">Supermercado</label>
+              <select class="form-select" id="promoStore" required>
+                <option value="">Seleccionar supermercado</option>
+                <option value="Éxito">Éxito</option>
+                <option value="Carulla">Carulla</option>
+                <option value="Jumbo">Jumbo</option>
+                <option value="Olímpica">Olímpica</option>
+                <option value="D1">D1</option>
+                <option value="Ara">Ara</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="promoCity" class="form-label">Ciudad</label>
+              <select class="form-select" id="promoCity" required>
+                <option value="">Seleccionar ciudad</option>
+                <option value="Bogotá">Bogotá</option>
+                <option value="Medellín">Medellín</option>
+                <option value="Cali">Cali</option>
+                <option value="Barranquilla">Barranquilla</option>
+                <option value="Bucaramanga">Bucaramanga</option>
+                <option value="Pereira">Pereira</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="promoDiscount" class="form-label">Descuento (%)</label>
+              <input type="number" class="form-control" id="promoDiscount" min="0" max="100" required>
+            </div>
+            <div class="mb-3">
+              <label for="promoExpiry" class="form-label">Fecha de expiración</label>
+              <input type="date" class="form-control" id="promoExpiry" required>
+            </div>
+            <button type="submit" class="btn btn-orange w-100">Agregar promoción</button>
           </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" form="addPromoForm" class="btn btn-orange">Guardar promoción</button>
         </div>
       </div>
     </div>
   </div>
-
   <!-- Footer -->
-  <footer class="bg-dark text-white mt-5">
+  <footer class="footer mt-5">
     <div class="container py-5">
       <div class="row row-cols-1 row-cols-md-4 g-4">
         <div class="col">
@@ -360,70 +799,65 @@
         <div class="col">
           <h4 class="fs-6 mb-3">Categorías</h4>
           <ul class="list-unstyled text-secondary">
-            <li class="mb-2">Lácteos</li>
-            <li class="mb-2">Cereales</li>
-            <li class="mb-2">Frutas y Verduras</li>
-            <li class="mb-2">Carnes</li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Lácteos</a></li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Cereales</a></li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Frutas y Verduras</a></li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Carnes</a></li>
           </ul>
         </div>
         <div class="col">
           <h4 class="fs-6 mb-3">Supermercados</h4>
           <ul class="list-unstyled text-secondary">
-            <li class="mb-2">Éxito</li>
-            <li class="mb-2">Carulla</li>
-            <li class="mb-2">Jumbo</li>
-            <li class="mb-2">Olímpica</li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Éxito</a></li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Carulla</a></li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Jumbo</a></li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Olímpica</a></li>
           </ul>
         </div>
         <div class="col">
           <h4 class="fs-6 mb-3">Soporte</h4>
           <ul class="list-unstyled text-secondary">
-            <li class="mb-2">Centro de ayuda</li>
-            <li class="mb-2">Términos y condiciones</li>
-            <li class="mb-2">Política de privacidad</li>
-            <li class="mb-2">Contacto</li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Centro de ayuda</a></li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Términos y condiciones</a></li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Política de privacidad</a></li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Contacto</a></li>
           </ul>
         </div>
       </div>
-      <div class="border-top border-secondary mt-4 pt-4 text-center text-secondary">
-        © 2024 Promomanía. Todos los derechos reservados. | 
-        <a href="login.html" class="text-orange text-decoration-none">Iniciar Sesión</a> | 
-        <a href="register.html" class="text-orange text-decoration-none">Registrarse</a>
+      <div class="border-top mt-4 pt-4 text-center text-secondary" style="border-color: var(--gray-700) !important;">
+        © 2025 Promomanía. Todos los derechos reservados.
       </div>
     </div>
   </footer>
-
   <!-- Back to top button -->
-  <button id="backToTop" class="btn btn-orange btn-lg rounded-circle position-fixed bottom-0 end-0 m-4 shadow-lg" style="display: none;" title="Volver arriba">
+  <button id="backToTop" class="btn btn-orange back-to-top position-fixed bottom-0 end-0 m-4 shadow-lg" style="display: none;" title="Volver arriba">
     <i class="fas fa-arrow-up"></i>
   </button>
-
-  <!-- Bootstrap Bundle with Popper -->
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  
-  <!-- Custom JS -->
   <script src="main.js"></script>
-  
   <script>
     // Back to top button functionality
-    const backToTopBtn = document.getElementById('backToTop');
-    
-    window.onscroll = function() {
-      if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-        backToTopBtn.style.display = "block";
+    const backToTopButton = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        backToTopButton.style.display = 'flex';
       } else {
-        backToTopBtn.style.display = "none";
+        backToTopButton.style.display = 'none';
       }
-    };
-    
-    backToTopBtn.addEventListener('click', function() {
-      window.scrollTo({top: 0, behavior: 'smooth'});
     });
     
-    // Initialize tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl)
+    backToTopButton.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+    
+    // Tooltips initialization
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
     });
   </script>
 </body>

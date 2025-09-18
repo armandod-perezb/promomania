@@ -241,20 +241,32 @@
         </svg>
       </div>
       <form id="registerForm">
-        <div class="form-floating">
-          <input type="text" class="form-control" id="registerName" placeholder="Nombre completo" required>
-          <i class="fas fa-user input-icon"></i>
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0" style="border-radius:10px 0 0 10px;">
+              <i class="fas fa-user text-secondary"></i>
+            </span>
+            <input type="text" class="form-control border-start-0" id="registerName" placeholder="Nombre completo" required style="border-radius:0 10px 10px 0;">
+          </div>
         </div>
-        <div class="form-floating">
-          <input type="email" class="form-control" id="registerEmail" placeholder="Correo electrónico" required>
-          <i class="fas fa-envelope input-icon"></i>
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0" style="border-radius:10px 0 0 10px;">
+              <i class="fas fa-envelope text-secondary"></i>
+            </span>
+            <input type="email" class="form-control border-start-0" id="registerEmail" placeholder="Correo electrónico" required style="border-radius:0 10px 10px 0;">
+          </div>
         </div>
-        <div class="form-floating">
-          <input type="password" class="form-control" id="registerPassword" placeholder="Contraseña" required>
-          <i class="fas fa-lock input-icon"></i>
-          <button type="button" class="password-toggle" onclick="togglePassword()">
-            <i class="fas fa-eye" id="passwordIcon"></i>
-          </button>
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0" style="border-radius:10px 0 0 10px;">
+              <i class="fas fa-lock text-secondary"></i>
+            </span>
+            <input type="password" class="form-control border-start-0" id="registerPassword" placeholder="Contraseña" required style="border-radius:0 10px 10px 0;">
+            <button type="button" class="btn btn-outline-secondary" style="border-radius:0 10px 10px 0;" onclick="togglePassword()">
+              <i class="fas fa-eye" id="passwordIcon"></i>
+            </button>
+          </div>
         </div>
         <button type="submit" class="btn btn-primary" id="registerBtn">
           Crear cuenta

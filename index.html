@@ -409,13 +409,16 @@
           </button>
         </form>
         <div class="d-flex align-items-center ms-auto gap-2">
-          <!-- Login/Register icons -->
-          <a href="login.html" class="btn btn-link px-2" title="Iniciar sesión">
-            <i class="fas fa-sign-in-alt fa-lg text-orange"></i>
+          <!-- Login/Register icons + text -->
+          <a href="login.html" class="btn btn-link px-2 d-flex align-items-center" title="Iniciar sesión">
+            <i class="fas fa-sign-in-alt fa-lg text-orange me-1"></i>
+            <span class="d-none d-md-inline" style="font-weight:500;">Iniciar sesión</span>
           </a>
-          <a href="register.html" class="btn btn-link px-2" title="Registrarse">
-            <i class="fas fa-user-plus fa-lg text-orange"></i>
+          <a href="register.html" class="btn btn-link px-2 d-flex align-items-center" title="Registrarse">
+            <i class="fas fa-user-plus fa-lg text-orange me-1"></i>
+            <span class="d-none d-md-inline" style="font-weight:500;">Registrarse</span>
           </a>
+          <span class="d-none d-md-inline mx-2" style="color:var(--gray-400);font-weight:500;">/</span>
           <button class="btn btn-orange d-none d-md-block" data-bs-toggle="modal" data-bs-target="#addPromoModal">
             Agregar Promoción
           </button>
@@ -428,6 +431,7 @@
   <section class="filters-section py-3">
     <div class="container">
       <div class="row g-2">
+        <!-- ...existing filters... -->
         <div class="col-6 col-md-3">
           <select class="form-select" id="categoryFilter">
             <option selected value="Todos">Todas las categorías</option>
@@ -470,6 +474,36 @@
             <option value="50">50% o más</option>
           </select>
         </div>
+        <!-- NUEVOS FILTROS -->
+        <div class="col-6 col-md-3">
+          <input type="date" class="form-control" id="expiryFilter" placeholder="Vence antes de...">
+        </div>
+        <div class="col-6 col-md-3">
+          <input type="number" class="form-control" id="minPriceFilter" placeholder="Precio mínimo">
+        </div>
+        <div class="col-6 col-md-3">
+          <input type="number" class="form-control" id="maxPriceFilter" placeholder="Precio máximo">
+        </div>
+        <div class="col-6 col-md-3">
+          <select class="form-select" id="subtypeFilter">
+            <option selected value="Todos">Tipo de producto</option>
+            <option value="Leche">Leche</option>
+            <option value="Yogurt">Yogurt</option>
+            <option value="Queso">Queso</option>
+            <option value="Cereal">Cereal</option>
+            <option value="Fruta">Fruta</option>
+            <option value="Verdura">Verdura</option>
+            <option value="Carne">Carne</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-3">
+          <select class="form-select" id="orderFilter">
+            <option selected value="recientes">Ordenar por más recientes</option>
+            <option value="descuento">Mayor descuento</option>
+            <option value="populares">Más populares</option>
+            <option value="favoritos">Favoritos</option>
+          </select>
+        </div>
       </div>
       <div class="mt-2 text-end">
         <button class="btn btn-sm btn-link" style="color: var(--gray-600); text-decoration: none;" id="clearFilters">
@@ -480,7 +514,7 @@
   </section>
 
   <!-- Hero Section -->
-  <section class="hero-section">
+  <section class="hero-section" style="background: linear-gradient(135deg, #e55a2b 0%, #ff6b35 100%);">
     <div class="container py-5">
       <div class="text-center hero-content">
         <h1 class="display-4 mb-4">
@@ -543,14 +577,24 @@
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4" id="promotionsGrid">
       <!-- Promo Card 1 -->
       <div class="col">
-        <div class="card promo-card h-100">
+        <div class="card promo-card h-100 position-relative">
           <div class="position-relative">
             <img src="https://images.unsplash.com/photo-1621458472871-d8b6a409aba1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaWxrJTIwZGFpcnklMjBwcm9kdUNC2FjdGl2YXRpb258ZW58MXx8fHwxNzU3OTI3NDE2fDA&ixlib=rb-4.1.0&q=80&w=1080" 
                  class="card-img-top" alt="Leche Alpina Deslactosada">
             <span class="discount-badge position-absolute top-0 end-0 m-2">-33%</span>
-            <div class="store-badge position-absolute bottom-0 start-0 m-2">Éxito</div>
+            <div class="store-badge position-absolute bottom-0 start-0 m-2">
+              <i class="fas fa-store me-1"></i> Éxito
+            </div>
             <div class="verified-badge position-absolute top-0 start-0 m-2" title="Promoción verificada">
               <i class="fas fa-check-circle"></i>
+            </div>
+            <!-- FAVORITO -->
+            <button class="btn btn-light position-absolute top-0 start-50 translate-middle-x m-2 favorite-btn" title="Guardar favorito">
+              <i class="fas fa-heart"></i>
+            </button>
+            <!-- COUNTDOWN -->
+            <div class="position-absolute bottom-0 end-0 m-2">
+              <span class="badge bg-warning text-dark countdown-badge" data-expiry="2025-01-22">Expira en <span class="countdown-text"></span></span>
             </div>
           </div>
           <div class="card-body">
@@ -560,10 +604,14 @@
               <span class="text-decoration-line-through price-original">$5,200</span>
             </div>
             <div class="d-flex justify-content-between mb-2">
-              <span class="category-badge">Lácteos</span>
-              <small style="color: var(--gray-600); font-weight: 500;">Bogotá</small>
+              <span class="category-badge"><i class="fas fa-tag me-1"></i> Lácteos</span>
+              <small style="color: var(--gray-600); font-weight: 500;">
+                <i class="fas fa-map-marker-alt me-1"></i> Bogotá
+              </small>
             </div>
-            <small style="color: var(--gray-500);" class="d-block mb-3">Expira: 22 de enero, 2025</small>
+            <small style="color: var(--gray-500);" class="d-block mb-3">
+              <i class="fas fa-calendar-alt me-1"></i> Expira: 22 de enero, 2025
+            </small>
           </div>
           <div class="card-footer d-flex justify-content-between">
             <div class="d-flex gap-2">
@@ -576,6 +624,10 @@
             </div>
             <button class="interaction-btn">
               <i class="fas fa-comment me-1"></i> 8
+            </button>
+            <!-- VER DETALLE -->
+            <button class="btn btn-sm btn-orange ms-2 view-detail-btn" data-bs-toggle="modal" data-bs-target="#promoDetailModal">
+              Ver detalle
             </button>
           </div>
         </div>
@@ -833,6 +885,36 @@
   <button id="backToTop" class="btn btn-orange back-to-top position-fixed bottom-0 end-0 m-4 shadow-lg" style="display: none;" title="Volver arriba">
     <i class="fas fa-arrow-up"></i>
   </button>
+  <!-- Modal de detalle de promoción (estructura básica) -->
+  <div class="modal fade" id="promoDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Detalle de la promoción</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Aquí se cargará el detalle dinámicamente -->
+          <div id="promoDetailContent">
+            <!-- Título, imagen, descripción, comentarios, botón de favorito, etc. -->
+          </div>
+          <!-- Comentarios/reseñas -->
+          <div class="mt-4">
+            <h6>Comentarios</h6>
+            <div id="promoComments">
+              <!-- Comentarios dinámicos -->
+            </div>
+            <form id="addCommentForm" class="mt-2">
+              <div class="mb-2">
+                <textarea class="form-control" id="commentText" rows="2" placeholder="Escribe tu comentario..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-orange btn-sm">Enviar comentario</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script src="main.js"></script>
@@ -858,6 +940,56 @@
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Countdown para promociones
+    function updateCountdowns() {
+      document.querySelectorAll('.countdown-badge').forEach(function(badge) {
+        const expiry = badge.getAttribute('data-expiry');
+        if (!expiry) return;
+        const expiryDate = new Date(expiry);
+        const now = new Date();
+        const diff = expiryDate - now;
+        if (diff <= 0) {
+          badge.querySelector('.countdown-text').textContent = 'Expirada';
+          badge.classList.add('bg-danger');
+        } else {
+          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+          badge.querySelector('.countdown-text').textContent = 
+            (days > 0 ? days + 'd ' : '') + hours + 'h';
+        }
+      });
+    }
+    setInterval(updateCountdowns, 60000);
+    updateCountdowns();
+
+    // Favoritos (solo visual, requiere backend para persistencia)
+    document.querySelectorAll('.favorite-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        btn.classList.toggle('btn-danger');
+        btn.querySelector('i').classList.toggle('fa-solid');
+      });
+    });
+
+    // Ver detalle (estructura básica)
+    document.querySelectorAll('.view-detail-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        // Aquí se cargaría el detalle dinámico de la promoción
+        document.getElementById('promoDetailContent').innerHTML = '<p>Detalle de la promoción aquí...</p>';
+        document.getElementById('promoComments').innerHTML = '<p>No hay comentarios aún.</p>';
+      });
+    });
+
+    // Comentarios (solo visual)
+    document.getElementById('addCommentForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const text = document.getElementById('commentText').value;
+      if (text.trim()) {
+        const commentsDiv = document.getElementById('promoComments');
+        commentsDiv.innerHTML += `<div class="mb-2"><strong>Usuario:</strong> ${text}</div>`;
+        document.getElementById('commentText').value = '';
+      }
     });
   </script>
 </body>

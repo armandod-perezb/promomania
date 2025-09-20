@@ -30,6 +30,8 @@
       --gray-100: #f5f5f5;
       --success: #22c55e;
       --danger: #ef4444;
+      --info: #3b82f6;
+      --warning: #f59e0b;
     }
     
     * {
@@ -98,6 +100,43 @@
       transform: translateY(-50%);
     }
     
+    /* Filtros activos */
+    .active-filters {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .filter-chip {
+      background: var(--orange-primary);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      margin: 0.25rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .filter-chip .remove-filter {
+      cursor: pointer;
+      font-weight: bold;
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+    }
+    
+    .filter-chip .remove-filter:hover {
+      opacity: 1;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
     /* Filters section */
     .filters-section {
       background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
@@ -116,7 +155,7 @@
       box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.1);
     }
     
-    /* Hero section - Complete redesign */
+    /* Hero section - Complete redesign - Compacto */
     .hero-section {
       background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-dark) 100%);
       position: relative;
@@ -143,115 +182,149 @@
       font-weight: 700;
       color: white;
       text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      font-size: 2.5rem;
     }
     
     .hero-section p {
       color: rgba(255, 255, 255, 0.9);
       font-weight: 400;
+      font-size: 1rem;
     }
     
     .stat-card {
       background: rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 16px;
-      padding: 1.5rem;
+      border-radius: 12px;
+      padding: 1rem;
       transition: transform 0.3s ease;
     }
     
     .stat-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-3px);
       background: rgba(255, 255, 255, 0.2);
     }
     
     .stat-card i {
       color: rgba(255, 255, 255, 0.9);
+      font-size: 1.5rem;
     }
     
     .stat-card .stat-number {
       color: white;
       font-weight: 700;
-      font-size: 2rem;
+      font-size: 1.5rem;
     }
     
     .stat-card .stat-label {
       color: rgba(255, 255, 255, 0.8);
       font-weight: 400;
+      font-size: 0.85rem;
     }
     
-    /* Cards improvements */
+    /* Cards improvements - Compacto */
     .promo-card {
       border: none;
-      border-radius: 16px;
+      border-radius: 12px;
       overflow: hidden;
       transition: all 0.3s ease;
       background: white;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: relative;
     }
     
     .promo-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
     }
     
     .promo-card img {
-      height: 200px;
+      height: 160px;
       object-fit: cover;
       transition: transform 0.3s ease;
     }
     
     .promo-card:hover img {
-      transform: scale(1.05);
+      transform: scale(1.03);
     }
     
     .promo-card .card-body {
-      padding: 1.25rem;
+      padding: 1rem;
     }
     
     .promo-card .card-title {
       color: var(--gray-900);
       font-weight: 600;
-      font-size: 1.1rem;
-      margin-bottom: 1rem;
-      line-height: 1.4;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+      line-height: 1.3;
+    }
+    
+    /* Discount badge mejorado - esquina superior izquierda - Compacto */
+    .discount-corner {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+      color: white;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+      z-index: 10;
+      transform: rotate(-2deg);
     }
     
     .price-current {
       color: var(--danger) !important;
       font-weight: 700;
-      font-size: 1.5rem;
+      font-size: 1.3rem;
     }
     
     .price-original {
       color: var(--gray-500);
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: 400;
     }
     
-    .discount-badge {
-      background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+    /* Ahorro directo destacado - Compacto */
+    .savings-amount {
+      background: linear-gradient(135deg, var(--success) 0%, #16a34a 100%);
       color: white;
       font-weight: 600;
-      padding: 0.5rem 0.75rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      box-shadow: 0 1px 3px rgba(34, 197, 94, 0.3);
     }
     
+    /* Tags diferenciados por color - Compacto */
     .store-badge {
-      background: var(--gray-900);
+      background: linear-gradient(135deg, var(--success) 0%, #16a34a 100%);
       color: white;
       font-weight: 500;
-      padding: 0.4rem 0.8rem;
-      border-radius: 6px;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+    }
+    
+    .city-badge {
+      background: linear-gradient(135deg, var(--info) 0%, #2563eb 100%);
+      color: white;
+      font-weight: 500;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
     }
     
     .category-badge {
-      background: var(--gray-100);
-      color: var(--gray-700);
+      background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-dark) 100%);
+      color: white;
       font-weight: 500;
-      padding: 0.4rem 0.8rem;
-      border-radius: 20px;
-      font-size: 0.875rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
     }
     
     .verified-badge i {
@@ -260,17 +333,103 @@
       filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
     }
     
+    /* Fecha de vencimiento mejorada */
+    .expiry-date {
+      color: var(--warning);
+      font-weight: 500;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    
+    .expiry-date.urgent {
+      color: var(--danger);
+      animation: blink 1.5s infinite;
+    }
+    
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0.6; }
+    }
+    
+    /* Likes/Dislikes mejorados - Compacto */
+    .vote-section {
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+    }
+    
+    .vote-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 16px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+    
+    .vote-btn.like-btn {
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--success);
+      border-color: rgba(34, 197, 94, 0.2);
+    }
+    
+    .vote-btn.like-btn:hover {
+      background: var(--success);
+      color: white;
+      transform: translateY(-1px);
+    }
+    
+    .vote-btn.dislike-btn {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+    
+    .vote-btn.dislike-btn:hover {
+      background: var(--danger);
+      color: white;
+      transform: translateY(-1px);
+    }
+    
+    .vote-btn i {
+      font-size: 1rem;
+    }
+    
+    /* Barra de proporción de votos */
+    .vote-ratio {
+      width: 100%;
+      height: 4px;
+      background: var(--gray-200);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+    
+    .vote-ratio-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--success) 0%, var(--danger) 100%);
+      transition: width 0.3s ease;
+    }
+    
     .card-footer {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
       justify-content: space-between;
+      background: #fafafa;
+      border-top: 1px solid #eee;
+      padding: 0.8rem 1rem;
     }
     
     .card-footer .footer-actions {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.4rem;
       align-items: center;
     }
     
@@ -278,55 +437,39 @@
       margin-left: auto;
     }
     
-    /* Spacing for card details */
+    /* Spacing for card details - Compacto */
     .promo-card .card-body .card-title {
-      margin-bottom: 0.5rem;
-      font-size: 1.2rem;
-      font-weight: 700;
-    }
-    .promo-card .card-body .price-current {
-      font-size: 1.6rem;
-      margin-bottom: 0.3rem;
-    }
-    .promo-card .card-body .price-original {
+      margin-bottom: 0.6rem;
       font-size: 1rem;
-      margin-left: 0.5rem;
+      font-weight: 600;
     }
-    .promo-card .card-body .promo-details-row {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 0.5rem;
-      align-items: center;
-    }
-    .promo-card .card-body .promo-details-row .category-badge,
-    .promo-card .card-body .promo-city {
-      margin-bottom: 0;
-    }
-    .promo-card .card-body .promo-date-row {
-      margin-bottom: 1rem;
-      color: var(--gray-500);
-      font-size: 0.95rem;
+    .promo-card .card-body .price-section {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+      flex-wrap: wrap;
     }
-    /* Bigger icons for interactions */
-    .interaction-btn i {
-      font-size: 1.2rem !important;
-      color: var(--orange-primary);
+    .promo-card .card-body .badges-section {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 0.6rem;
+      flex-wrap: wrap;
     }
-    .interaction-btn {
-      font-size: 1rem;
-      padding: 0.45rem 1rem;
-      border-radius: 8px;
+    .promo-card .card-body .meta-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.4rem;
+      font-size: 0.85rem;
     }
-    /* Ver detalle button alignment */
+    
+    /* Ver detalle button alignment - Compacto */
     .view-detail-btn {
-      font-size: 0.95rem;
-      padding: 0.45rem 1rem;
-      border-radius: 8px;
-      margin-left: 0.5rem;
-      margin-top: 0.2rem;
+      font-size: 0.8rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-weight: 500;
     }
     
     /* Results section */
@@ -338,6 +481,10 @@
     .results-count {
       color: var(--gray-600);
       font-weight: 400;
+    }
+    
+    .sort-dropdown {
+      min-width: 200px;
     }
     
     /* Footer improvements */
@@ -417,18 +564,47 @@
       box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.1);
     }
     
-    /* NUEVAS MEJORAS */
+    /* Secciones adicionales */
     .navbar-brand span { font-weight: bold; }
     .navbar-nav .nav-link.active { color: var(--orange-primary) !important; }
     .filter-card { border-radius: 1rem; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
     .promo-card .card-img-top { border-radius: 1rem 1rem 0 0; }
     .promo-card .badge { font-size: 0.95rem; }
     .promo-card .rating-stars { color: #ffc107; font-size: 1.1rem; }
-    .promo-card .card-footer { background: #fafafa; border-top: 1px solid #eee; }
     .section-title { font-weight: 700; color: var(--orange-primary); margin-bottom: 1.5rem; }
     .benefit-icon { font-size: 2rem; color: var(--orange-primary); }
     .testimonial-card { border-radius: 1rem; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
     .faq-card { border-radius: 1rem; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    
+    /* Beneficios section - Compacto */
+    .benefits-section {
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    }
+    
+    .benefit-card {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .benefit-card:hover {
+      transform: translateY(-3px);
+    }
+    
+    .benefit-card h4 {
+      color: var(--gray-900);
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+      font-size: 1.1rem;
+    }
+    
+    .benefit-card p {
+      color: var(--gray-600);
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
@@ -436,7 +612,9 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="#">
-        <img src="1.jpg" alt="Logo" width="36" class="me-2">
+        <div style="width: 36px; height: 36px; background: linear-gradient(135deg, #ff6b35 0%, #e55a2b 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 0.5rem;">
+          <i class="fas fa-tags" style="color: white; font-size: 1.2rem;"></i>
+        </div>
         <span>Promo<span class="text-orange">manía</span></span>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
@@ -444,50 +622,128 @@
       </button>
       <div class="collapse navbar-collapse" id="mainNav">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link active" href="#">Inicio</a></li>
-          
+          <li class="nav-item"><a class="nav-link active" href="#inicio">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#beneficios">Beneficios</a></li>
           <li class="nav-item"><a class="nav-link" href="#testimonios">Testimonios</a></li>
-          
+          <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
         </ul>
         <div class="d-flex align-items-center ms-lg-3 gap-2">
           <a href="login.html" class="btn btn-outline-orange btn-sm"><i class="fas fa-sign-in-alt me-1"></i> Iniciar sesión</a>
           <a href="register.html" class="btn btn-orange btn-sm"><i class="fas fa-user-plus me-1"></i> Registrarse</a>
-          
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- HERO MEJORADO -->
-  <section class="hero-section py-5 bg-orange text-white">
+  <!-- HERO MEJORADO Y COMPACTO -->
+  <section id="inicio" class="hero-section py-4 bg-orange text-white">
     <div class="container">
       <div class="row align-items-center">
         <div class="col-lg-7 text-center text-lg-start">
-          <h1 class="display-4 fw-bold mb-3">Encuentra las mejores <span class="text-warning">promociones</span> en supermercados</h1>
-          <p class="lead mb-4">Ahorra en tus compras con la comunidad #1 de ofertas en Colombia.</p>
-          <div class="d-flex flex-wrap gap-3">
-        <button class="btn btn-light btn-lg text-orange fw-bold" data-bs-toggle="modal" data-bs-target="#addPromoModal">
-          <i class="fas fa-plus"></i> Publica tu promoción
-        </button>
-        <a href="#beneficios" class="btn btn-outline-light btn-lg">¿Cómo funciona?</a>
+          <h1 class="display-5 fw-bold mb-3">Encuentra las mejores <span class="text-warning">promociones</span> en supermercados</h1>
+          <p class="lead mb-3">Ahorra en tus compras con la comunidad #1 de ofertas en Colombia. Más de 10,000 promociones verificadas diariamente.</p>
+          <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-lg-start">
+            <button class="btn btn-light btn-lg text-orange fw-bold" data-bs-toggle="modal" data-bs-target="#addPromoModal">
+              <i class="fas fa-plus"></i> Publica tu promoción
+            </button>
+            <a href="#beneficios" class="btn btn-outline-light btn-lg">¿Cómo funciona?</a>
+          </div>
+          <!-- Estadísticas -->
+          <div class="row mt-4 g-2">
+            <div class="col-sm-4">
+              <div class="stat-card text-center">
+                <i class="fas fa-tags mb-2"></i>
+                <div class="stat-number">5,000+</div>
+                <div class="stat-label">Promociones activas</div>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="stat-card text-center">
+                <i class="fas fa-users mb-2"></i>
+                <div class="stat-number">25,000+</div>
+                <div class="stat-label">Usuarios activos</div>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="stat-card text-center">
+                <i class="fas fa-piggy-bank mb-2"></i>
+                <div class="stat-number">$2M+</div>
+                <div class="stat-label">Ahorros generados</div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="col-lg-5 mt-5">
-          <img src="3.png" alt="Promomanía" height="400px" width="auto">
+        <div class="col-lg-5 mt-4 text-center">
+          <div style="background: rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(10px);">
+            <i class="fas fa-mobile-alt" style="font-size: 6rem; color: rgba(255, 255, 255, 0.8);"></i>
+            <h3 class="mt-3 mb-2" style="color: white; font-size: 1.3rem;">¡Descarga nuestra app!</h3>
+            <p style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">Recibe notificaciones de las mejores ofertas</p>
+            <div class="d-flex gap-2 justify-content-center mt-3">
+              <button class="btn btn-light btn-sm">
+                <i class="fab fa-apple me-1"></i> App Store
+              </button>
+              <button class="btn btn-light btn-sm">
+                <i class="fab fa-google-play me-1"></i> Google Play
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- FILTROS EN CARD CON TABS -->
-  <section class="container my-4">
-    <div class="card filter-card p-3">
-      <ul class="nav nav-tabs mb-3" id="filterTabs" role="tablist">
+  <!-- SECCIÓN: BENEFICIOS - COMPACTA -->
+  <section id="beneficios" class="benefits-section py-4">
+    <div class="container">
+      <div class="text-center mb-4">
+        <h2 class="section-title">¿Cómo funciona Promomanía?</h2>
+        <p class="lead text-muted">Descubre, comparte y ahorra en tres simples pasos</p>
+      </div>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="benefit-card">
+            <div class="benefit-icon mb-3">
+              <i class="fas fa-search"></i>
+            </div>
+            <h4>1. Busca ofertas</h4>
+            <p>Explora miles de promociones verificadas en los mejores supermercados de Colombia. Filtra por categoría, ciudad y descuento.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="benefit-card">
+            <div class="benefit-icon mb-3">
+              <i class="fas fa-share-alt"></i>
+            </div>
+            <h4>2. Comparte promociones</h4>
+            <p>¿Encontraste una oferta increíble? Compártela con la comunidad y ayuda a otros a ahorrar tanto como tú.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="benefit-card">
+            <div class="benefit-icon mb-3">
+              <i class="fas fa-piggy-bank"></i>
+            </div>
+            <h4>3. Ahorra dinero</h4>
+            <p>Obtén descuentos de hasta el 70% en productos de primera necesidad y haz que tu dinero rinda más.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FILTROS EN CARD CON TABS MEJORADOS Y COMPACTOS -->
+  <section class="container my-3">
+    <div class="card filter-card p-2">
+      <ul class="nav nav-tabs mb-2" id="filterTabs" role="tablist">
         <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="quick-tab" data-bs-toggle="tab" data-bs-target="#quick" type="button" role="tab">Búsqueda rápida</button>
+          <button class="nav-link active" id="quick-tab" data-bs-toggle="tab" data-bs-target="#quick" type="button" role="tab">
+            <i class="fas fa-search me-1"></i> Búsqueda rápida
+          </button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="advanced-tab" data-bs-toggle="tab" data-bs-target="#advanced" type="button" role="tab">Filtros avanzados</button>
+          <button class="nav-link" id="advanced-tab" data-bs-toggle="tab" data-bs-target="#advanced" type="button" role="tab">
+            <i class="fas fa-sliders-h me-1"></i> Filtros avanzados
+          </button>
         </li>
       </ul>
       <div class="tab-content" id="filterTabsContent">
@@ -495,22 +751,44 @@
         <div class="tab-pane fade show active" id="quick" role="tabpanel">
           <form class="row g-2 align-items-end">
             <div class="col-md-4">
-              <input class="form-control" type="search" placeholder="Buscar promociones..." aria-label="Buscar">
+              <div class="position-relative">
+                <input class="form-control" type="search" id="searchInput" placeholder="Buscar promociones..." aria-label="Buscar">
+                <button type="button" class="btn position-absolute end-0 top-0 h-100" style="border: none; background: none;">
+                  <i class="fas fa-search text-muted"></i>
+                </button>
+              </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
               <select class="form-select" id="categoryFilter">
-                <option selected value="Todos">Todas las categorías</option>
+                <option value="">Todas las categorías</option>
                 <option value="Lácteos">Lácteos</option>
                 <option value="Cereales">Cereales</option>
                 <option value="Frutas y Verduras">Frutas y Verduras</option>
                 <option value="Despensa">Despensa</option>
                 <option value="Carnes">Carnes</option>
+                <option value="Bebidas">Bebidas</option>
+                <option value="Limpieza">Limpieza</option>
               </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
               <select class="form-select" id="cityFilter">
-                <option selected value="Todas">Todas las ciudades de Colombia</option>
-                <!-- Dinámico -->
+                <option value="">Todas las ciudades</option>
+                <option value="Bogotá">Bogotá</option>
+                <option value="Medellín">Medellín</option>
+                <option value="Cali">Cali</option>
+                <option value="Barranquilla">Barranquilla</option>
+                <option value="Bucaramanga">Bucaramanga</option>
+                <option value="Pereira">Pereira</option>
+                <option value="Manizales">Manizales</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <select class="form-select sort-dropdown" id="sortFilter">
+                <option value="recientes">Más recientes</option>
+                <option value="descuento">Mayor descuento</option>
+                <option value="precio">Menor precio</option>
+                <option value="populares">Más populares</option>
+                <option value="vencimiento">Próximos a vencer</option>
               </select>
             </div>
           </form>
@@ -518,32 +796,21 @@
         <!-- Filtros avanzados -->
         <div class="tab-pane fade" id="advanced" role="tabpanel">
           <form class="row g-2">
-            <div class="col-md-3">
-              <select class="form-select" id="subtypeFilter">
-                <option selected value="Todos">Tipo de producto</option>
-                <option value="Leche">Leche</option>
-                <option value="Yogurt">Yogurt</option>
-                <option value="Queso">Queso</option>
-                <option value="Cereal">Cereal</option>
-                <option value="Fruta">Fruta</option>
-                <option value="Verdura">Verdura</option>
-                <option value="Carne">Carne</option>
-              </select>
-            </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
               <select class="form-select" id="storeFilter">
-                <option selected value="Todos">Todos los supermercados</option>
+                <option value="">Todos los supermercados</option>
                 <option value="Éxito">Éxito</option>
                 <option value="Carulla">Carulla</option>
                 <option value="Jumbo">Jumbo</option>
                 <option value="Olímpica">Olímpica</option>
                 <option value="D1">D1</option>
                 <option value="Ara">Ara</option>
+                <option value="PriceSmart">PriceSmart</option>
               </select>
             </div>
             <div class="col-md-2">
               <select class="form-select" id="discountFilter">
-                <option selected value="0">Cualquier descuento</option>
+                <option value="0">Cualquier descuento</option>
                 <option value="10">10% o más</option>
                 <option value="20">20% o más</option>
                 <option value="30">30% o más</option>
@@ -552,165 +819,380 @@
               </select>
             </div>
             <div class="col-md-2">
-              <input type="number" class="form-control" id="minPriceFilter" placeholder="Precio mínimo">
+              <input type="number" class="form-control" id="minPriceFilter" placeholder="Precio mín $">
             </div>
             <div class="col-md-2">
-              <input type="number" class="form-control" id="maxPriceFilter" placeholder="Precio máximo">
+              <input type="number" class="form-control" id="maxPriceFilter" placeholder="Precio máx $">
             </div>
-            <div class="col-md-3 mt-2">
-              <input type="date" class="form-control" id="expiryFilter" placeholder="Vence antes de...">
+            <div class="col-md-2">
+              <input type="date" class="form-control" id="expiryFilter" title="Vence antes de...">
             </div>
-            <div class="col-md-3 mt-2">
-              <select class="form-select" id="orderFilter">
-                <option selected value="recientes">Ordenar por más recientes</option>
-                <option value="descuento">Mayor descuento</option>
-                <option value="populares">Más populares</option>
-                <option value="favoritos">Favoritos</option>
-              </select>
-            </div>
-            <div class="col-md-3 mt-2">
-              <button class="btn btn-orange w-100" id="clearFilters" type="button">Limpiar filtros</button>
+            <div class="col-md-2">
+              <button class="btn btn-outline-secondary w-100" id="clearFilters" type="button">
+                <i class="fas fa-times me-1"></i> Limpiar
+              </button>
             </div>
           </form>
         </div>
       </div>
     </div>
+    
+    <!-- FILTROS ACTIVOS -->
+    <div id="activeFilters" class="active-filters d-none">
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="fw-medium text-muted">Filtros activos:</span>
+        <div id="activeFiltersContainer"></div>
+        <button class="btn btn-sm btn-outline-secondary" id="clearAllFilters">
+          <i class="fas fa-times me-1"></i> Limpiar todos
+        </button>
+      </div>
+    </div>
   </section>
   
-  <!-- RESULTADOS Y CARDS MEJORADOS -->
-  <main class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4 results-header">
+  <!-- RESULTADOS Y CARDS MEJORADOS Y COMPACTOS -->
+  <main class="container py-3">
+    <div class="d-flex justify-content-between align-items-center mb-3 results-header flex-wrap gap-2">
       <div>
-        <h2 class="fs-2" id="resultsTitle">Promociones destacadas</h2>
-        <p class="results-count" id="resultsCount">6 promociones encontradas</p>
+        <h2 class="fs-3 mb-1" id="resultsTitle">Promociones destacadas</h2>
+        <p class="results-count mb-0" id="resultsCount">6 promociones encontradas</p>
       </div>
-      <button class="btn btn-orange d-inline-block" data-bs-toggle="modal" data-bs-target="#addPromoModal">
+      <button class="btn btn-orange btn-sm" data-bs-toggle="modal" data-bs-target="#addPromoModal">
         <i class="fas fa-plus"></i> Agregar Promoción
       </button>
     </div>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4" id="promotionsGrid">
-      <!-- CARD 1 -->
-      <div class="col">
-        <div class="card promo-card h-100 shadow-sm">
-          <img src="https://images.unsplash.com/photo-1621458472871-d8b6a409aba1?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Leche Alpina">
+    
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3" id="promotionsGrid">
+      <!-- CARD 1 - Mejorada -->
+      <div class="col" data-category="Lácteos" data-city="Bogotá" data-store="Éxito" data-discount="33" data-price="3500">
+        <div class="card promo-card h-100">
+          <div class="position-relative">
+            <img src="https://images.unsplash.com/photo-1621458472871-d8b6a409aba1?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Leche Alpina">
+            <div class="discount-corner">-33%</div>
+          </div>
           <div class="card-body">
             <h5 class="card-title">Leche Alpina Deslactosada 1L</h5>
-            <div class="d-flex align-items-center mb-2">
-              <span class="badge bg-danger me-2">-33%</span>
-              <span class="price-current me-2">$3,500</span>
+            
+            <div class="price-section">
+              <span class="price-current">$3,500</span>
               <span class="text-decoration-line-through price-original">$5,200</span>
+              <span class="savings-amount">Ahorras $1,700</span>
             </div>
-            <div class="mb-2">
-              <span class="badge bg-secondary">Éxito</span>
-              <span class="badge bg-light text-dark ms-2">Bogotá</span>
-              <span class="badge bg-info text-dark ms-2">Lácteos</span>
+            
+            <div class="badges-section">
+              <span class="store-badge">Éxito</span>
+              <span class="city-badge">Bogotá</span>
+              <span class="category-badge">Lácteos</span>
             </div>
-            <div class="rating-stars mb-2">
-              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+            
+            <div class="meta-section">
+              <div class="rating-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                <span class="ms-1 text-muted">(4.5)</span>
+              </div>
+              <div class="expiry-date">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Vence: 22/01/2025</span>
+              </div>
             </div>
-            <small class="text-muted">Expira: 22/01/2025</small>
           </div>
-          <div class="card-footer d-flex justify-content-between align-items-center">
-            <div>
-              <button class="btn btn-outline-success btn-sm"><i class="fas fa-thumbs-up"></i> 24</button>
-              <button class="btn btn-outline-danger btn-sm"><i class="fas fa-thumbs-down"></i> 2</button>
-              <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-comment"></i> 8</button>
+          
+          <div class="card-footer">
+            <div class="vote-section">
+              <button class="vote-btn like-btn">
+                <i class="fas fa-thumbs-up"></i>
+                <span>24</span>
+              </button>
+              <button class="vote-btn dislike-btn">
+                <i class="fas fa-thumbs-down"></i>
+                <span>2</span>
+              </button>
+              <div class="vote-ratio">
+                <div class="vote-ratio-fill" style="width: 92%;"></div>
+              </div>
             </div>
-            <button class="btn btn-orange btn-sm view-detail-btn" data-bs-toggle="modal" data-bs-target="#promoDetailModal">Ver detalle</button>
+            <button class="btn btn-orange btn-sm view-detail-btn" data-bs-toggle="modal" data-bs-target="#promoDetailModal">
+              Ver detalle
+            </button>
           </div>
         </div>
       </div>
-      <!-- CARD 2 -->
-      <div class="col">
-        <div class="card promo-card h-100 shadow-sm">
-          <img src="https://images.unsplash.com/photo-1685702563055-d1e74ffc53b3?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Cereal Kellogg's">
+      
+      <!-- CARD 2 - Mejorada -->
+      <div class="col" data-category="Cereales" data-city="Medellín" data-store="Carulla" data-discount="30" data-price="8400">
+        <div class="card promo-card h-100">
+          <div class="position-relative">
+            <img src="https://images.unsplash.com/photo-1685702563055-d1e74ffc53b3?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Cereal Kellogg's">
+            <div class="discount-corner">-30%</div>
+          </div>
           <div class="card-body">
             <h5 class="card-title">Cereal Kellogg's Corn Flakes 500g</h5>
-            <div class="d-flex align-items-center mb-2">
-              <span class="badge bg-danger me-2">-30%</span>
-              <span class="price-current me-2">$8,400</span>
+            
+            <div class="price-section">
+              <span class="price-current">$8,400</span>
               <span class="text-decoration-line-through price-original">$12,000</span>
+              <span class="savings-amount">Ahorras $3,600</span>
             </div>
-            <div class="mb-2">
-              <span class="badge bg-secondary">Carulla</span>
-              <span class="badge bg-light text-dark ms-2">Medellín</span>
-              <span class="badge bg-info text-dark ms-2">Cereales</span>
+            
+            <div class="badges-section">
+              <span class="store-badge">Carulla</span>
+              <span class="city-badge">Medellín</span>
+              <span class="category-badge">Cereales</span>
             </div>
-            <div class="rating-stars mb-2">
-              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            
+            <div class="meta-section">
+              <div class="rating-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                <span class="ms-1 text-muted">(5.0)</span>
+              </div>
+              <div class="expiry-date urgent">
+                <i class="fas fa-calendar-exclamation-triangle"></i>
+                <span>Vence: 20/01/2025</span>
+              </div>
             </div>
-            <small class="text-muted">Expira: 20/01/2025</small>
           </div>
-          <div class="card-footer d-flex justify-content-between align-items-center">
-            <div>
-              <button class="btn btn-outline-success btn-sm"><i class="fas fa-thumbs-up"></i> 18</button>
-              <button class="btn btn-outline-danger btn-sm"><i class="fas fa-thumbs-down"></i> 1</button>
+          
+          <div class="card-footer">
+            <div class="vote-section">
+              <button class="vote-btn like-btn">
+                <i class="fas fa-thumbs-up"></i>
+                <span>18</span>
+              </button>
+              <button class="vote-btn dislike-btn">
+                <i class="fas fa-thumbs-down"></i>
+                <span>1</span>
+              </button>
+              <div class="vote-ratio">
+                <div class="vote-ratio-fill" style="width: 95%;"></div>
+              </div>
             </div>
-            <button class="btn btn-orange btn-sm view-detail-btn" data-bs-toggle="modal" data-bs-target="#promoDetailModal">Ver detalle</button>
+            <button class="btn btn-orange btn-sm view-detail-btn" data-bs-toggle="modal" data-bs-target="#promoDetailModal">
+              Ver detalle
+            </button>
           </div>
         </div>
       </div>
-      <!-- CARD 3 -->
-      <div class="col">
-        <div class="card promo-card h-100 shadow-sm">
-          <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Frutas Frescas">
+      
+      <!-- CARD 3 - Mejorada -->
+      <div class="col" data-category="Frutas y Verduras" data-city="Cali" data-store="Jumbo" data-discount="25" data-price="4500">
+        <div class="card promo-card h-100">
+          <div class="position-relative">
+            <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Frutas Frescas">
+            <div class="discount-corner">-25%</div>
+          </div>
           <div class="card-body">
-            <h5 class="card-title">Manzanas Rojas x 1kg</h5>
-            <div class="d-flex align-items-center mb-2">
-              <span class="badge bg-danger me-2">-25%</span>
-              <span class="price-current me-2">$4,500</span>
+            <h5 class="card-title">Manzanas Rojas Premium x 1kg</h5>
+            
+            <div class="price-section">
+              <span class="price-current">$4,500</span>
               <span class="text-decoration-line-through price-original">$6,000</span>
+              <span class="savings-amount">Ahorras $1,500</span>
             </div>
-            <div class="mb-2">
-              <span class="badge bg-secondary">Jumbo</span>
-              <span class="badge bg-light text-dark ms-2">Cali</span>
-              <span class="badge bg-info text-dark ms-2">Frutas y Verduras</span>
+            
+            <div class="badges-section">
+              <span class="store-badge">Jumbo</span>
+              <span class="city-badge">Cali</span>
+              <span class="category-badge">Frutas y Verduras</span>
             </div>
-            <div class="rating-stars mb-2">
-              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            
+            <div class="meta-section">
+              <div class="rating-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                <span class="ms-1 text-muted">(5.0)</span>
+              </div>
+              <div class="expiry-date">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Vence: 25/01/2025</span>
+              </div>
             </div>
-            <small class="text-muted">Expira: 25/01/2025</small>
           </div>
-          <div class="card-footer d-flex justify-content-between align-items-center">
-            <div>
-              <button class="btn btn-outline-success btn-sm"><i class="fas fa-thumbs-up"></i> 32</button>
-              <button class="btn btn-outline-danger btn-sm"><i class="fas fa-thumbs-down"></i> 0</button>
+          
+          <div class="card-footer">
+            <div class="vote-section">
+              <button class="vote-btn like-btn">
+                <i class="fas fa-thumbs-up"></i>
+                <span>32</span>
+              </button>
+              <button class="vote-btn dislike-btn">
+                <i class="fas fa-thumbs-down"></i>
+                <span>0</span>
+              </button>
+              <div class="vote-ratio">
+                <div class="vote-ratio-fill" style="width: 100%;"></div>
+              </div>
             </div>
-            <button class="btn btn-orange btn-sm view-detail-btn" data-bs-toggle="modal" data-bs-target="#promoDetailModal">Ver detalle</button>
+            <button class="btn btn-orange btn-sm view-detail-btn" data-bs-toggle="modal" data-bs-target="#promoDetailModal">
+              Ver detalle
+            </button>
           </div>
         </div>
       </div>
-      <!-- CARD 4 -->
-      <div class="col">
-        <div class="card promo-card h-100 shadow-sm">
-          <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Carne Premium">
+      
+      <!-- CARD 4 - Mejorada -->
+      <div class="col" data-category="Carnes" data-city="Barranquilla" data-store="Olímpica" data-discount="40" data-price="18000">
+        <div class="card promo-card h-100">
+          <div class="position-relative">
+            <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Carne Premium">
+            <div class="discount-corner">-40%</div>
+          </div>
           <div class="card-body">
             <h5 class="card-title">Lomo de Res Premium x 500g</h5>
-            <div class="d-flex align-items-center mb-2">
-              <span class="badge bg-danger me-2">-40%</span>
-              <span class="price-current me-2">$18,000</span>
+            
+            <div class="price-section">
+              <span class="price-current">$18,000</span>
               <span class="text-decoration-line-through price-original">$30,000</span>
+              <span class="savings-amount">Ahorras $12,000</span>
             </div>
-            <div class="mb-2">
-              <span class="badge bg-secondary">Olímpica</span>
-              <span class="badge bg-light text-dark ms-2">Barranquilla</span>
-              <span class="badge bg-info text-dark ms-2">Carnes</span>
+            
+            <div class="badges-section">
+              <span class="store-badge">Olímpica</span>
+              <span class="city-badge">Barranquilla</span>
+              <span class="category-badge">Carnes</span>
             </div>
-            <div class="rating-stars mb-2">
-              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            
+            <div class="meta-section">
+              <div class="rating-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                <span class="ms-1 text-muted">(5.0)</span>
+              </div>
+              <div class="expiry-date">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Vence: 28/01/2025</span>
+              </div>
             </div>
-            <small class="text-muted">Expira: 28/01/2025</small>
           </div>
-          <div class="card-footer d-flex justify-content-between align-items-center">
-            <div>
-              <button class="btn btn-outline-success btn-sm"><i class="fas fa-thumbs-up"></i> 15</button>
-              <button class="btn btn-outline-danger btn-sm"><i class="fas fa-thumbs-down"></i> 1</button>
+          
+          <div class="card-footer">
+            <div class="vote-section">
+              <button class="vote-btn like-btn">
+                <i class="fas fa-thumbs-up"></i>
+                <span>15</span>
+              </button>
+              <button class="vote-btn dislike-btn">
+                <i class="fas fa-thumbs-down"></i>
+                <span>1</span>
+              </button>
+              <div class="vote-ratio">
+                <div class="vote-ratio-fill" style="width: 94%;"></div>
+              </div>
             </div>
-            <button class="btn btn-orange btn-sm view-detail-btn" data-bs-toggle="modal" data-bs-target="#promoDetailModal">Ver detalle</button>
+            <button class="btn btn-orange btn-sm view-detail-btn" data-bs-toggle="modal" data-bs-target="#promoDetailModal">
+              Ver detalle
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- CARD 5 - Nueva -->
+      <div class="col" data-category="Bebidas" data-city="Bogotá" data-store="D1" data-discount="20" data-price="2800">
+        <div class="card promo-card h-100">
+          <div class="position-relative">
+            <img src="https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Gaseosa">
+            <div class="discount-corner">-20%</div>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Coca-Cola 1.5L</h5>
+            
+            <div class="price-section">
+              <span class="price-current">$2,800</span>
+              <span class="text-decoration-line-through price-original">$3,500</span>
+              <span class="savings-amount">Ahorras $700</span>
+            </div>
+            
+            <div class="badges-section">
+              <span class="store-badge">D1</span>
+              <span class="city-badge">Bogotá</span>
+              <span class="category-badge">Bebidas</span>
+            </div>
+            
+            <div class="meta-section">
+              <div class="rating-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
+                <span class="ms-1 text-muted">(4.0)</span>
+              </div>
+              <div class="expiry-date">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Vence: 30/01/2025</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card-footer">
+            <div class="vote-section">
+              <button class="vote-btn like-btn">
+                <i class="fas fa-thumbs-up"></i>
+                <span>12</span>
+              </button>
+              <button class="vote-btn dislike-btn">
+                <i class="fas fa-thumbs-down"></i>
+                <span>3</span>
+              </button>
+              <div class="vote-ratio">
+                <div class="vote-ratio-fill" style="width: 80%;"></div>
+              </div>
+            </div>
+            <button class="btn btn-orange btn-sm view-detail-btn" data-bs-toggle="modal" data-bs-target="#promoDetailModal">
+              Ver detalle
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- CARD 6 - Nueva -->
+      <div class="col" data-category="Limpieza" data-city="Medellín" data-store="Ara" data-discount="35" data-price="8500">
+        <div class="card promo-card h-100">
+          <div class="position-relative">
+            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Detergente">
+            <div class="discount-corner">-35%</div>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Detergente Ariel 2kg</h5>
+            
+            <div class="price-section">
+              <span class="price-current">$8,500</span>
+              <span class="text-decoration-line-through price-original">$13,000</span>
+              <span class="savings-amount">Ahorras $4,500</span>
+            </div>
+            
+            <div class="badges-section">
+              <span class="store-badge">Ara</span>
+              <span class="city-badge">Medellín</span>
+              <span class="category-badge">Limpieza</span>
+            </div>
+            
+            <div class="meta-section">
+              <div class="rating-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                <span class="ms-1 text-muted">(4.7)</span>
+              </div>
+              <div class="expiry-date">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Vence: 26/01/2025</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card-footer">
+            <div class="vote-section">
+              <button class="vote-btn like-btn">
+                <i class="fas fa-thumbs-up"></i>
+                <span>28</span>
+              </button>
+              <button class="vote-btn dislike-btn">
+                <i class="fas fa-thumbs-down"></i>
+                <span>2</span>
+              </button>
+              <div class="vote-ratio">
+                <div class="vote-ratio-fill" style="width: 93%;"></div>
+              </div>
+            </div>
+            <button class="btn btn-orange btn-sm view-detail-btn" data-bs-toggle="modal" data-bs-target="#promoDetailModal">
+              Ver detalle
+            </button>
           </div>
         </div>
       </div>
     </div>
+    
     <!-- No results state -->
     <div class="text-center py-5 d-none" id="noResultsMessage">
       <i class="fas fa-shopping-bag fs-1 mb-4" style="color: var(--gray-400);"></i>
@@ -724,39 +1206,68 @@
     </div>
   </main>
 
-
-  
-
   <!-- SECCIÓN: TESTIMONIOS -->
   <section class="container my-5" id="testimonios">
-    <h2 class="section-title text-center">Testimonios</h2>
+    <div class="text-center mb-5">
+      <h2 class="section-title">Lo que dicen nuestros usuarios</h2>
+      <p class="lead text-muted">Más de 25,000 personas confían en Promomanía para ahorrar</p>
+    </div>
     <div class="row g-4 justify-content-center">
       <div class="col-md-4">
-        <div class="testimonial-card p-4">
-          <div class="d-flex align-items-center mb-2">
-            <img src="https://randomuser.me/api/portraits/men/32.jpg" class="rounded-circle me-3" width="48">
+        <div class="testimonial-card p-4 h-100">
+          <div class="d-flex align-items-center mb-3">
+            <img src="https://randomuser.me/api/portraits/men/32.jpg" class="rounded-circle me-3" width="48" height="48">
             <div>
-              <strong>Juan P.</strong>
-              <div class="rating-stars">
+              <strong class="d-block">Juan Pérez</strong>
+              <small class="text-muted">Usuario desde hace 2 años</small>
+              <div class="rating-stars mt-1">
                 <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
               </div>
             </div>
           </div>
-          <p class="mb-0">"Gracias a Promomanía he ahorrado mucho en mis compras semanales. ¡Recomendado!"</p>
+          <p class="mb-3">"Gracias a Promomanía he ahorrado más de $200,000 en mis compras semanales. La comunidad siempre encuentra las mejores ofertas."</p>
+          <div class="text-success fw-medium">
+            <i class="fas fa-piggy-bank me-1"></i>
+            Ahorro mensual: $50,000
+          </div>
         </div>
       </div>
       <div class="col-md-4">
-        <div class="testimonial-card p-4">
-          <div class="d-flex align-items-center mb-2">
-            <img src="https://randomuser.me/api/portraits/women/44.jpg" class="rounded-circle me-3" width="48">
+        <div class="testimonial-card p-4 h-100">
+          <div class="d-flex align-items-center mb-3">
+            <img src="https://randomuser.me/api/portraits/women/44.jpg" class="rounded-circle me-3" width="48" height="48">
             <div>
-              <strong>María G.</strong>
-              <div class="rating-stars">
+              <strong class="d-block">María González</strong>
+              <small class="text-muted">Usuario desde hace 1 año</small>
+              <div class="rating-stars mt-1">
                 <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
               </div>
             </div>
           </div>
-          <p class="mb-0">"Me encanta compartir ofertas y ver los comentarios de otros usuarios."</p>
+          <p class="mb-3">"Me encanta compartir ofertas y ver los comentarios de otros usuarios. Es como tener una familia de compradores inteligentes."</p>
+          <div class="text-success fw-medium">
+            <i class="fas fa-piggy-bank me-1"></i>
+            Ahorro mensual: $35,000
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="testimonial-card p-4 h-100">
+          <div class="d-flex align-items-center mb-3">
+            <img src="https://randomuser.me/api/portraits/men/67.jpg" class="rounded-circle me-3" width="48" height="48">
+            <div>
+              <strong class="d-block">Carlos Rodríguez</strong>
+              <small class="text-muted">Usuario desde hace 6 meses</small>
+              <div class="rating-stars mt-1">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+              </div>
+            </div>
+          </div>
+          <p class="mb-3">"La app es súper fácil de usar y siempre encuentro promociones cerca de mi casa. Ya no compro sin consultar Promomanía."</p>
+          <div class="text-success fw-medium">
+            <i class="fas fa-piggy-bank me-1"></i>
+            Ahorro mensual: $42,000
+          </div>
         </div>
       </div>
     </div>
@@ -764,117 +1275,288 @@
 
   <!-- SECCIÓN: FAQ -->
   <section class="container my-5" id="faq">
-    <h2 class="section-title text-center">Preguntas frecuentes</h2>
+    <div class="text-center mb-5">
+      <h2 class="section-title">Preguntas frecuentes</h2>
+      <p class="lead text-muted">Resolvemos las dudas más comunes de nuestros usuarios</p>
+    </div>
     <div class="row g-4">
       <div class="col-md-6">
-        <div class="faq-card p-3">
-          <h6>¿Cómo puedo publicar una promoción?</h6>
-          <p>Solo haz clic en "Agregar promoción", llena el formulario y listo.</p>
+        <div class="faq-card p-4 h-100">
+          <div class="d-flex align-items-start gap-3">
+            <div class="flex-shrink-0">
+              <div class="bg-orange text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+            </div>
+            <div>
+              <h6 class="mb-2">¿Cómo verifican las promociones?</h6>
+              <p class="text-muted mb-0">La comunidad puede calificar y reportar ofertas falsas. Nuestro equipo revisa las más populares y las marcas con un sello de verificación.</p>
+            </div>
+          </div>
         </div>
       </div>
       <div class="col-md-6">
-        <div class="faq-card p-3">
-          <h6>¿Es gratis usar Promomanía?</h6>
-          <p>Sí, la plataforma es completamente gratuita para todos los usuarios.</p>
+        <div class="faq-card p-4 h-100">
+          <div class="d-flex align-items-start gap-3">
+            <div class="flex-shrink-0">
+              <div class="bg-orange text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="fas fa-mobile-alt"></i>
+              </div>
+            </div>
+            <div>
+              <h6 class="mb-2">¿Puedo usar Promomanía desde mi celular?</h6>
+              <p class="text-muted mb-0">Sí, la web es completamente responsiva y funciona perfectamente en cualquier dispositivo. También estamos trabajando en una app móvil.</p>
+            </div>
+          </div>
         </div>
       </div>
       <div class="col-md-6">
-        <div class="faq-card p-3">
-          <h6>¿Cómo verifican las promociones?</h6>
-          <p>La comunidad puede calificar y reportar ofertas falsas. El equipo revisa las más populares.</p>
+        <div class="faq-card p-4 h-100">
+          <div class="d-flex align-items-start gap-3">
+            <div class="flex-shrink-0">
+              <div class="bg-orange text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="fas fa-bell"></i>
+              </div>
+            </div>
+            <div>
+              <h6 class="mb-2">¿Puedo recibir notificaciones de ofertas?</h6>
+              <p class="text-muted mb-0">Próximamente podrás suscribirte a alertas por categoría, tienda o ciudad para no perderte ninguna oferta importante.</p>
+            </div>
+          </div>
         </div>
       </div>
       <div class="col-md-6">
-        <div class="faq-card p-3">
-          <h6>¿Puedo usar Promomanía desde mi celular?</h6>
-          <p>Sí, la web es responsiva y funciona en cualquier dispositivo.</p>
+        <div class="faq-card p-4 h-100">
+          <div class="d-flex align-items-start gap-3">
+            <div class="flex-shrink-0">
+              <div class="bg-orange text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+            </div>
+            <div>
+              <h6 class="mb-2">¿Funciona en toda Colombia?</h6>
+              <p class="text-muted mb-0">Sí, cubrimos las principales ciudades de Colombia y seguimos expandiéndonos. Si tu ciudad no aparece, ¡contáctanos!</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Add Promotion Modal -->
+  <!-- Add Promotion Modal - Mejorado -->
   <div class="modal fade" id="addPromoModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Agregar Nueva Promoción</h5>
+          <h5 class="modal-title">
+            <i class="fas fa-plus-circle text-orange me-2"></i>
+            Agregar Nueva Promoción
+          </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
+          <div class="alert alert-info d-flex align-items-center">
+            <i class="fas fa-info-circle me-2"></i>
+            <small>Comparte ofertas reales y ayuda a la comunidad a ahorrar. Las promociones falsas serán reportadas.</small>
+          </div>
           <form id="addPromoForm">
-            <div class="mb-3">
-              <label for="promoTitle" class="form-label">Título de la promoción</label>
-              <input type="text" class="form-control" id="promoTitle" required>
+            <div class="row g-3">
+              <div class="col-12">
+                <label for="promoTitle" class="form-label">Título de la promoción *</label>
+                <input type="text" class="form-control" id="promoTitle" placeholder="Ej: Leche Alpina Deslactosada 1L" required>
+              </div>
+              <div class="col-12">
+                <label for="promoDescription" class="form-label">Descripción</label>
+                <textarea class="form-control" id="promoDescription" rows="3" placeholder="Detalles adicionales sobre la promoción..."></textarea>
+              </div>
+              <div class="col-12">
+                <label for="promoImage" class="form-label">Imagen de la promoción (URL)</label>
+                <input type="url" class="form-control" id="promoImage" placeholder="https://ejemplo.com/imagen.jpg">
+              </div>
+              <div class="col-md-6">
+                <label for="promoCategory" class="form-label">Categoría *</label>
+                <select class="form-select" id="promoCategory" required>
+                  <option value="">Seleccionar categoría</option>
+                  <option value="Lácteos">Lácteos</option>
+                  <option value="Cereales">Cereales</option>
+                  <option value="Frutas y Verduras">Frutas y Verduras</option>
+                  <option value="Despensa">Despensa</option>
+                  <option value="Carnes">Carnes</option>
+                  <option value="Bebidas">Bebidas</option>
+                  <option value="Limpieza">Limpieza</option>
+                  <option value="Cuidado Personal">Cuidado Personal</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="promoStore" class="form-label">Supermercado *</label>
+                <select class="form-select" id="promoStore" required>
+                  <option value="">Seleccionar supermercado</option>
+                  <option value="Éxito">Éxito</option>
+                  <option value="Carulla">Carulla</option>
+                  <option value="Jumbo">Jumbo</option>
+                  <option value="Olímpica">Olímpica</option>
+                  <option value="D1">D1</option>
+                  <option value="Ara">Ara</option>
+                  <option value="PriceSmart">PriceSmart</option>
+                  <option value="Metro">Metro</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="promoCity" class="form-label">Ciudad *</label>
+                <select class="form-select" id="promoCity" required>
+                  <option value="">Seleccionar ciudad</option>
+                  <option value="Bogotá">Bogotá</option>
+                  <option value="Medellín">Medellín</option>
+                  <option value="Cali">Cali</option>
+                  <option value="Barranquilla">Barranquilla</option>
+                  <option value="Bucaramanga">Bucaramanga</option>
+                  <option value="Pereira">Pereira</option>
+                  <option value="Manizales">Manizales</option>
+                  <option value="Cartagena">Cartagena</option>
+                  <option value="Santa Marta">Santa Marta</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="promoDiscount" class="form-label">Descuento (%) *</label>
+                <input type="number" class="form-control" id="promoDiscount" min="1" max="90" placeholder="25" required>
+              </div>
+              <div class="col-md-6">
+                <label for="promoCurrentPrice" class="form-label">Precio con descuento *</label>
+                <input type="number" class="form-control" id="promoCurrentPrice" min="100" placeholder="3500" required>
+              </div>
+              <div class="col-md-6">
+                <label for="promoOriginalPrice" class="form-label">Precio original *</label>
+                <input type="number" class="form-control" id="promoOriginalPrice" min="100" placeholder="5200" required>
+              </div>
+              <div class="col-12">
+                <label for="promoExpiry" class="form-label">Fecha de expiración *</label>
+                <input type="date" class="form-control" id="promoExpiry" required>
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="promoDescription" class="form-label">Descripción</label>
-              <textarea class="form-control" id="promoDescription" rows="3" required></textarea>
+            <div class="d-flex gap-2 mt-4">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-orange flex-fill">
+                <i class="fas fa-plus me-1"></i> Agregar promoción
+              </button>
             </div>
-            <div class="mb-3">
-              <label for="promoImage" class="form-label">Imagen de la promoción (URL)</label>
-              <input type="url" class="form-control" id="promoImage" required>
-            </div>
-            <div class="mb-3">
-              <label for="promoCategory" class="form-label">Categoría</label>
-              <select class="form-select" id="promoCategory" required>
-                <option value="">Seleccionar categoría</option>
-                <option value="Lácteos">Lácteos</option>
-                <option value="Cereales">Cereales</option>
-                <option value="Frutas y Verduras">Frutas y Verduras</option>
-                <option value="Despensa">Despensa</option>
-                <option value="Carnes">Carnes</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="promoStore" class="form-label">Supermercado</label>
-              <select class="form-select" id="promoStore" required>
-                <option value="">Seleccionar supermercado</option>
-                <option value="Éxito">Éxito</option>
-                <option value="Carulla">Carulla</option>
-                <option value="Jumbo">Jumbo</option>
-                <option value="Olímpica">Olímpica</option>
-                <option value="D1">D1</option>
-                <option value="Ara">Ara</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="promoCity" class="form-label">Ciudad</label>
-              <select class="form-select" id="promoCity" required>
-                <option value="">Seleccionar ciudad</option>
-                <option value="Bogotá">Bogotá</option>
-                <option value="Medellín">Medellín</option>
-                <option value="Cali">Cali</option>
-                <option value="Barranquilla">Barranquilla</option>
-                <option value="Bucaramanga">Bucaramanga</option>
-                <option value="Pereira">Pereira</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="promoDiscount" class="form-label">Descuento (%)</label>
-              <input type="number" class="form-control" id="promoDiscount" min="0" max="100" required>
-            </div>
-            <div class="mb-3">
-              <label for="promoExpiry" class="form-label">Fecha de expiración</label>
-              <input type="date" class="form-control" id="promoExpiry" required>
-            </div>
-            <button type="submit" class="btn btn-orange w-100">Agregar promoción</button>
           </form>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Modal de detalle de promoción - Mejorado -->
+  <div class="modal fade" id="promoDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Detalle de la promoción</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div id="promoDetailContent">
+            <div class="row g-4">
+              <div class="col-md-6">
+                <img src="https://images.unsplash.com/photo-1621458472871-d8b6a409aba1?auto=format&fit=crop&w=400&q=80" class="img-fluid rounded" alt="Producto">
+              </div>
+              <div class="col-md-6">
+                <h4 class="mb-3">Leche Alpina Deslactosada 1L</h4>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <span class="badge bg-danger fs-6">-33%</span>
+                  <span class="fs-3 fw-bold text-danger">$3,500</span>
+                  <span class="text-decoration-line-through text-muted">$5,200</span>
+                </div>
+                <div class="alert alert-success">
+                  <i class="fas fa-piggy-bank me-2"></i>
+                  <strong>¡Ahorras $1,700!</strong>
+                </div>
+                <div class="mb-3">
+                  <span class="badge bg-success me-2">Éxito</span>
+                  <span class="badge bg-primary me-2">Bogotá</span>
+                  <span class="badge bg-warning me-2">Lácteos</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div class="rating-stars">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    <span class="ms-2">(4.5/5)</span>
+                  </div>
+                  <div class="text-warning">
+                    <i class="fas fa-calendar-alt me-1"></i>
+                    Vence: 22/01/2025
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Comentarios/reseñas -->
+          <div class="mt-4">
+            <h6 class="mb-3">
+              <i class="fas fa-comments me-2"></i>
+              Comentarios de la comunidad
+            </h6>
+            <div id="promoComments" class="mb-3">
+              <div class="border rounded p-3 mb-2">
+                <div class="d-flex justify-content-between mb-2">
+                  <strong>Usuario123</strong>
+                  <small class="text-muted">Hace 2 horas</small>
+                </div>
+                <p class="mb-0">¡Excelente oferta! La encontré en el Éxito de la 93. Muy fresca y con buen vencimiento.</p>
+              </div>
+              <div class="border rounded p-3">
+                <div class="d-flex justify-content-between mb-2">
+                  <strong>ComprarBien</strong>
+                  <small class="text-muted">Hace 5 horas</small>
+                </div>
+                <p class="mb-0">Confirmado en Bogotá Norte. Vale la pena ir temprano porque se agota rápido.</p>
+              </div>
+            </div>
+            <form id="addCommentForm">
+              <div class="mb-2">
+                <textarea class="form-control" id="commentText" rows="2" placeholder="Comparte tu experiencia con esta promoción..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-orange btn-sm">
+                <i class="fas fa-paper-plane me-1"></i>
+                Enviar comentario
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="footer mt-5">
     <div class="container py-5">
       <div class="row row-cols-1 row-cols-md-4 g-4">
         <div class="col">
           <h3 class="fs-5 mb-3">
-            Promo<span class="text-orange">manía</span>
+            <div class="d-flex align-items-center">
+              <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #ff6b35 0%, #e55a2b 100%); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-right: 0.5rem;">
+                <i class="fas fa-tags" style="color: white; font-size: 1rem;"></i>
+              </div>
+              Promo<span class="text-orange">manía</span>
+            </div>
           </h3>
-          <p class="text-secondary">
+          <p class="text-secondary mb-3">
             La plataforma colaborativa de promociones más confiable de Colombia.
           </p>
+          <div class="d-flex gap-3">
+            <a href="#" class="text-decoration-none">
+              <i class="fab fa-facebook-f fs-5"></i>
+            </a>
+            <a href="#" class="text-decoration-none">
+              <i class="fab fa-instagram fs-5"></i>
+            </a>
+            <a href="#" class="text-decoration-none">
+              <i class="fab fa-twitter fs-5"></i>
+            </a>
+            <a href="#" class="text-decoration-none">
+              <i class="fab fa-youtube fs-5"></i>
+            </a>
+          </div>
         </div>
         <div class="col">
           <h4 class="fs-6 mb-3">Categorías</h4>
@@ -883,6 +1565,8 @@
             <li class="mb-2"><a href="#" class="text-decoration-none">Cereales</a></li>
             <li class="mb-2"><a href="#" class="text-decoration-none">Frutas y Verduras</a></li>
             <li class="mb-2"><a href="#" class="text-decoration-none">Carnes</a></li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Bebidas</a></li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Limpieza</a></li>
           </ul>
         </div>
         <div class="col">
@@ -892,6 +1576,8 @@
             <li class="mb-2"><a href="#" class="text-decoration-none">Carulla</a></li>
             <li class="mb-2"><a href="#" class="text-decoration-none">Jumbo</a></li>
             <li class="mb-2"><a href="#" class="text-decoration-none">Olímpica</a></li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">D1</a></li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Ara</a></li>
           </ul>
         </div>
         <div class="col">
@@ -901,131 +1587,553 @@
             <li class="mb-2"><a href="#" class="text-decoration-none">Términos y condiciones</a></li>
             <li class="mb-2"><a href="#" class="text-decoration-none">Política de privacidad</a></li>
             <li class="mb-2"><a href="#" class="text-decoration-none">Contacto</a></li>
+            <li class="mb-2"><a href="#" class="text-decoration-none">Reportar problema</a></li>
           </ul>
         </div>
       </div>
-      <div class="border-top mt-4 pt-4 text-center text-secondary" style="border-color: var(--gray-700) !important;">
-        © 2025 Promomanía. Todos los derechos reservados.
+      <div class="border-top mt-4 pt-4 text-center" style="border-color: var(--gray-700) !important;">
+        <div class="row align-items-center">
+          <div class="col-md-6 text-center text-md-start">
+            <p class="text-secondary mb-2 mb-md-0">
+              © 2025 Promomanía. Todos los derechos reservados.
+            </p>
+          </div>
+          <div class="col-md-6 text-center text-md-end">
+            <p class="text-secondary mb-0">
+              <i class="fas fa-users me-1"></i>
+              Más de 25,000 usuarios ahorran con nosotros
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </footer>
+
   <!-- Back to top button -->
   <button id="backToTop" class="btn btn-orange back-to-top position-fixed bottom-0 end-0 m-4 shadow-lg" style="display: none;" title="Volver arriba">
     <i class="fas fa-arrow-up"></i>
   </button>
-  <!-- Modal de detalle de promoción (estructura básica) -->
-  <div class="modal fade" id="promoDetailModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Detalle de la promoción</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Aquí se cargará el detalle dinámicamente -->
-          <div id="promoDetailContent">
-            <!-- Título, imagen, descripción, comentarios, botón de favorito, etc. -->
-          </div>
-          <!-- Comentarios/reseñas -->
-          <div class="mt-4">
-            <h6>Comentarios</h6>
-            <div id="promoComments">
-              <!-- Comentarios dinámicos -->
-            </div>
-            <form id="addCommentForm" class="mt-2">
-              <div class="mb-2">
-                <textarea class="form-control" id="commentText" rows="2" placeholder="Escribe tu comentario..."></textarea>
-              </div>
-              <button type="submit" class="btn btn-orange btn-sm">Enviar comentario</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="main.js"></script>
   <script>
-    // Back to top button functionality
-    const backToTopButton = document.getElementById('backToTop');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 300) {
-        backToTopButton.style.display = 'flex';
+    // Variables globales
+    let currentFilters = {};
+    let allPromotions = [];
+    
+    // Inicializar datos de promociones
+    function initializePromotions() {
+      allPromotions = Array.from(document.querySelectorAll('#promotionsGrid .col')).map((card, index) => ({
+        element: card,
+        title: card.querySelector('.card-title').textContent,
+        category: card.dataset.category,
+        city: card.dataset.city,
+        store: card.dataset.store,
+        discount: parseInt(card.dataset.discount),
+        price: parseInt(card.dataset.price),
+        originalPrice: parseInt(card.querySelector('.price-original').textContent.replace(/[^\d]/g, '')),
+        likes: parseInt(card.querySelector('.like-btn span').textContent),
+        dislikes: parseInt(card.querySelector('.dislike-btn span').textContent),
+        expiry: card.querySelector('.expiry-date span').textContent.split(': ')[1],
+        index: index
+      }));
+    }
+    
+    // Función para mostrar filtros activos
+    function updateActiveFilters() {
+      const activeFiltersContainer = document.getElementById('activeFiltersContainer');
+      const activeFiltersSection = document.getElementById('activeFilters');
+      
+      activeFiltersContainer.innerHTML = '';
+      
+      const filters = [
+        { key: 'search', label: 'Búsqueda', value: document.getElementById('searchInput').value },
+        { key: 'category', label: 'Categoría', value: document.getElementById('categoryFilter').value },
+        { key: 'city', label: 'Ciudad', value: document.getElementById('cityFilter').value },
+        { key: 'store', label: 'Supermercado', value: document.getElementById('storeFilter').value },
+        { key: 'discount', label: 'Descuento mín', value: document.getElementById('discountFilter').value },
+        { key: 'minPrice', label: 'Precio mín', value: document.getElementById('minPriceFilter').value },
+        { key: 'maxPrice', label: 'Precio máx', value: document.getElementById('maxPriceFilter').value },
+        { key: 'expiry', label: 'Vence antes', value: document.getElementById('expiryFilter').value }
+      ];
+      
+      const activeFilters = filters.filter(filter => filter.value && filter.value !== '' && filter.value !== '0');
+      
+      if (activeFilters.length > 0) {
+        activeFiltersSection.classList.remove('d-none');
+        activeFilters.forEach(filter => {
+          const chip = document.createElement('span');
+          chip.className = 'filter-chip';
+          chip.innerHTML = `
+            ${filter.label}: ${filter.value}
+            <span class="remove-filter" onclick="removeFilter('${filter.key}')">✕</span>
+          `;
+          activeFiltersContainer.appendChild(chip);
+        });
       } else {
-        backToTopButton.style.display = 'none';
+        activeFiltersSection.classList.add('d-none');
       }
-    });
+    }
     
-    backToTopButton.addEventListener('click', () => {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
+    // Función para remover un filtro específico
+    function removeFilter(filterKey) {
+      const filterMap = {
+        'search': 'searchInput',
+        'category': 'categoryFilter',
+        'city': 'cityFilter',
+        'store': 'storeFilter',
+        'discount': 'discountFilter',
+        'minPrice': 'minPriceFilter',
+        'maxPrice': 'maxPriceFilter',
+        'expiry': 'expiryFilter'
+      };
+      
+      const element = document.getElementById(filterMap[filterKey]);
+      if (element.type === 'search' || element.type === 'text' || element.type === 'number' || element.type === 'date') {
+        element.value = '';
+      } else {
+        element.value = filterKey === 'discount' ? '0' : '';
+      }
+      
+      applyFilters();
+    }
+    
+    // Función principal de filtrado
+    function applyFilters() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const category = document.getElementById('categoryFilter').value;
+      const city = document.getElementById('cityFilter').value;
+      const store = document.getElementById('storeFilter').value;
+      const minDiscount = parseInt(document.getElementById('discountFilter').value) || 0;
+      const minPrice = parseInt(document.getElementById('minPriceFilter').value) || 0;
+      const maxPrice = parseInt(document.getElementById('maxPriceFilter').value) || Infinity;
+      const expiryFilter = document.getElementById('expiryFilter').value;
+      const sort = document.getElementById('sortFilter').value;
+      
+      let filteredPromotions = allPromotions.filter(promo => {
+        const matchesSearch = !search || promo.title.toLowerCase().includes(search) || 
+                             promo.category.toLowerCase().includes(search) ||
+                             promo.city.toLowerCase().includes(search) ||
+                             promo.store.toLowerCase().includes(search);
+        const matchesCategory = !category || promo.category === category;
+        const matchesCity = !city || promo.city === city;
+        const matchesStore = !store || promo.store === store;
+        const matchesDiscount = promo.discount >= minDiscount;
+        const matchesPrice = promo.price >= minPrice && promo.price <= maxPrice;
+        
+        let matchesExpiry = true;
+        if (expiryFilter) {
+          const filterDate = new Date(expiryFilter);
+          const promoExpiry = new Date(promo.expiry.split('/').reverse().join('-'));
+          matchesExpiry = promoExpiry <= filterDate;
+        }
+        
+        return matchesSearch && matchesCategory && matchesCity && matchesStore && 
+               matchesDiscount && matchesPrice && matchesExpiry;
       });
-    });
-    
-    // Tooltips initialization
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-    
-    // Countdown para promociones + Expired overlay
-    function updateCountdowns() {
-      document.querySelectorAll('.countdown-badge').forEach(function(badge) {
-        const expiry = badge.getAttribute('data-expiry');
-        if (!expiry) return;
-        const expiryDate = new Date(expiry);
-        const now = new Date();
-        const diff = expiryDate - now;
-        const card = badge.closest('.promo-card');
-        const overlay = card.querySelector('.promo-expired-overlay');
-        if (diff <= 0) {
-          badge.querySelector('.countdown-text').textContent = 'Expirada';
-          badge.classList.add('bg-danger');
-          card.classList.add('promo-expired');
-          overlay.classList.remove('d-none');
-        } else {
-          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-          const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-          badge.querySelector('.countdown-text').textContent = 
-            (days > 0 ? days + 'd ' : '') + hours + 'h';
-          badge.classList.remove('bg-danger');
-          card.classList.remove('promo-expired');
-          overlay.classList.add('d-none');
+      
+      // Ordenar resultados
+      filteredPromotions.sort((a, b) => {
+        switch(sort) {
+          case 'descuento':
+            return b.discount - a.discount;
+          case 'precio':
+            return a.price - b.price;
+          case 'populares':
+            return (b.likes - b.dislikes) - (a.likes - a.dislikes);
+          case 'vencimiento':
+            return new Date(a.expiry.split('/').reverse().join('-')) - new Date(b.expiry.split('/').reverse().join('-'));
+          default: // recientes
+            return a.index - b.index;
         }
       });
-    }
-    setInterval(updateCountdowns, 60000);
-    updateCountdowns();
-
-    // Favoritos (solo visual, requiere backend para persistencia)
-    document.querySelectorAll('.favorite-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        btn.classList.toggle('btn-danger');
-        btn.querySelector('i').classList.toggle('fa-solid');
+      
+      // Mostrar/ocultar promociones
+      allPromotions.forEach(promo => {
+        promo.element.style.display = 'none';
       });
-    });
-
-    // Ver detalle (estructura básica)
-    document.querySelectorAll('.view-detail-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        // Aquí se cargaría el detalle dinámico de la promoción
-        document.getElementById('promoDetailContent').innerHTML = '<p>Detalle de la promoción aquí...</p>';
-        document.getElementById('promoComments').innerHTML = '<p>No hay comentarios aún.</p>';
+      
+      filteredPromotions.forEach(promo => {
+        promo.element.style.display = 'block';
       });
-    });
-
-    // Comentarios (solo visual)
-    document.getElementById('addCommentForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const text = document.getElementById('commentText').value;
-      if (text.trim()) {
-        const commentsDiv = document.getElementById('promoComments');
-        commentsDiv.innerHTML += `<div class="mb-2"><strong>Usuario:</strong> ${text}</div>`;
-        document.getElementById('commentText').value = '';
+      
+      // Actualizar contador de resultados
+      const resultsCount = document.getElementById('resultsCount');
+      const noResults = document.getElementById('noResultsMessage');
+      
+      if (filteredPromotions.length > 0) {
+        resultsCount.textContent = `${filteredPromotions.length} promoción${filteredPromotions.length === 1 ? '' : 'es'} encontrada${filteredPromotions.length === 1 ? '' : 's'}`;
+        noResults.classList.add('d-none');
+      } else {
+        resultsCount.textContent = 'No se encontraron promociones';
+        noResults.classList.remove('d-none');
       }
+      
+      updateActiveFilters();
+    }
+    
+    // Event listeners para filtros
+    document.addEventListener('DOMContentLoaded', function() {
+      initializePromotions();
+      
+      // Filtros en tiempo real
+      document.getElementById('searchInput').addEventListener('input', applyFilters);
+      document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+      document.getElementById('cityFilter').addEventListener('change', applyFilters);
+      document.getElementById('storeFilter').addEventListener('change', applyFilters);
+      document.getElementById('discountFilter').addEventListener('change', applyFilters);
+      document.getElementById('minPriceFilter').addEventListener('input', applyFilters);
+      document.getElementById('maxPriceFilter').addEventListener('input', applyFilters);
+      document.getElementById('expiryFilter').addEventListener('change', applyFilters);
+      document.getElementById('sortFilter').addEventListener('change', applyFilters);
+      
+      // Limpiar filtros
+      document.getElementById('clearFilters').addEventListener('click', function() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('categoryFilter').value = '';
+        document.getElementById('cityFilter').value = '';
+        document.getElementById('storeFilter').value = '';
+        document.getElementById('discountFilter').value = '0';
+        document.getElementById('minPriceFilter').value = '';
+        document.getElementById('maxPriceFilter').value = '';
+        document.getElementById('expiryFilter').value = '';
+        applyFilters();
+      });
+      
+      document.getElementById('clearAllFilters').addEventListener('click', function() {
+        document.getElementById('clearFilters').click();
+      });
+      
+      document.getElementById('resetFiltersBtn').addEventListener('click', function() {
+        document.getElementById('clearFilters').click();
+      });
+    });
+    
+    // Funcionalidad de votos
+    document.querySelectorAll('.vote-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const isLike = this.classList.contains('like-btn');
+        const span = this.querySelector('span');
+        let count = parseInt(span.textContent);
+        
+        if (this.classList.contains('voted')) {
+          // Quitar voto
+          count--;
+          this.classList.remove('voted');
+        } else {
+          // Agregar voto
+          count++;
+          this.classList.add('voted');
+          
+          // Remover voto del botón opuesto si existe
+          const oppositeBtn = isLike ? 
+            this.parentElement.querySelector('.dislike-btn') : 
+            this.parentElement.querySelector('.like-btn');
+          
+          if (oppositeBtn.classList.contains('voted')) {
+            oppositeBtn.classList.remove('voted');
+            const oppositeSpan = oppositeBtn.querySelector('span');
+            oppositeSpan.textContent = parseInt(oppositeSpan.textContent) - 1;
+          }
+        }
+        
+        span.textContent = count;
+        updateVoteRatio(this.closest('.vote-section'));
+      });
+    });
+    
+    function updateVoteRatio(voteSection) {
+      const likes = parseInt(voteSection.querySelector('.like-btn span').textContent);
+      const dislikes = parseInt(voteSection.querySelector('.dislike-btn span').textContent);
+      const total = likes + dislikes;
+      const percentage = total > 0 ? (likes / total) * 100 : 50;
+      
+      const ratioFill = voteSection.querySelector('.vote-ratio-fill');
+      ratioFill.style.width = percentage + '%';
+    }
+    
+    // Función para agregar nueva promoción
+    document.addEventListener('DOMContentLoaded', function() {
+      const addPromoForm = document.getElementById('addPromoForm');
+      if (addPromoForm) {
+        addPromoForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          // Obtener datos del formulario
+          const title = document.getElementById('promoTitle').value;
+          const description = document.getElementById('promoDescription').value;
+          const image = document.getElementById('promoImage').value || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=400&q=80';
+          const category = document.getElementById('promoCategory').value;
+          const store = document.getElementById('promoStore').value;
+          const city = document.getElementById('promoCity').value;
+          const discount = document.getElementById('promoDiscount').value;
+          const currentPrice = document.getElementById('promoCurrentPrice').value;
+          const originalPrice = document.getElementById('promoOriginalPrice').value;
+          const expiry = document.getElementById('promoExpiry').value;
+          
+          // Crear nueva card
+          const newCard = createPromotionCard({
+            title,
+            description,
+            image,
+            category,
+            store,
+            city,
+            discount,
+            currentPrice,
+            originalPrice,
+            expiry
+          });
+          
+          // Agregar al grid
+          const promotionsGrid = document.getElementById('promotionsGrid');
+          promotionsGrid.insertAdjacentHTML('afterbegin', newCard);
+          
+          // Cerrar modal y resetear formulario
+          const modal = bootstrap.Modal.getInstance(document.getElementById('addPromoModal'));
+          modal.hide();
+          addPromoForm.reset();
+          
+          // Actualizar datos de promociones
+          initializePromotions();
+          applyFilters();
+          
+          // Mostrar mensaje de éxito
+          showSuccessMessage('¡Promoción agregada exitosamente!');
+        });
+      }
+    });
+    
+    // Función para crear una nueva card de promoción
+    function createPromotionCard(data) {
+      const savings = data.originalPrice - data.currentPrice;
+      const formattedExpiry = new Date(data.expiry).toLocaleDateString('es-CO');
+      
+      return `
+        <div class="col" data-category="${data.category}" data-city="${data.city}" data-store="${data.store}" data-discount="${data.discount}" data-price="${data.currentPrice}">
+          <div class="card promo-card h-100">
+            <div class="position-relative">
+              <img src="${data.image}" class="card-img-top" alt="${data.title}">
+              <div class="discount-corner">-${data.discount}%</div>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">${data.title}</h5>
+              
+              <div class="price-section">
+                <span class="price-current">$${parseInt(data.currentPrice).toLocaleString()}</span>
+                <span class="text-decoration-line-through price-original">$${parseInt(data.originalPrice).toLocaleString()}</span>
+                <span class="savings-amount">Ahorras $${savings.toLocaleString()}</span>
+              </div>
+              
+              <div class="badges-section">
+                <span class="store-badge">${data.store}</span>
+                <span class="city-badge">${data.city}</span>
+                <span class="category-badge">${data.category}</span>
+              </div>
+              
+              <div class="meta-section">
+                <div class="rating-stars">
+                  <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                  <span class="ms-1 text-muted">(5.0)</span>
+                </div>
+                <div class="expiry-date">
+                  <i class="fas fa-calendar-alt"></i>
+                  <span>Vence: ${formattedExpiry}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-footer">
+              <div class="vote-section">
+                <button class="vote-btn like-btn">
+                  <i class="fas fa-thumbs-up"></i>
+                  <span>0</span>
+                </button>
+                <button class="vote-btn dislike-btn">
+                  <i class="fas fa-thumbs-down"></i>
+                  <span>0</span>
+                </button>
+                <div class="vote-ratio">
+                  <div class="vote-ratio-fill" style="width: 50%;"></div>
+                </div>
+              </div>
+              <button class="btn btn-orange btn-sm view-detail-btn" data-bs-toggle="modal" data-bs-target="#promoDetailModal">
+                Ver detalle
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Función para mostrar mensajes de éxito
+    function showSuccessMessage(message) {
+      const alert = document.createElement('div');
+      alert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+      alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+      alert.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      
+      document.body.appendChild(alert);
+      
+      // Auto-ocultar después de 5 segundos
+      setTimeout(() => {
+        if (alert.parentNode) {
+          alert.remove();
+        }
+      }, 5000);
+    }
+    
+    // Botón de volver arriba
+    document.addEventListener('DOMContentLoaded', function() {
+      const backToTopBtn = document.getElementById('backToTop');
+      
+      window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+          backToTopBtn.style.display = 'flex';
+        } else {
+          backToTopBtn.style.display = 'none';
+        }
+      });
+      
+      backToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    });
+    
+    // Funcionalidad de comentarios en modal de detalle
+    document.addEventListener('DOMContentLoaded', function() {
+      const addCommentForm = document.getElementById('addCommentForm');
+      if (addCommentForm) {
+        addCommentForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          const commentText = document.getElementById('commentText');
+          const comment = commentText.value.trim();
+          
+          if (comment) {
+            const commentsContainer = document.getElementById('promoComments');
+            const newComment = document.createElement('div');
+            newComment.className = 'border rounded p-3 mb-2';
+            newComment.innerHTML = `
+              <div class="d-flex justify-content-between mb-2">
+                <strong>Usuario${Math.floor(Math.random() * 1000)}</strong>
+                <small class="text-muted">Hace unos segundos</small>
+              </div>
+              <p class="mb-0">${comment}</p>
+            `;
+            
+            commentsContainer.insertBefore(newComment, commentsContainer.lastElementChild);
+            commentText.value = '';
+            
+            showSuccessMessage('¡Comentario agregado exitosamente!');
+          }
+        });
+      }
+    });
+    
+    // Actualizar listeners de votos cuando se agreguen nuevas cards
+    function updateVoteListeners() {
+      document.querySelectorAll('.vote-btn').forEach(btn => {
+        // Remover listeners anteriores clonando el elemento
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        
+        // Agregar nuevo listener
+        newBtn.addEventListener('click', function() {
+          const isLike = this.classList.contains('like-btn');
+          const span = this.querySelector('span');
+          let count = parseInt(span.textContent);
+          
+          if (this.classList.contains('voted')) {
+            // Quitar voto
+            count--;
+            this.classList.remove('voted');
+          } else {
+            // Agregar voto
+            count++;
+            this.classList.add('voted');
+            
+            // Remover voto del botón opuesto si existe
+            const oppositeBtn = isLike ? 
+              this.parentElement.querySelector('.dislike-btn') : 
+              this.parentElement.querySelector('.like-btn');
+            
+            if (oppositeBtn && oppositeBtn.classList.contains('voted')) {
+              oppositeBtn.classList.remove('voted');
+              const oppositeSpan = oppositeBtn.querySelector('span');
+              oppositeSpan.textContent = parseInt(oppositeSpan.textContent) - 1;
+            }
+          }
+          
+          span.textContent = count;
+          updateVoteRatio(this.closest('.vote-section'));
+        });
+      });
+    }
+    
+    // Función para actualizar la visualización del modal de detalle
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.view-detail-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const card = this.closest('.col');
+          const title = card.querySelector('.card-title').textContent;
+          const img = card.querySelector('.card-img-top').src;
+          const discount = card.querySelector('.discount-corner').textContent;
+          const currentPrice = card.querySelector('.price-current').textContent;
+          const originalPrice = card.querySelector('.price-original').textContent;
+          const savings = card.querySelector('.savings-amount').textContent;
+          const store = card.querySelector('.store-badge').textContent;
+          const city = card.querySelector('.city-badge').textContent;
+          const category = card.querySelector('.category-badge').textContent;
+          const expiry = card.querySelector('.expiry-date span').textContent;
+          
+          // Actualizar contenido del modal
+          const modalContent = document.getElementById('promoDetailContent');
+          modalContent.innerHTML = `
+            <div class="row g-4">
+              <div class="col-md-6">
+                <img src="${img}" class="img-fluid rounded" alt="${title}">
+              </div>
+              <div class="col-md-6">
+                <h4 class="mb-3">${title}</h4>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <span class="badge bg-danger fs-6">${discount}</span>
+                  <span class="fs-3 fw-bold text-danger">${currentPrice}</span>
+                  <span class="text-decoration-line-through text-muted">${originalPrice}</span>
+                </div>
+                <div class="alert alert-success">
+                  <i class="fas fa-piggy-bank me-2"></i>
+                  <strong>${savings}!</strong>
+                </div>
+                <div class="mb-3">
+                  <span class="badge bg-success me-2">${store}</span>
+                  <span class="badge bg-primary me-2">${city}</span>
+                  <span class="badge bg-warning me-2">${category}</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div class="rating-stars">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    <span class="ms-2">(4.5/5)</span>
+                  </div>
+                  <div class="text-warning">
+                    <i class="fas fa-calendar-alt me-1"></i>
+                    ${expiry}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+      });
     });
   </script>
 </body>
 </html>
+    

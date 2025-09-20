@@ -16,23 +16,71 @@
   
   <style>
     :root {
-      --orange-primary: #ff6b35;
-      --orange-light: #ff8559;
-      --orange-dark: #e55a2b;
-      --gray-900: #1a1a1a;
-      --gray-800: #2d2d2d;
-      --gray-700: #404040;
-      --gray-600: #666666;
-      --gray-500: #808080;
-      --gray-400: #a0a0a0;
-      --gray-300: #cccccc;
-      --gray-200: #e5e5e5;
-      --gray-100: #f5f5f5;
-      --success: #22c55e;
-      --danger: #ef4444;
-      --info: #3b82f6;
-      --warning: #f59e0b;
-    }
+  /* Colores principales - Morado, Azul, Naranja (acento) */
+  --purple-primary: #a715f6;
+  --purple-light: #c869ff;
+  --purple-dark: #8b0bcc;
+  --purple-accent: #d946ef;
+
+  --blue-primary: #3b82f6;
+  --blue-light: #60a5fa;
+  --blue-dark: #2563eb;
+  --blue-accent: #06b6d4;
+
+  --orange-primary: #7f1de9;
+  --orange-light: #ff8c42;
+  --orange-dark: #560c7b;
+  --orange-accent: #ff7f50;
+
+  /* Gradientes con énfasis en morado y azul */
+  --gradient-main: linear-gradient(135deg, #a715f6 0%, #3b82f6 100%);
+  --gradient-magic: linear-gradient(135deg, #c869ff 0%, #8b0bcc 100%);
+  --gradient-ocean: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
+  --gradient-sunset: linear-gradient(135deg, #a715f6 0%, #3b82f6 70%, #ff6b35 100%);
+  --gradient-warm: linear-gradient(135deg, #d946ef 0%, #ff6b35 100%);
+
+  /* Grises mejorados */
+  --gray-900: #0f0f23;
+  --gray-800: #1e1e2e;
+  --gray-700: #313244;
+  --gray-600: #585b70;
+  --gray-500: #7f849c;
+  --gray-400: #9399b2;
+  --gray-300: #bac2de;
+  --gray-200: #cdd6f4;
+  --gray-100: #eff1f5;
+  --gray-50: #f8f9fa;
+
+  /* Estados */
+  --success: #22c55e;
+  --success-light: #4ade80;
+  --success-dark: #16a34a;
+
+  --danger: #ef4444;
+  --danger-light: #f87171;
+  --danger-dark: #dc2626;
+
+  --warning: #f59e0b;
+  --warning-light: #fbbf24;
+  --warning-dark: #d97706;
+
+  --info: #06b6d4;
+  --info-light: #22d3ee;
+  --info-dark: #0891b2;
+
+  /* Sombras con colores */
+  --shadow-purple: 0 8px 32px rgba(167, 21, 246, 0.25);
+  --shadow-blue: 0 8px 32px rgba(59, 130, 246, 0.25);
+  --shadow-mixed: 0 8px 32px rgba(167, 21, 246, 0.2), 0 4px 16px rgba(59, 130, 246, 0.15);
+
+  /* Superficies */
+  --surface-purple: rgba(167, 21, 246, 0.1);
+  --surface-blue: rgba(59, 130, 246, 0.1);
+  --surface-orange: rgba(255, 107, 53, 0.1);
+  --surface-glass: rgba(255, 255, 255, 0.1);
+  --surface-dark-glass: rgba(0, 0, 0, 0.1);
+}
+
     
     * {
       font-family: 'Inter', sans-serif;
@@ -320,7 +368,7 @@
       background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-dark) 100%);
       border-color: var(--orange-primary);
       color: white;
-      box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+      box-shadow: 0 2px 8px rgba(102, 9, 215, 0.3);
     }
     
     .btn-orange:hover {
@@ -328,7 +376,7 @@
       border-color: var(--orange-dark);
       color: white;
       transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+      box-shadow: 0 6px 16px rgba(0, 11, 223, 0.4);
     }
     
     /* Container responsive */
@@ -886,7 +934,7 @@
   <nav class="navbar navbar-expand-lg navbar-light sticky-top" id="mainNavbar">
     <div class="container-fluid px-4">
       <a class="navbar-brand d-flex align-items-center" href="#inicio">
-        <img src="logo.png" alt="Promomanía Logo" style="width:150px; height:80px; border-radius:12px; margin-right:1rem; margin-left: 5rem;">
+        <img src="img/logo.png" alt="Promomanía Logo" style="width:150px; height:80px; border-radius:12px; margin-right:1rem; margin-left: 5rem;">
       </a>
       
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -960,6 +1008,11 @@
           </div>
         </div>
         
+        <div class="col-lg-5 text-center">
+          <div class="hero-image-container">
+            <img src="img/4.png" alt="Promociones" class="img-fluid hero-image" style="max-width: 100%; height: auto; filter: drop-shadow(0 10px 25px rgba(0,0,0,0.2));">
+          </div>
+        </div>
       </div>
     </div>
   </section>

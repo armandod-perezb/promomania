@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Perfil - Promomanía</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Paleta de colores moderna mejorada */
+      --primary-500: #e19730;
+      --primary-600: #e56946;
+      --primary-700: #f8ac1e;
+      --primary-800: #3730a3;
+      --primary-50: #f8fafc;
+      --primary-100: #e2e8f0;
+      --primary-200: #cbd5e1;
+      --primary-300: #94a3b8;
+      
+      --secondary-500: #06b6d4;
+      --secondary-600: #0891b2;
+      --secondary-700: #0e7490;
+      --secondary-800: #155e75;
+      --secondary-50: #f0fdff;
+      --secondary-100: #ccfbf1;
+      --secondary-200: #99f6e4;
+      --secondary-300: #5eead4;
+      
+      --accent-500: #f59e0b;
+      --accent-600: #d97706;
+      --accent-700: #b45309;
+      --accent-800: #92400e;
+      --accent-50: #fffbeb;
+      --accent-100: #fef3c7;
+      --accent-200: #fde68a;
+      --accent-300: #fcd34d;
+      
+      --success-500: #10b981;
+      --success-600: #059669;
+      --success-700: #047857;
+      --success-800: #065f46;
+      --success-50: #f0fdf4;
+      --success-100: #dcfce7;
+      --success-200: #bbf7d0;
+      --success-300: #86efac;
+      
+      --error-500: #ef4444;
+      --error-600: #dc2626;
+      --error-700: #b91c1c;
+      --error-800: #991b1b;
+      --error-50: #fef2f2;
+      --error-100: #fee2e2;
+      --error-200: #fecaca;
+      --error-300: #fca5a5;
+      
+      --warning-500: #f59e0b;
+      --warning-600: #d97706;
+      --warning-700: #b45309;
+      --warning-800: #92400e;
+      --warning-50: #fffbeb;
+      --warning-100: #fef3c7;
+      --warning-200: #fde68a;
+      --warning-300: #fcd34d;
+      
+      --amber-500: #f59e0b;
+      --amber-600: #d97706;
+      --amber-700: #b45309;
+      --amber-800: #92400e;
+      --amber-50: #fffbeb;
+      --amber-100: #fef3c7;
+      --amber-200: #fde68a;
+      --amber-300: #fcd34d;
+      
+      --orange-500: #f97316;
+      --orange-600: #ea580c;
+      --orange-700: #c2410c;
+      --orange-800: #9a3412;
+      --orange-50: #fff7ed;
+      --orange-100: #ffedd5;
+      --orange-200: #fed7aa;
+      --orange-300: #fdba74;
+      
+      --red-500: #ef4444;
+      --red-600: #dc2626;
+      --red-700: #b91c1c;
+      --red-800: #991b1b;
+      --red-50: #fef2f2;
+      --red-100: #fee2e2;
+      --red-200: #fecaca;
+      --red-300: #fca5a5;
+      
+      --green-500: #22c55e;
+      --green-600: #16a34a;
+      --green-700: #15803d;
+      --green-800: #166534;
+      --green-50: #f0fdf4;
+      --green-100: #dcfce7;
+      --green-200: #bbf7d0;
+      --green-300: #86efac;
+      
+      --info-500: #3b82f6;
+      --info-600: #2563eb;
+      --info-700: #1d4ed8;
+      --info-800: #1e40af;
+      --info-50: #eff6ff;
+      --info-100: #dbeafe;
+      --info-200: #bfdbfe;
+      --info-300: #93c5fd;
+      
+      --neutral-50: #fafafa;
+      --neutral-100: #f5f5f5;
+      --neutral-200: #e5e5e5;
+      --neutral-300: #d4d4d4;
+      --neutral-400: #a3a3a3;
+      --neutral-500: #737373;
+      --neutral-600: #525252;
+      --neutral-700: #404040;
+      --neutral-800: #262626;
+      --neutral-900: #171717;
+      
+      /* Gradientes modernos mejorados */
+      --gradient-primary: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+      --gradient-secondary: linear-gradient(135deg, var(--secondary-500) 0%, var(--secondary-700) 100%);
+      --gradient-accent: linear-gradient(135deg, var(--accent-500) 0%, var(--accent-700) 100%);
+      --gradient-success: linear-gradient(135deg, var(--success-500) 0%, var(--success-700) 100%);
+      --gradient-orange: linear-gradient(135deg, var(--orange-500) 0%, var(--orange-700) 100%);
+      --gradient-amber: linear-gradient(135deg, var(--amber-500) 0%, var(--amber-700) 100%);
+      --gradient-error: linear-gradient(135deg, var(--error-500) 0%, var(--error-700) 100%);
+      --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+      --gradient-dark-glass: linear-gradient(135deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.05) 100%);
+      
+      /* Sombras mejoradas */
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+      --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.06);
+      
+      /* Bordes redondeados */
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-2xl: 20px;
+      --radius-3xl: 24px;
+      --radius-full: 9999px;
+    }
+    
+    * {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    body {
+      background: var(--neutral-50);
+      color: var(--neutral-800);
+      line-height: 1.6;
+    }
+    
+    /* Utilidades de color */
+    .text-primary { color: var(--primary-500) !important; }
+    .text-secondary { color: var(--secondary-500) !important; }
+    .text-accent { color: var(--accent-500) !important; }
+    .text-success { color: var(--success-500) !important; }
+    .text-error { color: var(--error-500) !important; }
+    
+    .bg-primary { background: var(--gradient-primary) !important; }
+    .bg-secondary { background: var(--gradient-secondary) !important; }
+    .bg-accent { background: var(--gradient-accent) !important; }
+    .bg-success { background: var(--gradient-success) !important; }
+    
+    /* Botones mejorados con nueva paleta */
+    .btn-orange {
+      background: var(--gradient-orange);
+      border: none;
+      color: white;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-orange:hover {
+      background: var(--gradient-orange);
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-lg);
+      color: white;
+    }
+    
+    .btn-outline-orange {
+      border: 2px solid var(--orange-500);
+      color: var(--orange-500);
+      background: transparent;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+    }
+    
+    .btn-outline-orange:hover {
+      background: var(--orange-500);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    /* Header moderno */
+    .navbar {
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.9) !important;
+      border-bottom: 1px solid var(--neutral-200);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .navbar-brand {
+      color: var(--neutral-900) !important;
+      font-weight: 700;
+      font-size: 1.5rem !important;
+    }
+    
+    .navbar-brand span { font-weight: bold; }
+    .navbar-nav .nav-link.active { color: var(--primary-500) !important; }
+    
+    /* Profile Header con gradiente moderno */
+    .profile-header {
+      background: var(--gradient-primary);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .profile-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+        linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%);
+      opacity: 0.7;
+    }
+    
+    .profile-content {
+      position: relative;
+      z-index: 2;
+    }
+    
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border: 4px solid white;
+      border-radius: var(--radius-full);
+      object-fit: cover;
+      box-shadow: var(--shadow-xl);
+      transition: transform 0.3s ease;
+    }
+    
+    .profile-avatar:hover {
+      transform: scale(1.05);
+    }
+    
+    .level-badge {
+      background: var(--gradient-glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+    }
+    
+    .level-badge:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .stats-card {
+      background: var(--gradient-glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .stats-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .stats-card i {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+    
+    .stats-number {
+      color: white;
+      font-weight: 700;
+      font-size: 1.8rem;
+      margin-bottom: 0.25rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .stats-label {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 400;
+      font-size: 0.9rem;
+    }
+    
+    /* Cards con diseño moderno */
+    .content-card {
+      background: white;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--neutral-200);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    
+    .content-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+      border-color: var(--primary-200);
+    }
+    
+    .content-card .card-header {
+      background: linear-gradient(135deg, var(--neutral-50) 0%, white 100%);
+      border-bottom: 1px solid var(--neutral-200);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0 !important;
+      padding: 1.5rem;
+    }
+    
+    .content-card .card-title {
+      color: var(--neutral-900);
+      font-weight: 600;
+      margin-bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .content-card .card-body {
+      padding: 1.5rem;
+    }
+    
+    /* Progress bars modernos */
+    .progress {
+      height: 8px;
+      border-radius: var(--radius-full);
+      background-color: var(--neutral-200);
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      background: var(--gradient-primary);
+      border-radius: var(--radius-full);
+      transition: width 0.6s ease;
+    }
+    
+    /* Achievement badges mejorados */
+    .achievement-badge {
+      background: var(--gradient-accent);
+      color: white;
+      padding: 1.2rem;
+      border-radius: var(--radius-lg);
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+    }
+    
+    .achievement-badge::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: translateX(-100%) rotate(45deg);
+      transition: transform 0.6s ease;
+    }
+    
+    .achievement-badge:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .achievement-badge:hover::before {
+      transform: translateX(100%) rotate(45deg);
+    }
+    
+    .achievement-badge.locked {
+      background: linear-gradient(135deg, var(--neutral-400) 0%, var(--neutral-500) 100%);
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .achievement-badge i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+    
+    /* Cards de promoción mejoradas */
+    .promo-card-mini {
+      border: none;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: white;
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+    
+    .promo-card-mini:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .promo-card-mini img {
+      height: 140px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    .promo-card-mini:hover img {
+      transform: scale(1.1);
+    }
+    
+    .discount-corner-mini {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: var(--gradient-accent);
+      color: white;
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      z-index: 10;
+    }
+    
+    .badge-store { 
+      background: var(--gradient-success);
+      color: white;
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .badge-city { 
+      background: var(--gradient-secondary);
+      color: white;
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .badge-category { 
+      background: var(--gradient-primary);
+      color: white;
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    /* Tabs modernos */
+    .nav-tabs {
+      border: none;
+      margin-bottom: 2rem;
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: 0.5rem;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .nav-tabs .nav-link {
+      border: none;
+      color: var(--neutral-600);
+      font-weight: 500;
+      padding: 0.8rem 1.5rem;
+      border-radius: var(--radius-lg);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      margin: 0 0.25rem;
+    }
+    
+    .nav-tabs .nav-link:hover {
+      color: var(--primary-500);
+      background: var(--primary-50);
+      transform: translateY(-1px);
+    }
+    
+    .nav-tabs .nav-link.active {
+      color: white;
+      background: var(--gradient-primary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    
+    /* Activity timeline mejorado */
+    .activity-timeline {
+      position: relative;
+      padding-left: 2.5rem;
+    }
+    
+    .activity-timeline::before {
+      content: '';
+      position: absolute;
+      left: 1rem;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--primary-500), var(--secondary-500));
+      border-radius: var(--radius-full);
+    }
+    
+    .activity-item {
+      position: relative;
+      margin-bottom: 2rem;
+    }
+    
+    .activity-item::before {
+      content: '';
+      position: absolute;
+      left: -2.25rem;
+      top: 0.75rem;
+      width: 16px;
+      height: 16px;
+      border-radius: var(--radius-full);
+      background: var(--gradient-primary);
+      border: 3px solid white;
+      box-shadow: var(--shadow-md);
+      z-index: 1;
+    }
+    
+    .activity-card {
+      background: white;
+      border: 1px solid var(--neutral-200);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .activity-card:hover {
+      border-color: var(--primary-300);
+      transform: translateX(8px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    /* Forms modernos */
+    .settings-section {
+      border-bottom: 1px solid var(--neutral-200);
+      padding-bottom: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+    
+    .settings-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+    
+    .form-control {
+      border: 2px solid var(--neutral-200);
+      border-radius: var(--radius-md);
+      padding: 0.875rem 1rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 0.95rem;
+    }
+    
+    .form-control:focus {
+      border-color: var(--primary-500);
+      box-shadow: 0 0 0 3px var(--primary-100);
+      transform: translateY(-1px);
+    }
+    
+    .form-label {
+      color: var(--neutral-700);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .form-check-input:checked {
+      background-color: var(--primary-500);
+      border-color: var(--primary-500);
+    }
+    
+    .form-check-input:focus {
+      box-shadow: 0 0 0 3px var(--primary-100);
+    }
+    
+    /* Modales modernos */
+    .modal-content {
+      border-radius: var(--radius-xl);
+      border: none;
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+    }
+    
+    .modal-header {
+      background: linear-gradient(135deg, var(--neutral-50) 0%, white 100%);
+      border-bottom: 1px solid var(--neutral-200);
+      padding: 1.5rem 2rem;
+    }
+    
+    .modal-title {
+      color: var(--neutral-900);
+      font-weight: 600;
+    }
+    
+    .modal-body {
+      padding: 2rem;
+    }
+    
+    .modal-footer {
+      background: var(--neutral-50);
+      border-top: 1px solid var(--neutral-200);
+      padding: 1.5rem 2rem;
+    }
+    
+    /* Tooltip personalizado */
+    .tooltip-custom {
+      position: relative;
+      cursor: help;
+    }
+    
+    .tooltip-custom::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--neutral-900);
+      color: white;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-md);
+      font-size: 0.8rem;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .tooltip-custom:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    /* Animaciones mejoradas */
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
+    }
+    
+    @keyframes shimmer {
+      0% {
+        background-position: -468px 0;
+      }
+      100% {
+        background-position: 468px 0;
+      }
+    }
+    
+    .animate-slide-up {
+      animation: slideInUp 0.6s ease-out;
+    }
+    
+    .loading-shimmer {
+      background: linear-gradient(90deg, var(--neutral-200) 25%, var(--neutral-100) 50%, var(--neutral-200) 75%);
+      background-size: 468px 100%;
+      animation: shimmer 1.2s infinite;
+    }
+    
+    /* Responsive mejorado */
+    @media (max-width: 768px) {
+      .profile-avatar {
+        width: 80px;
+        height: 80px;
+      }
+      
+      .stats-card {
+        margin-bottom: 1rem;
+        padding: 1rem;
+      }
+      
+      .stats-number {
+        font-size: 1.5rem;
+      }
+      
+      .content-card .card-header,
+      .content-card .card-body {
+        padding: 1rem;
+      }
+      
+      .nav-tabs .nav-link {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+      }
+      
+      .activity-timeline {
+        padding-left: 2rem;
+      }
+      
+      .activity-timeline::before {
+        left: 0.75rem;
+      }
+      
+      .activity-item::before {
+        left: -1.75rem;
+        width: 12px;
+        height: 12px;
+      }
+    }
+    
+    /* Dark mode support (opcional) */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --neutral-50: #171717;
+        --neutral-100: #262626;
+        --neutral-200: #404040;
+        --neutral-300: #525252;
+        --neutral-400: #737373;
+        --neutral-500: #a3a3a3;
+        --neutral-600: #d4d4d4;
+        --neutral-700: #e5e5e5;
+        --neutral-800: #f5f5f5;
+        --neutral-900: #fafafa;
+      }
+      
+      body {
+        background: var(--neutral-50);
+        color: var(--neutral-800);
+      }
+      
+      .content-card {
+        background: var(--neutral-100);
+        border-color: var(--neutral-200);
+      }
+      
+      .navbar {
+        background: rgba(23, 23, 23, 0.9) !important;
+        border-bottom-color: var(--neutral-200);
+      }
+    }
+    
+    /* Utilities adicionales */
+    .glass-effect {
+      background: var(--gradient-glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .text-gradient {
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .shadow-glow {
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    }
+  </style>
+  </style>
+</head>
+<body>
+  <!-- NAVBAR - Igual que la página principal -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="index.html">
+        <div style="width: 36px; height: 36px; background: var(--gradient-primary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-right: 0.5rem;">
+          <i class="fas fa-tags" style="color: white; font-size: 1.2rem;"></i>
+        </div>
+        <span>Promo<span class="text-primary">manía</span></span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link active" href="#perfil">Mi Perfil</a></li>
+          <li class="nav-item"><a class="nav-link" href="#configuracion">Configuración</a></li>
+        </ul>
+        <div class="d-flex align-items-center ms-lg-3 gap-2">
+          <div class="dropdown">
+            <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <img src="https://randomuser.me/api/portraits/men/32.jpg" width="24" height="24" class="rounded-circle me-1">
+              Juan Pérez
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#perfil">
+                <i class="fas fa-user me-2 text-primary"></i>Mi Perfil
+              </a></li>
+              <li><a class="dropdown-item" href="#configuracion">
+                <i class="fas fa-cog me-2 text-secondary"></i>Configuración
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-error" href="#">
+                <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+              </a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- PROFILE HEADER -->
+  <section class="profile-header py-5 text-white">
+    <div class="container">
+      <div class="profile-content">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-3 text-center">
+            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Juan Pérez" class="profile-avatar mb-3">
+            <div class="level-badge">
+              <i class="fas fa-star"></i>
+              Usuario Pro
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <h1 class="fw-bold mb-2">Juan Pérez</h1>
+            <p class="mb-3 opacity-75">
+              <i class="fas fa-map-marker-alt me-2"></i>Bogotá, Colombia
+            </p>
+            <p class="mb-3">Miembro activo desde enero 2023. Apasionado por encontrar las mejores ofertas y compartirlas con la comunidad.</p>
+            <div class="d-flex gap-2 flex-wrap">
+              <span class="badge bg-light text-dark">Cazador de ofertas</span>
+              <span class="badge bg-light text-dark">Experto en supermercados</span>
+              <span class="badge bg-light text-dark">Top contributor</span>
+            </div>
+          </div>
+          <div class="col-lg-3">
+            <div class="text-center">
+              <button class="btn btn-light text-primary fw-bold mb-2 w-100 shadow-glow">
+                <i class="fas fa-edit me-1"></i> Editar Perfil
+              </button>
+              <button class="btn btn-outline-light w-100">
+                <i class="fas fa-share-alt me-1"></i> Compartir Perfil
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="row g-3 mt-4">
+          <div class="col-6 col-md-3">
+            <div class="stats-card">
+              <i class="fas fa-tags"></i>
+              <div class="stats-number">47</div>
+              <div class="stats-label">Promociones publicadas</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stats-card">
+              <i class="fas fa-thumbs-up"></i>
+              <div class="stats-number">1,245</div>
+              <div class="stats-label">Likes recibidos</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stats-card">
+              <i class="fas fa-piggy-bank"></i>
+              <div class="stats-number">$127,500</div>
+              <div class="stats-label">Ahorro generado</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="stats-card">
+              <i class="fas fa-trophy"></i>
+              <div class="stats-number">8</div>
+              <div class="stats-label">Logros desbloqueados</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN CONTENT -->
+  <div class="container py-5">
+    <div class="row g-4">
+      <!-- SIDEBAR -->
+      <div class="col-lg-4">
+        <!-- Level Progress -->
+        <div class="content-card mb-4">
+          <div class="card-header">
+            <h5 class="card-title">
+              <i class="fas fa-chart-line text-primary"></i>
+              Progreso de Nivel
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="fw-medium">Usuario Pro</span>
+              <span class="text-muted">Nivel 4</span>
+            </div>
+            <div class="progress mb-3">
+              <div class="progress-bar" style="width: 75%"></div>
+            </div>
+            <p class="text-muted small mb-3">
+              Publica 8 promociones más para alcanzar el nivel <strong>Experto</strong>
+            </p>
+            <div class="d-flex justify-content-between text-sm">
+              <span class="text-success tooltip-custom" data-tooltip="Promociones publicadas">
+                <i class="fas fa-tags me-1"></i> 47
+              </span>
+              <span class="text-secondary tooltip-custom" data-tooltip="Próximo nivel">
+                <i class="fas fa-target me-1"></i> 55
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="content-card mb-4">
+          <div class="card-header">
+            <h5 class="card-title">
+              <i class="fas fa-trophy text-amber"></i>
+              Logros Recientes
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-6">
+                <div class="achievement-badge amber text-center p-3 rounded-3">
+                  <i class="fas fa-fire-flame-curved text-amber fs-3 mb-2"></i>
+                  <div class="fw-bold small text-amber-800">Hot Streak</div>
+                  <div style="font-size: 0.75rem; color: var(--amber-700);">5 días activo</div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="achievement-badge red text-center p-3 rounded-3">
+                  <i class="fas fa-heart text-red-600 fs-3 mb-2"></i>
+                  <div class="fw-bold small text-red-800">Popular</div>
+                  <div style="font-size: 0.75rem; color: var(--red-700);">1000+ likes</div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="achievement-badge green text-center p-3 rounded-3">
+                  <i class="fas fa-piggy-bank text-green-600 fs-3 mb-2"></i>
+                  <div class="fw-bold small text-green-800">Top Saver</div>
+                  <div style="font-size: 0.75rem; color: var(--green-700);">$100k ahorrados</div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="achievement-badge locked text-center p-3 rounded-3" style="background: linear-gradient(135deg, var(--neutral-100), var(--neutral-200)); border: 2px dashed var(--neutral-300); opacity: 0.6;">
+                  <i class="fas fa-crown text-neutral-400 fs-3 mb-2"></i>
+                  <div class="fw-bold small text-neutral-600">VIP</div>
+                  <div style="font-size: 0.75rem; color: var(--neutral-500);">Próximamente</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="content-card">
+          <div class="card-header">
+            <h5 class="card-title">
+              <i class="fas fa-chart-bar text-orange"></i>
+              Estadísticas del Mes
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <div class="fw-medium">Promociones publicadas</div>
+                <small class="text-muted">Este mes</small>
+              </div>
+              <span class="h4 text-orange mb-0">12</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <div class="fw-medium">Ahorro generado</div>
+                <small class="text-muted">Para la comunidad</small>
+              </div>
+              <span class="h4 text-success mb-0">$15,200</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-medium">Ranking mensual</div>
+                <small class="text-muted">En tu ciudad</small>
+              </div>
+              <span class="h4 text-info mb-0">#7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT AREA -->
+      <div class="col-lg-8">
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="promos-tab" data-bs-toggle="tab" data-bs-target="#promos" type="button" role="tab">
+              <i class="fas fa-tags me-1"></i> Mis Promociones
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="favorites-tab" data-bs-toggle="tab" data-bs-target="#favorites" type="button" role="tab">
+              <i class="fas fa-heart me-1"></i> Favoritos
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">
+              <i class="fas fa-clock me-1"></i> Actividad
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">
+              <i class="fas fa-cog me-1"></i> Configuración
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="profileTabsContent">
+          <!-- MIS PROMOCIONES -->
+          <div class="tab-pane fade show active" id="promos" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4 class="mb-0">Mis Promociones (47)</h4>
+              <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPromoModal">
+                <i class="fas fa-plus me-1"></i> Nueva Promoción
+              </button>
+            </div>
+            
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="card promo-card-mini h-100">
+                  <div class="position-relative">
+                    <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Manzanas">
+                    <div class="discount-corner-mini">-25%</div>
+                  </div>
+                  <div class="card-body p-3">
+                    <h6 class="card-title mb-2">Manzanas Rojas Premium 1kg</h6>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                      <span class="fw-bold text-danger">$4,500</span>
+                      <span class="text-decoration-line-through small text-muted">$6,000</span>
+                    </div>
+                    <div class="d-flex gap-1 mb-2">
+                      <span class="badge badge-store small">Jumbo</span>
+                      <span class="badge badge-city small">Cali</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center small text-muted">
+                      <span><i class="fas fa-thumbs-up me-1"></i> 32 likes</span>
+                      <span>Hace 3 días</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="card promo-card-mini h-100">
+                  <div class="position-relative">
+                    <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Carne">
+                    <div class="discount-corner-mini">-40%</div>
+                  </div>
+                  <div class="card-body p-3">
+                    <h6 class="card-title mb-2">Lomo de Res Premium 500g</h6>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                      <span class="fw-bold text-danger">$18,000</span>
+                      <span class="text-decoration-line-through small text-muted">$30,000</span>
+                    </div>
+                    <div class="d-flex gap-1 mb-2">
+                      <span class="badge badge-store small">Olímpica</span>
+                      <span class="badge badge-city small">Barranquilla</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center small text-muted">
+                      <span><i class="fas fa-thumbs-up me-1"></i> 15 likes</span>
+                      <span>Hace 1 día</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="card promo-card-mini h-100">
+                  <div class="position-relative">
+                    <img src="https://images.unsplash.com/photo-1621458472871-d8b6a409aba1?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Leche Alpina">
+                    <div class="discount-corner-mini">-33%</div>
+                  </div>
+                  <div class="card-body p-3">
+                    <h6 class="card-title mb-2">Leche Alpina Deslactosada 1L</h6>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                      <span class="fw-bold text-danger">$3,500</span>
+                      <span class="text-decoration-line-through small text-muted">$5,200</span>
+                    </div>
+                    <div class="d-flex gap-1 mb-2">
+                      <span class="badge badge-store small">Éxito</span>
+                      <span class="badge badge-city small">Bogotá</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center small text-muted">
+                      <span><i class="fas fa-thumbs-up me-1"></i> 24 likes</span>
+                      <span>Hace 2 días</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="card promo-card-mini h-100">
+                  <div class="position-relative">
+                    <img src="https://images.unsplash.com/photo-1551006652-2d85da467f30?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Cereal Kellogg's">
+                    <div class="discount-corner-mini">-30%</div>
+                  </div>
+                  <div class="card-body p-3">
+                    <h6 class="card-title mb-2">Cereal Kellogg's Corn Flakes</h6>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                      <span class="fw-bold text-danger">$8,400</span>
+                      <span class="text-decoration-line-through small text-muted">$12,000</span>
+                    </div>
+                    <div class="d-flex gap-1 mb-2">
+                      <span class="badge badge-store small">Carulla</span>
+                      <span class="badge badge-city small">Medellín</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center small text-muted">
+                      <span><i class="fas fa-thumbs-up me-1"></i> 18 likes</span>
+                      <span>Hace 1 semana</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="text-center mt-4">
+              <button class="btn btn-outline-primary">
+                <i class="fas fa-eye me-1"></i> Ver todas mis promociones
+              </button>
+            </div>
+          </div>
+
+          <!-- FAVORITOS -->
+          <div class="tab-pane fade" id="favorites" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4 class="mb-0">Promociones Favoritas (23)</h4>
+              <div class="btn-group" role="group">
+                <input type="radio" class="btn-check" name="favFilter" id="allFavs" checked>
+                <label class="btn btn-outline-primary btn-sm" for="allFavs">Todas</label>
+                
+                <input type="radio" class="btn-check" name="favFilter" id="activeFavs">
+                <label class="btn btn-outline-primary btn-sm" for="activeFavs">Activas</label>
+                
+                <input type="radio" class="btn-check" name="favFilter" id="expiredFavs">
+                <label class="btn btn-outline-primary btn-sm" for="expiredFavs">Expiradas</label>
+              </div>
+            </div>
+            
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="card promo-card-mini h-100">
+                  <div class="position-relative">
+                    <img src="https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Coca-Cola">
+                    <div class="discount-corner-mini">-20%</div>
+                    <div class="position-absolute top-0 end-0 p-2">
+                      <i class="fas fa-heart text-danger"></i>
+                    </div>
+                  </div>
+                  <div class="card-body p-3">
+                    <h6 class="card-title mb-2">Coca-Cola 1.5L</h6>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                      <span class="fw-bold text-danger">$2,800</span>
+                      <span class="text-decoration-line-through small text-muted">$3,500</span>
+                    </div>
+                    <div class="d-flex gap-1 mb-2">
+                      <span class="badge badge-store small">D1</span>
+                      <span class="badge badge-city small">Bogotá</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center small">
+                      <span class="text-success"><i class="fas fa-check-circle me-1"></i> Activa</span>
+                      <span class="text-muted">Vence: 30/01/2025</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="card promo-card-mini h-100">
+                  <div class="position-relative">
+                    <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Detergente">
+                    <div class="discount-corner-mini">-35%</div>
+                    <div class="position-absolute top-0 end-0 p-2">
+                      <i class="fas fa-heart text-danger"></i>
+                    </div>
+                  </div>
+                  <div class="card-body p-3">
+                    <h6 class="card-title mb-2">Detergente Ariel 2kg</h6>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                      <span class="fw-bold text-danger">$8,500</span>
+                      <span class="text-decoration-line-through small text-muted">$13,000</span>
+                    </div>
+                    <div class="d-flex gap-1 mb-2">
+                      <span class="badge badge-store small">Ara</span>
+                      <span class="badge badge-city small">Medellín</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center small">
+                      <span class="text-success"><i class="fas fa-check-circle me-1"></i> Activa</span>
+                      <span class="text-muted">Vence: 26/01/2025</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="text-center mt-4">
+              <button class="btn btn-outline-primary">
+                <i class="fas fa-eye me-1"></i> Ver todos mis favoritos
+              </button>
+            </div>
+          </div>
+
+          <!-- ACTIVIDAD -->
+          <div class="tab-pane fade" id="activity" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4 class="mb-0">Actividad Reciente</h4>
+              <div class="btn-group btn-group-sm" role="group">
+                <input type="radio" class="btn-check" name="activityFilter" id="allActivity" checked>
+                <label class="btn btn-outline-primary" for="allActivity">Todas</label>
+                
+                <input type="radio" class="btn-check" name="activityFilter" id="likesActivity">
+                <label class="btn btn-outline-primary" for="likesActivity">Likes</label>
+                
+                <input type="radio" class="btn-check" name="activityFilter" id="promosActivity">
+                <label class="btn btn-outline-primary" for="promosActivity">Promociones</label>
+              </div>
+            </div>
+            
+            <div class="activity-timeline">
+              <div class="activity-item">
+                <div class="activity-card">
+                  <div class="d-flex align-items-start gap-3">
+                    <div class="flex-shrink-0">
+                      <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="fas fa-plus"></i>
+                      </div>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1">Publicaste una nueva promoción</h6>
+                      <p class="mb-2 text-muted">Leche Alpina Deslactosada 1L con 33% de descuento</p>
+                      <small class="text-muted">
+                        <i class="fas fa-clock me-1"></i> Hace 2 horas
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="activity-item">
+                <div class="activity-card">
+                  <div class="d-flex align-items-start gap-3">
+                    <div class="flex-shrink-0">
+                      <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="fas fa-heart"></i>
+                      </div>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1">Recibiste 5 nuevos likes</h6>
+                      <p class="mb-2 text-muted">En tu promoción de Cereal Kellogg's Corn Flakes</p>
+                      <small class="text-muted">
+                        <i class="fas fa-clock me-1"></i> Hace 6 horas
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="activity-item">
+                <div class="activity-card">
+                  <div class="d-flex align-items-start gap-3">
+                    <div class="flex-shrink-0">
+                      <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="fas fa-trophy"></i>
+                      </div>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1">¡Nuevo logro desbloqueado!</h6>
+                      <p class="mb-2 text-muted">Hot Streak - 5 días seguidos siendo activo</p>
+                      <small class="text-muted">
+                        <i class="fas fa-clock me-1"></i> Ayer
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="activity-item">
+                <div class="activity-card">
+                  <div class="d-flex align-items-start gap-3">
+                    <div class="flex-shrink-0">
+                      <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="fas fa-star"></i>
+                      </div>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1">Agregaste a favoritos</h6>
+                      <p class="mb-2 text-muted">Promoción de Detergente Ariel con 35% de descuento</p>
+                      <small class="text-muted">
+                        <i class="fas fa-clock me-1"></i> Hace 2 días
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONFIGURACIÓN -->
+          <div class="tab-pane fade" id="settings" role="tabpanel">
+            <h4 class="mb-4">Configuración de la cuenta</h4>
+            
+            <!-- Información Personal -->
+            <div class="settings-section">
+              <h5 class="text-primary mb-3">
+                <i class="fas fa-user me-2"></i>
+                Información Personal
+              </h5>
+              <form>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="firstName" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="firstName" value="Juan">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="lastName" class="form-label">Apellidos</label>
+                    <input type="text" class="form-control" id="lastName" value="Pérez">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="email" class="form-label">Correo electrónico</label>
+                    <input type="email" class="form-control" id="email" value="juan.perez@email.com">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="phone" class="form-label">Teléfono</label>
+                    <input type="tel" class="form-control" id="phone" value="+57 300 123 4567">
+                  </div>
+                  <div class="col-12">
+                    <label for="city" class="form-label">Ciudad</label>
+                    <select class="form-control" id="city">
+                      <option value="Bogotá" selected>Bogotá</option>
+                      <option value="Medellín">Medellín</option>
+                      <option value="Cali">Cali</option>
+                      <option value="Barranquilla">Barranquilla</option>
+                      <option value="Bucaramanga">Bucaramanga</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <label for="bio" class="form-label">Biografía</label>
+                    <textarea class="form-control" id="bio" rows="3">Apasionado por encontrar las mejores ofertas y compartirlas con la comunidad.</textarea>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-orange mt-3">
+                  <i class="fas fa-save me-1"></i> Guardar cambios
+                </button>
+              </form>
+            </div>
+
+            <!-- Notificaciones -->
+            <div class="settings-section">
+              <h5 class="text-orange mb-3">
+                <i class="fas fa-bell me-2"></i>
+                Notificaciones
+              </h5>
+              <div class="row g-3">
+                <div class="col-12">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="emailNotif" checked>
+                    <label class="form-check-label" for="emailNotif">
+                      Recibir notificaciones por email
+                    </label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="likeNotif" checked>
+                    <label class="form-check-label" for="likeNotif">
+                      Notificar cuando reciba likes en mis promociones
+                    </label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="newPromoNotif">
+                    <label class="form-check-label" for="newPromoNotif">
+                      Notificar sobre nuevas promociones en mi ciudad
+                    </label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="weeklyDigest" checked>
+                    <label class="form-check-label" for="weeklyDigest">
+                      Resumen semanal de actividad
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-orange mt-3">
+                <i class="fas fa-bell me-1"></i> Actualizar notificaciones
+              </button>
+            </div>
+
+            <!-- Privacidad -->
+            <div class="settings-section">
+              <h5 class="text-orange mb-3">
+                <i class="fas fa-shield-alt me-2"></i>
+                Privacidad y Seguridad
+              </h5>
+              <div class="row g-3">
+                <div class="col-12">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="publicProfile" checked>
+                    <label class="form-check-label" for="publicProfile">
+                      Perfil público (otros usuarios pueden ver mi perfil)
+                    </label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="showStats" checked>
+                    <label class="form-check-label" for="showStats">
+                      Mostrar estadísticas públicamente
+                    </label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="allowMessages">
+                    <label class="form-check-label" for="allowMessages">
+                      Permitir mensajes de otros usuarios
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-3">
+                <button class="btn btn-outline-orange me-2">
+                  <i class="fas fa-key me-1"></i> Cambiar contraseña
+                </button>
+                <button class="btn btn-orange">
+                  <i class="fas fa-shield-alt me-1"></i> Actualizar privacidad
+                </button>
+              </div>
+            </div>
+
+            <!-- Zona de Peligro -->
+            <div class="settings-section">
+              <h5 class="text-danger mb-3">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Zona de Peligro
+              </h5>
+              <div class="alert alert-danger">
+                <h6 class="alert-heading">Eliminar cuenta</h6>
+                <p class="mb-2">Esta acción no se puede deshacer. Se eliminarán permanentemente todas tus promociones, favoritos y estadísticas.</p>
+                <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                  <i class="fas fa-trash me-1"></i> Eliminar cuenta
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para eliminar cuenta -->
+  <div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-0">
+          <h5 class="modal-title text-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Eliminar cuenta
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-danger">
+            <h6>⚠️ Esta acción es irreversible</h6>
+            <p class="mb-0">Se eliminarán permanentemente:</p>
+            <ul class="mb-0 mt-2">
+              <li>Todas tus promociones (47)</li>
+              <li>Tus favoritos (23)</li>
+              <li>Estadísticas y logros</li>
+              <li>Historial de actividad</li>
+            </ul>
+          </div>
+          <p>Para confirmar, escribe <strong>ELIMINAR</strong> en el campo de abajo:</p>
+          <input type="text" class="form-control" id="deleteConfirm" placeholder="Escribe ELIMINAR">
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-danger" id="confirmDelete" disabled>
+            <i class="fas fa-trash me-1"></i> Eliminar cuenta
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para agregar promoción -->
+  <div class="modal fade" id="addPromoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fas fa-plus-circle text-primary me-2"></i>
+            Nueva Promoción
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addPromoForm">
+            <div class="row g-3">
+              <div class="col-12">
+                <label for="promoTitle" class="form-label">Título de la promoción</label>
+                <input type="text" class="form-control" id="promoTitle" placeholder="Ej: Manzanas Rojas Premium 1kg" required>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="originalPrice" class="form-label">Precio original</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" class="form-control" id="originalPrice" placeholder="0" required>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="discountPrice" class="form-label">Precio con descuento</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" class="form-control" id="discountPrice" placeholder="0" required>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="store" class="form-label">Tienda</label>
+                <select class="form-control" id="store" required>
+                  <option value="">Seleccionar tienda</option>
+                  <option value="Jumbo">Jumbo</option>
+                  <option value="Éxito">Éxito</option>
+                  <option value="Carulla">Carulla</option>
+                  <option value="Olímpica">Olímpica</option>
+                  <option value="D1">D1</option>
+                  <option value="Ara">Ara</option>
+                  <option value="Metro">Metro</option>
+                </select>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="city" class="form-label">Ciudad</label>
+                <select class="form-control" id="city" required>
+                  <option value="">Seleccionar ciudad</option>
+                  <option value="Bogotá">Bogotá</option>
+                  <option value="Medellín">Medellín</option>
+                  <option value="Cali">Cali</option>
+                  <option value="Barranquilla">Barranquilla</option>
+                  <option value="Bucaramanga">Bucaramanga</option>
+                </select>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="category" class="form-label">Categoría</label>
+                <select class="form-control" id="category" required>
+                  <option value="">Seleccionar categoría</option>
+                  <option value="Frutas y Verduras">Frutas y Verduras</option>
+                  <option value="Carnes y Pollo">Carnes y Pollo</option>
+                  <option value="Lácteos">Lácteos</option>
+                  <option value="Panadería">Panadería</option>
+                  <option value="Bebidas">Bebidas</option>
+                  <option value="Aseo">Aseo</option>
+                  <option value="Despensa">Despensa</option>
+                </select>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="expiryDate" class="form-label">Fecha de vencimiento</label>
+                <input type="date" class="form-control" id="expiryDate" required>
+              </div>
+              
+              <div class="col-12">
+                <label for="description" class="form-label">Descripción</label>
+                <textarea class="form-control" id="description" rows="3" placeholder="Describe la promoción, condiciones especiales, etc."></textarea>
+              </div>
+              
+              <div class="col-12">
+                <label for="promoImage" class="form-label">Imagen del producto</label>
+                <input type="file" class="form-control" id="promoImage" accept="image/*">
+                <div class="form-text">Formatos permitidos: JPG, PNG, WebP. Tamaño máximo: 5MB</div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" form="addPromoForm" class="btn btn-primary">
+            <i class="fas fa-save me-1"></i> Publicar Promoción
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back to top button -->
+  <button id="backToTop" class="btn btn-orange position-fixed bottom-0 end-0 m-4 shadow-lg" style="display: none; width: 50px; height: 50px; border-radius: 50%;" title="Volver arriba">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Back to top functionality
+      const backToTopButton = document.getElementById('backToTop');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+          backToTopButton.style.display = 'flex';
+        } else {
+          backToTopButton.style.display = 'none';
+        }
+      });
+      
+      backToTopButton.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      // Delete account confirmation
+      const deleteConfirmInput = document.getElementById('deleteConfirm');
+      const confirmDeleteBtn = document.getElementById('confirmDelete');
+      
+      deleteConfirmInput.addEventListener('input', function() {
+        confirmDeleteBtn.disabled = this.value !== 'ELIMINAR';
+      });
+
+      confirmDeleteBtn.addEventListener('click', function() {
+        // Aquí iría la lógica para eliminar la cuenta
+        alert('Funcionalidad de eliminar cuenta - requiere implementación backend');
+      });
+
+      // Add promotion form handler
+      document.getElementById('addPromoForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get form data
+        const formData = new FormData(this);
+        const promoData = {
+          title: formData.get('promoTitle') || document.getElementById('promoTitle').value,
+          originalPrice: document.getElementById('originalPrice').value,
+          discountPrice: document.getElementById('discountPrice').value,
+          store: document.getElementById('store').value,
+          city: document.getElementById('city').value,
+          category: document.getElementById('category').value,
+          expiryDate: document.getElementById('expiryDate').value,
+          description: document.getElementById('description').value
+        };
+
+        // Calculate discount percentage
+        const discount = Math.round((1 - promoData.discountPrice / promoData.originalPrice) * 100);
+
+        // Simulate saving
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Publicando...';
+        submitBtn.disabled = true;
+
+        setTimeout(() => {
+          // Hide modal
+          const modal = bootstrap.Modal.getInstance(document.getElementById('addPromoModal'));
+          modal.hide();
+          
+          // Reset form
+          this.reset();
+          
+          // Show success message
+          alert(`¡Promoción "${promoData.title}" publicada exitosamente con ${discount}% de descuento!`);
+          
+          // Reset button
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+        }, 2000);
+      });
+
+      // Price calculation for discount percentage
+      function calculateDiscount() {
+        const original = parseFloat(document.getElementById('originalPrice').value) || 0;
+        const discount = parseFloat(document.getElementById('discountPrice').value) || 0;
+        
+        if (original > 0 && discount > 0 && discount < original) {
+          const percentage = Math.round((1 - discount / original) * 100);
+          console.log(`Descuento calculado: ${percentage}%`);
+        }
+      }
+
+      document.getElementById('originalPrice').addEventListener('input', calculateDiscount);
+      document.getElementById('discountPrice').addEventListener('input', calculateDiscount);
+    });
+  </script>
+</body>
+</html>

@@ -160,6 +160,12 @@
       background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-dark) 100%);
       position: relative;
       overflow: hidden;
+      margin-top: 3rem; /* Más margen arriba de la nav */
+    }
+
+    .hero-section h1,
+    .hero-section p {
+      margin-top: 1.5rem; /* Más margen arriba del texto */
     }
     
     .hero-section::before {
@@ -609,27 +615,24 @@
 </head>
 <body>
   <!-- NAVBAR MEJORADA -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-    <div class="container">
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top py-3">
+    <div class="container-fluid px-4">
       <a class="navbar-brand d-flex align-items-center" href="#">
-        <div style="width: 36px; height: 36px; background: linear-gradient(135deg, #ff6b35 0%, #e55a2b 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 0.5rem;">
-          <i class="fas fa-tags" style="color: white; font-size: 1.2rem;"></i>
-        </div>
-        <span>Promo<span class="text-orange">manía</span></span>
+        <img src="logo.png" alt="Promomanía Logo" style="width:150px; height:80px; border-radius:12px; margin-right:1rem; margin-left: 5rem;">
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="mainNav">
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 fs-5">
           <li class="nav-item"><a class="nav-link active" href="#inicio">Inicio</a></li>
           <li class="nav-item"><a class="nav-link" href="#beneficios">Beneficios</a></li>
           <li class="nav-item"><a class="nav-link" href="#testimonios">Testimonios</a></li>
           <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
         </ul>
-        <div class="d-flex align-items-center ms-lg-3 gap-2">
-          <a href="login.html" class="btn btn-outline-orange btn-sm"><i class="fas fa-sign-in-alt me-1"></i> Iniciar sesión</a>
-          <a href="register.html" class="btn btn-orange btn-sm"><i class="fas fa-user-plus me-1"></i> Registrarse</a>
+        <div class="d-flex align-items-center ms-lg-4 gap-3">
+          <a href="login.html" class="btn btn-outline-orange btn-lg px-4"><i class="fas fa-sign-in-alt me-1"></i> Iniciar sesión</a>
+          <a href="register.html" class="btn btn-orange btn-lg px-4"><i class="fas fa-user-plus me-1"></i> Registrarse</a>
         </div>
       </div>
     </div>
@@ -962,7 +965,7 @@
       <div class="col" data-category="Frutas y Verduras" data-city="Cali" data-store="Jumbo" data-discount="25" data-price="4500">
         <div class="card promo-card h-100">
           <div class="position-relative">
-            <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Frutas Frescas">
+            <img src="https://images.unsplash.com/photo-1621458472871-d8b6a409aba1?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Frutas Frescas">
             <div class="discount-corner">-25%</div>
           </div>
           <div class="card-body">

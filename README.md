@@ -1,57 +1,120 @@
-# 🛒 BuyGo
+# Promomanía 📱
 
-BuyGo es una aplicación móvil que conecta a personas que no desean o no pueden ir al supermercado con usuarios dispuestos a realizar compras por encargo a cambio de una comisión.
+Aplicación móvil colaborativa para **centralizar promociones reales y
+verificadas en Colombia**, permitiendo a los usuarios encontrar ofertas
+de manera segura y a los comercios locales aumentar su visibilidad.
 
-La app promueve la economía colaborativa, ahorra tiempo y crea oportunidades de ingreso flexible dentro de una comunidad.
+------------------------------------------------------------------------
 
----
+# 📖 Descripción
 
-## 📱 Descripción general
+En la actualidad, muchas promociones y descuentos se difunden de forma
+**desorganizada** en redes sociales, páginas web y medios físicos. Esto
+dificulta que los consumidores identifiquen ofertas **reales y
+vigentes**, generando pérdida de tiempo y posibles fraudes.
 
-Los usuarios pueden crear solicitudes de compra indicando los productos que necesitan y el supermercado de preferencia.  
-Otros usuarios pueden aceptar estas solicitudes, realizar la compra y entregar el pedido en el domicilio acordado, recibiendo una comisión por su servicio.
+**Promomanía** surge como una solución a este problema, ofreciendo una
+plataforma móvil donde los usuarios pueden:
 
-La plataforma actúa como intermediaria para garantizar un proceso simple, transparente y seguro para ambas partes.
+-   Consultar promociones reales.
+-   Publicar nuevas ofertas encontradas.
+-   Validar promociones mediante participación comunitaria.
+-   Acceder a información centralizada y confiable.
 
----
+Además, la aplicación brinda a los **comercios locales** una plataforma
+gratuita para promocionar sus ofertas y mejorar su alcance digital.
 
-## 🚀 Funcionalidades principales
+------------------------------------------------------------------------
 
-### Para solicitantes
-- Crear solicitudes de compra personalizadas
-- Seleccionar supermercado y ubicación de entrega
-- Visualizar el estado del pedido en tiempo real
-- Calificar al comprador una vez finalizado el servicio
+# 🎯 Objetivo del proyecto
 
-### Para compradores
-- Explorar solicitudes disponibles cercanas
-- Aceptar encargos y obtener ganancias por comisión
-- Historial de pedidos realizados
-- Sistema de reputación y calificaciones
+Desarrollar una aplicación móvil que permita **buscar, publicar y
+validar promociones** de forma colaborativa, segura y transparente,
+mejorando la experiencia de compra de los usuarios y apoyando la
+economía digital local.
 
----
+------------------------------------------------------------------------
 
-## 🧠 Beneficios
-- Ahorro de tiempo y esfuerzo
-- Ingresos flexibles para compradores
-- Reducción de traslados innecesarios
-- Apoyo a personas con movilidad reducida o agendas ocupadas
-- Fomento de comunidades colaborativas
+# 🚀 Características principales
 
----
+## 📍 Exploración de promociones
 
-## 🛠️ Tecnologías utilizadas
+-   Búsqueda de ofertas cercanas o por categoría.
 
-> *(Modificar según el stack real del proyecto)*
+## 📝 Publicación de promociones
 
-- Frontend móvil: Flutter / React Native
-- Backend: Node.js / Spring Boot / Django
-- Base de datos: PostgreSQL / MongoDB
-- Autenticación: JWT / Firebase Auth
-- Mapas y geolocalización: Google Maps API
-- Pasarela de pagos: Stripe / MercadoPago
+-   Los usuarios pueden registrar nuevas promociones encontradas.
 
----
+## ✔️ Sistema de validación
 
-## 📂 Estructura del proyecto
+-   Las promociones pueden ser verificadas por la comunidad y por
+    administradores.
+
+## 🔔 Notificaciones
+
+-   Avisos sobre nuevas promociones relevantes.
+
+## 🏪 Apoyo a comercios locales
+
+-   Plataforma gratuita para promocionar ofertas.
+
+------------------------------------------------------------------------
+
+# 🏗️ Tecnologías (propuesta)
+
+## Frontend
+
+-   Flutter
+-   Dart
+
+## Backend
+
+-   Firebase
+
+## Base de datos
+
+-   PostgreSQL
+
+## Servicios adicionales
+
+-   Firebase (notificaciones push)
+-   API REST
+
+------------------------------------------------------------------------
+
+# 👥 Integrantes del proyecto
+
+-   **Armando Pérez Bolívar**
+-   **Nicely Meza Polo**
+-   **Tania Rua Pérez**
+
+------------------------------------------------------------------------
+
+# 🎓 Información académica
+
+-   **Universidad:** Universidad Libre\
+-   **Facultad:** Ingeniería\
+-   **Asignatura:** Programación Móvil\
+-   **Docente:** William Insignares
+
+Barranquilla, Atlántico --- 2026
+
+------------------------------------------------------------------------
+
+# 💡 Impacto esperado
+
+Promomanía busca:
+
+-   Facilitar la búsqueda de promociones reales.
+-   Reducir la desinformación sobre ofertas.
+-   Impulsar la **economía digital local**.
+-   Fomentar la **participación comunitaria** en la verificación de
+    promociones.
+
+------------------------------------------------------------------------
+
+# 📌 Estado del proyecto
+
+🚧 En desarrollo (proyecto académico)
+
 

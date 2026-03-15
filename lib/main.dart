@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'Core/Routes/app_routes.dart';
+import 'Authentication/login_screen.dart';
+import 'Authentication/register_screen.dart';
+import 'Authentication/forgot_password_screen.dart';
+import 'Authentication/verify_code_screen.dart';
+import 'Authentication/new_password_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,11 +22,14 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.onboarding,
+      initialRoute: AppRoutes.login,
       routes: {
-        /*AppRoutes.login: (context) => const LoginScreen(),
+        AppRoutes.login: (context) => const LoginScreen(),
         AppRoutes.register: (context) => const RegisterScreen(),
         AppRoutes.forgotPassword: (context) => const ForgotPasswordScreen(),
+        AppRoutes.verifyCode: (context) => const VerifyCodeScreen(email:''),
+        AppRoutes.newPassword: (context) => const NewPasswordScreen(),
+        /*
         AppRoutes.onboarding: (context) => const OnboardingScreen(),
         AppRoutes.onboarding2: (context) => const OnboardingScreen2(),
         AppRoutes.onboarding3: (context) => const OnboardingScreen3(),

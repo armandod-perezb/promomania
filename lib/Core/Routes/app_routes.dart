@@ -3,6 +3,8 @@ class AppRoutes {
   static const login = '/login';
   static const register = '/register';
   static const forgotPassword = '/forgot_password';
+  static const verifyCode = '/verify_code';
+  static const newPassword = '/new_password';
 
   // Onboarding
   static const onboarding = '/onboarding';

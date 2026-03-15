@@ -5,6 +5,13 @@ import 'Authentication/register_screen.dart';
 import 'Authentication/forgot_password_screen.dart';
 import 'Authentication/verify_code_screen.dart';
 import 'Authentication/new_password_screen.dart';
+import 'User/user_home_screen.dart';
+import 'User/user_profile_screen.dart';
+import 'User/user_favorites_screen.dart';
+import 'User/user_profile_edit_screen.dart';
+import 'User/user_explore_screen.dart';
+import 'User/user_promo_detail_screen.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -29,6 +36,12 @@ class MyApp extends StatelessWidget {
         AppRoutes.forgotPassword: (context) => const ForgotPasswordScreen(),
         AppRoutes.verifyCode: (context) => const VerifyCodeScreen(email:''),
         AppRoutes.newPassword: (context) => const NewPasswordScreen(),
+        AppRoutes.userHome: (context) => const HomeMapScreen(),
+        AppRoutes.userProfile: (context) => const UserProfileScreen(),
+        AppRoutes.userFavorites: (context) => const MisFavoritosScreen(),
+        AppRoutes.userEdit: (context) => const EditProfileScreen(),
+        AppRoutes.explore: (context) => const ExploreScreen(),
+        AppRoutes.promotionDetails: (context) => const PromoDetailScreen(),
         /*
         AppRoutes.onboarding: (context) => const OnboardingScreen(),
         AppRoutes.onboarding2: (context) => const OnboardingScreen2(),
@@ -39,12 +52,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.managePromotions: (context) => const ManagePromotionsScreen(),
         AppRoutes.manageStores: (context) => const ManageStoresScreen(),
         AppRoutes.manageNotifications: (context) => const ManageNotificationsScreen(),
-        AppRoutes.userHome: (context) => const UserHomeScreen(),
-        AppRoutes.userProfile: (context) => const UserProfileScreen(),
-        AppRoutes.userFavorites: (context) => const UserFavoritesScreen(),
-        AppRoutes.userEdit: (context) => const UserEditScreen(),
-        AppRoutes.explore: (context) => const ExploreScreen(),
-        AppRoutes.promotionDetails: (context) => const PromotionDetailsScreen(),
+        
         AppRoutes.addPromotions: (context) => const AddPromotionsScreen(),
         AppRoutes.addPromotions2: (context) => const AddPromotionsScreen2(),
         AppRoutes.addPromotions3: (context) => const AddPromotionsScreen3(),

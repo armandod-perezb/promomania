@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../Core/Routes/app_routes.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PANTALLA DE PERFIL
@@ -1131,6 +1132,12 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       _NavTab(icon: Icons.favorite_border_rounded, label: 'Favoritos'),
       _NavTab(icon: Icons.person_outline_rounded, label: 'Perfil'),
     ];
+    final routesByTab = [
+      AppRoutes.userHome,
+      AppRoutes.explore,
+      AppRoutes.userFavorites,
+      AppRoutes.userProfile,
+    ];
 
     return Container(
       height: 64 + MediaQuery.of(context).padding.bottom,
@@ -1150,8 +1157,18 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           final isActive = _selectedNavTab == i;
           return GestureDetector(
             onTap: () {
-              setState(() => _selectedNavTab = i);
               HapticFeedback.selectionClick();
+
+              if (_selectedNavTab != i) {
+                setState(() => _selectedNavTab = i);
+              }
+
+              final route = routesByTab[i];
+              final currentRoute = ModalRoute.of(context)?.settings.name;
+
+              if (route != currentRoute) {
+                Navigator.pushNamed(context, route);
+              }
             },
             behavior: HitTestBehavior.opaque,
             child: SizedBox(

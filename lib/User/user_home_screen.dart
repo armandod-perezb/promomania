@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../Core/Routes/app_routes.dart';
 
 class HomeMapScreen extends StatefulWidget {
   const HomeMapScreen({super.key});
@@ -543,6 +544,12 @@ class _HomeMapScreenState extends State<HomeMapScreen>
       _NavTab(icon: Icons.favorite_border_rounded, label: 'Favoritos'),
       _NavTab(icon: Icons.person_outline_rounded, label: 'Perfil'),
     ];
+    final routesByTab = [
+      AppRoutes.userHome,
+      AppRoutes.explore,
+      AppRoutes.userFavorites,
+      AppRoutes.userProfile,
+    ];
 
     return Container(
       height: 68 + MediaQuery.of(context).padding.bottom,
@@ -562,8 +569,18 @@ class _HomeMapScreenState extends State<HomeMapScreen>
           final isActive = _selectedTab == i;
           return GestureDetector(
             onTap: () {
-              setState(() => _selectedTab = i);
               HapticFeedback.selectionClick();
+
+              if (_selectedTab != i) {
+                setState(() => _selectedTab = i);
+              }
+
+              final route = routesByTab[i];
+              final currentRoute = ModalRoute.of(context)?.settings.name;
+
+              if (route != currentRoute) {
+                Navigator.pushNamed(context, route);
+              }
             },
             behavior: HitTestBehavior.opaque,
             child: SizedBox(

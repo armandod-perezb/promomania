@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:app/Authentication/register_screen.dart';
+import '../Core/Routes/app_routes.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -33,6 +33,9 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
     await Future.delayed(const Duration(seconds: 2));
     setState(() => _isLoading = false);
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, AppRoutes.userHome);
+    }
   }
 
   @override
@@ -198,7 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         GestureDetector(
           onTap: () {
-            // Navegar a ForgotPasswordScreen
+            Navigator.pushNamed(context, AppRoutes.forgotPassword);
           },
           child: const Text(
             '¿Contraseña olvidada?',
@@ -301,10 +304,7 @@ class _LoginScreenState extends State<LoginScreen> {
             WidgetSpan(
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const RegisterScreen()),
-                  );
+                  Navigator.pushNamed(context, AppRoutes.register);
                 },
                 child: const Text(
                   'Regístrate',

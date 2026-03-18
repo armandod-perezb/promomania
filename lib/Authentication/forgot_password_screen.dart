@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:app/Authentication/verify_code_screen.dart';
+import '../Core/Routes/app_routes.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -28,11 +28,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     await Future.delayed(const Duration(seconds: 2));
     setState(() => _isLoading = false);
     if (mounted) {
-      Navigator.push(
+      Navigator.pushNamed(
         context,
-        MaterialPageRoute(
-          builder: (_) => VerifyCodeScreen(email: _emailController.text),
-        ),
+        AppRoutes.verifyCode,
+        arguments: _emailController.text,
       );
     }
   }

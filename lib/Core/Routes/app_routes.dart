@@ -24,6 +24,7 @@ class AppRoutes {
   static const userProfile = '/user/profile';
   static const userFavorites = '/user/favorites';
   static const userEdit = '/user/edit';
+  static const userConfig = '/user/config';
   static const explore = '/user/explore';
   static const promotionDetails = '/user/promotion_details';
 

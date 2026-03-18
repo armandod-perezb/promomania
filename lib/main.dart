@@ -9,8 +9,13 @@ import 'User/user_home_screen.dart';
 import 'User/user_profile_screen.dart';
 import 'User/user_favorites_screen.dart';
 import 'User/user_profile_edit_screen.dart';
+import 'User/user_config_screen.dart';
 import 'User/user_explore_screen.dart';
 import 'User/user_promo_detail_screen.dart';
+import 'Settings/app_about_screen.dart';
+import 'Settings/user_terms_service_screen.dart';
+import 'Settings/help_center_screen.dart';
+import 'Settings/privacy_policy_screen.dart';
 
 
 void main() {
@@ -29,19 +34,35 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.userHome,
+      initialRoute: AppRoutes.login,
+      onGenerateRoute: (settings) {
+        if (settings.name == AppRoutes.verifyCode) {
+          final email = settings.arguments is String
+              ? settings.arguments as String
+              : '';
+          return MaterialPageRoute(
+            builder: (context) => VerifyCodeScreen(email: email),
+            settings: settings,
+          );
+        }
+        return null;
+      },
       routes: {
         AppRoutes.login: (context) => const LoginScreen(),
         AppRoutes.register: (context) => const RegisterScreen(),
         AppRoutes.forgotPassword: (context) => const ForgotPasswordScreen(),
-        AppRoutes.verifyCode: (context) => const VerifyCodeScreen(email:''),
         AppRoutes.newPassword: (context) => const NewPasswordScreen(),
         AppRoutes.userHome: (context) => const HomeMapScreen(),
         AppRoutes.userProfile: (context) => const UserProfileScreen(),
         AppRoutes.userFavorites: (context) => const MisFavoritosScreen(),
         AppRoutes.userEdit: (context) => const EditProfileScreen(),
+        AppRoutes.userConfig: (context) => const SettingsScreen(),
         AppRoutes.explore: (context) => const ExploreScreen(),
         AppRoutes.promotionDetails: (context) => const PromoDetailScreen(),
+        AppRoutes.termsService: (context) => const TermsOfServiceScreen(),
+        AppRoutes.privacyPolicy: (context) => const PrivacyPolicyScreen(),
+        AppRoutes.aboutUs: (context) => const AboutScreen(),
+        AppRoutes.helpCenter: (context) => const HelpCenterScreen(),
         /*
         AppRoutes.onboarding: (context) => const OnboardingScreen(),
         AppRoutes.onboarding2: (context) => const OnboardingScreen2(),
@@ -58,10 +79,6 @@ class MyApp extends StatelessWidget {
         AppRoutes.addPromotions3: (context) => const AddPromotionsScreen3(),
         AppRoutes.addPromotions4: (context) => const AddPromotionsScreen4(),
         AppRoutes.addPromotions5: (context) => const AddPromotionsScreen5(),
-        AppRoutes.termsService: (context) => const TermsServiceScreen(),
-        AppRoutes.privacyPolicy: (context) => const PrivacyPolicyScreen(),
-        AppRoutes.aboutUs: (context) => const AboutUsScreen(),
-        AppRoutes.helpCenter: (context) => const HelpCenterScreen(),
         */
       },
     );

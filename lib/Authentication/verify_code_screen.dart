@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../Core/Routes/app_routes.dart';
 
 class VerifyCodeScreen extends StatefulWidget {
   final String email;
@@ -78,7 +79,9 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
     setState(() => _isVerifying = true);
     await Future.delayed(const Duration(seconds: 2));
     setState(() => _isVerifying = false);
-    // Navegar a siguiente pantalla
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, AppRoutes.newPassword);
+    }
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Core/Routes/app_routes.dart';
 
 class NewPasswordScreen extends StatefulWidget {
   const NewPasswordScreen({super.key});
@@ -37,9 +38,13 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
     await Future.delayed(const Duration(seconds: 2));
     setState(() => _isLoading = false);
     if (mounted) {
-      // Navegar a pantalla de éxito o login
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('¡Contraseña cambiada exitosamente!')),
+      );
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.login,
+        (route) => false,
       );
     }
   }

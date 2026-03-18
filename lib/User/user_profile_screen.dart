@@ -135,21 +135,27 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               ),
             ),
           ),
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.15),
-                width: 1,
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              Navigator.pushNamed(context, AppRoutes.userConfig);
+            },
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.15),
+                  width: 1,
+                ),
               ),
-            ),
-            child: const Icon(
-              Icons.settings_outlined,
-              color: Colors.white,
-              size: 18,
+              child: const Icon(
+                Icons.settings_outlined,
+                color: Colors.white,
+                size: 18,
+              ),
             ),
           ),
         ],
@@ -286,7 +292,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             width: double.infinity,
             height: 44,
             child: ElevatedButton(
-              onPressed: () => HapticFeedback.lightImpact(),
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                Navigator.pushNamed(context, AppRoutes.userEdit);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: _primary,
                 foregroundColor: Colors.white,
@@ -1016,16 +1025,19 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         icon: Icons.info_outline_rounded,
         label: 'Acerca de PromoMap',
         color: const Color(0xFF8A8FA8),
+        route: AppRoutes.aboutUs,
       ),
       _InfoItem(
         icon: Icons.description_outlined,
         label: 'Términos y Condiciones',
         color: _green,
+        route: AppRoutes.termsService,
       ),
       _InfoItem(
         icon: Icons.privacy_tip_outlined,
         label: 'Política de Privacidad',
         color: _primary,
+        route: AppRoutes.privacyPolicy,
       ),
     ];
 
@@ -1057,7 +1069,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
   Widget _buildInfoRow(_InfoItem item) {
     return GestureDetector(
-      onTap: () => HapticFeedback.selectionClick(),
+      onTap: () {
+        HapticFeedback.selectionClick();
+        Navigator.pushNamed(context, item.route);
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         decoration: const BoxDecoration(
@@ -1272,10 +1287,12 @@ class _InfoItem {
   final IconData icon;
   final String label;
   final Color color;
+  final String route;
   const _InfoItem({
     required this.icon,
     required this.label,
     required this.color,
+    required this.route,
   });
 }
 

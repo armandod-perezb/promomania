@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Core/Routes/app_routes.dart';
 
 class ManagePromotionsScreen extends StatefulWidget {
   const ManagePromotionsScreen({super.key});
@@ -270,22 +271,36 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                       const SizedBox(height: 5),
                       Row(
                         children: [
-                          const Icon(Icons.storefront_outlined, size: 13, color: textGray),
+                          const Icon(
+                            Icons.storefront_outlined,
+                            size: 13,
+                            color: textGray,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             promo['store'] as String,
-                            style: const TextStyle(color: textGray, fontSize: 12),
+                            style: const TextStyle(
+                              color: textGray,
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(Icons.calendar_today_outlined, size: 12, color: textGray),
+                          const Icon(
+                            Icons.calendar_today_outlined,
+                            size: 12,
+                            color: textGray,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             promo['dateRange'] as String,
-                            style: const TextStyle(color: textGray, fontSize: 12),
+                            style: const TextStyle(
+                              color: textGray,
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),
@@ -347,7 +362,9 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isActive ? greenAccent.withOpacity(0.1) : Colors.red.withOpacity(0.08),
+        color: isActive
+            ? greenAccent.withOpacity(0.1)
+            : Colors.red.withOpacity(0.08),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -441,21 +458,14 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
             ),
           ),
           const SizedBox(height: 2),
-          Text(
-            label,
-            style: const TextStyle(color: textGray, fontSize: 12),
-          ),
+          Text(label, style: const TextStyle(color: textGray, fontSize: 12)),
         ],
       ),
     );
   }
 
   Widget _verticalDivider() {
-    return Container(
-      width: 1,
-      height: 36,
-      color: const Color(0xFFEEEEF2),
-    );
+    return Container(width: 1, height: 36, color: const Color(0xFFEEEEF2));
   }
 
   Widget _conversionStat(int pct) {
@@ -582,17 +592,42 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
             onPressed: () {
               setState(() => _promos.remove(promo));
               Navigator.pop(context);
             },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'Eliminar',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
     );
+  }
+
+  String _routeForIndex(int index) {
+    switch (index) {
+      case 0:
+        return AppRoutes.adminDashboard;
+      case 1:
+        return AppRoutes.manageUsers;
+      case 2:
+        return AppRoutes.managePromotions;
+      case 3:
+        return AppRoutes.manageStores;
+      default:
+        return AppRoutes.manageNotifications;
+    }
+  }
+
+  void _onBottomNavTap(int index) {
+    if (index == _selectedIndex) return;
+    Navigator.pushReplacementNamed(context, _routeForIndex(index));
   }
 
   // ─── BOTTOM NAV ─────────────────────────────────────────────────────────────
@@ -622,12 +657,14 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
         children: List.generate(items.length, (i) {
           final selected = i == _selectedIndex;
           return GestureDetector(
-            onTap: () => setState(() => _selectedIndex = i),
+            onTap: () => _onBottomNavTap(i),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
-                color: selected ? primaryOrange.withOpacity(0.12) : Colors.transparent,
+                color: selected
+                    ? primaryOrange.withOpacity(0.12)
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -644,7 +681,9 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                     style: TextStyle(
                       color: selected ? primaryOrange : textGray,
                       fontSize: 10,
-                      fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
+                      fontWeight: selected
+                          ? FontWeight.w700
+                          : FontWeight.normal,
                     ),
                   ),
                 ],

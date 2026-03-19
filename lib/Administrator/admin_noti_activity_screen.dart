@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../Core/Routes/app_routes.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODELOS
@@ -57,7 +58,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
 
   int _selectedTab = 0; // Actividad/Reportes/Alertas/Exportar
   int _selectedFilter = 0; // Todas/Usuarios/Promos/Comercios
-  int _selectedNavTab = 0; // Panel activo
+  int _selectedNavTab = 4; // Avisos activo
 
   final List<_ActivityItem> _activities = const [
     _ActivityItem(
@@ -949,10 +950,10 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
   Widget _buildBottomNav() {
     final tabs = [
       _NavItem(icon: Icons.dashboard_outlined, label: 'Panel'),
-      _NavItem(icon: Icons.local_offer_outlined, label: 'Promos'),
       _NavItem(icon: Icons.people_outline_rounded, label: 'Usuarios'),
-      _NavItem(icon: Icons.policy_outlined, label: 'Auditoría'),
-      _NavItem(icon: Icons.more_horiz_rounded, label: 'Más'),
+      _NavItem(icon: Icons.local_offer_outlined, label: 'Promos'),
+      _NavItem(icon: Icons.storefront_outlined, label: 'Comercios'),
+      _NavItem(icon: Icons.notifications_outlined, label: 'Avisos'),
     ];
 
     return Container(
@@ -972,10 +973,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
         children: List.generate(tabs.length, (i) {
           final isActive = _selectedNavTab == i;
           return GestureDetector(
-            onTap: () {
-              setState(() => _selectedNavTab = i);
-              HapticFeedback.selectionClick();
-            },
+            onTap: () => _onBottomNavTap(i),
             behavior: HitTestBehavior.opaque,
             child: SizedBox(
               width: 62,
@@ -1016,6 +1014,27 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
         }),
       ),
     );
+  }
+
+  String _routeForIndex(int index) {
+    switch (index) {
+      case 0:
+        return AppRoutes.adminDashboard;
+      case 1:
+        return AppRoutes.manageUsers;
+      case 2:
+        return AppRoutes.managePromotions;
+      case 3:
+        return AppRoutes.manageStores;
+      default:
+        return AppRoutes.manageNotifications;
+    }
+  }
+
+  void _onBottomNavTap(int index) {
+    if (index == _selectedNavTab) return;
+    HapticFeedback.selectionClick();
+    Navigator.pushReplacementNamed(context, _routeForIndex(index));
   }
 }
 

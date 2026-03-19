@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Core/Routes/app_routes.dart';
 
 class ManageStoresScreen extends StatefulWidget {
   const ManageStoresScreen({super.key});
@@ -290,8 +291,11 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(Icons.location_on_outlined,
-                              size: 12, color: textGray),
+                          const Icon(
+                            Icons.location_on_outlined,
+                            size: 12,
+                            color: textGray,
+                          ),
                           const SizedBox(width: 3),
                           Expanded(
                             child: Text(
@@ -477,21 +481,14 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
             ),
           ),
           const SizedBox(height: 2),
-          Text(
-            label,
-            style: const TextStyle(color: textGray, fontSize: 12),
-          ),
+          Text(label, style: const TextStyle(color: textGray, fontSize: 12)),
         ],
       ),
     );
   }
 
   Widget _verticalDivider() {
-    return Container(
-      width: 1,
-      height: 38,
-      color: const Color(0xFFEEEEF2),
-    );
+    return Container(width: 1, height: 38, color: const Color(0xFFEEEEF2));
   }
 
   Widget _contactItem({
@@ -638,18 +635,41 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
             onPressed: () {
               setState(() => _stores.remove(store));
               Navigator.pop(context);
             },
-            child: const Text('Eliminar',
-                style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'Eliminar',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
     );
+  }
+
+  String _routeForIndex(int index) {
+    switch (index) {
+      case 0:
+        return AppRoutes.adminDashboard;
+      case 1:
+        return AppRoutes.manageUsers;
+      case 2:
+        return AppRoutes.managePromotions;
+      case 3:
+        return AppRoutes.manageStores;
+      default:
+        return AppRoutes.manageNotifications;
+    }
+  }
+
+  void _onBottomNavTap(int index) {
+    if (index == _selectedIndex) return;
+    Navigator.pushReplacementNamed(context, _routeForIndex(index));
   }
 
   // ─── BOTTOM NAV ─────────────────────────────────────────────────────────────
@@ -679,11 +699,10 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
         children: List.generate(items.length, (i) {
           final selected = i == _selectedIndex;
           return GestureDetector(
-            onTap: () => setState(() => _selectedIndex = i),
+            onTap: () => _onBottomNavTap(i),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
                 color: selected
                     ? primaryOrange.withOpacity(0.12)

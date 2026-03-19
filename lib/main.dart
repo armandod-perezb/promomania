@@ -16,7 +16,11 @@ import 'Settings/app_about_screen.dart';
 import 'Settings/user_terms_service_screen.dart';
 import 'Settings/help_center_screen.dart';
 import 'Settings/privacy_policy_screen.dart';
-
+import 'Administrator/admin_dashboard_screen.dart';
+import 'Administrator/admin_usuarios_screen.dart';
+import 'Administrator/admin_promos_screen.dart';
+import 'Administrator/admin_store_screen.dart';
+import 'Administrator/admin_noti_activity_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -63,16 +67,16 @@ class MyApp extends StatelessWidget {
         AppRoutes.privacyPolicy: (context) => const PrivacyPolicyScreen(),
         AppRoutes.aboutUs: (context) => const AboutScreen(),
         AppRoutes.helpCenter: (context) => const HelpCenterScreen(),
+        AppRoutes.adminDashboard: (context) => const AdminDashboardScreen(),
+        AppRoutes.manageUsers: (context) => const ManageUsersScreen(),
+        AppRoutes.managePromotions: (context) => const ManagePromotionsScreen(),
+        AppRoutes.manageStores: (context) => const ManageStoresScreen(),
+        AppRoutes.manageNotifications: (context) => const AdminAuditScreen(),
         /*
         AppRoutes.onboarding: (context) => const OnboardingScreen(),
         AppRoutes.onboarding2: (context) => const OnboardingScreen2(),
         AppRoutes.onboarding3: (context) => const OnboardingScreen3(),
         AppRoutes.onboarding4: (context) => const OnboardingScreen4(),
-        AppRoutes.adminDashboard: (context) => const AdminDashboardScreen(),
-        AppRoutes.manageUsers: (context) => const ManageUsersScreen(),
-        AppRoutes.managePromotions: (context) => const ManagePromotionsScreen(),
-        AppRoutes.manageStores: (context) => const ManageStoresScreen(),
-        AppRoutes.manageNotifications: (context) => const ManageNotificationsScreen(),
         
         AppRoutes.addPromotions: (context) => const AddPromotionsScreen(),
         AppRoutes.addPromotions2: (context) => const AddPromotionsScreen2(),
@@ -84,5 +88,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-

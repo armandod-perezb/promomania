@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Core/Routes/app_routes.dart';
 
 class ManageUsersScreen extends StatefulWidget {
   const ManageUsersScreen({super.key});
@@ -380,7 +381,14 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
         children: [
           Icon(icon, size: 14, color: textGray),
           const SizedBox(width: 5),
-          Text(label, style: const TextStyle(color: textDark, fontSize: 12, fontWeight: FontWeight.w500)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: textDark,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );
@@ -395,7 +403,11 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
       ),
       child: Text(
         label,
-        style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w700),
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -455,12 +467,19 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                                 ),
                               ),
                               const SizedBox(width: 4),
-                              const Icon(Icons.verified, color: primaryOrange, size: 14),
+                              const Icon(
+                                Icons.verified,
+                                color: primaryOrange,
+                                size: 14,
+                              ),
                             ],
                           ),
                           Text(
                             user['email'] as String,
-                            style: const TextStyle(color: textGray, fontSize: 11),
+                            style: const TextStyle(
+                              color: textGray,
+                              fontSize: 11,
+                            ),
                           ),
                         ],
                       ),
@@ -483,7 +502,10 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                   children: [
                     _metaItem(Icons.access_time, user['lastActive'] as String),
                     const SizedBox(width: 16),
-                    _metaItem(Icons.calendar_today_outlined, user['joinDate'] as String),
+                    _metaItem(
+                      Icons.calendar_today_outlined,
+                      user['joinDate'] as String,
+                    ),
                   ],
                 ),
               ],
@@ -530,7 +552,11 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                       color: Colors.red.withOpacity(0.08),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.delete_outline, color: Colors.red, size: 17),
+                    child: const Icon(
+                      Icons.delete_outline,
+                      color: Colors.red,
+                      size: 17,
+                    ),
                   ),
                 ),
               ],
@@ -566,8 +592,8 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             role == 'Admin'
                 ? Icons.shield_outlined
                 : role == 'Negocio'
-                    ? Icons.storefront_outlined
-                    : Icons.person_outline,
+                ? Icons.storefront_outlined
+                : Icons.person_outline,
             color: color,
             size: 11,
           ),
@@ -589,7 +615,9 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: isActive ? greenAccent.withOpacity(0.1) : Colors.red.withOpacity(0.08),
+        color: isActive
+            ? greenAccent.withOpacity(0.1)
+            : Colors.red.withOpacity(0.08),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
@@ -675,7 +703,10 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text('Eliminar usuario', style: TextStyle(color: textDark, fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Eliminar usuario',
+          style: TextStyle(color: textDark, fontWeight: FontWeight.bold),
+        ),
         content: Text(
           '¿Estás seguro de eliminar a ${user['name']}? Esta acción no se puede deshacer.',
           style: const TextStyle(color: textGray, fontSize: 14),
@@ -688,13 +719,18 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
             onPressed: () {
               setState(() => _users.remove(user));
               Navigator.pop(context);
             },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'Eliminar',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -724,7 +760,11 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
               children: [
                 const Text(
                   'Nuevo Usuario',
-                  style: TextStyle(color: textDark, fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: textDark,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
@@ -737,7 +777,10 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             const SizedBox(height: 12),
             _inputField('Correo electrónico', Icons.email_outlined),
             const SizedBox(height: 12),
-            _inputField('Rol (Usuario / Negocio / Admin)', Icons.shield_outlined),
+            _inputField(
+              'Rol (Usuario / Negocio / Admin)',
+              Icons.shield_outlined,
+            ),
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
@@ -745,10 +788,18 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryOrange,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Crear Usuario', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                child: const Text(
+                  'Crear Usuario',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -774,6 +825,26 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
         ),
       ),
     );
+  }
+
+  String _routeForIndex(int index) {
+    switch (index) {
+      case 0:
+        return AppRoutes.adminDashboard;
+      case 1:
+        return AppRoutes.manageUsers;
+      case 2:
+        return AppRoutes.managePromotions;
+      case 3:
+        return AppRoutes.manageStores;
+      default:
+        return AppRoutes.manageNotifications;
+    }
+  }
+
+  void _onBottomNavTap(int index) {
+    if (index == _selectedIndex) return;
+    Navigator.pushReplacementNamed(context, _routeForIndex(index));
   }
 
   // ─── BOTTOM NAV ─────────────────────────────────────────────────────────────
@@ -803,12 +874,14 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
         children: List.generate(items.length, (i) {
           final selected = i == _selectedIndex;
           return GestureDetector(
-            onTap: () => setState(() => _selectedIndex = i),
+            onTap: () => _onBottomNavTap(i),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
-                color: selected ? primaryOrange.withOpacity(0.12) : Colors.transparent,
+                color: selected
+                    ? primaryOrange.withOpacity(0.12)
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -825,7 +898,9 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                     style: TextStyle(
                       color: selected ? primaryOrange : textGray,
                       fontSize: 10,
-                      fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
+                      fontWeight: selected
+                          ? FontWeight.w700
+                          : FontWeight.normal,
                     ),
                   ),
                 ],

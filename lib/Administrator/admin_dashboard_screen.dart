@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Core/Routes/app_routes.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -128,7 +129,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             children: [
               _headerStat(Icons.people_outline, '6', 'Usuarios', '+1 hoy'),
               const SizedBox(width: 12),
-              _headerStat(Icons.confirmation_number_outlined, '140', 'Tickets', '+7 hoy'),
+              _headerStat(
+                Icons.confirmation_number_outlined,
+                '140',
+                'Tickets',
+                '+7 hoy',
+              ),
               const SizedBox(width: 12),
               _headerStat(Icons.attach_money, '\$4.2M', 'Revenue', '+18%'),
             ],
@@ -166,7 +172,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               children: [
                 Icon(icon, color: Colors.white70, size: 16),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white24,
                     borderRadius: BorderRadius.circular(6),
@@ -193,10 +202,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 11,
-              ),
+              style: const TextStyle(color: Colors.white70, fontSize: 11),
             ),
           ],
         ),
@@ -360,13 +366,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          Text(
-            sublabel,
-            style: const TextStyle(
-              color: textGray,
-              fontSize: 11,
-            ),
-          ),
+          Text(sublabel, style: const TextStyle(color: textGray, fontSize: 11)),
         ],
       ),
     );
@@ -408,10 +408,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     ),
                     Text(
                       'Últimos 7 días  •  COP \$15.2M total',
-                      style: const TextStyle(
-                        color: textGray,
-                        fontSize: 12,
-                      ),
+                      style: const TextStyle(color: textGray, fontSize: 12),
                     ),
                   ],
                 ),
@@ -442,13 +439,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-                  .map((d) => Text(
-                        d,
-                        style: const TextStyle(
-                          color: textGray,
-                          fontSize: 11,
-                        ),
-                      ))
+                  .map(
+                    (d) => Text(
+                      d,
+                      style: const TextStyle(color: textGray, fontSize: 11),
+                    ),
+                  )
                   .toList(),
             ),
           ],
@@ -460,9 +456,24 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   // ─── TOP USERS ───────────────────────────────────────────────────────────────
   Widget _buildTopUsers() {
     final users = [
-      {'name': 'Luis Herrera', 'tickets': '39 tickets', 'badge': '+12%', 'color': primaryOrange},
-      {'name': 'Carlos López', 'tickets': '54 tickets', 'badge': '+8%', 'color': const Color(0xFF3498DB)},
-      {'name': 'Sofía Ramírez', 'tickets': '37 tickets', 'badge': '+15%', 'color': greenAccent},
+      {
+        'name': 'Luis Herrera',
+        'tickets': '39 tickets',
+        'badge': '+12%',
+        'color': primaryOrange,
+      },
+      {
+        'name': 'Carlos López',
+        'tickets': '54 tickets',
+        'badge': '+8%',
+        'color': const Color(0xFF3498DB),
+      },
+      {
+        'name': 'Sofía Ramírez',
+        'tickets': '37 tickets',
+        'badge': '+15%',
+        'color': greenAccent,
+      },
     ];
 
     return Padding(
@@ -494,7 +505,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         color: primaryOrange.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(9),
                       ),
-                      child: const Icon(Icons.person_outline, color: primaryOrange, size: 18),
+                      child: const Icon(
+                        Icons.person_outline,
+                        color: primaryOrange,
+                        size: 18,
+                      ),
                     ),
                     const SizedBox(width: 10),
                     const Text(
@@ -511,12 +526,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            ...users.map((u) => _userRow(
-                  name: u['name'] as String,
-                  sub: u['tickets'] as String,
-                  badge: u['badge'] as String,
-                  color: u['color'] as Color,
-                )),
+            ...users.map(
+              (u) => _userRow(
+                name: u['name'] as String,
+                sub: u['tickets'] as String,
+                badge: u['badge'] as String,
+                color: u['color'] as Color,
+              ),
+            ),
           ],
         ),
       ),
@@ -597,7 +614,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     final stores = [
       {'name': 'Sport Zone', 'city': 'Cali', 'count': '15', 'badge': '+23%'},
       {'name': 'TechStore', 'city': 'Bogotá', 'count': '12', 'badge': '+18%'},
-      {'name': 'Pizza Express', 'city': 'Medellín', 'count': '8', 'badge': '+10%'},
+      {
+        'name': 'Pizza Express',
+        'city': 'Medellín',
+        'count': '8',
+        'badge': '+10%',
+      },
     ];
 
     return Padding(
@@ -629,7 +651,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         color: primaryOrange.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(9),
                       ),
-                      child: const Icon(Icons.storefront_outlined, color: primaryOrange, size: 18),
+                      child: const Icon(
+                        Icons.storefront_outlined,
+                        color: primaryOrange,
+                        size: 18,
+                      ),
                     ),
                     const SizedBox(width: 10),
                     const Text(
@@ -646,12 +672,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            ...stores.map((s) => _storeRow(
-                  name: s['name']!,
-                  city: s['city']!,
-                  count: s['count']!,
-                  badge: s['badge']!,
-                )),
+            ...stores.map(
+              (s) => _storeRow(
+                name: s['name']!,
+                city: s['city']!,
+                count: s['count']!,
+                badge: s['badge']!,
+              ),
+            ),
           ],
         ),
       ),
@@ -701,9 +729,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ),
                 Row(
                   children: [
-                    const Icon(Icons.location_on_outlined, size: 11, color: textGray),
+                    const Icon(
+                      Icons.location_on_outlined,
+                      size: 11,
+                      color: textGray,
+                    ),
                     const SizedBox(width: 2),
-                    Text(city, style: const TextStyle(color: textGray, fontSize: 12)),
+                    Text(
+                      city,
+                      style: const TextStyle(color: textGray, fontSize: 12),
+                    ),
                   ],
                 ),
               ],
@@ -741,10 +776,34 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   // ─── GEO DISTRIBUTION ────────────────────────────────────────────────────────
   Widget _buildGeoDistribution() {
     final cities = [
-      {'city': 'Bogotá', 'stores': '12 tiendas', 'users': '245 usuarios', 'pct': 0.40, 'color': primaryOrange},
-      {'city': 'Medellín', 'stores': '8 tiendas', 'users': '189 usuarios', 'pct': 0.27, 'color': const Color(0xFF2C3E50)},
-      {'city': 'Cali', 'stores': '6 tiendas', 'users': '156 usuarios', 'pct': 0.20, 'color': greenAccent},
-      {'city': 'Barranquilla', 'stores': '4 tiendas', 'users': '98 usuarios', 'pct': 0.13, 'color': const Color(0xFFF5A623)},
+      {
+        'city': 'Bogotá',
+        'stores': '12 tiendas',
+        'users': '245 usuarios',
+        'pct': 0.40,
+        'color': primaryOrange,
+      },
+      {
+        'city': 'Medellín',
+        'stores': '8 tiendas',
+        'users': '189 usuarios',
+        'pct': 0.27,
+        'color': const Color(0xFF2C3E50),
+      },
+      {
+        'city': 'Cali',
+        'stores': '6 tiendas',
+        'users': '156 usuarios',
+        'pct': 0.20,
+        'color': greenAccent,
+      },
+      {
+        'city': 'Barranquilla',
+        'stores': '4 tiendas',
+        'users': '98 usuarios',
+        'pct': 0.13,
+        'color': const Color(0xFFF5A623),
+      },
     ];
 
     return Padding(
@@ -774,7 +833,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     color: greenLight,
                     borderRadius: BorderRadius.circular(9),
                   ),
-                  child: const Icon(Icons.location_on_outlined, color: greenAccent, size: 18),
+                  child: const Icon(
+                    Icons.location_on_outlined,
+                    color: greenAccent,
+                    size: 18,
+                  ),
                 ),
                 const SizedBox(width: 10),
                 const Text(
@@ -788,13 +851,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ],
             ),
             const SizedBox(height: 18),
-            ...cities.map((c) => _geoRow(
-                  city: c['city'] as String,
-                  stores: c['stores'] as String,
-                  users: c['users'] as String,
-                  pct: c['pct'] as double,
-                  color: c['color'] as Color,
-                )),
+            ...cities.map(
+              (c) => _geoRow(
+                city: c['city'] as String,
+                stores: c['stores'] as String,
+                users: c['users'] as String,
+                pct: c['pct'] as double,
+                color: c['color'] as Color,
+              ),
+            ),
           ],
         ),
       ),
@@ -936,7 +1001,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         color: primaryOrange.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(9),
                       ),
-                      child: const Icon(Icons.bolt, color: primaryOrange, size: 18),
+                      child: const Icon(
+                        Icons.bolt,
+                        color: primaryOrange,
+                        size: 18,
+                      ),
                     ),
                     const SizedBox(width: 10),
                     const Text(
@@ -1017,10 +1086,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
           ),
           const SizedBox(width: 8),
-          Text(
-            time,
-            style: const TextStyle(color: textGray, fontSize: 11),
-          ),
+          Text(time, style: const TextStyle(color: textGray, fontSize: 11)),
         ],
       ),
     );
@@ -1061,16 +1127,24 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   icon: Icons.person_add_outlined,
                   label: 'Nuevo\nUsuario',
                   color: primaryOrange,
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.manageUsers),
                 ),
                 _quickActionBtn(
                   icon: Icons.local_offer_outlined,
                   label: 'Crear\nPromo',
                   color: greenAccent,
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.managePromotions),
                 ),
                 _quickActionBtn(
                   icon: Icons.notifications_outlined,
                   label: 'Notificar',
                   color: const Color(0xFFF5A623),
+                  onTap: () => Navigator.pushNamed(
+                    context,
+                    AppRoutes.manageNotifications,
+                  ),
                 ),
               ],
             ),
@@ -1084,30 +1158,54 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     required IconData icon,
     required String label,
     required Color color,
+    VoidCallback? onTap,
   }) {
-    return Column(
-      children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(16),
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(icon, color: Colors.white, size: 26),
           ),
-          child: Icon(icon, color: Colors.white, size: 26),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 12,
-            height: 1.3,
+          const SizedBox(height: 8),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 12,
+              height: 1.3,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
+  }
+
+  String _routeForIndex(int index) {
+    switch (index) {
+      case 0:
+        return AppRoutes.adminDashboard;
+      case 1:
+        return AppRoutes.manageUsers;
+      case 2:
+        return AppRoutes.managePromotions;
+      case 3:
+        return AppRoutes.manageStores;
+      default:
+        return AppRoutes.manageNotifications;
+    }
+  }
+
+  void _onBottomNavTap(int index) {
+    if (index == _selectedIndex) return;
+    Navigator.pushReplacementNamed(context, _routeForIndex(index));
   }
 
   // ─── BOTTOM NAV ──────────────────────────────────────────────────────────────
@@ -1137,12 +1235,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         children: List.generate(items.length, (i) {
           final selected = i == _selectedIndex;
           return GestureDetector(
-            onTap: () => setState(() => _selectedIndex = i),
+            onTap: () => _onBottomNavTap(i),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
-                color: selected ? primaryOrange.withOpacity(0.12) : Colors.transparent,
+                color: selected
+                    ? primaryOrange.withOpacity(0.12)
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -1159,7 +1259,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     style: TextStyle(
                       color: selected ? primaryOrange : textGray,
                       fontSize: 10,
-                      fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
+                      fontWeight: selected
+                          ? FontWeight.w700
+                          : FontWeight.normal,
                     ),
                   ),
                 ],
@@ -1180,7 +1282,13 @@ class _LineChartPainter extends CustomPainter {
 
     // Y-axis labels
     final yLabelStyle = TextStyle(color: Colors.grey.shade400, fontSize: 10);
-    final yLabels = ['\$3.2\nM', '\$2.4\nM', '\$1.6\nM', '\$0.8\nM', '\$0.0\nM'];
+    final yLabels = [
+      '\$3.2\nM',
+      '\$2.4\nM',
+      '\$1.6\nM',
+      '\$0.8\nM',
+      '\$0.0\nM',
+    ];
     for (int i = 0; i < yLabels.length; i++) {
       final tp = TextPainter(
         text: TextSpan(text: yLabels[i], style: yLabelStyle),

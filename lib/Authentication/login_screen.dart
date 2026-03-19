@@ -30,11 +30,20 @@ class _LoginScreenState extends State<LoginScreen> {
   void _login() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty)
       return;
+
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final isAdminLogin = email == 'admin@gmail.com' && password == '123';
+
     setState(() => _isLoading = true);
     await Future.delayed(const Duration(seconds: 2));
     setState(() => _isLoading = false);
+
     if (mounted) {
-      Navigator.pushReplacementNamed(context, AppRoutes.userHome);
+      Navigator.pushReplacementNamed(
+        context,
+        isAdminLogin ? AppRoutes.adminDashboard : AppRoutes.userHome,
+      );
     }
   }
 

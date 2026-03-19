@@ -50,7 +50,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildHeader(),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 children: [
                   // Plan Banner
                   _buildPlanBanner(),
@@ -66,7 +69,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       iconBg: const Color(0xFFE5E5EA),
                       title: 'Editar perfil',
                       subtitle: 'Nombre, foto, bio',
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.userEdit),
+                      onTap: () =>
+                          Navigator.pushNamed(context, AppRoutes.userEdit),
                     ),
                     _buildDivider(),
                     _buildNavItem(
@@ -245,6 +249,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       iconBg: const Color(0xFFFFEDE6),
                       title: 'Cerrar sesión',
                       titleColor: const Color(0xFFFF6B35),
+                      onTap: () {
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          AppRoutes.login,
+                          (route) => false,
+                        );
+                      },
                     ),
                     _buildDivider(),
                     _buildDangerItem(
@@ -344,7 +355,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               color: const Color(0xFFFF6B35),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.local_fire_department, color: Colors.white, size: 22),
+            child: const Icon(
+              Icons.local_fire_department,
+              color: Colors.white,
+              size: 22,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -363,7 +378,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(width: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFF8E8E93).withOpacity(0.3),
                         borderRadius: BorderRadius.circular(4),
@@ -383,10 +401,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 2),
                 const Text(
                   'Activa promos ilimitadas con Pro',
-                  style: TextStyle(
-                    color: Color(0xFF8E8E93),
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
                 ),
               ],
             ),
@@ -519,11 +534,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
             ),
-            const Icon(
-              Icons.chevron_right,
-              color: Color(0xFFC7C7CC),
-              size: 20,
-            ),
+            const Icon(Icons.chevron_right, color: Color(0xFFC7C7CC), size: 20),
           ],
         ),
       ),
@@ -556,10 +567,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF8E8E93),
-            ),
+            style: const TextStyle(fontSize: 14, color: Color(0xFF8E8E93)),
           ),
           if (showChevron) ...[
             const SizedBox(width: 4),
@@ -627,40 +635,48 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required String title,
     String? subtitle,
     required Color titleColor,
+    VoidCallback? onTap,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      child: Row(
-        children: [
-          _buildIconContainer(icon: icon, iconColor: iconColor, iconBg: iconBg),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    color: titleColor,
-                  ),
-                ),
-                if (subtitle != null) ...[
-                  const SizedBox(height: 2),
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
+          children: [
+            _buildIconContainer(
+              icon: icon,
+              iconColor: iconColor,
+              iconBg: iconBg,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF8E8E93),
+                    title,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: titleColor,
                     ),
                   ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF8E8E93),
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-          const Icon(Icons.chevron_right, color: Color(0xFFC7C7CC), size: 20),
-        ],
+            const Icon(Icons.chevron_right, color: Color(0xFFC7C7CC), size: 20),
+          ],
+        ),
       ),
     );
   }
@@ -679,7 +695,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   color: const Color(0xFFFF6B35),
                   borderRadius: BorderRadius.circular(7),
                 ),
-                child: const Icon(Icons.location_on, color: Colors.white, size: 16),
+                child: const Icon(
+                  Icons.location_on,
+                  color: Colors.white,
+                  size: 16,
+                ),
               ),
               const SizedBox(width: 8),
               const Text(
@@ -696,10 +716,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 4),
           const Text(
             'Encuentra. Comparte. Ahorra.',
-            style: TextStyle(
-              fontSize: 11,
-              color: Color(0xFF8E8E93),
-            ),
+            style: TextStyle(fontSize: 11, color: Color(0xFF8E8E93)),
           ),
         ],
       ),

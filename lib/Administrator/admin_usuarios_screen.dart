@@ -285,7 +285,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
           ],
         ),
         GestureDetector(
-          onTap: () => _showAddUserDialog(),
+          onTap: () => _showCrearUsuarioModal(),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
             decoration: BoxDecoration(
@@ -809,6 +809,15 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     );
   }
 
+  void _showCrearUsuarioModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const CrearUsuarioModal(),
+    );
+  }
+
   Widget _inputField(String hint, IconData icon) {
     return Container(
       decoration: BoxDecoration(
@@ -908,6 +917,688 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             ),
           );
         }),
+      ),
+    );
+  }
+}
+
+const kOrange = Color(0xFFFF4422);
+const kOrangeSoft = Color(0xFFFF6644);
+const kNavy = Color(0xFF1A1F36);
+const kBg = Color(0xFFF3F4F8);
+const kWhite = Colors.white;
+const kTextDark = Color(0xFF1A1F36);
+const kMuted = Color(0xFF9096AF);
+const kBorder = Color(0xFFE8E9F0);
+const kGreen = Color(0xFF22C55E);
+const kGreenBg = Color(0xFFDCFCE7);
+const kLabelBlue = Color(0xFF6366F1);
+const kChipBg = Color(0xFFFFF0EE);
+const kChipBord = Color(0xFFFFCCC5);
+const kPreviewBg = Color(0xFF1E2440);
+
+class CrearUsuarioModal extends StatefulWidget {
+  const CrearUsuarioModal({super.key});
+
+  @override
+  State<CrearUsuarioModal> createState() => _CrearUsuarioModalState();
+}
+
+class _CrearUsuarioModalState extends State<CrearUsuarioModal> {
+  final _nombre = TextEditingController();
+  final _email = TextEditingController();
+  final _pass = TextEditingController();
+  final _passConf = TextEditingController();
+  final _telefono = TextEditingController();
+  final _numDoc = TextEditingController();
+  final _fechaNac = TextEditingController();
+  final _ciudad = TextEditingController();
+  final _direccion = TextEditingController();
+
+  bool _showPass = false;
+  bool _showPassC = false;
+  bool _usuarioActive = true;
+  String _rol = 'Usuario';
+  String _tipoDoc = 'CC';
+  String? _genero;
+
+  @override
+  void dispose() {
+    _nombre.dispose();
+    _email.dispose();
+    _pass.dispose();
+    _passConf.dispose();
+    _telefono.dispose();
+    _numDoc.dispose();
+    _fechaNac.dispose();
+    _ciudad.dispose();
+    _direccion.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final mq = MediaQuery.of(context);
+    return Container(
+      height: mq.size.height * 0.95,
+      decoration: const BoxDecoration(
+        color: kBg,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 10),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: kBorder,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [kOrange, kOrangeSoft],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.person_add_outlined,
+                    color: kWhite,
+                    size: 21,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Crear Usuario',
+                      style: TextStyle(
+                        color: kWhite,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      'Completa los datos del nuevo usuario',
+                      style: TextStyle(color: Colors.white70, fontSize: 11),
+                    ),
+                  ],
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.close, color: kWhite, size: 18),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
+              children: [
+                _sectionHeader(
+                  Icons.person_outline,
+                  'Informacion Basica',
+                  'Obligatorio',
+                  labelColor: kOrange,
+                ),
+                const SizedBox(height: 12),
+                _fieldLabel('NOMBRE COMPLETO *'),
+                _inputField(
+                  _nombre,
+                  'Maria Garcia Lopez',
+                  icon: Icons.person_outline,
+                ),
+                const SizedBox(height: 12),
+                _fieldLabel('CORREO ELECTRONICO *'),
+                _inputField(
+                  _email,
+                  'maria.garcia@ejemplo.com',
+                  icon: Icons.email_outlined,
+                  keyType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 12),
+                _fieldLabel('CONTRASENA *'),
+                _inputField(
+                  _pass,
+                  'Minimo 8 caracteres',
+                  icon: Icons.lock_outline,
+                  obscure: !_showPass,
+                  suffix: IconButton(
+                    icon: Icon(
+                      _showPass
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      color: kMuted,
+                      size: 18,
+                    ),
+                    onPressed: () => setState(() => _showPass = !_showPass),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _fieldLabel('CONFIRMAR CONTRASENA *'),
+                _inputField(
+                  _passConf,
+                  'Repite la contrasena',
+                  icon: Icons.lock_outline,
+                  obscure: !_showPassC,
+                  suffix: IconButton(
+                    icon: Icon(
+                      _showPassC
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      color: kMuted,
+                      size: 18,
+                    ),
+                    onPressed: () => setState(() => _showPassC = !_showPassC),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _fieldLabel('TELEFONO'),
+                _inputField(
+                  _telefono,
+                  '+57 300 123 4567',
+                  icon: Icons.phone_outlined,
+                  keyType: TextInputType.phone,
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _fieldLabel('TIPO DOC.'),
+                          _dropdownField(
+                            value: _tipoDoc,
+                            items: const ['CC', 'CE', 'PA', 'NIT'],
+                            onChanged: (v) =>
+                                setState(() => _tipoDoc = v ?? 'CC'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _fieldLabel('NUMERO'),
+                          _inputField(
+                            _numDoc,
+                            '1234567890',
+                            icon: Icons.badge_outlined,
+                            keyType: TextInputType.number,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _fieldLabel('FECHA NAC.'),
+                          _inputField(
+                            _fechaNac,
+                            'DD/MM/AAAA',
+                            icon: Icons.cake_outlined,
+                            keyType: TextInputType.datetime,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _fieldLabel('GENERO'),
+                          _dropdownField(
+                            value: _genero,
+                            hint: 'Seleccionar',
+                            items: const ['Masculino', 'Femenino', 'Otro'],
+                            onChanged: (v) => setState(() => _genero = v),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                _sectionHeader(
+                  Icons.location_on_outlined,
+                  'Ubicacion',
+                  null,
+                  labelColor: kGreen,
+                ),
+                const SizedBox(height: 12),
+                _fieldLabel('CIUDAD'),
+                _inputField(_ciudad, '', icon: Icons.location_city_outlined),
+                const SizedBox(height: 12),
+                _fieldLabel('DIRECCION'),
+                _inputField(
+                  _direccion,
+                  'Calle 123 #45-67, Apto 101',
+                  icon: Icons.home_outlined,
+                ),
+                const SizedBox(height: 20),
+                _sectionHeader(
+                  Icons.shield_outlined,
+                  'Permisos y Estado',
+                  null,
+                  labelColor: kLabelBlue,
+                ),
+                const SizedBox(height: 12),
+                _fieldLabel('ROL DEL USUARIO *'),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    _roleChip(
+                      'Usuario',
+                      Icons.person_outline,
+                      active: _rol == 'Usuario',
+                      onTap: () => setState(() => _rol = 'Usuario'),
+                    ),
+                    const SizedBox(width: 10),
+                    _roleChip(
+                      'Admin',
+                      Icons.admin_panel_settings_outlined,
+                      active: _rol == 'Admin',
+                      onTap: () => setState(() => _rol = 'Admin'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  decoration: BoxDecoration(
+                    color: kWhite,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: kBorder),
+                  ),
+                  padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: kGreen.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.toggle_on_outlined,
+                          color: kGreen,
+                          size: 19,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Estado del Usuario',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                              color: kTextDark,
+                            ),
+                          ),
+                          Text(
+                            'Usuario activo al crearse',
+                            style: TextStyle(fontSize: 11, color: kMuted),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () =>
+                            setState(() => _usuarioActive = !_usuarioActive),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _usuarioActive
+                                ? kGreenBg
+                                : const Color(0xFFF3F4F8),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: _usuarioActive ? kGreen : kBorder,
+                            ),
+                          ),
+                          child: Text(
+                            _usuarioActive ? 'Activo' : 'Inactivo',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: _usuarioActive ? kGreen : kMuted,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _fieldLabel('VISTA PREVIA'),
+                const SizedBox(height: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    color: kPreviewBg,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  padding: const EdgeInsets.all(14),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 46,
+                        height: 46,
+                        decoration: BoxDecoration(
+                          color: kOrange.withOpacity(0.25),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.person,
+                          color: kOrange,
+                          size: 26,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _nombre.text.isEmpty ? 'Sin nombre' : _nombre.text,
+                            style: const TextStyle(
+                              color: kWhite,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _email.text.isEmpty ? 'Sin correo' : _email.text,
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 11.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: kOrange,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          _rol,
+                          style: const TextStyle(
+                            color: kWhite,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: kMuted,
+                          side: const BorderSide(color: kBorder),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Cancelar',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton.icon(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.person_add_outlined, size: 18),
+                        label: const Text(
+                          'Crear Usuario',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: kOrange,
+                          foregroundColor: kWhite,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _sectionHeader(
+    IconData icon,
+    String title,
+    String? badge, {
+    required Color labelColor,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, color: labelColor, size: 18),
+        const SizedBox(width: 7),
+        Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 14.5,
+            color: kTextDark,
+          ),
+        ),
+        if (badge != null) ...[
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: kOrange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              badge,
+              style: const TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w700,
+                color: kOrange,
+              ),
+            ),
+          ),
+        ],
+        const Spacer(),
+        Container(height: 1, width: 60, color: kBorder),
+      ],
+    );
+  }
+
+  Widget _fieldLabel(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 10.5,
+          fontWeight: FontWeight.w700,
+          color: kMuted,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _inputField(
+    TextEditingController ctrl,
+    String hint, {
+    IconData? icon,
+    bool obscure = false,
+    Widget? suffix,
+    TextInputType keyType = TextInputType.text,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: kWhite,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: kBorder),
+      ),
+      child: TextField(
+        controller: ctrl,
+        obscureText: obscure,
+        keyboardType: keyType,
+        style: const TextStyle(fontSize: 13.5, color: kTextDark),
+        onChanged: (_) => setState(() {}),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(color: kMuted.withOpacity(0.7), fontSize: 13),
+          prefixIcon: icon != null ? Icon(icon, color: kMuted, size: 18) : null,
+          suffixIcon: suffix,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 13,
+          ),
+          isDense: true,
+        ),
+      ),
+    );
+  }
+
+  Widget _dropdownField({
+    required String? value,
+    String? hint,
+    required List<String> items,
+    required void Function(String?) onChanged,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: kWhite,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: kBorder),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          hint: Text(
+            hint ?? items.first,
+            style: TextStyle(color: kMuted.withOpacity(0.7), fontSize: 13),
+          ),
+          isExpanded: true,
+          icon: const Icon(Icons.keyboard_arrow_down, color: kMuted, size: 18),
+          style: const TextStyle(fontSize: 13.5, color: kTextDark),
+          items: items
+              .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
+              .toList(),
+          onChanged: onChanged,
+        ),
+      ),
+    );
+  }
+
+  Widget _roleChip(
+    String label,
+    IconData icon, {
+    required bool active,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: active ? kChipBg : kWhite,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: active ? kChipBord : kBorder,
+            width: active ? 1.5 : 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: active ? kOrange : kMuted, size: 22),
+            const SizedBox(height: 5),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: active ? kOrange : kMuted,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -18,6 +18,10 @@ class AppRoutes {
   static const managePromotions = '/admin/manage_promotions';
   static const manageStores = '/admin/manage_stores';
   static const manageNotifications = '/admin/manage_notifications';
+  static const adminNotiActivity = '/admin/noti/activity';
+  static const adminNotiReport = '/admin/noti/report';
+  static const adminNotiAlert = '/admin/noti/alert';
+  static const adminNotiExport = '/admin/noti/export';
 
   // User
   static const userHome = '/user/home';

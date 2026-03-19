@@ -21,6 +21,9 @@ import 'Administrator/admin_usuarios_screen.dart';
 import 'Administrator/admin_promos_screen.dart';
 import 'Administrator/admin_store_screen.dart';
 import 'Administrator/admin_noti_activity_screen.dart';
+import 'Administrator/admin_noti_report_screen.dart';
+import 'Administrator/admin_noti_alert_screen.dart';
+import 'Administrator/admin_noti_exportar_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -72,6 +75,10 @@ class MyApp extends StatelessWidget {
         AppRoutes.managePromotions: (context) => const ManagePromotionsScreen(),
         AppRoutes.manageStores: (context) => const ManageStoresScreen(),
         AppRoutes.manageNotifications: (context) => const AdminAuditScreen(),
+        AppRoutes.adminNotiActivity: (context) => const AdminAuditScreen(),
+        AppRoutes.adminNotiReport: (context) => const AdminNotiReportScreen(),
+        AppRoutes.adminNotiAlert: (context) => const AdminNotiAlertScreen(),
+        AppRoutes.adminNotiExport: (context) => const AdminNotiExportScreen(),
         /*
         AppRoutes.onboarding: (context) => const OnboardingScreen(),
         AppRoutes.onboarding2: (context) => const OnboardingScreen2(),

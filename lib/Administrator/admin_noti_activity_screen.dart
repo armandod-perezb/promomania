@@ -553,10 +553,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
           final t = tabs[i];
           return Expanded(
             child: GestureDetector(
-              onTap: () {
-                setState(() => _selectedTab = i);
-                HapticFeedback.selectionClick();
-              },
+              onTap: () => _onAuditTabTap(i),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
@@ -1029,6 +1026,25 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
       default:
         return AppRoutes.manageNotifications;
     }
+  }
+
+  String _notiRouteForTab(int index) {
+    switch (index) {
+      case 0:
+        return AppRoutes.adminNotiActivity;
+      case 1:
+        return AppRoutes.adminNotiReport;
+      case 2:
+        return AppRoutes.adminNotiAlert;
+      default:
+        return AppRoutes.adminNotiExport;
+    }
+  }
+
+  void _onAuditTabTap(int index) {
+    if (index == _selectedTab) return;
+    HapticFeedback.selectionClick();
+    Navigator.pushReplacementNamed(context, _notiRouteForTab(index));
   }
 
   void _onBottomNavTap(int index) {

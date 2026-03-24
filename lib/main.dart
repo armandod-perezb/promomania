@@ -16,6 +16,11 @@ import 'Settings/app_about_screen.dart';
 import 'Settings/user_terms_service_screen.dart';
 import 'Settings/help_center_screen.dart';
 import 'Settings/privacy_policy_screen.dart';
+import 'Promotions/add_promo1_screen.dart';
+import 'Promotions/add_promo2_screen.dart';
+import 'Promotions/add_promo3_screen.dart';
+import 'Promotions/add_promo4_screen.dart';
+import 'Promotions/add_promo5_screen.dart';
 import 'Administrator/admin_dashboard_screen.dart';
 import 'Administrator/admin_usuarios_screen.dart';
 import 'Administrator/admin_promos_screen.dart';
@@ -70,6 +75,11 @@ class MyApp extends StatelessWidget {
         AppRoutes.privacyPolicy: (context) => const PrivacyPolicyScreen(),
         AppRoutes.aboutUs: (context) => const AboutScreen(),
         AppRoutes.helpCenter: (context) => const HelpCenterScreen(),
+        AppRoutes.addPromotions: (context) => const AddPromotion1Screen(),
+        AppRoutes.addPromotions2: (context) => const AddPromotion2Screen(),
+        AppRoutes.addPromotions3: (context) => const AddPromotion3Screen(),
+        AppRoutes.addPromotions4: (context) => const AddPromotion4Screen(),
+        AppRoutes.addPromotions5: (context) => const AddPromotion5Screen(),
         AppRoutes.adminDashboard: (context) => const AdminDashboardScreen(),
         AppRoutes.manageUsers: (context) => const ManageUsersScreen(),
         AppRoutes.managePromotions: (context) => const ManagePromotionsScreen(),
@@ -79,18 +89,6 @@ class MyApp extends StatelessWidget {
         AppRoutes.adminNotiReport: (context) => const AdminNotiReportScreen(),
         AppRoutes.adminNotiAlert: (context) => const AdminNotiAlertScreen(),
         AppRoutes.adminNotiExport: (context) => const AdminNotiExportScreen(),
-        /*
-        AppRoutes.onboarding: (context) => const OnboardingScreen(),
-        AppRoutes.onboarding2: (context) => const OnboardingScreen2(),
-        AppRoutes.onboarding3: (context) => const OnboardingScreen3(),
-        AppRoutes.onboarding4: (context) => const OnboardingScreen4(),
-        
-        AppRoutes.addPromotions: (context) => const AddPromotionsScreen(),
-        AppRoutes.addPromotions2: (context) => const AddPromotionsScreen2(),
-        AppRoutes.addPromotions3: (context) => const AddPromotionsScreen3(),
-        AppRoutes.addPromotions4: (context) => const AddPromotionsScreen4(),
-        AppRoutes.addPromotions5: (context) => const AddPromotionsScreen5(),
-        */
       },
     );
   }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "160922851464",
+    "project_id": "promomania-page",
+    "storage_bucket": "promomania-page.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:160922851464:android:6adb058ac02cb5037fe73d",
+        "android_client_info": {
+          "package_name": "com.promomania.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-P4YaKGc7frycRGjPCdYYEc-nrn-dfEI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

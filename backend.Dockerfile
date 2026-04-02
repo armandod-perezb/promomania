@@ -42,5 +42,4 @@ CMD sh -c 'until pg_isready -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER}; do \
     done && \
     echo "Database is ready!" && \
     python manage.py migrate --fake-initial --noinput && \
-    python manage.py collectstatic --noinput && \
     python manage.py runserver 0.0.0.0:8000'

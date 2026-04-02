@@ -1,3 +1,32 @@
+from core.views import CreateView, ListView, DetailView, UpdateView, DeleteView
+
+from .models import Categoria
+from .serializers import CategoriaSerializer
+
+
+class CategoriaCreateView(CreateView):
+    model = Categoria
+    serializer_class = CategoriaSerializer
+
+
+class CategoriaListView(ListView):
+    model = Categoria
+    serializer_class = CategoriaSerializer
+
+
+class CategoriaDetailView(DetailView):
+    model = Categoria
+    serializer_class = CategoriaSerializer
+
+
+class CategoriaUpdateView(UpdateView):
+    model = Categoria
+    serializer_class = CategoriaSerializer
+
+
+class CategoriaDeleteView(DeleteView):
+    model = Categoria
+    serializer_class = CategoriaSerializer
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt

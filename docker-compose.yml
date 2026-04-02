@@ -10,7 +10,7 @@ services:
   # BASE DE DATOS POSTGRESQL
   # ==========================================
   db:
-    container_name: postgres_db
+    container_name: promo_postgres
     image: postgres:15
     restart: always
     ports:
@@ -49,7 +49,7 @@ services:
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: mysecretpassword
-      DB_NAME: postgresdb
+      DB_NAME: mypostgresdb
       # Python
       PYTHONUNBUFFERED: "1"
     depends_on:

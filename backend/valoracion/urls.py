@@ -1,17 +1,8 @@
-from django.urls import path
+from rest_framework.routers import DefaultRouter
 
-from .views import (
-    ValoracionCreateView,
-    ValoracionDeleteView,
-    ValoracionDetailView,
-    ValoracionListView,
-    ValoracionUpdateView,
-)
+from .views import ValoracionViewSet
 
-urlpatterns = [
-    path('', ValoracionCreateView.as_view()),
-    path('list/', ValoracionListView.as_view()),
-    path('<int:id>/', ValoracionDetailView.as_view()),
-    path('update/', ValoracionUpdateView.as_view()),
-    path('delete/', ValoracionDeleteView.as_view()),
-]
+router = DefaultRouter()
+router.register('', ValoracionViewSet, basename='valoracion')
+
+urlpatterns = router.urls

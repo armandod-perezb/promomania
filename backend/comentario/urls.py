@@ -1,17 +1,8 @@
-from django.urls import path
+from rest_framework.routers import DefaultRouter
 
-from .views import (
-    ComentarioCreateView,
-    ComentarioDeleteView,
-    ComentarioDetailView,
-    ComentarioListView,
-    ComentarioUpdateView,
-)
+from .views import ComentarioViewSet
 
-urlpatterns = [
-    path('', ComentarioCreateView.as_view()),
-    path('list/', ComentarioListView.as_view()),
-    path('<int:id>/', ComentarioDetailView.as_view()),
-    path('update/', ComentarioUpdateView.as_view()),
-    path('delete/', ComentarioDeleteView.as_view()),
-]
+router = DefaultRouter()
+router.register('', ComentarioViewSet, basename='comentario')
+
+urlpatterns = router.urls

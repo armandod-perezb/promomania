@@ -1,17 +1,8 @@
-from django.urls import path
+from rest_framework.routers import DefaultRouter
 
-from .views import (
-    SupermercadoCreateView,
-    SupermercadoDeleteView,
-    SupermercadoDetailView,
-    SupermercadoListView,
-    SupermercadoUpdateView,
-)
+from .views import SupermercadoViewSet
 
-urlpatterns = [
-    path('', SupermercadoCreateView.as_view()),
-    path('list/', SupermercadoListView.as_view()),
-    path('<int:id>/', SupermercadoDetailView.as_view()),
-    path('update/', SupermercadoUpdateView.as_view()),
-    path('delete/', SupermercadoDeleteView.as_view()),
-]
+router = DefaultRouter()
+router.register('', SupermercadoViewSet, basename='supermercado')
+
+urlpatterns = router.urls

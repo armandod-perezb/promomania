@@ -16,16 +16,37 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
+from categoria.views import CategoriaViewSet
+from comentario.views import ComentarioViewSet
+from favorito.views import FavoritoViewSet
+from notificacion.views import NotificacionViewSet
+from promocion.views import (
+    PromocionHorarioViewSet,
+    PromocionViewSet,
+    TipoPromocionViewSet,
+)
+from reporte.views import ReporteViewSet
+from supermercado.views import SupermercadoViewSet
+from usuario.views import UsuarioNotificacionViewSet, UsuarioViewSet
+from valoracion.views import ValoracionViewSet
+
+router = DefaultRouter()
+router.register('usuarios', UsuarioViewSet, basename='usuarios')
+router.register('usuarios-notificaciones', UsuarioNotificacionViewSet, basename='usuarios-notificaciones')
+router.register('categorias', CategoriaViewSet, basename='categorias')
+router.register('supermercados', SupermercadoViewSet, basename='supermercados')
+router.register('promociones', PromocionViewSet, basename='promociones')
+router.register('tipos-promocion', TipoPromocionViewSet, basename='tipos-promocion')
+router.register('promociones-horarios', PromocionHorarioViewSet, basename='promociones-horarios')
+router.register('comentarios', ComentarioViewSet, basename='comentarios')
+router.register('favoritos', FavoritoViewSet, basename='favoritos')
+router.register('reportes', ReporteViewSet, basename='reportes')
+router.register('notificaciones', NotificacionViewSet, basename='notificaciones')
+router.register('valoraciones', ValoracionViewSet, basename='valoraciones')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('usuario/', include('usuario.urls')),
-    path('categoria/', include('categoria.urls')),
-    path('supermercado/', include('supermercado.urls')),
-    path('promocion/', include('promocion.urls')),
-    path('comentario/', include('comentario.urls')),
-    path('favorito/', include('favorito.urls')),
-    path('reporte/', include('reporte.urls')),
-    path('notificacion/', include('notificacion.urls')),
-    
+    path('api/', include(router.urls)),
 ]

@@ -1,17 +1,8 @@
-from django.urls import path
+from rest_framework.routers import DefaultRouter
 
-from .views import (
-    ReporteCreateView,
-    ReporteDeleteView,
-    ReporteDetailView,
-    ReporteListView,
-    ReporteUpdateView,
-)
+from .views import ReporteViewSet
 
-urlpatterns = [
-    path('', ReporteCreateView.as_view()),
-    path('list/', ReporteListView.as_view()),
-    path('<int:id>/', ReporteDetailView.as_view()),
-    path('update/', ReporteUpdateView.as_view()),
-    path('delete/', ReporteDeleteView.as_view()),
-]
+router = DefaultRouter()
+router.register('', ReporteViewSet, basename='reporte')
+
+urlpatterns = router.urls

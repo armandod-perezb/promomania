@@ -564,442 +564,451 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   // ── Flash Deals ───────────────────────────────────────────────────────────
 
-  Widget _buildFlashDealsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 22, 20, 14),
-          child: Row(
-            children: [
-              const Icon(Icons.bolt_rounded, color: _primary, size: 20),
-              const SizedBox(width: 6),
-              const Text(
-                'Flash Deals',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF1A1F2E),
-                ),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                'Termina en',
-                style: TextStyle(fontSize: 12, color: Color(0xFF8A8FA8)),
-              ),
-              const SizedBox(width: 6),
-              _timerChip(_hours.toString().padLeft(2, '0')),
-              const SizedBox(width: 3),
-              const Text(
-                ':',
-                style: TextStyle(
-                  color: _darkBg,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 12,
-                ),
-              ),
-              const SizedBox(width: 3),
-              _timerChip(_minutes.toString().padLeft(2, '0')),
-              const SizedBox(width: 3),
-              const Text(
-                ':',
-                style: TextStyle(
-                  color: _darkBg,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 12,
-                ),
-              ),
-              const SizedBox(width: 3),
-              _timerChip(_seconds.toString().padLeft(2, '0')),
-              const Spacer(),
-              GestureDetector(
-                onTap: () {},
-                child: const Text(
-                  'Ver todos >',
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    color: _primary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 250,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _flashDeals.length,
-            itemBuilder: (_, i) => _buildFlashDealCard(_flashDeals[i]),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _timerChip(String val) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(
-        color: _darkBg,
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        val,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 11.5,
-          fontWeight: FontWeight.w800,
-          fontFeatures: [FontFeature.tabularFigures()],
-        ),
-      ),
-    );
-  }
-
-  void _openPromotionDetails() {
-    HapticFeedback.lightImpact();
-    Navigator.pushNamed(context, AppRoutes.promotionDetails);
-  }
-
-  Widget _buildFlashDealCard(_FlashDeal deal) {
-    return GestureDetector(
-      onTap: _openPromotionDetails,
-      child: Container(
-        width: 142,
-        margin: const EdgeInsets.only(right: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 12,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+Widget _buildFlashDealsSection() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(20, 22, 20, 14),
+        child: Row(
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(18),
-              ),
-              child: Container(
-                height: 90,
-                color: deal.accentColor.withValues(alpha: 0.12),
-                child: Stack(
-                  children: [
-                    Center(
-                      child: Text(
-                        deal.emoji,
-                        style: const TextStyle(fontSize: 40),
-                      ),
-                    ),
-                    Positioned(
-                      top: 10,
-                      left: 10,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _primary,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          deal.discount,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+            const Icon(Icons.bolt_rounded, color: _primary, size: 20),
+            const SizedBox(width: 6),
+            const Text(
+              'Flash Deals',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF1A1F2E),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: deal.accentColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      deal.category,
-                      style: TextStyle(
-                        color: deal.accentColor,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    deal.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF1A1F2E),
-                      height: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    deal.store,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFF8A8FA8),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Text(
-                        deal.price,
-                        style: const TextStyle(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF1A1F2E),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        deal.originalPrice,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Color(0xFFB0B5CC),
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.star_rounded,
-                        color: Color(0xFFFFB703),
-                        size: 12,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        deal.rating,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF1A1F2E),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+            const SizedBox(width: 10),
+            const Text(
+              'Termina en',
+              style: TextStyle(fontSize: 12, color: Color(0xFF8A8FA8)),
+            ),
+            const SizedBox(width: 6),
+            _timerChip(_hours.toString().padLeft(2, '0')),
+            const SizedBox(width: 3),
+            const Text(':'),
+            const SizedBox(width: 3),
+            _timerChip(_minutes.toString().padLeft(2, '0')),
+            const SizedBox(width: 3),
+            const Text(':'),
+            const SizedBox(width: 3),
+            _timerChip(_seconds.toString().padLeft(2, '0')),
+            const Spacer(),
+            const Text(
+              'Ver todos >',
+              style: TextStyle(
+                fontSize: 12.5,
+                color: _primary,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ],
         ),
       ),
-    );
-  }
 
-  // ── Tiendas cerca ─────────────────────────────────────────────────────────
-
-  Widget _buildNearbySection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 14),
-          child: Row(
-            children: [
-              const Icon(Icons.location_on_rounded, color: _primary, size: 18),
-              const SizedBox(width: 6),
-              const Text(
-                'Tiendas cerca',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF1A1F2E),
-                ),
-              ),
-              const Spacer(),
-              GestureDetector(
-                onTap: () {},
-                child: const Text(
-                  'Ver mapa >',
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    color: _primary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
+      SizedBox(
+        height: 210,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: _flashDeals.length,
+          itemBuilder: (_, i) => _buildFlashDealCard(_flashDeals[i]),
         ),
-        SizedBox(
-          height: 120,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _nearbyStores.length,
-            itemBuilder: (_, i) => _buildNearbyCard(_nearbyStores[i]),
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
 
-  Widget _buildNearbyCard(_NearbyStore store) {
-    return Container(
-      width: 154,
+// ── Timer Chip ───────────────────────────────────────────────────────────
+
+Widget _timerChip(String val) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+    decoration: BoxDecoration(
+      color: _darkBg,
+      borderRadius: BorderRadius.circular(6),
+    ),
+    child: Text(
+      val,
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 11.5,
+        fontWeight: FontWeight.w800,
+        fontFeatures: [FontFeature.tabularFigures()],
+      ),
+    ),
+  );
+}
+
+// ── Navegación ───────────────────────────────────────────────────────────
+
+void _openPromotionDetails() {
+  HapticFeedback.lightImpact();
+  Navigator.pushNamed(context, AppRoutes.promotionDetails);
+}
+
+// ── Card NUEVA estilo imagen ─────────────────────────────────────────────
+
+Widget _buildFlashDealCard(_FlashDeal deal) {
+  return GestureDetector(
+    onTap: _openPromotionDetails,
+    child: Container(
+      width: 170,
       margin: const EdgeInsets.only(right: 14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: Stack(
-          children: [
-            Container(color: store.bgColor),
-            Positioned(
-              right: -10,
-              bottom: -10,
-              child: Text(store.emoji, style: const TextStyle(fontSize: 44)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 🖼 IMAGEN
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(18),
             ),
-            Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          store.distance,
-                          style: const TextStyle(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1A1F2E),
-                          ),
-                        ),
+            child: Stack(
+              children: [
+                Image.network(
+                  _getImageByCategory(deal.category),
+                  height: 100,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+
+                // 🔴 DESCUENTO
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      deal.discount,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
                       ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.star_rounded,
-                              size: 10,
-                              color: Color(0xFFFFB703),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              store.rating,
-                              style: const TextStyle(
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF1A1F2E),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  Text(
-                    store.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                      color: Color(0xFF1A1F2E),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Text(
-                        store.category,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 10.5,
-                          color: Color(0xFF8A8FA8),
-                        ),
-                      ),
-                      const Text(
-                        ' · ',
-                        style: TextStyle(
-                          color: Color(0xFFB0B5CC),
-                          fontSize: 10,
-                        ),
-                      ),
-                      const Icon(
-                        Icons.access_time_rounded,
-                        size: 10,
-                        color: Color(0xFFB0B5CC),
-                      ),
-                      const SizedBox(width: 2),
-                      Text(
-                        store.time,
-                        style: const TextStyle(
-                          fontSize: 10.5,
-                          color: Color(0xFF8A8FA8),
-                        ),
-                      ),
-                    ],
+                ),
+              ],
+            ),
+          ),
+
+          // 📄 INFO
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  deal.title,
+                  style: const TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF1A1F2E),
                   ),
-                ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  deal.store,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFF8A8FA8),
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // 💰 PRECIOS
+                Row(
+                  children: [
+                    Text(
+                      deal.price,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.red,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      deal.originalPrice,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFFB0B5CC),
+                        decoration: TextDecoration.lineThrough,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 6),
+
+                // ⭐ RATING
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.star_rounded,
+                      size: 12,
+                      color: Color(0xFFFFB703),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      deal.rating,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+// ── Imágenes por categoría ───────────────────────────────────────────────
+
+String _getImageByCategory(String category) {
+  switch (category) {
+    case 'Café':
+      return 'https://images.unsplash.com/photo-1509042239860-f550ce710b93';
+    case 'Salud':
+      return 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd';
+    case 'Bebidas':
+      return 'https://images.unsplash.com/photo-1551024506-0bccd828d307';
+    default:
+      return 'https://images.unsplash.com/photo-1490645935967-10de6ba17061';
+  }
+}
+
+  // ── Tiendas cerca ─────────────────────────────────────────────────────────
+
+Widget _buildNearbySection() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 14),
+        child: Row(
+          children: [
+            const Icon(Icons.location_on_rounded, color: _primary, size: 18),
+            const SizedBox(width: 6),
+            const Text(
+              'Tiendas cerca',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF1A1F2E),
+              ),
+            ),
+            const Spacer(),
+            GestureDetector(
+              onTap: () {},
+              child: const Text(
+                'Ver mapa >',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: _primary,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ],
         ),
       ),
-    );
+
+      SizedBox(
+        height: 190,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: _nearbyStores.length,
+          itemBuilder: (_, i) => _buildNearbyCard(_nearbyStores[i]),
+        ),
+      ),
+    ],
+  );
+}
+
+// ── Card moderna con imagen ───────────────────────────────────────────────
+
+Widget _buildNearbyCard(_NearbyStore store) {
+  return Container(
+    width: 180,
+    margin: const EdgeInsets.only(right: 14),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.06),
+          blurRadius: 10,
+          offset: const Offset(0, 3),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 🖼 IMAGEN
+        ClipRRect(
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(18),
+          ),
+          child: Stack(
+            children: [
+              Image.network(
+                _getStoreImage(store.name),
+                height: 110,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+
+              // 📍 DISTANCIA (overlay)
+              Positioned(
+                left: 8,
+                bottom: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.7),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    store.distance,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+
+              // ⭐ RATING (overlay)
+              Positioned(
+                right: 8,
+                bottom: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.7),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.star, size: 10, color: Colors.yellow),
+                      const SizedBox(width: 3),
+                      Text(
+                        store.rating,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // 📄 INFO
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                store.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF1A1F2E),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Text(
+                    store.category,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Color(0xFF8A8FA8),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  const Icon(
+                    Icons.access_time_rounded,
+                    size: 12,
+                    color: Color(0xFFB0B5CC),
+                  ),
+                  const SizedBox(width: 3),
+                  Text(
+                    store.time,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Color(0xFF8A8FA8),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+// ── Imágenes dinámicas ────────────────────────────────────────────────────
+
+String _getStoreImage(String name) {
+  switch (name) {
+    case 'Burger House':
+      return 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd';
+    case 'Coffee Lab':
+      return 'https://images.unsplash.com/photo-1509042239860-f550ce710b93';
+    case 'SportMax':
+      return 'https://images.unsplash.com/photo-1517649763962-0c623066013b';
+    default:
+      return 'https://images.unsplash.com/photo-1492724441997-5dc865305da7';
   }
+}
 
   // ── Todas las promos ──────────────────────────────────────────────────────
 

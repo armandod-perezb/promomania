@@ -97,6 +97,15 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             child: Stack(
               children: [
                 Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: IgnorePointer(
+                    child: CustomPaint(painter: _DotsPainter()),
+                  ),
+                ),
+                Positioned(
                   top: 44,
                   left: 24,
                   child: _topCircleButton(
@@ -114,13 +123,6 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       Navigator.pushNamed(context, AppRoutes.userConfig);
                     },
                   ),
-                ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  bottom: 0,
-                  child: CustomPaint(painter: _DotsPainter()),
                 ),
               ],
             ),
@@ -146,9 +148,16 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         width: 62,
         height: 62,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.06),
+          color: Colors.white.withValues(alpha: 0.14),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.30)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.22),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Icon(icon, color: Colors.white, size: 26),
       ),

@@ -43,6 +43,10 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   static const Color _darkBg = Color(0xFF1A1F2E);
   static const Color _green = Color(0xFF10B981);
   static const Color _lightBg = Color(0xFFF5F6FA);
+  static const String _heroImageUrl =
+      'https://images.unsplash.com/photo-1496747611176-843222e1e57c';
+  static const String _storeImageUrl =
+      'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85';
 
   bool _isFavorite = false;
   bool _descExpanded = false;
@@ -115,7 +119,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: _lightBg,
         body: Stack(
           children: [
             // Contenido scrollable
@@ -155,73 +159,31 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
 
   Widget _buildHeroImage() {
     return SizedBox(
-      height: 280,
+      height: 290,
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // Imagen (placeholder con degradado oscuro estilo tienda)
+          Image.network(
+            _heroImageUrl,
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+          ),
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFF1A1A2E),
-                  Color(0xFF16213E),
-                  Color(0xFF0F3460),
+                  Colors.black.withValues(alpha: 0.24),
+                  Colors.black.withValues(alpha: 0.10),
+                  Colors.black.withValues(alpha: 0.52),
                 ],
               ),
-            ),
-            child: Stack(
-              children: [
-                // Letrero de fondo estilo "DEADLY IS THE FEMALE"
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'TREND',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.15),
-                          fontSize: 64,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 8,
-                        ),
-                      ),
-                      Text(
-                        'STUDIO',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.1),
-                          fontSize: 48,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Sombra inferior
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    height: 80,
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [Colors.black54, Colors.transparent],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
             ),
           ),
           // Botones overlay
           Positioned(
-            top: MediaQuery.of(context).padding.top + 8,
+            top: MediaQuery.of(context).padding.top + 10,
             left: 16,
             right: 16,
             child: Row(
@@ -256,15 +218,15 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
             bottom: 14,
             left: 16,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: const Color(0xFF8B5CF6),
+                color: Colors.white.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Text(
                 'Moda',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFF8B5CF6),
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                 ),
@@ -300,37 +262,44 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
 
   Widget _buildMainInfo() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 4),
+      padding: const EdgeInsets.fromLTRB(16, 18, 16, 6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Breadcrumb
           Row(
             children: const [
-              Icon(
-                Icons.access_time_outlined,
-                size: 13,
-                color: Color(0xFF8A8FA8),
+              Text(
+                'Moda',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF8B5CF6),
+                ),
               ),
+              SizedBox(width: 8),
+              Text('•', style: TextStyle(color: Color(0xFFD1D5DB))),
+              SizedBox(width: 8),
+              Icon(Icons.check_circle, size: 13, color: Color(0xFF3B82F6)),
               SizedBox(width: 4),
               Text(
                 'Moda · Ropa casual',
-                style: TextStyle(fontSize: 12.5, color: Color(0xFF8A8FA8)),
+                style: TextStyle(fontSize: 12.5, color: Color(0xFF6B7280)),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           // Título
           const Text(
             'Colección Primavera 2026 — 35% OFF en toda la tienda',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 21,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1A1F2E),
-              height: 1.25,
+              color: Color(0xFF111827),
+              height: 1.18,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           // Rating + distancia + tiempo
           Row(
             children: [
@@ -357,7 +326,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                 style: TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A1F2E),
+                  color: Color(0xFF111827),
                 ),
               ),
               const Text(
@@ -407,7 +376,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                         Text(
                           '\$97.500',
                           style: TextStyle(
-                            fontSize: 28,
+                            fontSize: 30,
                             fontWeight: FontWeight.w900,
                             color: _primary,
                           ),
@@ -438,25 +407,26 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
               // Badge de ahorro
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
+                  horizontal: 16,
+                  vertical: 14,
                 ),
                 decoration: BoxDecoration(
-                  color: _green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(14),
+                  color: _green.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: _green.withOpacity(0.25),
+                    color: _green.withValues(alpha: 0.18),
                     width: 1.2,
                   ),
                 ),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: const [
-                    Icon(Icons.savings_outlined, color: _green, size: 18),
-                    SizedBox(height: 4),
+                    Icon(Icons.shopping_bag_outlined, color: _green, size: 18),
+                    SizedBox(height: 5),
                     Text(
                       'Ahorras',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 11,
                         color: _green,
                         fontWeight: FontWeight.w600,
                       ),
@@ -464,7 +434,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                     Text(
                       '\$52.500 COP',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 12,
                         color: _green,
                         fontWeight: FontWeight.w800,
                       ),
@@ -483,19 +453,19 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
 
   Widget _buildCountdown() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       decoration: BoxDecoration(
         color: _darkBg,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
               color: _primary,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: const Row(
               children: [
@@ -505,7 +475,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                   'Termina: 8 mar 2026',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 11.5,
+                    fontSize: 11.25,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -529,16 +499,16 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
+            color: Colors.white.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
             val,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 16,
+              fontSize: 17,
               fontWeight: FontWeight.w900,
               fontFeatures: [FontFeature.tabularFigures()],
             ),
@@ -559,12 +529,12 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
 
   Widget _countdownSep() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 5),
       child: Text(
         ':',
         style: TextStyle(
           color: Colors.white.withOpacity(0.5),
-          fontSize: 16,
+          fontSize: 17,
           fontWeight: FontWeight.w800,
         ),
       ),
@@ -586,28 +556,48 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: stats.map((s) {
-          return Column(
-            children: [
-              Icon(s.icon, color: const Color(0xFF8A8FA8), size: 22),
-              const SizedBox(height: 5),
-              Text(
-                s.value,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF1A1F2E),
-                ),
+          return Expanded(
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFFF0F1F5)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
-              const SizedBox(height: 2),
-              Text(
-                s.label,
-                style: const TextStyle(fontSize: 11, color: Color(0xFF8A8FA8)),
+              child: Column(
+                children: [
+                  Icon(s.icon, color: const Color(0xFF9CA3AF), size: 20),
+                  const SizedBox(height: 8),
+                  Text(
+                    s.value,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF111827),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    s.label,
+                    style: const TextStyle(
+                      fontSize: 10.5,
+                      color: Color(0xFF8A8FA8),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           );
         }).toList(),
       ),
@@ -764,34 +754,54 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
           ),
           const SizedBox(height: 12),
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE8EAF0), width: 1.2),
+              borderRadius: BorderRadius.circular(18),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
             child: Row(
               children: [
                 // Logo tienda
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1A1F2E).withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: const Center(
-                    child: Text('👗', style: TextStyle(fontSize: 28)),
-                  ),
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: Image.network(
+                        _storeImageUrl,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Positioned(
+                      right: -1,
+                      bottom: -1,
+                      child: Container(
+                        width: 18,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: _green,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: const Icon(
+                          Icons.check,
+                          size: 11,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
                 // Info
                 Expanded(
                   child: Column(
@@ -802,7 +812,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                           Text(
                             'Trend Studio',
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 16,
                               fontWeight: FontWeight.w800,
                               color: Color(0xFF1A1F2E),
                             ),
@@ -811,42 +821,55 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                           Icon(
                             Icons.verified_rounded,
                             color: Color(0xFF3B82F6),
-                            size: 16,
+                            size: 15,
                           ),
                         ],
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 3),
                       const Text(
                         'Moda · Ropa casual',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 12.5,
                           color: Color(0xFF8A8FA8),
                         ),
                       ),
-                      const SizedBox(height: 5),
-                      Row(
-                        children: [
-                          Row(
-                            children: List.generate(
-                              5,
-                              (i) => Icon(
-                                i < 4
-                                    ? Icons.star_rounded
-                                    : Icons.star_half_rounded,
-                                color: const Color(0xFFFBBF24),
-                                size: 13,
+                      const SizedBox(height: 7),
+                      FittedBox(
+                        alignment: Alignment.centerLeft,
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          children: [
+                            Row(
+                              children: List.generate(
+                                5,
+                                (i) => Icon(
+                                  i < 4
+                                      ? Icons.star_rounded
+                                      : Icons.star_half_rounded,
+                                  color: const Color(0xFFFBBF24),
+                                  size: 12,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 5),
-                          const Text(
-                            '4.4  (380)',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF8A8FA8),
+                            const SizedBox(width: 4),
+                            const Text(
+                              '4.4',
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1A1F2E),
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            const Text(
+                              '(380)',
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                color: Color(0xFF8A8FA8),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -854,31 +877,28 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                 // Botón Ver
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+                    horizontal: 14,
+                    vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF5F6FA),
+                    color: const Color(0xFFF4F5F8),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: const Color(0xFFE8EAF0),
-                      width: 1,
-                    ),
                   ),
                   child: const Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         'Ver',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF1A1F2E),
+                          color: Color(0xFF1F2937),
                         ),
                       ),
-                      SizedBox(width: 4),
+                      SizedBox(width: 1),
                       Icon(
                         Icons.chevron_right_rounded,
-                        size: 16,
+                        size: 17,
                         color: Color(0xFF8A8FA8),
                       ),
                     ],
@@ -1208,6 +1228,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                       ),
                     ),
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: List.generate(
                         5,
                         (i) => Icon(
@@ -1215,18 +1236,24 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                               ? Icons.star_rounded
                               : Icons.star_outline_rounded,
                           color: const Color(0xFFFBBF24),
-                          size: 13,
+                          size: 12,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              Text(
-                r.time,
-                style: const TextStyle(
-                  fontSize: 11.5,
-                  color: Color(0xFF8A8FA8),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 64,
+                child: Text(
+                  r.time,
+                  textAlign: TextAlign.right,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 10.5,
+                    color: Color(0xFF8A8FA8),
+                  ),
                 ),
               ),
             ],

@@ -1,0 +1,226 @@
+quiero que implementes algo similar a lo que está en "C:\Users\arman\Documents\pj5042026\assets\data\twitter_data.json" para leer, usar, modificar y guardar datos en ese archivo .json.
+
+Para ello se deben crear modelos (clases) en la carpeta C:\Users\arman\Documents\ProyectosFlutter\Promomania\lib\models basados en estas tablas sql:
+
+-- =========================
+-- TABLA USUARIO
+-- =========================
+CREATE TABLE Usuario (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    correo VARCHAR(150) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    rol ENUM('usuario','admin') DEFAULT 'usuario',
+    estado ENUM('activo','inactivo') DEFAULT 'activo'
+);
+
+-- =========================
+-- TABLA SUPERMERCADO
+-- =========================
+CREATE TABLE Supermercado (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(150) NOT NULL,
+    direccion VARCHAR(255),
+    ciudad VARCHAR(100),
+    estado ENUM('activo','inactivo') DEFAULT 'activo'
+);
+
+-- =========================
+-- TABLA CATEGORIA
+-- =========================
+CREATE TABLE Categoria (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion VARCHAR(255)
+);
+
+-- =========================
+-- TABLA TIPO PROMOCION
+-- =========================
+CREATE TABLE TipoPromocion (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion VARCHAR(255),
+    estado ENUM('activo','inactivo') DEFAULT 'activo'
+);
+
+-- =========================
+-- TABLA PROMOCION
+-- =========================
+CREATE TABLE Promocion (
+
+    codigo VARCHAR(50) PRIMARY KEY,
+
+    titulo VARCHAR(500) NOT NULL,
+    descripcion TEXT,
+    precio DECIMAL(10,2) NOT NULL,
+    descuento INT,
+
+    condicion_producto ENUM(
+        'nuevo',
+        'usado',
+        'reacondicionado'
+    ) DEFAULT 'nuevo',
+
+    ubicacion VARCHAR(255),
+    url VARCHAR(255),
+    foto VARCHAR(255),
+
+    tipo_vigencia ENUM(
+        'por_fecha',
+        'permanente'
+    ) DEFAULT 'por_fecha',
+
+    fecha_inicio DATE NULL,
+    fecha_fin DATE NULL,
+
+    estado ENUM(
+        'pendiente',
+        'aprobada',
+        'rechazada'
+    ) DEFAULT 'pendiente',
+
+    vistas INT DEFAULT 0,
+
+    id_usuario INT,
+    id_supermercado INT,
+    id_categoria INT,
+    id_tipo_promocion INT,
+
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id),
+    FOREIGN KEY (id_supermercado) REFERENCES Supermercado(id),
+    FOREIGN KEY (id_categoria) REFERENCES Categoria(id),
+    FOREIGN KEY (id_tipo_promocion) REFERENCES TipoPromocion(id)
+);
+
+-- =========================
+-- TABLA HORARIO PROMOCION
+-- =========================
+CREATE TABLE PromocionHorario (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+
+    dia_semana ENUM(
+        'lunes',
+        'martes',
+        'miercoles',
+        'jueves',
+        'viernes',
+        'sabado',
+        'domingo'
+    ) NOT NULL,
+
+    hora_inicio TIME NOT NULL,
+    hora_fin TIME NOT NULL,
+
+    codigo_promocion VARCHAR(50) NOT NULL,
+
+    FOREIGN KEY (codigo_promocion) REFERENCES Promocion(codigo)
+);
+
+-- =========================
+-- TABLA COMENTARIO
+-- =========================
+CREATE TABLE Comentario (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    contenido TEXT NOT NULL,
+    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    id_usuario INT,
+    codigo_promocion VARCHAR(50),
+
+    id_comment_reply INT,
+
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id),
+    FOREIGN KEY (codigo_promocion) REFERENCES Promocion(codigo),
+    FOREIGN KEY (id_comment_reply) REFERENCES Comentario(id) ON DELETE CASCADE
+);
+
+-- =========================
+-- TABLA VALORACION
+-- =========================
+CREATE TABLE Valoracion (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    tipo ENUM('positiva','negativa') NOT NULL,
+
+    id_usuario INT,
+    codigo_promocion VARCHAR(50),
+
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id),
+    FOREIGN KEY (codigo_promocion) REFERENCES Promocion(codigo),
+
+    UNIQUE(id_usuario, codigo_promocion)
+);
+
+-- =========================
+-- TABLA NOTIFICACION
+-- =========================
+CREATE TABLE Notificacion (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    mensaje VARCHAR(255) NOT NULL,
+    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    t_notificacion ENUM(
+        'action_executer',
+        'action_receiver',
+        'action_controller'
+    ) DEFAULT 'action_receiver'
+);
+
+-- =========================
+-- TABLA INTERMEDIA NOTIFICACION-USUARIO
+-- =========================
+CREATE TABLE UsuarioNotificacion (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+
+    id_usuario INT NOT NULL,
+    id_notificacion INT NOT NULL,
+
+    leida BOOLEAN DEFAULT 0,
+    fecha_recibida DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id),
+    FOREIGN KEY (id_notificacion) REFERENCES Notificacion(id),
+
+    UNIQUE(id_usuario, id_notificacion)
+);
+
+-- =========================
+-- TABLA FAVORITO
+-- =========================
+CREATE TABLE Favorito (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+
+    id_usuario INT NOT NULL,
+    codigo_promocion VARCHAR(50) NOT NULL,
+
+    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id),
+    FOREIGN KEY (codigo_promocion) REFERENCES Promocion(codigo),
+
+    UNIQUE(id_usuario, codigo_promocion)
+);
+
+-- =========================
+-- TABLA REPORTE
+-- =========================
+CREATE TABLE Reporte (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    motivo VARCHAR(255) NOT NULL,
+    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    estado ENUM(
+        'pendiente',
+        'revisado',
+        'descartado'
+    ) DEFAULT 'pendiente',
+
+    id_usuario INT NOT NULL,
+    codigo_promocion VARCHAR(50) NOT NULL,
+
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id),
+    FOREIGN KEY (codigo_promocion) REFERENCES Promocion(codigo)
+);
+ 
+
+Además, se debe crear un service en C:\Users\arman\Documents\ProyectosFlutter\Promomania\lib\services de la forma que se implementa en C:\Users\arman\Documents\pj5042026\lib\services\twitter_service.dart . Por último, mira cómo se cargaron los datos en la pantalla C:\Users\arman\Documents\pj5042026\lib\ui\pages\home_page.dart e impleméntalo en las demás páginas de mi aplicación en donde corresponda.

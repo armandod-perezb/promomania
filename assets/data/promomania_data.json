@@ -1,0 +1,249 @@
+{
+  "app": {
+    "name": "Promomania",
+    "version": "1.0.0"
+  },
+  "usuarios": [
+    {
+      "id": 1,
+      "nombre": "Admin User",
+      "correo": "admin@gmail.com",
+      "password": "123",
+      "rol": "admin",
+      "estado": "activo"
+    },
+    {
+      "id": 2,
+      "nombre": "Juan Pérez",
+      "correo": "juan@gmail.com",
+      "password": "pass123",
+      "rol": "usuario",
+      "estado": "activo"
+    },
+    {
+      "id": 3,
+      "nombre": "María García",
+      "correo": "maria@gmail.com",
+      "password": "pass456",
+      "rol": "usuario",
+      "estado": "activo"
+    }
+  ],
+  "supermercados": [
+    {
+      "id": 1,
+      "nombre": "Supermercado XYZ",
+      "direccion": "Calle Principal 123",
+      "ciudad": "Medellín",
+      "estado": "activo"
+    },
+    {
+      "id": 2,
+      "nombre": "Tienda ABC",
+      "direccion": "Carrera 50 456",
+      "ciudad": "Bogotá",
+      "estado": "activo"
+    }
+  ],
+  "categorias": [
+    {
+      "id": 1,
+      "nombre": "Electrónica",
+      "descripcion": "Productos electrónicos en general"
+    },
+    {
+      "id": 2,
+      "nombre": "Alimentos",
+      "descripcion": "Comida y bebidas"
+    },
+    {
+      "id": 3,
+      "nombre": "Ropa",
+      "descripcion": "Prendas de vestir"
+    }
+  ],
+  "tipos_promocion": [
+    {
+      "id": 1,
+      "nombre": "Descuento",
+      "descripcion": "Porcentaje de descuento",
+      "estado": "activo"
+    },
+    {
+      "id": 2,
+      "nombre": "2x1",
+      "descripcion": "Lleva dos productos al precio de uno",
+      "estado": "activo"
+    },
+    {
+      "id": 3,
+      "nombre": "Rebaja",
+      "descripcion": "Precio reducido",
+      "estado": "activo"
+    }
+  ],
+  "promociones": [
+    {
+      "codigo": "PROMO001",
+      "titulo": "Descuento en Televisores",
+      "descripcion": "Descuento especial en todos los televisores de 55 pulgadas",
+      "precio": 1500.00,
+      "descuento": 20,
+      "condicion_producto": "nuevo",
+      "ubicacion": "Pasillo 3",
+      "url": "https://ejemplo.com/promo1",
+      "foto": "https://via.placeholder.com/300x200?text=TV+55",
+      "tipo_vigencia": "por_fecha",
+      "fecha_inicio": "2026-04-01",
+      "fecha_fin": "2026-04-30",
+      "estado": "aprobada",
+      "vistas": 245,
+      "id_usuario": 2,
+      "id_supermercado": 1,
+      "id_categoria": 1,
+      "id_tipo_promocion": 1
+    },
+    {
+      "codigo": "PROMO002",
+      "titulo": "2x1 en Camisetas",
+      "descripcion": "Lleva dos camisetas y paga solo una",
+      "precio": 45.00,
+      "descuento": 50,
+      "condicion_producto": "nuevo",
+      "ubicacion": "Sección Ropa",
+      "url": "https://ejemplo.com/promo2",
+      "foto": "https://via.placeholder.com/300x200?text=Camisetas",
+      "tipo_vigencia": "permanente",
+      "fecha_inicio": null,
+      "fecha_fin": null,
+      "estado": "aprobada",
+      "vistas": 312,
+      "id_usuario": 3,
+      "id_supermercado": 2,
+      "id_categoria": 3,
+      "id_tipo_promocion": 2
+    },
+    {
+      "codigo": "PROMO003",
+      "titulo": "Rebaja en Leche",
+      "descripcion": "Oferta especial en productos lácteos",
+      "precio": 5.99,
+      "descuento": 15,
+      "condicion_producto": "nuevo",
+      "ubicacion": "Zona Refrigerada",
+      "url": "https://ejemplo.com/promo3",
+      "foto": "https://via.placeholder.com/300x200?text=Leche",
+      "tipo_vigencia": "por_fecha",
+      "fecha_inicio": "2026-04-10",
+      "fecha_fin": "2026-04-20",
+      "estado": "aprobada",
+      "vistas": 128,
+      "id_usuario": 2,
+      "id_supermercado": 1,
+      "id_categoria": 2,
+      "id_tipo_promocion": 3
+    }
+  ],
+  "promociones_horarios": [
+    {
+      "id": 1,
+      "dia_semana": "lunes",
+      "hora_inicio": "09:00",
+      "hora_fin": "18:00",
+      "codigo_promocion": "PROMO001"
+    },
+    {
+      "id": 2,
+      "dia_semana": "martes",
+      "hora_inicio": "09:00",
+      "hora_fin": "18:00",
+      "codigo_promocion": "PROMO001"
+    }
+  ],
+  "comentarios": [
+    {
+      "id": 1,
+      "contenido": "Excelente promoción, muy recomendada",
+      "fecha": "2026-04-05T10:30:00",
+      "id_usuario": 2,
+      "codigo_promocion": "PROMO001",
+      "id_comment_reply": null
+    },
+    {
+      "id": 2,
+      "contenido": "Buena oferta, aprovechable",
+      "fecha": "2026-04-06T14:15:00",
+      "id_usuario": 3,
+      "codigo_promocion": "PROMO002",
+      "id_comment_reply": null
+    }
+  ],
+  "valoraciones": [
+    {
+      "id": 1,
+      "tipo": "positiva",
+      "id_usuario": 2,
+      "codigo_promocion": "PROMO001"
+    },
+    {
+      "id": 2,
+      "tipo": "negativa",
+      "id_usuario": 3,
+      "codigo_promocion": "PROMO003"
+    }
+  ],
+  "notificaciones": [
+    {
+      "id": 1,
+      "mensaje": "Nueva promoción disponible en tu categoría favorita",
+      "fecha": "2026-04-05T08:00:00",
+      "t_notificacion": "action_receiver"
+    },
+    {
+      "id": 2,
+      "mensaje": "Tu promoción ha sido aprobada",
+      "fecha": "2026-04-04T15:30:00",
+      "t_notificacion": "action_executer"
+    }
+  ],
+  "usuario_notificaciones": [
+    {
+      "id": 1,
+      "id_usuario": 2,
+      "id_notificacion": 1,
+      "leida": false,
+      "fecha_recibida": "2026-04-05T08:00:00"
+    },
+    {
+      "id": 2,
+      "id_usuario": 3,
+      "id_notificacion": 2,
+      "leida": true,
+      "fecha_recibida": "2026-04-04T15:30:00"
+    }
+  ],
+  "favoritos": [
+    {
+      "id": 1,
+      "id_usuario": 2,
+      "codigo_promocion": "PROMO001",
+      "fecha": "2026-04-03T12:00:00"
+    },
+    {
+      "id": 2,
+      "id_usuario": 3,
+      "codigo_promocion": "PROMO002",
+      "fecha": "2026-04-04T18:30:00"
+    }
+  ],
+  "reportes": [
+    {
+      "id": 1,
+      "motivo": "Contenido ofensivo",
+      "fecha": "2026-04-05T11:00:00",
+      "estado": "pendiente",
+      "id_usuario": 3,
+      "codigo_promocion": "PROMO001"
+    }
+  ]
+}

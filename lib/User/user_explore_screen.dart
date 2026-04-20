@@ -330,20 +330,20 @@ class _ExploreScreenState extends State<ExploreScreen>
     return Container(
       color: Colors.white,
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 12,
+        top: MediaQuery.of(context).padding.top + 10,
         left: 20,
         right: 20,
-        bottom: 14,
+        bottom: 10,
       ),
       child: Row(
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: const [
                 Row(
-                  children: const [
-                    Icon(Icons.location_on_rounded, color: _primary, size: 14),
+                  children: [
+                    Icon(Icons.location_on, color: _primary, size: 14),
                     SizedBox(width: 4),
                     Text(
                       'Bogotá, Colombia',
@@ -355,35 +355,26 @@ class _ExploreScreenState extends State<ExploreScreen>
                     ),
                   ],
                 ),
-                const SizedBox(height: 2),
-                const Text(
+                SizedBox(height: 4),
+                Text(
                   'Buenos días',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF1A1F2E),
-                  ),
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
                 ),
               ],
             ),
           ),
-          // Campana
+
+          // 🔔 Notificación
           Container(
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFFF0F1F5),
+              color: const Color(0xFFF2F3F7),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Stack(
               children: [
-                const Center(
-                  child: Icon(
-                    Icons.notifications_outlined,
-                    color: Color(0xFF1A1F2E),
-                    size: 22,
-                  ),
-                ),
+                const Center(child: Icon(Icons.notifications_none, size: 22)),
                 Positioned(
                   top: 8,
                   right: 8,
@@ -399,8 +390,10 @@ class _ExploreScreenState extends State<ExploreScreen>
               ],
             ),
           ),
+
           const SizedBox(width: 10),
-          // Avatar
+
+          // 👤 Avatar
           Container(
             width: 40,
             height: 40,
@@ -409,14 +402,7 @@ class _ExploreScreenState extends State<ExploreScreen>
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Center(
-              child: Text(
-                'JD',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
+              child: Text('JD', style: TextStyle(color: Colors.white)),
             ),
           ),
         ],
@@ -436,47 +422,32 @@ class _ExploreScreenState extends State<ExploreScreen>
             child: Container(
               height: 46,
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F6FA),
+                color: const Color(0xFFF2F3F7),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFE8EAF0), width: 1.2),
               ),
-              child: Row(
-                children: const [
+              child: const Row(
+                children: [
                   SizedBox(width: 12),
-                  Icon(
-                    Icons.search_rounded,
-                    color: Color(0xFFB0B5CC),
-                    size: 20,
-                  ),
+                  Icon(Icons.search, color: Color(0xFFB0B5CC)),
                   SizedBox(width: 8),
                   Text(
                     'Buscar tiendas, productos...',
-                    style: TextStyle(color: Color(0xFFB0B5CC), fontSize: 13.5),
+                    style: TextStyle(color: Color(0xFFB0B5CC), fontSize: 13),
                   ),
                 ],
               ),
             ),
           ),
           const SizedBox(width: 10),
+
           Container(
             width: 46,
             height: 46,
             decoration: BoxDecoration(
               color: _primary,
               borderRadius: BorderRadius.circular(14),
-              boxShadow: [
-                BoxShadow(
-                  color: _primary.withOpacity(0.35),
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
-                ),
-              ],
             ),
-            child: const Icon(
-              Icons.tune_rounded,
-              color: Colors.white,
-              size: 20,
-            ),
+            child: const Icon(Icons.tune, color: Colors.white),
           ),
         ],
       ),
@@ -490,130 +461,101 @@ class _ExploreScreenState extends State<ExploreScreen>
       opacity: _bannerFade,
       child: Container(
         margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-        height: 160,
+        height: 170,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
+          borderRadius: BorderRadius.circular(22),
+          image: const DecorationImage(
+            image: NetworkImage(
+              'https://images.unsplash.com/photo-1553621042-f6e147245754',
             ),
-          ],
+            fit: BoxFit.cover,
+          ),
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // Fondo degradado
-              Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      Color(0xFF1A0A00),
-                      Color(0xFF3D1A00),
-                      Color(0xFF8B4513),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(22),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.black.withOpacity(0.0),
+                Colors.black.withOpacity(0.45),
+              ],
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 🟦 etiqueta
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF3B82F6),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text(
+                    'Tiempo limitado',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                const Text(
+                  'Sushi Premium',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                const Text(
+                  '30% OFF — 20 piezas por \$42.000',
+                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                ),
+
+                const Spacer(),
+
+                // 🔵 botón
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF3B82F6),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Pedir ahora',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      SizedBox(width: 6),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 12,
+                        color: Colors.white,
+                      ),
                     ],
                   ),
                 ),
-              ),
-              // Textura de sushi (emoji decorativo)
-              Positioned(
-                right: -10,
-                top: -10,
-                child: Text(
-                  '🍣',
-                  style: TextStyle(
-                    fontSize: 100,
-                    color: Colors.white.withOpacity(0.08),
-                  ),
-                ),
-              ),
-              // Contenido
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _primary,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Text(
-                        '⏱ Tiempo limitado',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Sushi Premium',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                        height: 1.1,
-                      ),
-                    ),
-                    const Text(
-                      '50% OFF — 20 piezas por \$42.000',
-                      style: TextStyle(color: Colors.white70, fontSize: 12.5),
-                    ),
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _primary,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text(
-                        'Pedir ahora →',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Indicador de página
-              Positioned(
-                right: 16,
-                bottom: 14,
-                child: Row(
-                  children: List.generate(
-                    3,
-                    (i) => Container(
-                      margin: const EdgeInsets.only(left: 4),
-                      width: i == 0 ? 16 : 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: i == 0
-                            ? Colors.white
-                            : Colors.white.withOpacity(0.4),
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -685,7 +627,7 @@ class _ExploreScreenState extends State<ExploreScreen>
           ),
         ),
         SizedBox(
-          height: 168,
+          height: 250,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -725,16 +667,16 @@ class _ExploreScreenState extends State<ExploreScreen>
     return GestureDetector(
       onTap: _openPromotionDetails,
       child: Container(
-        width: 130,
-        margin: const EdgeInsets.only(right: 12),
+        width: 142,
+        margin: const EdgeInsets.only(right: 14),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 12,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -742,35 +684,37 @@ class _ExploreScreenState extends State<ExploreScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(18),
+              ),
               child: Container(
-                height: 80,
-                color: deal.accentColor.withOpacity(0.12),
+                height: 90,
+                color: deal.accentColor.withValues(alpha: 0.12),
                 child: Stack(
                   children: [
                     Center(
                       child: Text(
                         deal.emoji,
-                        style: const TextStyle(fontSize: 36),
+                        style: const TextStyle(fontSize: 40),
                       ),
                     ),
                     Positioned(
-                      top: 8,
-                      left: 8,
+                      top: 10,
+                      left: 10,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 7,
-                          vertical: 3,
+                          horizontal: 8,
+                          vertical: 4,
                         ),
                         decoration: BoxDecoration(
                           color: _primary,
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
                           deal.discount,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 10,
+                            fontSize: 11,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -781,30 +725,49 @@ class _ExploreScreenState extends State<ExploreScreen>
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: deal.accentColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      deal.category,
+                      style: TextStyle(
+                        color: deal.accentColor,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   Text(
                     deal.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
                       color: Color(0xFF1A1F2E),
-                      height: 1.25,
+                      height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 6),
                   Text(
                     deal.store,
                     style: const TextStyle(
-                      fontSize: 10.5,
+                      fontSize: 11,
                       color: Color(0xFF8A8FA8),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
                       Text(
@@ -822,6 +785,25 @@ class _ExploreScreenState extends State<ExploreScreen>
                           fontSize: 10,
                           color: Color(0xFFB0B5CC),
                           decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.star_rounded,
+                        color: Color(0xFFFFB703),
+                        size: 12,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        deal.rating,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1A1F2E),
                         ),
                       ),
                     ],
@@ -885,69 +867,104 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   Widget _buildNearbyCard(_NearbyStore store) {
     return Container(
-      width: 150,
-      margin: const EdgeInsets.only(right: 12),
+      width: 154,
+      margin: const EdgeInsets.only(right: 14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         child: Stack(
           children: [
-            // Fondo de color
             Container(color: store.bgColor),
-            // Emoji grande de fondo
             Positioned(
-              right: -8,
-              bottom: -8,
-              child: Text(store.emoji, style: const TextStyle(fontSize: 60)),
+              right: -10,
+              bottom: -10,
+              child: Text(store.emoji, style: const TextStyle(fontSize: 44)),
             ),
-            // Contenido
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 3,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      store.distance,
-                      style: const TextStyle(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A1F2E),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          store.distance,
+                          style: const TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF1A1F2E),
+                          ),
+                        ),
                       ),
-                    ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              size: 10,
+                              color: Color(0xFFFFB703),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              store.rating,
+                              style: const TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1A1F2E),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                   const Spacer(),
                   Text(
                     store.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
                       color: Color(0xFF1A1F2E),
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 4),
                   Row(
                     children: [
                       Text(
                         store.category,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 10.5,
                           color: Color(0xFF8A8FA8),
@@ -1129,176 +1146,216 @@ class _ExploreScreenState extends State<ExploreScreen>
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          // Imagen
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
-            child: Container(
-              height: 130,
-              color: p.categoryColor.withOpacity(0.1),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Center(
-                    child: Text(p.emoji, style: const TextStyle(fontSize: 52)),
-                  ),
-                  Positioned(
-                    top: 10,
-                    left: 10,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: p.discountColor,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
+              child: Container(
+                height: 138,
+                color: p.categoryColor.withValues(alpha: 0.1),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Center(
                       child: Text(
-                        p.discount,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
+                        p.emoji,
+                        style: const TextStyle(fontSize: 56),
+                      ),
+                    ),
+                    Positioned(
+                      top: 12,
+                      left: 12,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: p.discountColor,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          p.discount,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    top: 10,
-                    right: 10,
-                    child: Container(
-                      width: 28,
-                      height: 28,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        p.isFavorite
-                            ? Icons.favorite_rounded
-                            : Icons.favorite_border_rounded,
-                        color: p.isFavorite
-                            ? _primary
-                            : const Color(0xFFB0B5CC),
-                        size: 16,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 7,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: p.categoryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    p.category,
-                    style: TextStyle(
-                      color: p.categoryColor,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  p.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF1A1F2E),
-                    height: 1.25,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  p.store,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Color(0xFF8A8FA8),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  p.price,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFF1A1F2E),
-                  ),
-                ),
-                Text(
-                  p.originalPrice,
-                  style: const TextStyle(
-                    fontSize: 10.5,
-                    color: Color(0xFFB0B5CC),
-                    decoration: TextDecoration.lineThrough,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.star_rounded,
-                      color: Color(0xFFFBBF24),
-                      size: 12,
-                    ),
-                    const SizedBox(width: 2),
-                    Text(
-                      p.rating,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF1A1F2E),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const Text(
-                      ' · ',
-                      style: TextStyle(color: Color(0xFFB0B5CC), fontSize: 10),
-                    ),
-                    const Icon(
-                      Icons.access_time_rounded,
-                      size: 10,
-                      color: Color(0xFFB0B5CC),
-                    ),
-                    const SizedBox(width: 2),
-                    Text(
-                      p.time,
-                      style: const TextStyle(
-                        fontSize: 10.5,
-                        color: Color(0xFF8A8FA8),
+                    Positioned(
+                      top: 12,
+                      right: 12,
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.08),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          p.isFavorite
+                              ? Icons.favorite_rounded
+                              : Icons.favorite_border_rounded,
+                          color: p.isFavorite
+                              ? _primary
+                              : const Color(0xFFB0B5CC),
+                          size: 18,
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: p.categoryColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      p.category,
+                      style: TextStyle(
+                        color: p.categoryColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    p.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF1A1F2E),
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    p.store,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Color(0xFF8A8FA8),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        p.price,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          color: _primary,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        p.originalPrice,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFFB0B5CC),
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.star_rounded,
+                        color: Color(0xFFFBBF24),
+                        size: 12,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        p.rating,
+                        style: const TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1A1F2E),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        '·',
+                        style: TextStyle(
+                          color: Color(0xFFB0B5CC),
+                          fontSize: 10,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${p.reviews} reseñas',
+                        style: const TextStyle(
+                          fontSize: 10.5,
+                          color: Color(0xFF8A8FA8),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        '·',
+                        style: TextStyle(
+                          color: Color(0xFFB0B5CC),
+                          fontSize: 10,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(
+                        Icons.access_time_rounded,
+                        size: 10,
+                        color: Color(0xFFB0B5CC),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        p.time,
+                        style: const TextStyle(
+                          fontSize: 10.5,
+                          color: Color(0xFF8A8FA8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -1314,7 +1371,7 @@ class _ExploreScreenState extends State<ExploreScreen>
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -1322,82 +1379,84 @@ class _ExploreScreenState extends State<ExploreScreen>
         ),
         child: Row(
           children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(16),
-              bottomLeft: Radius.circular(16),
-            ),
-            child: Container(
-              width: 90,
-              height: 90,
-              color: p.categoryColor.withOpacity(0.1),
-              child: Center(
-                child: Text(p.emoji, style: const TextStyle(fontSize: 40)),
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                bottomLeft: Radius.circular(16),
+              ),
+              child: Container(
+                width: 90,
+                height: 90,
+                color: p.categoryColor.withValues(alpha: 0.1),
+                child: Center(
+                  child: Text(p.emoji, style: const TextStyle(fontSize: 40)),
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    p.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1A1F2E),
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    p.store,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF8A8FA8),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Text(
-                        p.price,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF1A1F2E),
-                        ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      p.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1A1F2E),
                       ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: p.discountColor,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          p.discount,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      p.store,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF8A8FA8),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Text(
+                          p.price,
                           style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF1A1F2E),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: p.discountColor,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            p.discount,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
+            const SizedBox(width: 12),
           ],
         ),
       ),
@@ -1426,7 +1485,7 @@ class _ExploreScreenState extends State<ExploreScreen>
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.07),
+            color: Colors.black.withValues(alpha: 0.07),
             blurRadius: 12,
             offset: const Offset(0, -2),
           ),
@@ -1465,7 +1524,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                     ),
                     decoration: BoxDecoration(
                       color: isActive
-                          ? _primary.withOpacity(0.1)
+                          ? _primary.withValues(alpha: 0.1)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(10),
                     ),

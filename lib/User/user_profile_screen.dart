@@ -33,6 +33,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         backgroundColor: _lightBg,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: _buildAppBar(),
+        ),
         body: Column(
           children: [
             _buildTopSection(),
@@ -75,63 +79,44 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   // ── Hero + card principal ───────────────────────────────────────────────────
 
   Widget _buildTopSection() {
-    return SizedBox(
-      height: 310,
-      child: Stack(
-        clipBehavior: Clip.none,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: _buildProfileHeroCard(),
+    );
+  }
+
+  Widget _buildAppBar() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF171A2D),
+            Color(0xFF2A2140),
+            Color(0xFF1B2A36),
+          ],
+        ),
+      ),
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top,
+        left: 16,
+        right: 16,
+        bottom: 10,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            height: 165,
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF171A2D),
-                  Color(0xFF2A2140),
-                  Color(0xFF1B2A36),
-                ],
-              ),
-            ),
-            child: Stack(
-              children: [
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  bottom: 0,
-                  child: IgnorePointer(
-                    child: CustomPaint(painter: _DotsPainter()),
-                  ),
-                ),
-                Positioned(
-                  top: 44,
-                  left: 24,
-                  child: _topCircleButton(
-                    icon: Icons.arrow_back_ios_new_rounded,
-                    onTap: () => Navigator.pop(context),
-                  ),
-                ),
-                Positioned(
-                  top: 44,
-                  right: 24,
-                  child: _topCircleButton(
-                    icon: Icons.settings_outlined,
-                    onTap: () {
-                      HapticFeedback.selectionClick();
-                      Navigator.pushNamed(context, AppRoutes.userConfig);
-                    },
-                  ),
-                ),
-              ],
-            ),
+          _topCircleButton(
+            icon: Icons.arrow_back_ios_new_rounded,
+            onTap: () => Navigator.pop(context),
           ),
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 0,
-            child: _buildProfileHeroCard(),
+          _topCircleButton(
+            icon: Icons.settings_outlined,
+            onTap: () {
+              HapticFeedback.selectionClick();
+              Navigator.pushNamed(context, AppRoutes.userConfig);
+            },
           ),
         ],
       ),

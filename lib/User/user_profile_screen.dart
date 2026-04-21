@@ -33,95 +33,94 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         backgroundColor: _lightBg,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(56),
-          child: _buildAppBar(),
-        ),
-        body: Column(
-          children: [
-            _buildTopSection(),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 12),
-                    _buildLevelSection(),
-                    const SizedBox(height: 14),
-                    _buildMetricsRow(),
-                    const SizedBox(height: 14),
-                    _buildQuickActions(),
-                    const SizedBox(height: 10),
-                    // Tabs + contenido
-                    Container(
-                      color: Colors.white,
-                      child: Column(
-                        children: [_buildContentTabBar(), _buildTabContent()],
+        body: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) {
+            return [
+              SliverAppBar(
+                expandedHeight: 320,
+                elevation: 0,
+                scrolledUnderElevation: 0,
+                pinned: true,
+                floating: false,
+                backgroundColor: _lightBg,
+                flexibleSpace: FlexibleSpaceBar(
+                  collapseMode: CollapseMode.parallax,
+                  background: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                    child: _buildProfileHeroCard(),
+                  ),
+                ),
+                title: innerBoxIsScrolled
+                    ? const Text(
+                        'Perfil',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF131A2F),
+                        ),
+                      )
+                    : null,
+                centerTitle: innerBoxIsScrolled,
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 16),
+                    child: Center(
+                      child: _topCircleButton(
+                        icon: Icons.settings_outlined,
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          Navigator.pushNamed(context, AppRoutes.userConfig);
+                        },
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    // Información
-                    Container(color: Colors.white, child: _buildInfoSection()),
-                    const SizedBox(height: 8),
-                    // Footer
-                    _buildFooter(),
-                    const SizedBox(height: 24),
-                  ],
+                  ),
+                ],
+                leading: Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Center(
+                    child: _topCircleButton(
+                      icon: Icons.arrow_back_ios_new_rounded,
+                      onTap: () => Navigator.pop(context),
+                    ),
+                  ),
+                ),
+                toolbarHeight: 62,
+              ),
+            ];
+          },
+          body: ListView(
+            padding: const EdgeInsets.all(0),
+            children: [
+              const SizedBox(height: 12),
+              _buildLevelSection(),
+              const SizedBox(height: 14),
+              _buildMetricsRow(),
+              const SizedBox(height: 14),
+              _buildQuickActions(),
+              const SizedBox(height: 10),
+              // Tabs + contenido
+              Container(
+                color: Colors.white,
+                child: Column(
+                  children: [_buildContentTabBar(), _buildTabContent()],
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              // Información
+              Container(color: Colors.white, child: _buildInfoSection()),
+              const SizedBox(height: 8),
+              // Footer
+              _buildFooter(),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
         bottomNavigationBar: _buildBottomNav(),
       ),
     );
   }
 
-  // ── Hero + card principal ───────────────────────────────────────────────────
-
-  Widget _buildTopSection() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      child: _buildProfileHeroCard(),
-    );
-  }
-
-  Widget _buildAppBar() {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF171A2D),
-            Color(0xFF2A2140),
-            Color(0xFF1B2A36),
-          ],
-        ),
-      ),
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top,
-        left: 16,
-        right: 16,
-        bottom: 10,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _topCircleButton(
-            icon: Icons.arrow_back_ios_new_rounded,
-            onTap: () => Navigator.pop(context),
-          ),
-          _topCircleButton(
-            icon: Icons.settings_outlined,
-            onTap: () {
-              HapticFeedback.selectionClick();
-              Navigator.pushNamed(context, AppRoutes.userConfig);
-            },
-          ),
-        ],
-      ),
-    );
-  }
+  // ── Botón circular del top ────────────────────────────────────────────────────
 
   Widget _topCircleButton({
     required IconData icon,

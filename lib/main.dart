@@ -29,6 +29,9 @@ import 'Administrator/admin_noti_activity_screen.dart';
 import 'Administrator/admin_noti_report_screen.dart';
 import 'Administrator/admin_noti_alert_screen.dart';
 import 'Administrator/admin_noti_exportar_screen.dart';
+import 'services/promo_service.dart';
+
+final promoService = PromoService();
 
 void main() {
   runApp(const MyApp());

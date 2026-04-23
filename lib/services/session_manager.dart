@@ -4,7 +4,7 @@ import '../models/usuario.dart';
 /// Gestor de sesión con patrón Singleton
 /// Maneja la persistencia de datos del usuario logueado usando SharedPreferences
 class SessionManager {
-  static final SessionManager _instance = SessionManager._internal();
+  static final SessionManager _instance = SessionManager._();
   static SharedPreferences? _prefs;
   Usuario? _usuarioActual;
 
@@ -17,7 +17,7 @@ class SessionManager {
   static const String _keyLoginTime = 'login_time';
   static const String _keySessionExpiry = 'session_expiry';
 
-  SessionManager._internal();
+  SessionManager._();
 
   factory SessionManager() {
     return _instance;

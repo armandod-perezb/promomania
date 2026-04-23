@@ -55,6 +55,7 @@ class _PromoCard {
   final String store;
   final String category;
   final Color categoryColor;
+  final String? imageUrl;
   final String price;
   final String originalPrice;
   final String discount;
@@ -70,6 +71,7 @@ class _PromoCard {
     required this.store,
     required this.category,
     required this.categoryColor,
+    this.imageUrl,
     required this.price,
     required this.originalPrice,
     required this.discount,
@@ -182,6 +184,7 @@ class _ExploreScreenState extends State<ExploreScreen>
       store: 'Burger House',
       category: 'Comida',
       categoryColor: Color(0xFFFF4D2E),
+      imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd',
       price: '\$28.000',
       originalPrice: '\$56.000',
       discount: '-50%',
@@ -196,6 +199,7 @@ class _ExploreScreenState extends State<ExploreScreen>
       store: 'NorthFeet',
       category: 'Deportes',
       categoryColor: Color(0xFF3B82F6),
+      imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff',
       price: '\$180.000',
       originalPrice: '\$300.000',
       discount: '-40%',
@@ -211,6 +215,7 @@ class _ExploreScreenState extends State<ExploreScreen>
       store: 'Coffee Lab',
       category: 'Comida',
       categoryColor: Color(0xFFFF4D2E),
+      imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93',
       price: '\$18.000',
       originalPrice: '\$27.000',
       discount: '-33%',
@@ -225,6 +230,7 @@ class _ExploreScreenState extends State<ExploreScreen>
       store: 'Glow Studio',
       category: 'Belleza',
       categoryColor: Color(0xFFEC4899),
+      imageUrl: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9',
       price: '\$65.000',
       originalPrice: '\$98.000',
       discount: '-30%',
@@ -239,6 +245,7 @@ class _ExploreScreenState extends State<ExploreScreen>
       store: 'Tech Zone',
       category: 'Tecnología',
       categoryColor: Color(0xFF6366F1),
+      imageUrl: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9',
       price: '\$3.654.000',
       originalPrice: '\$4.300.000',
       discount: '-15%',
@@ -253,6 +260,7 @@ class _ExploreScreenState extends State<ExploreScreen>
       store: 'Trend Studio',
       category: 'Moda',
       categoryColor: Color(0xFFF59E0B),
+      imageUrl: 'https://images.unsplash.com/photo-1445205170230-053b83016050',
       price: '\$97.500',
       originalPrice: '\$130.000',
       discount: '-25%',
@@ -564,100 +572,315 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   // ── Flash Deals ───────────────────────────────────────────────────────────
 
-Widget _buildFlashDealsSection() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(20, 22, 20, 14),
-        child: Row(
+  Widget _buildFlashDealsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 22, 20, 14),
+          child: Row(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      const Icon(Icons.bolt_rounded, color: _primary, size: 20),
+                      const SizedBox(width: 6),
+                      const Text(
+                        'Flash Deals',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF1A1F2E),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        'Termina en',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF8A8FA8),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      _timerChip(_hours.toString().padLeft(2, '0')),
+                      const SizedBox(width: 3),
+                      const Text(':'),
+                      const SizedBox(width: 3),
+                      _timerChip(_minutes.toString().padLeft(2, '0')),
+                      const SizedBox(width: 3),
+                      const Text(':'),
+                      const SizedBox(width: 3),
+                      _timerChip(_seconds.toString().padLeft(2, '0')),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Ver todos >',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: _primary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        SizedBox(
+          height: 220,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: _flashDeals.length,
+            itemBuilder: (_, i) => _buildFlashDealCard(_flashDeals[i]),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ── Timer Chip ───────────────────────────────────────────────────────────
+
+  Widget _timerChip(String val) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      decoration: BoxDecoration(
+        color: _darkBg,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        val,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 11.5,
+          fontWeight: FontWeight.w800,
+          fontFeatures: [FontFeature.tabularFigures()],
+        ),
+      ),
+    );
+  }
+
+  // ── Navegación ───────────────────────────────────────────────────────────
+
+  void _openPromotionDetails() {
+    HapticFeedback.lightImpact();
+    Navigator.pushNamed(context, AppRoutes.promotionDetails);
+  }
+
+  // ── Card NUEVA estilo imagen ─────────────────────────────────────────────
+
+  Widget _buildFlashDealCard(_FlashDeal deal) {
+    return GestureDetector(
+      onTap: _openPromotionDetails,
+      child: Container(
+        width: 170,
+        margin: const EdgeInsets.only(right: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.bolt_rounded, color: _primary, size: 20),
-            const SizedBox(width: 6),
-            const Text(
-              'Flash Deals',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF1A1F2E),
+            // 🖼 IMAGEN
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(18),
+              ),
+              child: Stack(
+                children: [
+                  Image.network(
+                    _getImageByCategory(deal.category),
+                    height: 100,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+
+                  // 🔴 DESCUENTO
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        deal.discount,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(width: 10),
-            const Text(
-              'Termina en',
-              style: TextStyle(fontSize: 12, color: Color(0xFF8A8FA8)),
-            ),
-            const SizedBox(width: 6),
-            _timerChip(_hours.toString().padLeft(2, '0')),
-            const SizedBox(width: 3),
-            const Text(':'),
-            const SizedBox(width: 3),
-            _timerChip(_minutes.toString().padLeft(2, '0')),
-            const SizedBox(width: 3),
-            const Text(':'),
-            const SizedBox(width: 3),
-            _timerChip(_seconds.toString().padLeft(2, '0')),
-            const Spacer(),
-            const Text(
-              'Ver todos >',
-              style: TextStyle(
-                fontSize: 12.5,
-                color: _primary,
-                fontWeight: FontWeight.w700,
+
+            //  INFO
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    deal.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1A1F2E),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    deal.store,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Color(0xFF8A8FA8),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+
+                  // 💰 PRECIOS
+                  Row(
+                    children: [
+                      Text(
+                        deal.price,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.red,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        deal.originalPrice,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFFB0B5CC),
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  // RATING
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.star_rounded,
+                        size: 12,
+                        color: Color(0xFFFFB703),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        deal.rating,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
 
-      SizedBox(
-        height: 210,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: _flashDeals.length,
-          itemBuilder: (_, i) => _buildFlashDealCard(_flashDeals[i]),
+  // ── Imágenes por categoría ───────────────────────────────────────────────
+
+  String _getImageByCategory(String category) {
+    switch (category) {
+      case 'Café':
+        return 'https://images.unsplash.com/photo-1509042239860-f550ce710b93';
+      case 'Salud':
+        return 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd';
+      case 'Bebidas':
+        return 'https://images.unsplash.com/photo-1551024506-0bccd828d307';
+      default:
+        return 'https://images.unsplash.com/photo-1490645935967-10de6ba17061';
+    }
+  }
+
+  // ── Tiendas cerca ─────────────────────────────────────────────────────────
+
+  Widget _buildNearbySection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 14),
+          child: Row(
+            children: [
+              const Icon(Icons.location_on_rounded, color: _primary, size: 18),
+              const SizedBox(width: 6),
+              const Text(
+                'Tiendas cerca',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF1A1F2E),
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () {},
+                child: const Text(
+                  'Ver mapa >',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: _primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    ],
-  );
-}
 
-// ── Timer Chip ───────────────────────────────────────────────────────────
+        SizedBox(
+          height: 190,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: _nearbyStores.length,
+            itemBuilder: (_, i) => _buildNearbyCard(_nearbyStores[i]),
+          ),
+        ),
+      ],
+    );
+  }
 
-Widget _timerChip(String val) {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-    decoration: BoxDecoration(
-      color: _darkBg,
-      borderRadius: BorderRadius.circular(6),
-    ),
-    child: Text(
-      val,
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 11.5,
-        fontWeight: FontWeight.w800,
-        fontFeatures: [FontFeature.tabularFigures()],
-      ),
-    ),
-  );
-}
+  // ── Card moderna con imagen ───────────────────────────────────────────────
 
-// ── Navegación ───────────────────────────────────────────────────────────
-
-void _openPromotionDetails() {
-  HapticFeedback.lightImpact();
-  Navigator.pushNamed(context, AppRoutes.promotionDetails);
-}
-
-// ── Card NUEVA estilo imagen ─────────────────────────────────────────────
-
-Widget _buildFlashDealCard(_FlashDeal deal) {
-  return GestureDetector(
-    onTap: _openPromotionDetails,
-    child: Container(
-      width: 170,
+  Widget _buildNearbyCard(_NearbyStore store) {
+    return Container(
+      width: 180,
       margin: const EdgeInsets.only(right: 14),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -675,38 +898,66 @@ Widget _buildFlashDealCard(_FlashDeal deal) {
         children: [
           // 🖼 IMAGEN
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(18),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
             child: Stack(
               children: [
                 Image.network(
-                  _getImageByCategory(deal.category),
-                  height: 100,
+                  _getStoreImage(store.name),
+                  height: 110,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
 
-                // 🔴 DESCUENTO
+                // 📍 DISTANCIA (overlay)
                 Positioned(
-                  top: 8,
                   left: 8,
+                  bottom: 8,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.red,
+                      color: Colors.black.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      deal.discount,
+                      store.distance,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
                       ),
+                    ),
+                  ),
+                ),
+
+                // ⭐ RATING (overlay)
+                Positioned(
+                  right: 8,
+                  bottom: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.star, size: 10, color: Colors.yellow),
+                        const SizedBox(width: 3),
+                        Text(
+                          store.rating,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -721,62 +972,37 @@ Widget _buildFlashDealCard(_FlashDeal deal) {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  deal.title,
+                  store.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 13.5,
+                    fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF1A1F2E),
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  deal.store,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Color(0xFF8A8FA8),
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // 💰 PRECIOS
                 Row(
                   children: [
                     Text(
-                      deal.price,
+                      store.category,
                       style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.red,
+                        fontSize: 11,
+                        color: Color(0xFF8A8FA8),
                       ),
                     ),
                     const SizedBox(width: 6),
-                    Text(
-                      deal.originalPrice,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFFB0B5CC),
-                        decoration: TextDecoration.lineThrough,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 6),
-
-                // ⭐ RATING
-                Row(
-                  children: [
                     const Icon(
-                      Icons.star_rounded,
+                      Icons.access_time_rounded,
                       size: 12,
-                      color: Color(0xFFFFB703),
+                      color: Color(0xFFB0B5CC),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 3),
                     Text(
-                      deal.rating,
+                      store.time,
                       style: const TextStyle(
                         fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF8A8FA8),
                       ),
                     ),
                   ],
@@ -786,367 +1012,22 @@ Widget _buildFlashDealCard(_FlashDeal deal) {
           ),
         ],
       ),
-    ),
-  );
-}
-
-// ── Imágenes por categoría ───────────────────────────────────────────────
-
-String _getImageByCategory(String category) {
-  switch (category) {
-    case 'Café':
-      return 'https://images.unsplash.com/photo-1509042239860-f550ce710b93';
-    case 'Salud':
-      return 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd';
-    case 'Bebidas':
-      return 'https://images.unsplash.com/photo-1551024506-0bccd828d307';
-    default:
-      return 'https://images.unsplash.com/photo-1490645935967-10de6ba17061';
-  }
-}
-
-  // ── Tiendas cerca ─────────────────────────────────────────────────────────
-
-Widget _buildNearbySection() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 14),
-        child: Row(
-          children: [
-            const Icon(Icons.location_on_rounded, color: _primary, size: 18),
-            const SizedBox(width: 6),
-            const Text(
-              'Tiendas cerca',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF1A1F2E),
-              ),
-            ),
-            const Spacer(),
-            GestureDetector(
-              onTap: () {},
-              child: const Text(
-                'Ver mapa >',
-                style: TextStyle(
-                  fontSize: 12.5,
-                  color: _primary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-
-      SizedBox(
-        height: 190,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: _nearbyStores.length,
-          itemBuilder: (_, i) => _buildNearbyCard(_nearbyStores[i]),
-        ),
-      ),
-    ],
-  );
-}
-
-// ── Card moderna con imagen ───────────────────────────────────────────────
-
-Widget _buildNearbyCard(_NearbyStore store) {
-  return Container(
-    width: 180,
-    margin: const EdgeInsets.only(right: 14),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(18),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.06),
-          blurRadius: 10,
-          offset: const Offset(0, 3),
-        ),
-      ],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 🖼 IMAGEN
-        ClipRRect(
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(18),
-          ),
-          child: Stack(
-            children: [
-              Image.network(
-                _getStoreImage(store.name),
-                height: 110,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-
-              // 📍 DISTANCIA (overlay)
-              Positioned(
-                left: 8,
-                bottom: 8,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    store.distance,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-
-              // ⭐ RATING (overlay)
-              Positioned(
-                right: 8,
-                bottom: 8,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.star, size: 10, color: Colors.yellow),
-                      const SizedBox(width: 3),
-                      Text(
-                        store.rating,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // 📄 INFO
-        Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                store.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF1A1F2E),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Text(
-                    store.category,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFF8A8FA8),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  const Icon(
-                    Icons.access_time_rounded,
-                    size: 12,
-                    color: Color(0xFFB0B5CC),
-                  ),
-                  const SizedBox(width: 3),
-                  Text(
-                    store.time,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFF8A8FA8),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-// ── Imágenes dinámicas ────────────────────────────────────────────────────
-
-String _getStoreImage(String name) {
-  switch (name) {
-    case 'Burger House':
-      return 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd';
-    case 'Coffee Lab':
-      return 'https://images.unsplash.com/photo-1509042239860-f550ce710b93';
-    case 'SportMax':
-      return 'https://images.unsplash.com/photo-1517649763962-0c623066013b';
-    default:
-      return 'https://images.unsplash.com/photo-1492724441997-5dc865305da7';
-  }
-}
-
-  // ── Todas las promos ──────────────────────────────────────────────────────
-
-  Widget _buildAllPromosHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 14),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.local_offer_rounded, color: _primary, size: 18),
-              const SizedBox(width: 6),
-              const Text(
-                'Todas las promos',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF1A1F2E),
-                ),
-              ),
-              const Spacer(),
-              // Toggle grid/list
-              GestureDetector(
-                onTap: () => setState(() => _gridView = !_gridView),
-                child: Container(
-                  padding: const EdgeInsets.all(7),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF0F1F5),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    _gridView
-                        ? Icons.view_list_rounded
-                        : Icons.grid_view_rounded,
-                    size: 18,
-                    color: const Color(0xFF1A1F2E),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // Filtros de orden
-          SizedBox(
-            height: 34,
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.tune_rounded,
-                  size: 16,
-                  color: Color(0xFF8A8FA8),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _sortOptions.length,
-                    itemBuilder: (_, i) {
-                      final isSelected = _selectedSort == i;
-                      return GestureDetector(
-                        onTap: () => setState(() => _selectedSort = i),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 180),
-                          margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected ? _darkBg : Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: isSelected
-                                  ? _darkBg
-                                  : const Color(0xFFE8EAF0),
-                              width: 1.2,
-                            ),
-                          ),
-                          child: Text(
-                            _sortOptions[i],
-                            style: TextStyle(
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w600,
-                              color: isSelected
-                                  ? Colors.white
-                                  : const Color(0xFF5A5F72),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 
-  SliverList _buildPromosGrid() {
-    if (_gridView) {
-      // Vista de lista
-      return SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (_, i) => Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-            child: _buildPromoListTile(_promos[i]),
-          ),
-          childCount: _promos.length,
-        ),
-      );
+  // ── Imágenes dinámicas ────────────────────────────────────────────────────
+
+  String _getStoreImage(String name) {
+    switch (name) {
+      case 'Burger House':
+        return 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd';
+      case 'Coffee Lab':
+        return 'https://images.unsplash.com/photo-1509042239860-f550ce710b93';
+      case 'SportMax':
+        return 'https://images.unsplash.com/photo-1517649763962-0c623066013b';
+      default:
+        return 'https://images.unsplash.com/photo-1492724441997-5dc865305da7';
     }
-    // Vista de grilla 2 columnas
-    return SliverList(
-      delegate: SliverChildBuilderDelegate((_, i) {
-        final row = i * 2;
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          child: Row(
-            children: [
-              Expanded(
-                child: _promos.length > row
-                    ? _buildPromoGridCard(_promos[row])
-                    : const SizedBox(),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _promos.length > row + 1
-                    ? _buildPromoGridCard(_promos[row + 1])
-                    : const SizedBox(),
-              ),
-            ],
-          ),
-        );
-      }, childCount: (_promos.length / 2).ceil()),
-    );
   }
 
   Widget _buildPromoGridCard(_PromoCard p) {
@@ -1167,67 +1048,89 @@ String _getStoreImage(String name) {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 🔥 IMAGEN REAL
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(20),
               ),
-              child: Container(
-                height: 138,
-                color: p.categoryColor.withValues(alpha: 0.1),
+              child: SizedBox(
+                height: 126,
+                width: double.infinity,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Center(
-                      child: Text(
-                        p.emoji,
-                        style: const TextStyle(fontSize: 56),
+                    // Imagen o fallback
+                    p.imageUrl != null
+                        ? Image.network(p.imageUrl!, fit: BoxFit.cover)
+                        : Container(
+                            color: p.categoryColor.withValues(alpha: 0.15),
+                            child: Center(
+                              child: Text(
+                                p.emoji,
+                                style: const TextStyle(fontSize: 50),
+                              ),
+                            ),
+                          ),
+
+                    // 🔥 OVERLAY OSCURO
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.35),
+                            Colors.transparent,
+                          ],
+                        ),
                       ),
                     ),
+
+                    // 🔥 DESCUENTO (arriba izquierda)
                     Positioned(
-                      top: 12,
-                      left: 12,
+                      top: 10,
+                      left: 10,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,
                           vertical: 5,
                         ),
                         decoration: BoxDecoration(
-                          color: p.discountColor,
+                          color: Colors.redAccent,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           p.discount,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 12,
+                            fontSize: 11,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
                       ),
                     ),
+
+                    // 🔥 FAVORITO (círculo blanco flotante)
                     Positioned(
-                      top: 12,
-                      right: 12,
+                      top: 10,
+                      right: 10,
                       child: Container(
                         width: 34,
                         height: 34,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
+                          shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.08),
-                              blurRadius: 10,
-                              offset: const Offset(0, 3),
+                              color: Colors.black.withValues(alpha: 0.15),
+                              blurRadius: 8,
                             ),
                           ],
                         ),
                         child: Icon(
-                          p.isFavorite
-                              ? Icons.favorite_rounded
-                              : Icons.favorite_border_rounded,
+                          p.isFavorite ? Icons.favorite : Icons.favorite_border,
                           color: p.isFavorite
-                              ? _primary
+                              ? Colors.red
                               : const Color(0xFFB0B5CC),
                           size: 18,
                         ),
@@ -1237,15 +1140,18 @@ String _getStoreImage(String name) {
                 ),
               ),
             ),
+
+            // 🔥 CONTENIDO
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // 🔥 CATEGORÍA (chip)
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
-                      vertical: 5,
+                      vertical: 4,
                     ),
                     decoration: BoxDecoration(
                       color: p.categoryColor.withValues(alpha: 0.12),
@@ -1255,108 +1161,99 @@ String _getStoreImage(String name) {
                       p.category,
                       style: TextStyle(
                         color: p.categoryColor,
-                        fontSize: 11,
+                        fontSize: 10.5,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
+
+                  const SizedBox(height: 6),
+
+                  // 🔥 TÍTULO
                   Text(
                     p.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w800,
                       color: Color(0xFF1A1F2E),
-                      height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 6),
+
+                  const SizedBox(height: 4),
+
+                  // 🔥 STORE
                   Text(
                     p.store,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 11,
                       color: Color(0xFF8A8FA8),
                     ),
                   ),
-                  const SizedBox(height: 12),
+
+                  const SizedBox(height: 8),
+
+                  // 🔥 PRECIO
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
                         p.price,
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.w900,
-                          color: _primary,
+                          color: Colors.redAccent,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       Text(
                         p.originalPrice,
                         style: const TextStyle(
-                          fontSize: 11,
+                          fontSize: 10,
                           color: Color(0xFFB0B5CC),
                           decoration: TextDecoration.lineThrough,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+
+                  const SizedBox(height: 6),
+
+                  // 🔥 RATING + TIEMPO
                   Row(
                     children: [
                       const Icon(
-                        Icons.star_rounded,
-                        color: Color(0xFFFBBF24),
+                        Icons.star,
                         size: 12,
+                        color: Color(0xFFFBBF24),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         p.rating,
                         style: const TextStyle(
-                          fontSize: 10.5,
+                          fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF1A1F2E),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        '·',
-                        style: TextStyle(
-                          color: Color(0xFFB0B5CC),
-                          fontSize: 10,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       Text(
-                        '${p.reviews} reseñas',
+                        '(${p.reviews})',
                         style: const TextStyle(
-                          fontSize: 10.5,
+                          fontSize: 10,
                           color: Color(0xFF8A8FA8),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        '·',
-                        style: TextStyle(
-                          color: Color(0xFFB0B5CC),
-                          fontSize: 10,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
+                      const Spacer(),
                       const Icon(
-                        Icons.access_time_rounded,
-                        size: 10,
+                        Icons.access_time,
+                        size: 11,
                         color: Color(0xFFB0B5CC),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 3),
                       Text(
                         p.time,
                         style: const TextStyle(
-                          fontSize: 10.5,
+                          fontSize: 10,
                           color: Color(0xFF8A8FA8),
                         ),
                       ),
@@ -1371,102 +1268,87 @@ String _getStoreImage(String name) {
     );
   }
 
-  Widget _buildPromoListTile(_PromoCard p) {
-    return GestureDetector(
-      onTap: _openPromotionDetails,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+  /// TODAS LAS PROMO
+  Widget _buildAllPromosHeader() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 12),
+      child: Row(
+        children: [
+          const Icon(Icons.local_offer_rounded, color: _primary, size: 18),
+          const SizedBox(width: 6),
+          const Expanded(
+            child: Text(
+              'Todas las promociones',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF1A1F2E),
+              ),
             ),
-          ],
+          ),
+          DropdownButtonHideUnderline(
+            child: DropdownButton<int>(
+              value: _selectedSort,
+              isDense: true,
+              borderRadius: BorderRadius.circular(12),
+              style: const TextStyle(
+                fontSize: 12,
+                color: Color(0xFF1A1F2E),
+                fontWeight: FontWeight.w600,
+              ),
+              items: List.generate(
+                _sortOptions.length,
+                (i) => DropdownMenuItem(value: i, child: Text(_sortOptions[i])),
+              ),
+              onChanged: (v) {
+                if (v == null) return;
+                setState(() => _selectedSort = v);
+              },
+            ),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () => setState(() => _gridView = !_gridView),
+            child: Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFE3E6EF)),
+              ),
+              child: Icon(
+                _gridView ? Icons.grid_view_rounded : Icons.view_agenda_rounded,
+                size: 18,
+                color: const Color(0xFF6B7280),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  SliverPadding _buildPromosGrid() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isNarrow = screenWidth < 400;
+    final crossAxisCount = _gridView ? 1 : 2;
+    final childAspectRatio = _gridView
+        ? (isNarrow ? 2.05 : 2.25)
+        : (isNarrow ? 0.52 : 0.56);
+
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      sliver: SliverGrid(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 10,
+          childAspectRatio: childAspectRatio,
         ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                bottomLeft: Radius.circular(16),
-              ),
-              child: Container(
-                width: 90,
-                height: 90,
-                color: p.categoryColor.withValues(alpha: 0.1),
-                child: Center(
-                  child: Text(p.emoji, style: const TextStyle(fontSize: 40)),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      p.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A1F2E),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      p.store,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF8A8FA8),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Text(
-                          p.price,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w900,
-                            color: Color(0xFF1A1F2E),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: p.discountColor,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            p.discount,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-          ],
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => _buildPromoGridCard(_promos[index]),
+          childCount: _promos.length,
         ),
       ),
     );

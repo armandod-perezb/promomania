@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart' show LatLng;
 import '../Core/Routes/app_routes.dart';
 
 class HomeMapScreen extends StatefulWidget {
@@ -13,10 +15,12 @@ class _HomeMapScreenState extends State<HomeMapScreen>
     with TickerProviderStateMixin {
   static const Color _primary = Color(0xFFFF4D2E);
   static const Color _darkBg = Color(0xFF1A1F2E);
+  static const LatLng _defaultCenter = LatLng(4.7110, -74.0721);
 
   int _selectedTab = 0;
-  double _zoomLevel = 100;
+  double _zoomLevel = 14;
   int _selectedPromo = 0;
+  final MapController _mapController = MapController();
 
   late final AnimationController _cardController;
   late final Animation<Offset> _cardSlide;
@@ -28,36 +32,31 @@ class _HomeMapScreenState extends State<HomeMapScreen>
       id: 0,
       label: '-50%',
       color: Color(0xFFE91E8C),
-      left: 0.55,
-      top: 0.22,
+      latLng: LatLng(4.7162, -74.0703),
     ),
     _MapPromo(
       id: 1,
       label: '50%',
       color: Color(0xFFFF4D2E),
-      left: 0.42,
-      top: 0.32,
+      latLng: LatLng(4.7093, -74.0757),
     ),
     _MapPromo(
       id: 2,
       label: '-40%',
       color: Color(0xFF3B82F6),
-      left: 0.63,
-      top: 0.52,
+      latLng: LatLng(4.7058, -74.0682),
     ),
     _MapPromo(
       id: 3,
       label: '-33%',
       color: Color(0xFF10B981),
-      left: 0.26,
-      top: 0.57,
+      latLng: LatLng(4.7018, -74.0801),
     ),
     _MapPromo(
       id: 4,
       label: '-33%',
       color: Color(0xFF10B981),
-      left: 0.75,
-      top: 0.66,
+      latLng: LatLng(4.6979, -74.0648),
     ),
   ];
 
@@ -140,14 +139,8 @@ class _HomeMapScreenState extends State<HomeMapScreen>
         backgroundColor: Colors.white,
         body: Stack(
           children: [
-            // ── Mapa simulado ──
-            _buildFakeMap(),
-
-            // ── Pins de promos ──
-            ..._buildPromoMarkers(),
-
-            // ── Pin de usuario ──
-            _buildUserPin(),
+            // ── Mapa real OpenStreetMap (gratis, sin API key) ──
+            _buildOsmMap(),
 
             // ── Barra de búsqueda ──
             _buildSearchBar(),
@@ -169,30 +162,40 @@ class _HomeMapScreenState extends State<HomeMapScreen>
 
   // ── Mapa ─────────────────────────────────────────────────────────────────────
 
-  Widget _buildFakeMap() {
+  Widget _buildOsmMap() {
     return Positioned.fill(
-      child: Container(
-        decoration: const BoxDecoration(
-          // Fondo simulando vista aérea
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFB8CBB8), Color(0xFF9DB89D), Color(0xFF8BAD8B)],
-          ),
+      child: FlutterMap(
+        mapController: _mapController,
+        options: MapOptions(
+          initialCenter: _defaultCenter,
+          initialZoom: _zoomLevel,
+          minZoom: 5,
+          maxZoom: 19,
         ),
-        child: CustomPaint(painter: _MapPainter()),
+        children: [
+          TileLayer(
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.promomania.app',
+          ),
+          MarkerLayer(markers: _buildPromoMarkers()),
+          MarkerLayer(markers: [_buildUserPin()]),
+        ],
       ),
     );
   }
 
-  List<Widget> _buildPromoMarkers() {
+  List<Marker> _buildPromoMarkers() {
     return _promos.map((p) {
       final isSelected = _selectedPromo == p.id;
-      return Positioned(
-        left: MediaQuery.of(context).size.width * p.left,
-        top: MediaQuery.of(context).size.height * p.top,
+      return Marker(
+        point: p.latLng,
+        width: 86,
+        height: 56,
         child: GestureDetector(
-          onTap: () => _selectPromo(p.id),
+          onTap: () {
+            _selectPromo(p.id);
+            _mapController.move(p.latLng, _zoomLevel);
+          },
           child: AnimatedScale(
             scale: isSelected ? 1.2 : 1.0,
             duration: const Duration(milliseconds: 200),
@@ -208,11 +211,11 @@ class _HomeMapScreenState extends State<HomeMapScreen>
     }).toList();
   }
 
-  Widget _buildUserPin() {
-    final size = MediaQuery.of(context).size;
-    return Positioned(
-      left: size.width * 0.48,
-      top: size.height * 0.48,
+  Marker _buildUserPin() {
+    return Marker(
+      point: _defaultCenter,
+      width: 22,
+      height: 22,
       child: Container(
         width: 16,
         height: 16,
@@ -320,7 +323,7 @@ class _HomeMapScreenState extends State<HomeMapScreen>
           ],
         ),
         child: Text(
-          'Zoom: ${_zoomLevel.toInt()}%',
+          'Zoom: ${((_zoomLevel - 5) / 14 * 100).clamp(0, 100).toInt()}%',
           style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -341,19 +344,28 @@ class _HomeMapScreenState extends State<HomeMapScreen>
         children: [
           _mapControlBtn(
             icon: Icons.near_me_outlined,
-            onTap: () => HapticFeedback.lightImpact(),
+            onTap: () {
+              HapticFeedback.lightImpact();
+              _mapController.move(_defaultCenter, _zoomLevel);
+            },
           ),
           const SizedBox(height: 8),
           _mapControlBtn(
             icon: Icons.add_rounded,
-            onTap: () =>
-                setState(() => _zoomLevel = (_zoomLevel + 10).clamp(50, 200)),
+            onTap: () {
+              final nextZoom = (_zoomLevel + 1).clamp(5, 19).toDouble();
+              setState(() => _zoomLevel = nextZoom);
+              _mapController.move(_mapController.camera.center, _zoomLevel);
+            },
           ),
           const SizedBox(height: 8),
           _mapControlBtn(
             icon: Icons.remove_rounded,
-            onTap: () =>
-                setState(() => _zoomLevel = (_zoomLevel - 10).clamp(50, 200)),
+            onTap: () {
+              final nextZoom = (_zoomLevel - 1).clamp(5, 19).toDouble();
+              setState(() => _zoomLevel = nextZoom);
+              _mapController.move(_mapController.camera.center, _zoomLevel);
+            },
           ),
         ],
       ),
@@ -629,157 +641,19 @@ class _HomeMapScreenState extends State<HomeMapScreen>
   }
 }
 
-// ── Custom Painter para simular mapa ─────────────────────────────────────────
-
-class _MapPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final buildingPaint = Paint()..color = const Color(0xFFD4DED4);
-    final roadPaint = Paint()
-      ..color = const Color(0xFFC8D8C8)
-      ..strokeWidth = 18
-      ..strokeCap = StrokeCap.round;
-    final roadPaint2 = Paint()
-      ..color = const Color(0xFFC8D8C8)
-      ..strokeWidth = 10
-      ..strokeCap = StrokeCap.round;
-
-    // Calles principales
-    canvas.drawLine(
-      Offset(0, size.height * 0.35),
-      Offset(size.width, size.height * 0.35),
-      roadPaint,
-    );
-    canvas.drawLine(
-      Offset(0, size.height * 0.65),
-      Offset(size.width, size.height * 0.65),
-      roadPaint,
-    );
-    canvas.drawLine(
-      Offset(size.width * 0.35, 0),
-      Offset(size.width * 0.35, size.height),
-      roadPaint,
-    );
-    canvas.drawLine(
-      Offset(size.width * 0.65, 0),
-      Offset(size.width * 0.65, size.height),
-      roadPaint,
-    );
-
-    // Calles secundarias
-    for (int i = 1; i <= 4; i++) {
-      canvas.drawLine(
-        Offset(0, size.height * (i * 0.18)),
-        Offset(size.width, size.height * (i * 0.18)),
-        roadPaint2,
-      );
-      canvas.drawLine(
-        Offset(size.width * (i * 0.22), 0),
-        Offset(size.width * (i * 0.22), size.height),
-        roadPaint2,
-      );
-    }
-
-    // Edificios / bloques
-    final buildings = [
-      Rect.fromLTWH(
-        size.width * 0.05,
-        size.height * 0.08,
-        size.width * 0.28,
-        size.height * 0.24,
-      ),
-      Rect.fromLTWH(
-        size.width * 0.38,
-        size.height * 0.06,
-        size.width * 0.24,
-        size.height * 0.26,
-      ),
-      Rect.fromLTWH(
-        size.width * 0.68,
-        size.height * 0.10,
-        size.width * 0.28,
-        size.height * 0.22,
-      ),
-      Rect.fromLTWH(
-        size.width * 0.04,
-        size.height * 0.38,
-        size.width * 0.28,
-        size.height * 0.24,
-      ),
-      Rect.fromLTWH(
-        size.width * 0.38,
-        size.height * 0.40,
-        size.width * 0.24,
-        size.height * 0.22,
-      ),
-      Rect.fromLTWH(
-        size.width * 0.68,
-        size.height * 0.38,
-        size.width * 0.28,
-        size.height * 0.24,
-      ),
-      Rect.fromLTWH(
-        size.width * 0.05,
-        size.height * 0.68,
-        size.width * 0.26,
-        size.height * 0.28,
-      ),
-      Rect.fromLTWH(
-        size.width * 0.35,
-        size.height * 0.70,
-        size.width * 0.26,
-        size.height * 0.26,
-      ),
-      Rect.fromLTWH(
-        size.width * 0.66,
-        size.height * 0.68,
-        size.width * 0.30,
-        size.height * 0.28,
-      ),
-    ];
-
-    for (final rect in buildings) {
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(rect, const Radius.circular(4)),
-        buildingPaint,
-      );
-    }
-
-    // Zona verde
-    final greenPaint = Paint()..color = const Color(0xFF9DC59D);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          size.width * 0.38,
-          size.height * 0.38,
-          size.width * 0.24,
-          size.height * 0.22,
-        ),
-        const Radius.circular(4),
-      ),
-      greenPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_MapPainter old) => false;
-}
-
 // ── Modelos auxiliares ────────────────────────────────────────────────────────
 
 class _MapPromo {
   final int id;
   final String label;
   final Color color;
-  final double left;
-  final double top;
+  final LatLng latLng;
 
   const _MapPromo({
     required this.id,
     required this.label,
     required this.color,
-    required this.left,
-    required this.top,
+    required this.latLng,
   });
 }
 

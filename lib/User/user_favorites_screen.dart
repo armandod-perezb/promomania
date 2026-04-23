@@ -10,6 +10,7 @@ enum _PromoUrgency { today, thisWeek, noRush }
 
 class _FavoritePromo {
   final String id;
+  final String imageUrl;
   final String title;
   final String store;
   final String category;
@@ -27,6 +28,7 @@ class _FavoritePromo {
 
   const _FavoritePromo({
     required this.id,
+    required this.imageUrl,
     required this.title,
     required this.store,
     required this.category,
@@ -70,6 +72,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   final List<_FavoritePromo> _allPromos = const [
     _FavoritePromo(
       id: '1',
+      imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93',
       title: 'Café + Pastel al precio de 1',
       store: 'Coffee Lab',
       category: 'COMIDA',
@@ -87,6 +90,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
     ),
     _FavoritePromo(
       id: '2',
+      imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd',
       title: '2x1 Hamburguesas Gourmet',
       store: 'Burger House',
       category: 'COMIDA',
@@ -104,6 +108,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
     ),
     _FavoritePromo(
       id: '3',
+      imageUrl: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9',
       title: 'Kit Skincare 50% OFF',
       store: 'Beauty Store',
       category: 'BELLEZA',
@@ -121,6 +126,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
     ),
     _FavoritePromo(
       id: '4',
+      imageUrl: 'https://images.unsplash.com/photo-1445205170230-053b83016050',
       title: 'Colección Primavera 25% OFF',
       store: 'Trend Studio',
       category: 'MODA',
@@ -138,6 +144,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
     ),
     _FavoritePromo(
       id: '5',
+      imageUrl: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9',
       title: 'iPhone 15 Pro + AirPods',
       store: 'Tech Zone',
       category: 'TECNOLOGÍA',
@@ -215,26 +222,19 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
         backgroundColor: _lightBg,
-        body: Column(
-          children: [
-            // Header fijo blanco
-            _buildTopHeader(),
-            // Contenido scrollable
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildSavingsCard(),
-                    if (_showBanner) _buildInfoBanner(),
-                    _buildTabBar(),
-                    _buildPromoGroups(),
-                    const SizedBox(height: 24),
-                  ],
-                ),
-              ),
-            ),
-          ],
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header que se desplaza con el contenido
+              _buildTopHeader(),
+              _buildSavingsCard(),
+              if (_showBanner) _buildInfoBanner(),
+              _buildTabBar(),
+              _buildPromoGroups(),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
         bottomNavigationBar: _buildBottomNav(),
       ),
@@ -248,47 +248,38 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
       color: Colors.white,
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 10,
-        left: 20,
-        right: 20,
-        bottom: 14,
+        left: 16,
+        right: 16,
+        bottom: 10,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                'Tu colección',
-                style: TextStyle(fontSize: 12, color: Color(0xFF8A8FA8)),
-              ),
-              Text(
-                'Mis Favoritos',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  color: Color(0xFF1A1F2E),
-                ),
-              ),
-            ],
+          const Text(
+            'Mis Favoritos',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF1A1F2E),
+            ),
           ),
           // Badge de contador
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
-              color: _primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: _primary.withOpacity(0.25), width: 1),
+              color: const Color(0xFFF5F6FA),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: const Color(0xFFE8EAF0)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.favorite_rounded, color: _primary, size: 16),
+                const Icon(Icons.favorite_rounded, color: _primary, size: 14),
                 const SizedBox(width: 6),
                 Text(
                   '${_visiblePromos.length}',
                   style: const TextStyle(
                     color: _primary,
-                    fontSize: 14,
+                    fontSize: 12.5,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -310,16 +301,16 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
         .length;
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      padding: const EdgeInsets.all(18),
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       decoration: BoxDecoration(
         color: _darkBg,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: _darkBg.withOpacity(0.3),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+            color: _darkBg.withValues(alpha: 0.22),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -329,25 +320,22 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                 decoration: BoxDecoration(
                   color: _primary,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Row(
                   children: [
-                    Icon(Icons.savings_outlined, color: Colors.white, size: 13),
+                    Icon(Icons.savings_outlined, color: Colors.white, size: 12),
                     SizedBox(width: 4),
                     Text(
                       'AHORROS DISPONIBLES',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 10.5,
+                        fontSize: 9.5,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 0.5,
+                        letterSpacing: 0.4,
                       ),
                     ),
                   ],
@@ -356,8 +344,8 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
               const Spacer(),
               // Donut chart simulado
               SizedBox(
-                width: 54,
-                height: 54,
+                width: 50,
+                height: 50,
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
@@ -374,7 +362,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                           '${((used / _visiblePromos.length.clamp(1, 100)) * 100).toInt()}%',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 11,
+                            fontSize: 10,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -382,7 +370,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                           'Usados',
                           style: TextStyle(
                             color: Color(0xFF8A8FA8),
-                            fontSize: 8,
+                            fontSize: 7,
                           ),
                         ),
                       ],
@@ -392,39 +380,44 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Text(
             _formatCurrency(total),
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 32,
+              fontSize: 30,
               fontWeight: FontWeight.w900,
               letterSpacing: -0.5,
             ),
           ),
           const Text(
             'COP',
-            style: TextStyle(color: Color(0xFF8A8FA8), fontSize: 12),
+            style: TextStyle(color: Color(0xFFB9C0D0), fontSize: 11),
           ),
-          const SizedBox(height: 14),
-          // Barra de progreso
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: used / _visiblePromos.length.clamp(1, 100),
-              minHeight: 5,
-              backgroundColor: Colors.white.withOpacity(0.12),
-              valueColor: const AlwaysStoppedAnimation<Color>(_primary),
+          const SizedBox(height: 10),
+          Container(
+            height: 5,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: FractionallySizedBox(
+              alignment: Alignment.centerLeft,
+              widthFactor: used / _visiblePromos.length.clamp(1, 100),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: _primary,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 12),
-          // Stats row
+          const SizedBox(height: 10),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _miniStat('${_visiblePromos.length}', 'guardadas'),
-              _statDivider(),
               _miniStat('$used', 'Usadas'),
-              _statDivider(),
               _miniStat('$urgent', 'Urgentes'),
             ],
           ),
@@ -441,13 +434,13 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
           val,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: 15,
             fontWeight: FontWeight.w800,
           ),
         ),
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF8A8FA8), fontSize: 11),
+          style: const TextStyle(color: Color(0xFF8A8FA8), fontSize: 10),
         ),
       ],
     );
@@ -465,29 +458,55 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   Widget _buildInfoBanner() {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      margin: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF8E1),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFFFE082), width: 1),
+        border: Border.all(color: const Color(0xFFF0F3F8), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
-        children: const [
-          Icon(Icons.swipe_left_outlined, color: Color(0xFFF59E0B), size: 16),
-          SizedBox(width: 8),
-          Expanded(
+        children: [
+          Container(
+            width: 18,
+            height: 18,
+            decoration: BoxDecoration(
+              color: _primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: const Icon(
+              Icons.swipe_left_outlined,
+              color: _primary,
+              size: 12,
+            ),
+          ),
+          const SizedBox(width: 8),
+          const Expanded(
             child: Text(
               'Desliza una promo a la izquierda para eliminarla',
               style: TextStyle(
-                fontSize: 12.5,
-                color: Color(0xFF92651A),
+                fontSize: 12,
+                color: Color(0xFF6B7280),
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          SizedBox(width: 8),
-          // Close
+          Container(
+            width: 18,
+            height: 18,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5F6FA),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: const Icon(Icons.close, color: Color(0xFFB0B5CC), size: 11),
+          ),
         ],
       ),
     );
@@ -497,16 +516,17 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
 
   Widget _buildTabBar() {
     final tabs = [
-      _TabItem(icon: Icons.grid_view_rounded, label: 'Todas', badge: null),
       _TabItem(
-        icon: Icons.schedule_rounded,
-        label: 'Por vencer',
-        badge: _allPromos
-            .where((p) => p.urgency == _PromoUrgency.today)
-            .length
-            .toString(),
+        icon: Icons.bookmark_border_rounded,
+        label: 'Todas',
+        badge: null,
       ),
-      _TabItem(icon: Icons.category_outlined, label: 'Categorías', badge: null),
+      _TabItem(
+        icon: Icons.local_fire_department_outlined,
+        label: 'Por vencer',
+        badge: '1',
+      ),
+      _TabItem(icon: Icons.folder_outlined, label: 'Carpetas', badge: '4'),
       _TabItem(
         icon: Icons.check_circle_outline_rounded,
         label: 'Usados',
@@ -516,15 +536,15 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -539,10 +559,13 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 9),
+                margin: const EdgeInsets.symmetric(horizontal: 2),
+                padding: const EdgeInsets.symmetric(vertical: 11),
                 decoration: BoxDecoration(
-                  color: isActive ? _darkBg : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12),
+                  color: isActive
+                      ? const Color(0xFF111827)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(18),
                 ),
                 child: Column(
                   children: [
@@ -551,29 +574,34 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                       children: [
                         Icon(
                           tabs[i].icon,
-                          size: 20,
+                          size: 22,
                           color: isActive
                               ? Colors.white
-                              : const Color(0xFFB0B5CC),
+                              : const Color(0xFF9CA3AF),
                         ),
                         if (tabs[i].badge != null)
                           Positioned(
-                            top: -5,
-                            right: -8,
+                            top: -10,
+                            right: -14,
                             child: Container(
+                              constraints: const BoxConstraints(
+                                minWidth: 20,
+                                minHeight: 20,
+                              ),
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 5,
-                                vertical: 1,
+                                horizontal: 6,
+                                vertical: 2,
                               ),
                               decoration: BoxDecoration(
                                 color: _primary,
-                                borderRadius: BorderRadius.circular(8),
+                                shape: BoxShape.circle,
                               ),
+                              alignment: Alignment.center,
                               child: Text(
                                 tabs[i].badge!,
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 9,
+                                  fontSize: 10,
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
@@ -581,17 +609,19 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                           ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Text(
                       tabs[i].label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 10.5,
                         fontWeight: isActive
                             ? FontWeight.w700
                             : FontWeight.w500,
                         color: isActive
                             ? Colors.white
-                            : const Color(0xFFB0B5CC),
+                            : const Color(0xFF9CA3AF),
                       ),
                     ),
                   ],
@@ -628,40 +658,48 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
       children: [
         if (today.isNotEmpty) ...[
           _buildGroupHeader(
-            '🔴 Vencen hoy — ¡Actúa ya!',
+            'Vencen hoy — ¡Actúa ya!',
             const Color(0xFFFF4D2E),
+            '🔥',
           ),
           ...today.map((p) => _buildSwipeCard(p)).toList(),
         ],
         if (thisWeek.isNotEmpty) ...[
-          _buildGroupHeader('🟡 Esta semana', const Color(0xFFF59E0B)),
+          _buildGroupHeader('Esta semana', const Color(0xFFF59E0B), '⏳'),
           ...thisWeek.map((p) => _buildSwipeCard(p)).toList(),
         ],
         if (noRush.isNotEmpty) ...[
-          _buildGroupHeader('🟢 Sin prisa', const Color(0xFF10B981)),
+          _buildGroupHeader('Sin prisa', const Color(0xFF10B981), '🟢'),
           ...noRush.map((p) => _buildSwipeCard(p)).toList(),
         ],
       ],
     );
   }
 
-  Widget _buildGroupHeader(String title, Color color) {
+  Widget _buildGroupHeader(String title, Color color, String emoji) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
       child: Row(
         children: [
           Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-              color: Color(0xFF1A1F2E),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                Text(emoji, style: const TextStyle(fontSize: 11)),
+                const SizedBox(width: 4),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF1A1F2E),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -675,7 +713,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
       direction: DismissDirection.endToStart,
       onDismissed: (_) => _dismiss(promo.id),
       background: Container(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+        margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
         decoration: BoxDecoration(
           color: _primary,
           borderRadius: BorderRadius.circular(18),
@@ -717,7 +755,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
     }
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+      margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
@@ -733,42 +771,48 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
         children: [
           // Fila principal
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(8),
             child: Row(
               children: [
                 // Imagen / Emoji
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: Container(
-                    width: 72,
-                    height: 72,
-                    color: p.categoryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  child: SizedBox(
+                    width: 50,
+                    height: 50,
                     child: Stack(
+                      fit: StackFit.expand,
                       children: [
-                        Center(
-                          child: Text(
-                            p.emoji,
-                            style: const TextStyle(fontSize: 34),
+                        Image.network(p.imageUrl, fit: BoxFit.cover),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Colors.black.withValues(alpha: 0.1),
+                                Colors.transparent,
+                              ],
+                            ),
                           ),
                         ),
-                        // Badge de descuento
                         Positioned(
-                          top: 5,
-                          left: 5,
+                          top: 4,
+                          left: 4,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 5,
+                              horizontal: 4,
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: p.categoryColor,
-                              borderRadius: BorderRadius.circular(6),
+                              color: _primary,
+                              borderRadius: BorderRadius.circular(5),
                             ),
                             child: Text(
                               p.discount,
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 9.5,
+                                fontSize: 8,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
@@ -778,7 +822,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
                 // Info
                 Expanded(
                   child: Column(
@@ -792,81 +836,81 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                               p.store,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                fontSize: 11.5,
+                                fontSize: 10,
                                 color: Color(0xFF8A8FA8),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 5),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 7,
+                              horizontal: 6,
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
                               color: urgencyColor.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(6),
+                              borderRadius: BorderRadius.circular(5),
                             ),
                             child: Text(
                               p.urgencyLabel,
                               style: TextStyle(
                                 color: urgencyColor,
-                                fontSize: 9,
+                                fontSize: 8,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 2),
                       Text(
                         p.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontSize: 13.5,
+                          fontSize: 12,
                           fontWeight: FontWeight.w800,
                           color: Color(0xFF1A1F2E),
-                          height: 1.25,
+                          height: 1.15,
                         ),
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 3),
                       // Precio
                       Row(
                         children: [
                           Text(
                             p.price,
                             style: const TextStyle(
-                              fontSize: 15,
+                              fontSize: 13.5,
                               fontWeight: FontWeight.w900,
                               color: Color(0xFF1A1F2E),
                             ),
                           ),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 5),
                           Text(
                             p.originalPrice,
                             style: const TextStyle(
-                              fontSize: 11,
+                              fontSize: 9.5,
                               color: Color(0xFFB0B5CC),
                               decoration: TextDecoration.lineThrough,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       // Rating + distancia + tiempo
                       Row(
                         children: [
                           const Icon(
                             Icons.star_rounded,
                             color: Color(0xFFFBBF24),
-                            size: 12,
+                            size: 10,
                           ),
-                          const SizedBox(width: 3),
+                          const SizedBox(width: 2),
                           Text(
                             p.rating,
                             style: const TextStyle(
-                              fontSize: 11,
+                              fontSize: 9.5,
                               color: Color(0xFF5A5F72),
                               fontWeight: FontWeight.w600,
                             ),
@@ -875,18 +919,18 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                             ' · ',
                             style: TextStyle(
                               color: Color(0xFFB0B5CC),
-                              fontSize: 10,
+                              fontSize: 8,
                             ),
                           ),
                           const Icon(
                             Icons.location_on_outlined,
-                            size: 11,
+                            size: 9,
                             color: Color(0xFFB0B5CC),
                           ),
                           Text(
                             p.distance,
                             style: const TextStyle(
-                              fontSize: 11,
+                              fontSize: 9.5,
                               color: Color(0xFF8A8FA8),
                             ),
                           ),
@@ -894,19 +938,19 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                             ' · ',
                             style: TextStyle(
                               color: Color(0xFFB0B5CC),
-                              fontSize: 10,
+                              fontSize: 8,
                             ),
                           ),
                           const Icon(
                             Icons.access_time_rounded,
-                            size: 11,
+                            size: 9,
                             color: Color(0xFFB0B5CC),
                           ),
                           const SizedBox(width: 2),
                           Text(
                             p.timeLeft,
                             style: const TextStyle(
-                              fontSize: 11,
+                              fontSize: 9.5,
                               color: Color(0xFF8A8FA8),
                             ),
                           ),
@@ -915,13 +959,13 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 // Botón Ver Promo
                 Column(
                   children: [
                     Container(
-                      width: 46,
-                      height: 46,
+                      width: 38,
+                      height: 38,
                       decoration: BoxDecoration(
                         color: _primary,
                         shape: BoxShape.circle,
@@ -936,14 +980,14 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                       child: const Icon(
                         Icons.bolt_rounded,
                         color: Colors.white,
-                        size: 22,
+                        size: 18,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 3),
                     const Text(
                       'Ver Promo',
                       style: TextStyle(
-                        fontSize: 9.5,
+                        fontSize: 8,
                         color: _primary,
                         fontWeight: FontWeight.w700,
                       ),
@@ -956,7 +1000,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
           // Footer de ahorro
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: _green.withOpacity(0.07),
               borderRadius: const BorderRadius.vertical(
@@ -971,13 +1015,13 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                 const Icon(
                   Icons.savings_outlined,
                   color: Color(0xFF10B981),
-                  size: 14,
+                  size: 12,
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 5),
                 Text(
                   'Ahorras si usas esta promo',
                   style: TextStyle(
-                    fontSize: 11.5,
+                    fontSize: 10,
                     color: _green.withOpacity(0.8),
                     fontWeight: FontWeight.w600,
                   ),
@@ -986,7 +1030,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                 Text(
                   p.savings,
                   style: const TextStyle(
-                    fontSize: 13,
+                    fontSize: 11.5,
                     color: _green,
                     fontWeight: FontWeight.w900,
                   ),

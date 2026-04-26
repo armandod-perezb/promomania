@@ -30,10 +30,18 @@ import 'Administrator/admin_noti_report_screen.dart';
 import 'Administrator/admin_noti_alert_screen.dart';
 import 'Administrator/admin_noti_exportar_screen.dart';
 import 'services/promo_service.dart';
+import 'services/session_manager.dart';
 
+final sessionManager = SessionManager();
 final promoService = PromoService();
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Inicializar servicios
+  await SessionManager.init();
+  await promoService.init();
+
   runApp(const MyApp());
 }
 
@@ -60,13 +68,21 @@ class MyApp extends StatelessWidget {
             settings: settings,
           );
         }
+        if (settings.name == AppRoutes.newPassword) {
+          final email = settings.arguments is String
+              ? settings.arguments as String
+              : null;
+          return MaterialPageRoute(
+            builder: (context) => NewPasswordScreen(email: email),
+            settings: settings,
+          );
+        }
         return null;
       },
       routes: {
         AppRoutes.login: (context) => const LoginScreen(),
         AppRoutes.register: (context) => const RegisterScreen(),
         AppRoutes.forgotPassword: (context) => const ForgotPasswordScreen(),
-        AppRoutes.newPassword: (context) => const NewPasswordScreen(),
         AppRoutes.userHome: (context) => const HomeMapScreen(),
         AppRoutes.userProfile: (context) => const UserProfileScreen(),
         AppRoutes.userFavorites: (context) => const MisFavoritosScreen(),

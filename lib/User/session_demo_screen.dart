@@ -163,9 +163,7 @@ print(datos);
     return Container(
       decoration: BoxDecoration(
         color: Colors.blue[50],
-        border: Border.left(
-          side: BorderSide(color: Colors.blue[400]!, width: 4),
-        ),
+        border: Border(left: BorderSide(color: Colors.blue[400]!, width: 4)),
         borderRadius: BorderRadius.circular(4),
       ),
       padding: const EdgeInsets.all(12),

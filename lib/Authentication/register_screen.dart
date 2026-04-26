@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../Core/Routes/app_routes.dart';
+import '../main.dart';
+import '../models/usuario.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -40,12 +42,72 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _acceptTerms;
 
   void _register() async {
-    if (!_canRegister) return;
+    if (!_canRegister) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor completa todos los campos correctamente'),
+        ),
+      );
+      return;
+    }
+
+    final email = _emailController.text.trim();
+    final nombre = _nameController.text.trim();
+    final password = _passwordController.text;
+
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isLoading = false);
-    if (mounted) {
-      Navigator.pushReplacementNamed(context, AppRoutes.userHome);
+
+    try {
+      // Validar que el email no exista ya
+      final usuarioExistente = promoService.getUsuarioByEmail(email);
+      if (usuarioExistente != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('El email ya está registrado')),
+          );
+        }
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      // Crear nuevo usuario (generamos un ID simple)
+      final nuevoId =
+          (promoService.getUsuarios().isNotEmpty
+              ? promoService.getUsuarios().last.id
+              : 0) +
+          1;
+
+      final nuevoUsuario = Usuario(
+        id: nuevoId,
+        nombre: nombre,
+        correo: email,
+        password: password, // En producción: usar bcrypt
+        rol: 'user',
+        estado: 'activo',
+      );
+
+      // Guardar usuario en la base de datos
+      promoService.addUsuario(nuevoUsuario);
+
+      // Guardar sesión
+      await sessionManager.guardarSesion(nuevoUsuario);
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('¡Registro exitoso!')));
+        Navigator.pushReplacementNamed(context, AppRoutes.userHome);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

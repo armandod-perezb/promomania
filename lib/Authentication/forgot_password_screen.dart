@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../Core/Routes/app_routes.dart';
+import '../main.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -23,16 +24,46 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   void _sendCode() async {
-    if (_emailController.text.isEmpty) return;
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isLoading = false);
-    if (mounted) {
-      Navigator.pushNamed(
-        context,
-        AppRoutes.verifyCode,
-        arguments: _emailController.text,
+    if (_emailController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor ingresa tu email')),
       );
+      return;
+    }
+
+    final email = _emailController.text.trim();
+
+    setState(() => _isLoading = true);
+
+    try {
+      // Validar que el usuario exista
+      final usuario = promoService.getUsuarioByEmail(email);
+      if (usuario == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Usuario no encontrado')),
+          );
+        }
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      // Simular envío de código
+      await Future.delayed(const Duration(seconds: 1));
+
+      if (mounted) {
+        Navigator.pushNamed(context, AppRoutes.verifyCode, arguments: email);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../Core/Routes/app_routes.dart';
+import '../main.dart';
 
 class VerifyCodeScreen extends StatefulWidget {
   final String email;
@@ -75,12 +76,45 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
   bool get _isCodeComplete => _controllers.every((c) => c.text.length == 1);
 
   void _verifyCode() async {
-    if (!_isCodeComplete) return;
+    if (!_isCodeComplete) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor ingresa el código completo')),
+      );
+      return;
+    }
+
+    final codigo = _controllers.map((c) => c.text).join();
     setState(() => _isVerifying = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isVerifying = false);
-    if (mounted) {
-      Navigator.pushReplacementNamed(context, AppRoutes.newPassword);
+
+    try {
+      // Simular verificación de código
+      // En producción: validar contra un servidor
+      if (codigo == '123456') {
+        // Código válido
+        if (mounted) {
+          Navigator.pushReplacementNamed(
+            context,
+            AppRoutes.newPassword,
+            arguments: widget.email,
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Código incorrecto')));
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isVerifying = false);
+      }
     }
   }
 

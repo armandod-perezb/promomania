@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../Core/Routes/app_routes.dart';
+import '../main.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -28,22 +29,65 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _login() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty)
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor completa todos los campos')),
+      );
       return;
+    }
 
     final email = _emailController.text.trim();
     final password = _passwordController.text;
-    final isAdminLogin = email == 'admin@gmail.com' && password == '123';
 
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isLoading = false);
 
-    if (mounted) {
-      Navigator.pushReplacementNamed(
-        context,
-        isAdminLogin ? AppRoutes.adminDashboard : AppRoutes.userHome,
-      );
+    try {
+      // Buscar usuario en la base de datos
+      final usuario = promoService.getUsuarioByEmail(email);
+
+      if (usuario == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Usuario no encontrado')),
+          );
+        }
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      // Validar contraseña (en producción usar hash bcrypt)
+      if (usuario.password != password) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Contraseña incorrecta')),
+          );
+        }
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      // Guardar sesión
+      await sessionManager.guardarSesion(usuario);
+
+      if (mounted) {
+        // Navegar según el rol
+        Navigator.pushReplacementNamed(
+          context,
+          usuario.rol == 'admin'
+              ? AppRoutes.adminDashboard
+              : AppRoutes.userHome,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

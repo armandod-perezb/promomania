@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import '../Core/Routes/app_routes.dart';
+import '../main.dart';
 
 class NewPasswordScreen extends StatefulWidget {
-  const NewPasswordScreen({super.key});
+  final String? email;
+
+  const NewPasswordScreen({super.key, this.email});
 
   @override
   State<NewPasswordScreen> createState() => _NewPasswordScreenState();
@@ -33,19 +36,53 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
       _passwordController.text == _confirmController.text;
 
   void _changePassword() async {
-    if (!_canSubmit) return;
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isLoading = false);
-    if (mounted) {
+    if (!_canSubmit) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('¡Contraseña cambiada exitosamente!')),
+        const SnackBar(
+          content: Text(
+            'Las contraseñas deben coincidir y tener 8+ caracteres',
+          ),
+        ),
       );
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        AppRoutes.login,
-        (route) => false,
-      );
+      return;
+    }
+
+    final newPassword = _passwordController.text;
+    setState(() => _isLoading = true);
+
+    try {
+      // Si tenemos el email, actualizar la contraseña del usuario
+      if (widget.email != null && widget.email!.isNotEmpty) {
+        final usuario = promoService.getUsuarioByEmail(widget.email!);
+        if (usuario != null) {
+          final usuarioActualizado = usuario.copyWith(password: newPassword);
+          promoService.updateUsuario(usuarioActualizado);
+        }
+      }
+
+      // Simular envío al servidor
+      await Future.delayed(const Duration(seconds: 1));
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('¡Contraseña cambiada exitosamente!')),
+        );
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRoutes.login,
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

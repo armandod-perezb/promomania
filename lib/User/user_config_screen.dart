@@ -1,27 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import '../Core/Routes/app_routes.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'PromoMap Settings',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFFF5F5F5),
-        fontFamily: 'SF Pro Display',
-      ),
-      home: const SettingsScreen(),
-    );
-  }
-}
+import '../main.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -249,12 +229,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       iconBg: const Color(0xFFFFEDE6),
                       title: 'Cerrar sesión',
                       titleColor: const Color(0xFFFF6B35),
-                      onTap: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          AppRoutes.login,
-                          (route) => false,
-                        );
+                      onTap: () async {
+                        await sessionManager.logout();
+                        if (mounted) {
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            AppRoutes.login,
+                            (route) => false,
+                          );
+                        }
                       },
                     ),
                     _buildDivider(),

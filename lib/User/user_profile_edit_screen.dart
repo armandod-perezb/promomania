@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../Core/Routes/app_routes.dart';
+import '../main.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PANTALLA EDITAR PERFIL
@@ -20,16 +21,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   static const Color _lightBg = Color(0xFFF5F6FA);
 
   // Controllers
-  final _nameCtrl = TextEditingController(text: 'Juan Pérez');
-  final _usernameCtrl = TextEditingController(text: 'juanperez');
-  final _professionCtrl = TextEditingController(text: 'Diseñador UX');
-  final _bioCtrl = TextEditingController(text: '');
-  final _emailCtrl = TextEditingController(text: 'juan.perez@gmail.com');
-  final _phoneCtrl = TextEditingController(text: '314 567 8901');
-  final _cityCtrl = TextEditingController(text: 'Bogotá D.C.');
-  final _neighborhoodCtrl = TextEditingController(text: 'Chapinero');
-  final _instagramCtrl = TextEditingController(text: 'juanperez_co');
-  final _websiteCtrl = TextEditingController();
+  late TextEditingController _nameCtrl;
+  late TextEditingController _usernameCtrl;
+  late TextEditingController _professionCtrl;
+  late TextEditingController _bioCtrl;
+  late TextEditingController _emailCtrl;
+  late TextEditingController _phoneCtrl;
+  late TextEditingController _cityCtrl;
+  late TextEditingController _neighborhoodCtrl;
+  late TextEditingController _instagramCtrl;
+  late TextEditingController _websiteCtrl;
 
   static const int _bioMax = 140;
 
@@ -51,6 +52,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   bool _isSaving = false;
 
   @override
+  void initState() {
+    super.initState();
+    _initializeControllers();
+  }
+
+  void _initializeControllers() {
+    final usuario = sessionManager.usuarioActual;
+
+    _nameCtrl = TextEditingController(text: usuario?.nombre ?? 'Usuario');
+    _usernameCtrl = TextEditingController(
+      text: usuario?.nombre.toLowerCase().replaceAll(' ', '') ?? '',
+    );
+    _professionCtrl = TextEditingController(text: 'Profesional');
+    _bioCtrl = TextEditingController(text: '');
+    _emailCtrl = TextEditingController(text: usuario?.correo ?? '');
+    _phoneCtrl = TextEditingController(text: '');
+    _cityCtrl = TextEditingController(text: 'Bogotá D.C.');
+    _neighborhoodCtrl = TextEditingController(text: '');
+    _instagramCtrl = TextEditingController(text: '');
+    _websiteCtrl = TextEditingController(text: '');
+  }
+
+  @override
   void dispose() {
     _nameCtrl.dispose();
     _usernameCtrl.dispose();
@@ -67,9 +91,35 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   void _save() async {
     setState(() => _isSaving = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isSaving = false);
-    if (mounted) Navigator.pop(context);
+
+    try {
+      final usuario = sessionManager.usuarioActual;
+      if (usuario != null) {
+        final usuarioActualizado = usuario.copyWith(
+          nombre: _nameCtrl.text,
+          correo: _emailCtrl.text,
+        );
+        await sessionManager.actualizarUsuario(usuarioActualizado);
+        promoService.updateUsuario(usuarioActualizado);
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('¡Perfil actualizado exitosamente!')),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
   }
 
   @override
@@ -132,6 +182,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       title: 'Cuenta',
                       child: _buildCuentaSection(),
                     ),
+                    const SizedBox(height: 24),
+                    _buildSaveButton(),
                     const SizedBox(height: 32),
                   ],
                 ),
@@ -208,6 +260,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   // ── Hero con foto de perfil ────────────────────────────────────────────────────
 
   Widget _buildProfileHero() {
+    final usuario = sessionManager.usuarioActual;
+    final nombreCompleto = usuario?.nombre ?? 'Usuario';
+    final username = nombreCompleto.toLowerCase().replaceAll(' ', '');
+
     return Container(
       color: Colors.white,
       child: Column(
@@ -352,17 +408,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        children: const [
+                        children: [
                           Text(
-                            'Juan Pérez',
-                            style: TextStyle(
+                            nombreCompleto,
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w800,
                               color: Color(0xFF1A1F2E),
                             ),
                           ),
-                          SizedBox(width: 5),
-                          Icon(
+                          const SizedBox(width: 5),
+                          const Icon(
                             Icons.verified_rounded,
                             color: Color(0xFF3B82F6),
                             size: 16,
@@ -371,27 +427,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       const SizedBox(height: 2),
                       Row(
-                        children: const [
+                        children: [
                           Text(
-                            '@juanperez',
-                            style: TextStyle(
+                            '@$username',
+                            style: const TextStyle(
                               fontSize: 12.5,
                               color: Color(0xFF8A8FA8),
                             ),
                           ),
-                          Text(
+                          const Text(
                             ' · ',
                             style: TextStyle(color: Color(0xFFB0B5CC)),
                           ),
-                          Text(
+                          const Text(
                             'Bogotá',
                             style: TextStyle(
                               fontSize: 12.5,
                               color: Color(0xFF8A8FA8),
                             ),
                           ),
-                          SizedBox(width: 4),
-                          Text('🇨🇴', style: TextStyle(fontSize: 12)),
+                          const SizedBox(width: 4),
+                          const Text('🇨🇴', style: TextStyle(fontSize: 12)),
                         ],
                       ),
                       const SizedBox(height: 6),
@@ -1278,4 +1334,51 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     ),
   );
+
+  // ── Botón Guardar ─────────────────────────────────────────────────────────────
+
+  Widget _buildSaveButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: SizedBox(
+        width: double.infinity,
+        height: 54,
+        child: ElevatedButton(
+          onPressed: _isSaving ? null : _save,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _primary,
+            disabledBackgroundColor: _primary.withOpacity(0.5),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 0,
+          ),
+          child: _isSaving
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2.5,
+                  ),
+                )
+              : const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.check_circle_outline_rounded, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      'Guardar cambios',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+      ),
+    );
+  }
 }

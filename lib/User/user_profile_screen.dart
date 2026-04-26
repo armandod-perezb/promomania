@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../Core/Routes/app_routes.dart';
+import '../main.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PANTALLA DE PERFIL
@@ -149,6 +150,11 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   }
 
   Widget _buildProfileHeroCard() {
+    final usuario = sessionManager.usuarioActual;
+    final nombreCompleto = usuario?.nombre ?? 'Usuario';
+    final username = nombreCompleto.toLowerCase().replaceAll(' ', '');
+    final email = usuario?.correo ?? '';
+
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
       decoration: BoxDecoration(
@@ -202,8 +208,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                           color: _primary,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
-                          Icons.workspace_premium_rounded,
+                        child: Icon(
+                          usuario?.rol == 'admin'
+                              ? Icons.admin_panel_settings_rounded
+                              : Icons.workspace_premium_rounded,
                           color: Colors.white,
                           size: 14,
                         ),
@@ -219,60 +227,63 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   children: [
                     Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Text(
-                            'Juan Pérez',
-                            style: TextStyle(
+                            nombreCompleto,
+                            style: const TextStyle(
                               fontSize: 23,
                               fontWeight: FontWeight.w900,
                               color: Color(0xFF111827),
                             ),
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFF1EC),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xFFFFD5C6)),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(
-                                Icons.workspace_premium_outlined,
-                                color: _primary,
-                                size: 16,
+                        if (usuario?.rol == 'admin')
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFF1EC),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: const Color(0xFFFFD5C6),
                               ),
-                              SizedBox(width: 4),
-                              Text(
-                                'PRO',
-                                style: TextStyle(
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(
+                                  Icons.admin_panel_settings_outlined,
                                   color: _primary,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w900,
+                                  size: 16,
                                 ),
-                              ),
-                            ],
+                                SizedBox(width: 4),
+                                Text(
+                                  'ADMIN',
+                                  style: TextStyle(
+                                    color: _primary,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
                       ],
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      '@juanperez',
-                      style: TextStyle(
+                    Text(
+                      '@$username',
+                      style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xFF8A8FA8),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 10),
-                    const Text(
-                      'Apasionado por las mejores ofertas\n| Nivel 5 Experto | Bogotá,',
-                      style: TextStyle(
+                    Text(
+                      '$email\n| Miembro activo | Bogotá',
+                      style: const TextStyle(
                         fontSize: 13.5,
                         height: 1.35,
                         color: Color(0xFF6B7280),
@@ -306,7 +317,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               child: TextButton(
                 onPressed: () {
                   HapticFeedback.lightImpact();
-                  Navigator.pushNamed(context, AppRoutes.userEdit);
+                  Navigator.pushNamed(context, AppRoutes.userEdit).then((_) {
+                    setState(() {});
+                  });
                 },
                 child: const Text(
                   'Editar Perfil',

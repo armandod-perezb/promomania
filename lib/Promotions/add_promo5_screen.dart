@@ -3,19 +3,20 @@ import '../main.dart';
 import '../models/promocion.dart';
 import '../models/promocion_horario.dart';
 import '../models/supermercado.dart';
+import '../services/image_storage_service.dart';
 
 class AddPromotion5Screen extends StatefulWidget {
   // Datos opcionales que vienen de los pasos anteriores
   final String? promoTitle;
   final String? location;
-  final String? imageUrl;
+  final String? imageFileName; // ✅ Cambiar a imageFileName
   final Map<String, dynamic> draftData;
 
   const AddPromotion5Screen({
     super.key,
     this.promoTitle,
     this.location,
-    this.imageUrl,
+    this.imageFileName, // ✅ Cambiar a imageFileName
     this.draftData = const <String, dynamic>{},
   });
 
@@ -51,14 +52,18 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
   }
 
   String? get _previewImage {
-    final draftImage = (widget.draftData['imageUrl'] as String?)?.trim();
+    // Buscar en draftData primero
+    final draftImage = (widget.draftData['imageFileName'] as String?)?.trim();
     if (draftImage != null && draftImage.isNotEmpty) {
       return draftImage;
     }
-    final image = widget.imageUrl?.trim();
+    
+    // Buscar el parámetro del widget
+    final image = widget.imageFileName?.trim();
     if (image != null && image.isNotEmpty) {
       return image;
     }
+    
     return null;
   }
 

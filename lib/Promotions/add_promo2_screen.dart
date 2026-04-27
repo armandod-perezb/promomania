@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../main.dart';
 import 'add_promo3_screen.dart';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
+import '../services/image_storage_service.dart';
 
 class AddPromotion2Screen extends StatefulWidget {
   final String promoType;
@@ -27,7 +32,10 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
   final TextEditingController _codeController = TextEditingController();
 
   // Fotos: máximo 5, primera es principal
-  final List<String?> _photos = List.filled(5, null);
+  final List<Uint8List?> _photos = List.filled(5, null);
+  final List<String?> _photoPaths = List.filled(5, null);
+
+  final ImagePicker _picker = ImagePicker();
 
   String _condition = 'Nuevo';
   String _category = 'Electrónica';
@@ -58,6 +66,21 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
     ),
   ];
 
+  Future<void> _pickImage(int index) async {
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+
+    if (image == null) return;
+
+    final bytes = await image.readAsBytes();
+
+    setState(() {
+      _photos[index] = bytes;
+      _photoPaths[index] = image.path;
+    });
+  }
   @override
   void initState() {
     super.initState();
@@ -372,9 +395,7 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
     final hasPhoto = _photos[index] != null;
 
     return GestureDetector(
-      onTap: () {
-        // Abrir selector de imagen
-      },
+      onTap: () => _pickImage(index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
@@ -392,7 +413,7 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
         child: hasPhoto
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(13),
-                child: Image.network(_photos[index]!, fit: BoxFit.cover),
+                child: Image.memory(_photos[index]!, fit: BoxFit.cover),
               )
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -743,26 +764,42 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
   Future<void> _onNext() async {
     setState(() => _isLoading = true);
 
-    final nextDraft = <String, dynamic>{
-      ...widget.draftData,
-      'promoType': widget.promoType,
-      'title': _titleController.text.trim(),
-      'description': _descController.text.trim(),
-      'code': _codeController.text.trim(),
-      'condition': _condition,
-      'category': _category,
-      'imageUrl': _photos.first,
-    };
+    try {
+      // Guardar la primera imagen si existe
+      String? savedImageName;
+      if (_photos.first != null) {
+        final imageStorageService = ImageStorageService();
+        savedImageName = await imageStorageService.saveImageFromBytes(_photos.first!);
+        print('Imagen guardada: $savedImageName');
+      }
 
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => AddPromotion3Screen(draftData: nextDraft),
-      ),
-    );
+      final nextDraft = <String, dynamic>{
+        ...widget.draftData,
+        'promoType': widget.promoType,
+        'title': _titleController.text.trim(),
+        'description': _descController.text.trim(),
+        'code': _codeController.text.trim(),
+        'condition': _condition,
+        'category': _category,
+        'imageFileName': savedImageName, // ✅ Nombre del archivo guardado
+        'imagePath': _photoPaths.first, // Ruta temporal como respaldo
+      };
 
-    if (mounted) {
-      setState(() => _isLoading = false);
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => AddPromotion3Screen(draftData: nextDraft),
+        ),
+      );
+    } catch (e) {
+      print('Error guardando imagen: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al guardar la imagen')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 }

@@ -41,6 +41,9 @@ void main() async {
   // Inicializar servicios
   await SessionManager.init();
   await promoService.init();
+  
+  // ✅ Cargar promociones guardadas localmente
+  await promoService.loadLocalPromociones();
 
   runApp(const MyApp());
 }

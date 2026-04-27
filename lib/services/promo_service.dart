@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import '../models/usuario.dart';
 import '../models/supermercado.dart';
 import '../models/categoria.dart';
@@ -94,6 +96,62 @@ class PromoService extends ChangeNotifier {
     }
   }
 
+  /// Obtiene la ruta del archivo de datos persistentes
+  Future<File> _getDataFile() async {
+    final directory = await getApplicationDocumentsDirectory();
+    return File('${directory.path}/promomania_data.json');
+  }
+
+  /// Carga promociones guardadas localmente (persistencia)
+  Future<void> loadLocalPromociones() async {
+    try {
+      final file = await _getDataFile();
+      
+      if (!await file.exists()) {
+        print('No hay datos persistentes locales');
+        return;
+      }
+
+      final content = await file.readAsString();
+      final data = json.decode(content) as Map<String, dynamic>;
+
+      // Cargar promociones locales
+      if (data['promociones'] != null) {
+        promociones = (data['promociones'] as List)
+            .map((p) => Promocion.fromJson(p as Map<String, dynamic>))
+            .toList();
+      }
+
+      // Cargar horarios locales
+      if (data['promociones_horarios'] != null) {
+        promocionesHorarios = (data['promociones_horarios'] as List)
+            .map((h) => PromocionHorario.fromJson(h as Map<String, dynamic>))
+            .toList();
+      }
+
+      print('Datos persistentes cargados correctamente');
+    } catch (e) {
+      print('Error cargando datos persistentes: $e');
+    }
+  }
+
+  /// Guarda los datos en almacenamiento persistente
+  Future<void> _saveLocalData() async {
+    try {
+      final file = await _getDataFile();
+
+      final data = {
+        'promociones': promociones.map((p) => p.toJson()).toList(),
+        'promociones_horarios': promocionesHorarios.map((h) => h.toJson()).toList(),
+      };
+
+      await file.writeAsString(json.encode(data), flush: true);
+      print('Datos guardados correctamente');
+    } catch (e) {
+      print('Error guardando datos: $e');
+    }
+  }
+
   // ========== USUARIOS ==========
   Usuario? getUsuario(int id) {
     try {
@@ -157,6 +215,7 @@ class PromoService extends ChangeNotifier {
   void addPromocion(Promocion promocion) {
     promociones.add(promocion);
     notifyListeners();
+    _saveLocalData(); // Guardar cambios
   }
 
   void updatePromocion(Promocion promocion) {
@@ -164,12 +223,14 @@ class PromoService extends ChangeNotifier {
     if (index != -1) {
       promociones[index] = promocion;
       notifyListeners();
+      _saveLocalData(); // Guardar cambios
     }
   }
 
   void deletePromocion(String codigo) {
     promociones.removeWhere((p) => p.codigo == codigo);
     notifyListeners();
+    _saveLocalData(); // Guardar cambios
   }
 
   // ========== HORARIOS DE PROMOCION ==========
@@ -185,6 +246,7 @@ class PromoService extends ChangeNotifier {
   void addPromocionHorario(PromocionHorario promocionHorario) {
     promocionesHorarios.add(promocionHorario);
     notifyListeners();
+    _saveLocalData(); // Guardar cambios
   }
 
   void updatePromocionHorario(PromocionHorario promocionHorario) {
@@ -194,12 +256,14 @@ class PromoService extends ChangeNotifier {
     if (index != -1) {
       promocionesHorarios[index] = promocionHorario;
       notifyListeners();
+      _saveLocalData(); // Guardar cambios
     }
   }
 
   void deletePromocionHorario(int id) {
     promocionesHorarios.removeWhere((h) => h.id == id);
     notifyListeners();
+    _saveLocalData(); // Guardar cambios
   }
 
   void incrementarVistas(String codigo) {
@@ -208,6 +272,7 @@ class PromoService extends ChangeNotifier {
       final promo = promociones[index];
       promociones[index] = promo.copyWith(vistas: promo.vistas + 1);
       notifyListeners();
+      _saveLocalData(); // Guardar cambios
     }
   }
 

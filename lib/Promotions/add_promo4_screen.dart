@@ -93,7 +93,7 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
           draftData: nextDraft,
           promoTitle: nextDraft['title'] as String?,
           location: nextDraft['location'] as String?,
-          imageUrl: nextDraft['imageUrl'] as String?,
+          imageFileName: nextDraft['imageFileName'] as String?, // ✅ Usar imageFileName
         ),
       ),
     );

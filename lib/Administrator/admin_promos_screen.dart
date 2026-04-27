@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../Core/Routes/app_routes.dart';
+import '../main.dart';
+import '../models/promocion.dart';
 
 class ManagePromotionsScreen extends StatefulWidget {
   const ManagePromotionsScreen({super.key});
@@ -17,34 +19,8 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
   static const Color greenAccent = Color(0xFF2ECC71);
   static const Color bgColor = Color(0xFFF5F5F8);
 
-  final List<Map<String, dynamic>> _promos = [
-    {
-      'badge': '2x1',
-      'badgeLabel': 'OFF',
-      'title': '2x1 en Pizzas Familiar',
-      'store': 'Pizza Express',
-      'dateRange': '1 Mar → 16 Mar',
-      'code': 'PIZZA2X1',
-      'status': 'Activa',
-      'canjes': 64,
-      'vistas': 546,
-      'conversion': 48,
-      'badgeColor': Color(0xFFFF5733),
-    },
-    {
-      'badge': '50%',
-      'badgeLabel': 'OFF',
-      'title': '50% en Zapatillas',
-      'store': 'Sport Zone',
-      'dateRange': '20 Feb → 28 Feb',
-      'code': 'NIKE50',
-      'status': 'Expirada',
-      'canjes': 145,
-      'vistas': 444,
-      'conversion': 37,
-      'badgeColor': Color(0xFFFF5733),
-    },
-  ];
+  /// Obtiene promociones del servicio
+  List<Promocion> get _promos => promoService.promociones;
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +138,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
           ),
         ),
         GestureDetector(
-          onTap: () {},
+          onTap: () => _showCrearPromoModal(),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
             decoration: BoxDecoration(
@@ -190,9 +166,19 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
+  void _showCrearPromoModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const CrearPromoModal(),
+    );
+  }
+
   // ─── PROMO CARD ─────────────────────────────────────────────────────────────
-  Widget _buildPromoCard(Map<String, dynamic> promo) {
-    final bool isActive = promo['status'] == 'Activa';
+  Widget _buildPromoCard(Promocion promo) {
+    final bool isActive = promo.estado == 'aprobada';
+    final badge = '${promo.descuento ?? 0}%';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -220,14 +206,14 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: promo['badgeColor'] as Color,
+                    color: primaryOrange,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        promo['badge'] as String,
+                        badge,
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -235,9 +221,9 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                           height: 1.1,
                         ),
                       ),
-                      Text(
-                        promo['badgeLabel'] as String,
-                        style: const TextStyle(
+                      const Text(
+                        'OFF',
+                        style: TextStyle(
                           color: Colors.white70,
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
@@ -256,7 +242,9 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              promo['title'] as String,
+                              promo.titulo,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 color: textDark,
                                 fontSize: 15,
@@ -278,7 +266,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            promo['store'] as String,
+                            'Supermercado #${promo.idSupermercado}',
                             style: const TextStyle(
                               color: textGray,
                               fontSize: 12,
@@ -296,7 +284,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            promo['dateRange'] as String,
+                            '${promo.fechaInicio} → ${promo.fechaFin}',
                             style: const TextStyle(
                               color: textGray,
                               fontSize: 12,
@@ -312,18 +300,18 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
           ),
 
           // ── Promo code section ───────────────────────────────
-          _buildCodeSection(promo['code'] as String),
+          _buildCodeSection(promo.codigo),
 
           // ── Stats row ────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
             child: Row(
               children: [
-                _statItem(promo['canjes'].toString(), 'Canjes'),
+                _statItem('0', 'Canjes'),
                 _verticalDivider(),
-                _statItem(promo['vistas'].toString(), 'Vistas'),
+                _statItem(promo.vistas.toString(), 'Vistas'),
                 _verticalDivider(),
-                _conversionStat(promo['conversion'] as int),
+                _conversionStat(0),
               ],
             ),
           ),
@@ -337,21 +325,119 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                   child: _outlineBtn(
                     icon: Icons.edit_outlined,
                     label: 'Editar',
-                    onTap: () {},
+                    onTap: () => _editPromo(promo),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: _solidBtn(
-                    icon: Icons.bar_chart_rounded,
-                    label: 'Analíticas',
-                    onTap: () {},
-                  ),
+                  child: isActive
+                      ? _solidBtn(
+                          icon: Icons.check_circle_outline,
+                          label: 'Aprobada',
+                          onTap: () => _changeStatus(promo, 'rechazada'),
+                        )
+                      : _solidBtn(
+                          icon: Icons.check_circle_outline,
+                          label: 'Aprobar',
+                          onTap: () => _changeStatus(promo, 'aprobada'),
+                        ),
                 ),
                 const SizedBox(width: 10),
                 _deleteBtn(onTap: () => _confirmDelete(promo)),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Cambia el estado de la promoción
+  void _changeStatus(Promocion promo, String nuevoEstado) {
+    final updated = promo.copyWith(estado: nuevoEstado);
+    promoService.updatePromocion(updated);
+    setState(() {});
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Promoción: $nuevoEstado')));
+  }
+
+  /// Abre diálogo para editar promoción
+  void _editPromo(Promocion promo) {
+    final tituloCtrl = TextEditingController(text: promo.titulo);
+    final descCtrl = TextEditingController(text: promo.descripcion ?? '');
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Editar Promoción'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: tituloCtrl,
+                decoration: const InputDecoration(labelText: 'Título'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: descCtrl,
+                decoration: const InputDecoration(labelText: 'Descripción'),
+                maxLines: 3,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final updated = promo.copyWith(
+                titulo: tituloCtrl.text,
+                descripcion: descCtrl.text,
+              );
+              promoService.updatePromocion(updated);
+              setState(() {});
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Promoción actualizada')),
+              );
+            },
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Confirma eliminación de promoción
+  void _confirmDelete(Promocion promo) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Eliminar Promoción'),
+        content: Text('¿Eliminar "${promo.titulo}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              promoService.promociones.removeWhere(
+                (p) => p.codigo == promo.codigo,
+              );
+              setState(() {});
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Promoción eliminada')),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Eliminar'),
           ),
         ],
       ),
@@ -570,46 +656,6 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
-  // ─── DELETE CONFIRM ─────────────────────────────────────────────────────────
-  void _confirmDelete(Map<String, dynamic> promo) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text(
-          'Eliminar promoción',
-          style: TextStyle(color: textDark, fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          '¿Deseas eliminar "${promo['title']}"? Esta acción no se puede deshacer.',
-          style: const TextStyle(color: textGray, fontSize: 14),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar', style: TextStyle(color: textGray)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            onPressed: () {
-              setState(() => _promos.remove(promo));
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Eliminar',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   String _routeForIndex(int index) {
     switch (index) {
       case 0:
@@ -691,6 +737,337 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
             ),
           );
         }),
+      ),
+    );
+  }
+}
+
+class CrearPromoModal extends StatefulWidget {
+  const CrearPromoModal({super.key});
+
+  @override
+  State<CrearPromoModal> createState() => _CrearPromoModalState();
+}
+
+class _CrearPromoModalState extends State<CrearPromoModal> {
+  final _titulo = TextEditingController();
+  final _descripcion = TextEditingController();
+  final _precio = TextEditingController();
+  final _descuento = TextEditingController();
+  final _codigo = TextEditingController();
+
+  String _estado = 'pendiente';
+
+  @override
+  void dispose() {
+    _titulo.dispose();
+    _descripcion.dispose();
+    _precio.dispose();
+    _descuento.dispose();
+    _codigo.dispose();
+    super.dispose();
+  }
+
+  void _crearPromocion() {
+    if (_titulo.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('El título es obligatorio')));
+      return;
+    }
+    if (_codigo.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('El código es obligatorio')));
+      return;
+    }
+    if (_precio.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('El precio es obligatorio')));
+      return;
+    }
+
+    final nuevaPromo = Promocion(
+      codigo: _codigo.text,
+      titulo: _titulo.text,
+      descripcion: _descripcion.text,
+      precio: double.tryParse(_precio.text) ?? 0.0,
+      descuento: int.tryParse(_descuento.text),
+      condicionProducto: 'nuevo',
+      tipoVigencia: 'por_fecha',
+      estado: _estado,
+      vistas: 0,
+      idUsuario: sessionManager.usuarioActual?.id ?? 1,
+      idSupermercado: 1,
+      idCategoria: 1,
+      idTipoPromocion: 1,
+    );
+
+    promoService.addPromocion(nuevaPromo);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Promoción creada exitosamente')),
+    );
+
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.75,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 10),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+              children: [
+                const Text(
+                  'Crear Promoción',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A1A2E),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'CÓDIGO *',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF8A8A9A),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: _codigo,
+                  decoration: InputDecoration(
+                    hintText: 'PROMO2024',
+                    hintStyle: TextStyle(
+                      color: Colors.grey.withOpacity(0.5),
+                      fontSize: 13,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFEEEEF2)),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 13,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'TÍTULO *',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF8A8A9A),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: _titulo,
+                  decoration: InputDecoration(
+                    hintText: 'Descuento especial en frutas',
+                    hintStyle: TextStyle(
+                      color: Colors.grey.withOpacity(0.5),
+                      fontSize: 13,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFEEEEF2)),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 13,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'DESCRIPCIÓN',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF8A8A9A),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: _descripcion,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    hintText: 'Detalles de la promoción...',
+                    hintStyle: TextStyle(
+                      color: Colors.grey.withOpacity(0.5),
+                      fontSize: 13,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFEEEEF2)),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 13,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'PRECIO *',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF8A8A9A),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          TextField(
+                            controller: _precio,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              hintText: '19.99',
+                              hintStyle: TextStyle(
+                                color: Colors.grey.withOpacity(0.5),
+                                fontSize: 13,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: const BorderSide(
+                                  color: Color(0xFFEEEEF2),
+                                ),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 13,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'DESCUENTO %',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF8A8A9A),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          TextField(
+                            controller: _descuento,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              hintText: '20',
+                              hintStyle: TextStyle(
+                                color: Colors.grey.withOpacity(0.5),
+                                fontSize: 13,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: const BorderSide(
+                                  color: Color(0xFFEEEEF2),
+                                ),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 13,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF8A8A9A),
+                          side: const BorderSide(color: Color(0xFFEEEEF2)),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Cancelar',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton.icon(
+                        onPressed: _crearPromocion,
+                        icon: const Icon(Icons.add_outlined, size: 18),
+                        label: const Text(
+                          'Crear Promoción',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFF5733),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

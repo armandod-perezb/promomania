@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../Core/Routes/app_routes.dart';
+import '../main.dart';
+import '../models/supermercado.dart';
 
 class ManageStoresScreen extends StatefulWidget {
   const ManageStoresScreen({super.key});
@@ -15,59 +17,10 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
   static const Color textDark = Color(0xFF1A1A2E);
   static const Color textGray = Color(0xFF8A8A9A);
   static const Color greenAccent = Color(0xFF2ECC71);
-  static const Color blueAccent = Color(0xFF3498DB);
   static const Color bgColor = Color(0xFFF5F5F8);
 
-  final List<Map<String, dynamic>> _stores = [
-    {
-      'name': 'Pizza Express',
-      'address': 'Cra. 5 #20-10, El Prado',
-      'category': 'Restaurante',
-      'status': 'Activo',
-      'isPaused': false,
-      'promos': 8,
-      'canje': 83,
-      'vistas': 272,
-      'phone': '+57 4 567 8901',
-      'email': 'pedidos@pizzaexpress.co',
-      'iconColor': Color(0xFFFF5733),
-      'iconBg': Color(0xFFFFF0ED),
-      'iconLabel': '🍕',
-      'categoryColor': Color(0xFFFF5733),
-    },
-    {
-      'name': 'TechStore Bogotá',
-      'address': 'Cra. 7 #12-34, Centro Histórico',
-      'category': 'Tecnología',
-      'status': 'Activo',
-      'isPaused': false,
-      'promos': 12,
-      'canje': 20,
-      'vistas': 589,
-      'phone': '+57 1 234 5678',
-      'email': 'info@techstore.co',
-      'iconColor': Color(0xFF3498DB),
-      'iconBg': Color(0xFFEBF5FB),
-      'iconLabel': '📱',
-      'categoryColor': Color(0xFF3498DB),
-    },
-    {
-      'name': 'Sport Zone',
-      'address': 'Cl. 72 #11-09, Chapinero',
-      'category': 'Deportes',
-      'status': 'Activo',
-      'isPaused': false,
-      'promos': 15,
-      'canje': 65,
-      'vistas': 410,
-      'phone': '+57 1 987 6543',
-      'email': 'ventas@sportzone.co',
-      'iconColor': Color(0xFF2ECC71),
-      'iconBg': Color(0xFFE8F8F0),
-      'iconLabel': '👟',
-      'categoryColor': Color(0xFF2ECC71),
-    },
-  ];
+  /// Obtiene supermercados del servicio
+  List<Supermercado> get _stores => promoService.supermercados;
 
   @override
   Widget build(BuildContext context) {
@@ -193,7 +146,7 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
           ],
         ),
         GestureDetector(
-          onTap: () {},
+          onTap: () => _showCrearComercioModal(),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
             decoration: BoxDecoration(
@@ -221,9 +174,18 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
     );
   }
 
+  void _showCrearComercioModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const CrearComercioModal(),
+    );
+  }
+
   // ─── STORE CARD ─────────────────────────────────────────────────────────────
-  Widget _buildStoreCard(Map<String, dynamic> store) {
-    final bool isPaused = store['isPaused'] as bool;
+  Widget _buildStoreCard(Supermercado store) {
+    final isPaused = store.estado != 'activo';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -251,14 +213,11 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: store['iconBg'] as Color,
+                    color: Colors.orange.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Center(
-                    child: Text(
-                      store['iconLabel'] as String,
-                      style: const TextStyle(fontSize: 26),
-                    ),
+                  child: const Center(
+                    child: Text('🏪', style: TextStyle(fontSize: 26)),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -270,7 +229,7 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              store['name'] as String,
+                              store.nombre,
                               style: const TextStyle(
                                 color: textDark,
                                 fontSize: 15,
@@ -299,7 +258,7 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
                           const SizedBox(width: 3),
                           Expanded(
                             child: Text(
-                              store['address'] as String,
+                              store.direccion ?? 'Sin dirección',
                               style: const TextStyle(
                                 color: textGray,
                                 fontSize: 12,
@@ -310,16 +269,7 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
                         ],
                       ),
                       const SizedBox(height: 7),
-                      Row(
-                        children: [
-                          _categoryChip(
-                            store['category'] as String,
-                            store['categoryColor'] as Color,
-                          ),
-                          const SizedBox(width: 8),
-                          _statusChip(isPaused),
-                        ],
-                      ),
+                      Row(children: [_statusChip(isPaused)]),
                     ],
                   ),
                 ),
@@ -328,57 +278,6 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
           ),
 
           const SizedBox(height: 16),
-
-          // ── Stats row ────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                _statItem(
-                  value: store['promos'].toString(),
-                  label: 'Promos',
-                  color: textDark,
-                ),
-                _verticalDivider(),
-                _statItem(
-                  value: '${store['canje']}%',
-                  label: 'Canje',
-                  color: greenAccent,
-                ),
-                _verticalDivider(),
-                _statItem(
-                  value: store['vistas'].toString(),
-                  label: 'Vistas',
-                  color: blueAccent,
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // ── Contact row ──────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _contactItem(
-                    icon: Icons.phone_outlined,
-                    text: store['phone'] as String,
-                  ),
-                ),
-                Container(width: 1, height: 16, color: const Color(0xFFEEEEF2)),
-                Expanded(
-                  child: _contactItem(
-                    icon: Icons.email_outlined,
-                    text: store['email'] as String,
-                    align: TextAlign.right,
-                  ),
-                ),
-              ],
-            ),
-          ),
 
           const SizedBox(height: 14),
           Container(height: 1, color: const Color(0xFFF0F0F5)),
@@ -399,7 +298,7 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
                 Expanded(
                   child: _pauseBtn(
                     isPaused: isPaused,
-                    onTap: () => setState(() => store['isPaused'] = !isPaused),
+                    onTap: () => _toggleStatus(store),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -412,20 +311,40 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
     );
   }
 
-  Widget _categoryChip(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-        ),
+  /// Alterna el estado del supermercado
+  void _toggleStatus(Supermercado store) {
+    final updated = store.copyWith(
+      estado: store.estado == 'activo' ? 'inactivo' : 'activo',
+    );
+    promoService.updateSupermercado(updated);
+    setState(() {});
+  }
+
+  /// Confirma eliminación del supermercado
+  void _confirmDelete(Supermercado store) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Eliminar Supermercado'),
+        content: Text('¿Eliminar "${store.nombre}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              promoService.supermercados.removeWhere((s) => s.id == store.id);
+              setState(() {});
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Supermercado eliminado')),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Eliminar'),
+          ),
+        ],
       ),
     );
   }
@@ -459,66 +378,6 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
               fontWeight: FontWeight.w600,
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _statItem({
-    required String value,
-    required String label,
-    required Color color,
-  }) {
-    return Expanded(
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: TextStyle(
-              color: color,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(label, style: const TextStyle(color: textGray, fontSize: 12)),
-        ],
-      ),
-    );
-  }
-
-  Widget _verticalDivider() {
-    return Container(width: 1, height: 38, color: const Color(0xFFEEEEF2));
-  }
-
-  Widget _contactItem({
-    required IconData icon,
-    required String text,
-    TextAlign align = TextAlign.left,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Row(
-        mainAxisAlignment: align == TextAlign.right
-            ? MainAxisAlignment.end
-            : MainAxisAlignment.start,
-        children: [
-          if (align == TextAlign.left) ...[
-            Icon(icon, size: 14, color: textGray),
-            const SizedBox(width: 5),
-          ],
-          Flexible(
-            child: Text(
-              text,
-              style: const TextStyle(color: textGray, fontSize: 11),
-              overflow: TextOverflow.ellipsis,
-              textAlign: align,
-            ),
-          ),
-          if (align == TextAlign.right) ...[
-            const SizedBox(width: 5),
-            Icon(icon, size: 14, color: textGray),
-          ],
         ],
       ),
     );
@@ -612,46 +471,6 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
     );
   }
 
-  // ─── DELETE CONFIRM ─────────────────────────────────────────────────────────
-  void _confirmDelete(Map<String, dynamic> store) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text(
-          'Eliminar comercio',
-          style: TextStyle(color: textDark, fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          '¿Deseas eliminar "${store['name']}"? Esta acción no se puede deshacer.',
-          style: const TextStyle(color: textGray, fontSize: 14),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar', style: TextStyle(color: textGray)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            onPressed: () {
-              setState(() => _stores.remove(store));
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Eliminar',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   String _routeForIndex(int index) {
     switch (index) {
       case 0:
@@ -733,6 +552,251 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
             ),
           );
         }),
+      ),
+    );
+  }
+}
+
+class CrearComercioModal extends StatefulWidget {
+  const CrearComercioModal({super.key});
+
+  @override
+  State<CrearComercioModal> createState() => _CrearComercioModalState();
+}
+
+class _CrearComercioModalState extends State<CrearComercioModal> {
+  final _nombre = TextEditingController();
+  final _direccion = TextEditingController();
+  final _ciudad = TextEditingController();
+
+  @override
+  void dispose() {
+    _nombre.dispose();
+    _direccion.dispose();
+    _ciudad.dispose();
+    super.dispose();
+  }
+
+  void _crearComercio() {
+    if (_nombre.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('El nombre es obligatorio')));
+      return;
+    }
+
+    final newId =
+        (promoService.supermercados.isEmpty
+            ? 0
+            : promoService.supermercados
+                  .map((s) => s.id)
+                  .reduce((a, b) => a > b ? a : b)) +
+        1;
+
+    final nuevoComercio = Supermercado(
+      id: newId,
+      nombre: _nombre.text,
+      direccion: _direccion.text.isEmpty ? null : _direccion.text,
+      ciudad: _ciudad.text.isEmpty ? null : _ciudad.text,
+      estado: 'activo',
+    );
+
+    promoService.addSupermercado(nuevoComercio);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Comercio creado exitosamente')),
+    );
+
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.60,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 10),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+              children: [
+                const Text(
+                  'Crear Comercio',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A1A2E),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'NOMBRE DEL COMERCIO *',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF8A8A9A),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: _nombre,
+                  decoration: InputDecoration(
+                    hintText: 'Ej: Supermercado La Esquina',
+                    hintStyle: TextStyle(
+                      color: Colors.grey.withOpacity(0.5),
+                      fontSize: 13,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.storefront_outlined,
+                      color: Color(0xFF8A8A9A),
+                      size: 18,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFEEEEF2)),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 13,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'DIRECCIÓN',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF8A8A9A),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: _direccion,
+                  decoration: InputDecoration(
+                    hintText: 'Calle 123 #45-67',
+                    hintStyle: TextStyle(
+                      color: Colors.grey.withOpacity(0.5),
+                      fontSize: 13,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.location_on_outlined,
+                      color: Color(0xFF8A8A9A),
+                      size: 18,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFEEEEF2)),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 13,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'CIUDAD',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF8A8A9A),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: _ciudad,
+                  decoration: InputDecoration(
+                    hintText: 'Bogotá',
+                    hintStyle: TextStyle(
+                      color: Colors.grey.withOpacity(0.5),
+                      fontSize: 13,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.location_city_outlined,
+                      color: Color(0xFF8A8A9A),
+                      size: 18,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFEEEEF2)),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 13,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF8A8A9A),
+                          side: const BorderSide(color: Color(0xFFEEEEF2)),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Cancelar',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton.icon(
+                        onPressed: _crearComercio,
+                        icon: const Icon(Icons.add_outlined, size: 18),
+                        label: const Text(
+                          'Crear Comercio',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFF5733),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

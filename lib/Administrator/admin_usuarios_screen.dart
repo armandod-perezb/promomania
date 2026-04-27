@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../Core/Routes/app_routes.dart';
+import '../main.dart';
+import '../models/usuario.dart';
 
 class ManageUsersScreen extends StatefulWidget {
   const ManageUsersScreen({super.key});
@@ -20,75 +22,16 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
   static const Color cardBg = Color(0xFFFFFFFF);
   static const Color bgColor = Color(0xFFF5F5F8);
 
-  final List<Map<String, dynamic>> _users = [
-    {
-      'name': 'Diego Morales',
-      'email': 'diego@correo.com',
-      'role': 'Negocio',
-      'status': 'Inactivo',
-      'lastActive': 'Hace 1d',
-      'joinDate': '3 Mar 2024',
-      'color': Color(0xFF3498DB),
-      'isActive': false,
-    },
-    {
-      'name': 'Sofía Ramírez',
-      'email': 'sofia@correo.com',
-      'role': 'Usuario',
-      'status': 'Activo',
-      'lastActive': 'Hace 4h',
-      'joinDate': '20 Feb 2026',
-      'color': Color(0xFF9B59B6),
-      'isActive': true,
-    },
-    {
-      'name': 'Luis Herrera',
-      'email': 'luis@correo.com',
-      'role': 'Admin',
-      'status': 'Activo',
-      'lastActive': 'Hace 20m',
-      'joinDate': '1 Ene 2026',
-      'color': Color(0xFFFF5733),
-      'isActive': true,
-    },
-    {
-      'name': 'Ana Martínez',
-      'email': 'ana@correo.com',
-      'role': 'Usuario',
-      'status': 'Inactivo',
-      'lastActive': 'Hace 5d',
-      'joinDate': '8 Feb 2026',
-      'color': Color(0xFF1A1A2E),
-      'isActive': false,
-    },
-    {
-      'name': 'Carlos López',
-      'email': 'carlos@correo.com',
-      'role': 'Negocio',
-      'status': 'Activo',
-      'lastActive': 'Hace 1d',
-      'joinDate': '10 Ene 2026',
-      'color': Color(0xFF2980B9),
-      'isActive': true,
-    },
-    {
-      'name': 'María García',
-      'email': 'maria@correo.com',
-      'role': 'Usuario',
-      'status': 'Activo',
-      'lastActive': 'Hace 3h',
-      'joinDate': '15 Dic 2026',
-      'color': Color(0xFFE74C3C),
-      'isActive': true,
-    },
-  ];
+  /// Obtiene usuarios del servicio
+  List<Usuario> get _users => promoService.usuarios;
 
-  List<Map<String, dynamic>> get _filteredUsers {
+  /// Filtra usuarios según búsqueda
+  List<Usuario> get _filteredUsers {
     if (_searchQuery.isEmpty) return _users;
+    final q = _searchQuery.toLowerCase();
     return _users.where((u) {
-      final q = _searchQuery.toLowerCase();
-      return (u['name'] as String).toLowerCase().contains(q) ||
-          (u['email'] as String).toLowerCase().contains(q);
+      return u.nombre.toLowerCase().contains(q) ||
+          u.correo.toLowerCase().contains(q);
     }).toList();
   }
 
@@ -413,9 +356,9 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
   }
 
   // ─── USER CARD ──────────────────────────────────────────────────────────────
-  Widget _buildUserCard(Map<String, dynamic> user) {
-    final bool isActive = user['status'] == 'Activo';
-    final Color roleColor = _roleColor(user['role'] as String);
+  Widget _buildUserCard(Usuario user) {
+    final bool isActive = user.estado == 'activo';
+    final Color roleColor = _roleColor(user.rol);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -441,9 +384,9 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundColor: user['color'] as Color,
+                      backgroundColor: roleColor,
                       child: Text(
-                        (user['name'] as String)[0],
+                        user.nombre[0].toUpperCase(),
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -459,7 +402,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                           Row(
                             children: [
                               Text(
-                                user['name'] as String,
+                                user.nombre,
                                 style: const TextStyle(
                                   color: textDark,
                                   fontSize: 14,
@@ -475,7 +418,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                             ],
                           ),
                           Text(
-                            user['email'] as String,
+                            user.correo,
                             style: const TextStyle(
                               color: textGray,
                               fontSize: 11,
@@ -484,30 +427,26 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                         ],
                       ),
                     ),
-                    Icon(Icons.edit_outlined, color: textGray, size: 18),
+                    GestureDetector(
+                      onTap: () => _editUser(user),
+                      child: Icon(
+                        Icons.edit_outlined,
+                        color: textGray,
+                        size: 18,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 10),
                 // Tags row
                 Row(
                   children: [
-                    _roleTag(user['role'] as String, roleColor),
+                    _roleTag(user.rol, roleColor),
                     const SizedBox(width: 8),
                     _statusTag(isActive),
                   ],
                 ),
                 const SizedBox(height: 10),
-                // Meta row
-                Row(
-                  children: [
-                    _metaItem(Icons.access_time, user['lastActive'] as String),
-                    const SizedBox(width: 16),
-                    _metaItem(
-                      Icons.calendar_today_outlined,
-                      user['joinDate'] as String,
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
@@ -567,18 +506,108 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     );
   }
 
+  /// Alterna el estado del usuario (activo/inactivo)
+  void _toggleStatus(Usuario user) {
+    final updatedUser = user.copyWith(
+      estado: user.estado == 'activo' ? 'inactivo' : 'activo',
+    );
+    promoService.updateUsuario(updatedUser);
+    setState(() {});
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Usuario ${updatedUser.estado}')));
+  }
+
+  /// Abre diálogo para editar usuario
+  void _editUser(Usuario user) {
+    final nombreCtrl = TextEditingController(text: user.nombre);
+    final emailCtrl = TextEditingController(text: user.correo);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Editar Usuario'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nombreCtrl,
+                decoration: const InputDecoration(labelText: 'Nombre'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: emailCtrl,
+                decoration: const InputDecoration(labelText: 'Email'),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final updatedUser = user.copyWith(
+                nombre: nombreCtrl.text,
+                correo: emailCtrl.text,
+              );
+              promoService.updateUsuario(updatedUser);
+              setState(() {});
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Usuario actualizado')),
+              );
+            },
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Confirma eliminación de usuario
+  void _confirmDelete(Usuario user) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Eliminar Usuario'),
+        content: Text('¿Eliminar a ${user.nombre}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              promoService.usuarios.removeWhere((u) => u.id == user.id);
+              setState(() {});
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Usuario eliminado')),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Color _roleColor(String role) {
-    switch (role) {
-      case 'Admin':
+    switch (role.toLowerCase()) {
+      case 'admin':
         return primaryOrange;
-      case 'Negocio':
-        return const Color(0xFF3498DB);
       default:
         return const Color(0xFF9B59B6);
     }
   }
 
   Widget _roleTag(String role, Color color) {
+    final roleLower = role.toLowerCase();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
@@ -589,17 +618,13 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            role == 'Admin'
-                ? Icons.shield_outlined
-                : role == 'Negocio'
-                ? Icons.storefront_outlined
-                : Icons.person_outline,
+            roleLower == 'admin' ? Icons.shield_outlined : Icons.person_outline,
             color: color,
             size: 11,
           ),
           const SizedBox(width: 3),
           Text(
-            role,
+            roleLower.toUpperCase(),
             style: TextStyle(
               color: color,
               fontSize: 11,
@@ -686,53 +711,6 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  // ─── ACTIONS ────────────────────────────────────────────────────────────────
-  void _toggleStatus(Map<String, dynamic> user) {
-    setState(() {
-      user['status'] = user['status'] == 'Activo' ? 'Inactivo' : 'Activo';
-      user['isActive'] = user['status'] == 'Activo';
-    });
-  }
-
-  void _confirmDelete(Map<String, dynamic> user) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text(
-          'Eliminar usuario',
-          style: TextStyle(color: textDark, fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          '¿Estás seguro de eliminar a ${user['name']}? Esta acción no se puede deshacer.',
-          style: const TextStyle(color: textGray, fontSize: 14),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar', style: TextStyle(color: textGray)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            onPressed: () {
-              setState(() => _users.remove(user));
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Eliminar',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -974,6 +952,61 @@ class _CrearUsuarioModalState extends State<CrearUsuarioModal> {
     _ciudad.dispose();
     _direccion.dispose();
     super.dispose();
+  }
+
+  void _crearUsuario() {
+    // Validar campos obligatorios
+    if (_nombre.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('El nombre es obligatorio')));
+      return;
+    }
+    if (_email.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('El correo es obligatorio')));
+      return;
+    }
+    if (_pass.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('La contraseña es obligatoria')),
+      );
+      return;
+    }
+    if (_pass.text != _passConf.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Las contraseñas no coinciden')),
+      );
+      return;
+    }
+
+    // Crear nuevo usuario
+    final newId =
+        (promoService.usuarios.isEmpty
+            ? 0
+            : promoService.usuarios
+                  .map((u) => u.id)
+                  .reduce((a, b) => a > b ? a : b)) +
+        1;
+
+    final nuevoUsuario = Usuario(
+      id: newId,
+      nombre: _nombre.text,
+      correo: _email.text,
+      password: _pass.text,
+      rol: _rol.toLowerCase(),
+      estado: _usuarioActive ? 'activo' : 'inactivo',
+    );
+
+    // Guardar en el servicio
+    promoService.addUsuario(nuevoUsuario);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Usuario creado exitosamente')),
+    );
+
+    Navigator.pop(context);
   }
 
   @override
@@ -1410,7 +1443,7 @@ class _CrearUsuarioModalState extends State<CrearUsuarioModal> {
                     Expanded(
                       flex: 2,
                       child: ElevatedButton.icon(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: _crearUsuario,
                         icon: const Icon(Icons.person_add_outlined, size: 18),
                         label: const Text(
                           'Crear Usuario',

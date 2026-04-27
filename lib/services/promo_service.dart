@@ -170,6 +170,21 @@ class PromoService {
     }
   }
 
+  void updateSupermercado(Supermercado updated) {
+    final index = supermercados.indexWhere((s) => s.id == updated.id);
+    if (index != -1) {
+      supermercados[index] = updated;
+    }
+  }
+
+  void addSupermercado(Supermercado supermercado) {
+    supermercados.add(supermercado);
+  }
+
+  void deleteSupermercado(int id) {
+    supermercados.removeWhere((s) => s.id == id);
+  }
+
   // ========== CATEGORIAS ==========
   List<Categoria> getCategorias() => categorias;
 

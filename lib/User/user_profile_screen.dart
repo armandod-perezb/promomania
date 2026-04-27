@@ -1315,6 +1315,73 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   // ── Bottom nav ────────────────────────────────────────────────────────────────
 
   Widget _buildBottomNav() {
+    final usuario = sessionManager.usuarioActual;
+
+    // Si el usuario es administrador, mostrar la barra de admin (navegación administrativa)
+    if (usuario?.rol == 'admin') {
+      final items = [
+        {'icon': Icons.dashboard, 'label': 'Panel', 'route': AppRoutes.adminDashboard},
+        {'icon': Icons.people_outline, 'label': 'Usuarios', 'route': AppRoutes.manageUsers},
+        {'icon': Icons.local_offer_outlined, 'label': 'Promos', 'route': AppRoutes.managePromotions},
+        {'icon': Icons.storefront_outlined, 'label': 'Comercios', 'route': AppRoutes.manageStores},
+        {'icon': Icons.notifications_outlined, 'label': 'Avisos', 'route': AppRoutes.manageNotifications},
+      ];
+
+      final currentRoute = ModalRoute.of(context)?.settings.name;
+      var selectedIndex = items.indexWhere((it) => it['route'] == currentRoute);
+      if (selectedIndex < 0) selectedIndex = 0;
+
+      return Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Color(0x10000000),
+              blurRadius: 12,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: List.generate(items.length, (i) {
+            final selected = i == selectedIndex;
+            return GestureDetector(
+              onTap: () {
+                if (i == selectedIndex) return;
+                Navigator.pushReplacementNamed(context, items[i]['route'] as String);
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: selected ? _primary.withOpacity(0.12) : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(items[i]['icon'] as IconData, color: selected ? _primary : const Color(0xFF8A8FA8), size: 22),
+                    const SizedBox(height: 3),
+                    Text(
+                      items[i]['label'] as String,
+                      style: TextStyle(
+                        color: selected ? _primary : const Color(0xFF8A8FA8),
+                        fontSize: 10,
+                        fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+        ),
+      );
+    }
+
+    // Barra de navegación estándar para usuarios
     final tabs = [
       _NavTab(icon: Icons.map_rounded, label: 'Inicio'),
       _NavTab(icon: Icons.explore_outlined, label: 'Explorar'),
@@ -1372,9 +1439,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       vertical: 5,
                     ),
                     decoration: BoxDecoration(
-                      color: isActive
-                          ? _primary.withOpacity(0.1)
-                          : Colors.transparent,
+                      color: isActive ? _primary.withOpacity(0.1) : Colors.transparent,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(

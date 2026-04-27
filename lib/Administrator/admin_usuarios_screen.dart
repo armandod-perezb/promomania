@@ -3,6 +3,8 @@ import '../Core/Routes/app_routes.dart';
 import '../main.dart';
 import '../models/usuario.dart';
 
+/// Pantalla de gestion de usuarios con busqueda, filtros y acciones administrativas.
+
 class ManageUsersScreen extends StatefulWidget {
   const ManageUsersScreen({super.key});
 
@@ -11,7 +13,9 @@ class ManageUsersScreen extends StatefulWidget {
 }
 
 class _ManageUsersScreenState extends State<ManageUsersScreen> {
+  // Estado local de navegacion y filtros de busqueda.
   int _selectedIndex = 1;
+  // Controlador del campo de busqueda para limpiar/restaurar texto.
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -27,9 +31,12 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
 
   /// Filtra usuarios según búsqueda
   List<Usuario> get _filteredUsers {
+    // Sin termino, se devuelve el listado completo para evitar filtros innecesarios.
     if (_searchQuery.isEmpty) return _users;
+    // Normaliza a minusculas para comparar de forma consistente.
     final q = _searchQuery.toLowerCase();
     return _users.where((u) {
+      // Permite coincidencias por nombre o correo.
       return u.nombre.toLowerCase().contains(q) ||
           u.correo.toLowerCase().contains(q);
     }).toList();
@@ -37,41 +44,51 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
 
   @override
   void dispose() {
+    // Libera recursos del TextEditingController al destruir la pantalla.
     _searchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildTopBar(),
-            _buildBreadcrumb(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 16),
-                    _buildTitleRow(),
-                    const SizedBox(height: 14),
-                    _buildSearchBar(),
-                    const SizedBox(height: 12),
-                    _buildFilterRow(),
-                    const SizedBox(height: 16),
-                    ..._filteredUsers.map((u) => _buildUserCard(u)),
-                  ],
+    return AnimatedBuilder(
+      animation: promoService,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: bgColor,
+          body: SafeArea(
+            child: Column(
+              children: [
+                _buildTopBar(),
+                _buildBreadcrumb(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 16),
+                        // Resumen y accion principal para alta de usuarios.
+                        _buildTitleRow(),
+                        const SizedBox(height: 14),
+                        // Busqueda reactiva por nombre/correo.
+                        _buildSearchBar(),
+                        const SizedBox(height: 12),
+                        // Filtros visuales y contadores rapidos.
+                        _buildFilterRow(),
+                        const SizedBox(height: 16),
+                        // Tarjetas de usuario renderizadas segun el filtro activo.
+                        ..._filteredUsers.map((u) => _buildUserCard(u)),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+                _buildBottomNav(),
+              ],
             ),
-            _buildBottomNav(),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -555,7 +572,6 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                 correo: emailCtrl.text,
               );
               promoService.updateUsuario(updatedUser);
-              setState(() {});
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Usuario actualizado')),
@@ -582,8 +598,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              promoService.usuarios.removeWhere((u) => u.id == user.id);
-              setState(() {});
+              promoService.deleteUsuario(user.id);
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Usuario eliminado')),

@@ -3,6 +3,8 @@ import '../Core/Routes/app_routes.dart';
 import '../main.dart';
 import '../models/promocion.dart';
 
+/// Pantalla de gestion de promociones: crear, editar, aprobar y eliminar.
+
 class ManagePromotionsScreen extends StatefulWidget {
   const ManagePromotionsScreen({super.key});
 
@@ -11,6 +13,7 @@ class ManagePromotionsScreen extends StatefulWidget {
 }
 
 class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
+  // Mantiene el item activo en la barra de navegacion inferior.
   int _selectedIndex = 2;
 
   static const Color primaryOrange = Color(0xFFFF5733);
@@ -24,29 +27,36 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildTopBar(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildTitleRow(),
-                    const SizedBox(height: 20),
-                    ..._promos.map((p) => _buildPromoCard(p)),
-                  ],
+    return AnimatedBuilder(
+      animation: promoService,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: bgColor,
+          body: SafeArea(
+            child: Column(
+              children: [
+                _buildTopBar(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Encabezado con CTA principal para crear promociones.
+                        _buildTitleRow(),
+                        const SizedBox(height: 20),
+                        // Renderizado dinamico de todas las promociones actuales.
+                        ..._promos.map((p) => _buildPromoCard(p)),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+                _buildBottomNav(),
+              ],
             ),
-            _buildBottomNav(),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -167,6 +177,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
   }
 
   void _showCrearPromoModal() {
+    // Formulario modal para alta rapida de promociones desde el admin.
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -177,7 +188,9 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
 
   // ─── PROMO CARD ─────────────────────────────────────────────────────────────
   Widget _buildPromoCard(Promocion promo) {
+    // Una promo se considera activa cuando ya fue aprobada.
     final bool isActive = promo.estado == 'aprobada';
+    // Badge visual de descuento; usa 0% cuando no hay dato.
     final badge = '${promo.descuento ?? 0}%';
 
     return Container(
@@ -334,11 +347,13 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                       ? _solidBtn(
                           icon: Icons.check_circle_outline,
                           label: 'Aprobada',
+                          // Permite revertir una aprobada a rechazada desde el card.
                           onTap: () => _changeStatus(promo, 'rechazada'),
                         )
                       : _solidBtn(
                           icon: Icons.check_circle_outline,
                           label: 'Aprobar',
+                          // Aprueba en un toque cuando esta pendiente/rechazada.
                           onTap: () => _changeStatus(promo, 'aprobada'),
                         ),
                 ),
@@ -400,7 +415,6 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                 descripcion: descCtrl.text,
               );
               promoService.updatePromocion(updated);
-              setState(() {});
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Promoción actualizada')),
@@ -427,10 +441,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              promoService.promociones.removeWhere(
-                (p) => p.codigo == promo.codigo,
-              );
-              setState(() {});
+              promoService.deletePromocion(promo.codigo);
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Promoción eliminada')),

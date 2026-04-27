@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import '../Core/Routes/app_routes.dart';
 import '../main.dart';
 
+/// Pantalla de auditoria con actividad reciente, filtros y atajos de aviso.
+
 // ─────────────────────────────────────────────────────────────────────────────
 // MODELOS
 // ─────────────────────────────────────────────────────────────────────────────
@@ -48,6 +50,7 @@ class AdminAuditScreen extends StatefulWidget {
 
 class _AdminAuditScreenState extends State<AdminAuditScreen>
     with TickerProviderStateMixin {
+  // Colores base para mantener una identidad visual consistente en auditoria.
   static const Color _primary = Color(0xFFFF4D2E);
   static const Color _darkBg = Color(0xFF1A1F2E);
   static const Color _green = Color(0xFF10B981);
@@ -61,6 +64,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
   int _selectedFilter = 0; // Todas/Usuarios/Promos/Comercios
   int _selectedNavTab = 4; // Avisos activo
 
+  // Dataset de actividad reciente usado por la lista y los filtros de auditoria.
   final List<_ActivityItem> _activities = const [
     _ActivityItem(
       actor: 'Maria Garcia',
@@ -173,6 +177,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
   ];
 
   List<_ActivityItem> get _filtered {
+    // Aplica el filtro seleccionado sin mutar la coleccion base.
     switch (_selectedFilter) {
       case 1:
         return _activities.where((a) => a.type == _ActivityType.user).toList();
@@ -193,6 +198,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
         backgroundColor: _lightBg,
         body: Column(
           children: [
+            // Encabezado administrativo con identidad del modulo.
             _buildAdminTopBar(),
             Expanded(
               child: SingleChildScrollView(
@@ -202,6 +208,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                       color: Colors.white,
                       child: Column(
                         children: [
+                          // Resumen de contexto + tarjeta de push + tabs.
                           _buildPageHeader(),
                           _buildPushNotifCard(),
                           const SizedBox(height: 4),
@@ -215,6 +222,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                       color: Colors.white,
                       child: Column(
                         children: [
+                          // Herramientas de consulta: filtros y listado de eventos.
                           _buildFilterChips(),
                           _buildActivityHeader(),
                           _buildActivityList(),
@@ -247,7 +255,6 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
       ),
       child: Row(
         children: [
-          // Logo
           Container(
             width: 34,
             height: 34,
@@ -285,7 +292,6 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
             ],
           ),
           const Spacer(),
-          // Campana con badge
           Stack(
             children: [
               Container(

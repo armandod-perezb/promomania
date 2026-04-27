@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../Core/Routes/app_routes.dart';
 import '../main.dart';
 
-// ── Paleta exacta ─────────────────────────────────────────────────────────────
+/// Pantalla de alertas administrativas y exportacion de datos desde avisos.
+
 const kOrange = Color(0xFFFF4422);
 const kNavy = Color(0xFF1A1F36);
 const kBg = Color(0xFFF3F4F8);
@@ -30,9 +31,12 @@ class AdminNotiAlertScreen extends StatefulWidget {
 }
 
 class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
+  // Controla la pestana activa y el estado de opciones de exportacion.
   int _tab = 2; // Alertas activo
   int _nav = 4; // Avisos activo
+  // Incluye metadata complementaria al exportar reportes.
   bool _incl = true;
+  // Permite comprimir el archivo final para bajar peso de descarga.
   bool _comp = false;
 
   @override
@@ -42,17 +46,22 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // Cabecera de marca y estado de notificaciones.
             _topBar(),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
                 children: [
+                  // Bloque contextual del centro de auditoria.
                   _auditoria(),
                   const SizedBox(height: 12),
+                  // Tarjeta de rendimiento de campañas push.
                   _pushCard(),
                   const SizedBox(height: 14),
+                  // Navegacion secundaria entre actividad, reportes, alertas y exportar.
                   _tabBar(),
                   const SizedBox(height: 14),
+                  // Accesos rapidos a formatos de exportacion.
                   _exportCard(
                     iconWidget: const Icon(
                       Icons.picture_as_pdf_outlined,
@@ -89,8 +98,10 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
                     size: '880 KB',
                   ),
                   const SizedBox(height: 18),
+                  // Parametros de generacion del archivo.
                   _configCard(),
                   const SizedBox(height: 14),
+                  // Nota de ayuda sobre alcance y uso de las exportaciones.
                   _infoCard(),
                   const SizedBox(height: 20),
                 ],
@@ -103,7 +114,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
     );
   }
 
-  // ─── TOP BAR ────────────────────────────────────────────────────────────────
+  
   Widget _topBar() => Container(
     color: kWhite,
     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -197,7 +208,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
     ),
   );
 
-  // ─── AUDITORÍA ──────────────────────────────────────────────────────────────
+  // ÔöÇÔöÇÔöÇ AUDITOR├ìA ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
   Widget _auditoria() => Container(
     decoration: BoxDecoration(
       color: kYellowBg,
@@ -225,7 +236,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: const [
             Text(
-              'Auditoría',
+              'Auditor├¡a',
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
@@ -244,7 +255,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
     ),
   );
 
-  // ─── PUSH CARD ──────────────────────────────────────────────────────────────
+  // ÔöÇÔöÇÔöÇ PUSH CARD ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
   Widget _pushCard() => Container(
     decoration: BoxDecoration(
       color: kNavy,
@@ -290,7 +301,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
                 ],
               ),
             ),
-            // Botón Nueva Campaña
+            // Bot├│n Nueva Campa├▒a
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
               decoration: BoxDecoration(
@@ -303,7 +314,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
                   Icon(Icons.send_outlined, color: kWhite, size: 13),
                   SizedBox(width: 5),
                   Text(
-                    'Nueva Campaña',
+                    'Nueva Campa├▒a',
                     style: TextStyle(
                       color: kWhite,
                       fontSize: 10.5,
@@ -385,7 +396,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
         ),
       );
 
-  // ─── TAB BAR ────────────────────────────────────────────────────────────────
+  // ÔöÇÔöÇÔöÇ TAB BAR ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
   Widget _tabBar() {
     // badges: Actividad=0, Reportes=8, Alertas=1, Exportar=0
     final tabs = [
@@ -473,7 +484,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
     );
   }
 
-  // ─── EXPORT CARD ────────────────────────────────────────────────────────────
+  // ÔöÇÔöÇÔöÇ EXPORT CARD ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
   Widget _exportCard({
     required Widget iconWidget,
     required Color iconBg,
@@ -546,7 +557,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
     ),
   );
 
-  // ─── CONFIG CARD ────────────────────────────────────────────────────────────
+  // ÔöÇÔöÇÔöÇ CONFIG CARD ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
   Widget _configCard() => Container(
     decoration: BoxDecoration(
       color: kWhite,
@@ -563,7 +574,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
               Icon(Icons.settings_outlined, color: kOrange, size: 19),
               SizedBox(width: 8),
               Text(
-                'Configuración de Exportación',
+                'Configuraci├│n de Exportaci├│n',
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 14,
@@ -641,7 +652,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
     ),
   );
 
-  // ─── INFO CARD ──────────────────────────────────────────────────────────────
+  // ÔöÇÔöÇÔöÇ INFO CARD ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
   Widget _infoCard() => Container(
     decoration: BoxDecoration(
       color: kBlueBg,
@@ -677,7 +688,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
               SizedBox(height: 5),
               Text(
                 'Todos los datos se exportan de forma encriptada y se '
-                'eliminan automáticamente después de 24 horas.',
+                'eliminan autom├íticamente despu├®s de 24 horas.',
                 style: TextStyle(fontSize: 12, color: kTextMuted, height: 1.5),
               ),
             ],
@@ -687,7 +698,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
     ),
   );
 
-  // ─── BOTTOM NAV ─────────────────────────────────────────────────────────────
+  // ÔöÇÔöÇÔöÇ BOTTOM NAV ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
   Widget _bottomNav() {
     final items = [
       {'icon': Icons.grid_view_outlined, 'label': 'Panel'},

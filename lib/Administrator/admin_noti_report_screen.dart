@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../Core/Routes/app_routes.dart';
 import '../main.dart';
 
+/// Pantalla de reportes de notificaciones con metricas y resumen visual.
+
 // ── Colores globales ──────────────────────────────────────────────────────────
 const kOrange = Color(0xFFFF4500); // rojo-naranja principal
 const kOrangeLight = Color(0xFFFF6633);
@@ -24,46 +26,59 @@ class AdminNotiReportScreen extends StatefulWidget {
 }
 
 class _AdminNotiReportScreenState extends State<AdminNotiReportScreen> {
+  // Indices de navegacion para sincronizar tabs internas y menu inferior.
   int _selectedTab = 1; // Reportes selected
   int _bottomNav = 4; // Avisos selected
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kBgGray,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildTopBar(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 12),
-                    _buildAuditoriaCard(),
-                    const SizedBox(height: 12),
-                    _buildPushCard(),
-                    const SizedBox(height: 16),
-                    _buildTabBar(),
-                    const SizedBox(height: 16),
-                    _buildActividadHeader(),
-                    const SizedBox(height: 8),
-                    _buildBarChart(),
-                    const SizedBox(height: 16),
-                    _buildReporteGrid(),
-                    const SizedBox(height: 16),
-                    _buildDescargarSection(),
-                    const SizedBox(height: 20),
-                  ],
+    return AnimatedBuilder(
+      animation: promoService,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: kBgGray,
+          body: SafeArea(
+            child: Column(
+              children: [
+                // Header institucional del panel administrativo.
+                _buildTopBar(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 12),
+                        // Entrada al centro de auditoria.
+                        _buildAuditoriaCard(),
+                        const SizedBox(height: 12),
+                        // Contexto de campanas push y desempeno reciente.
+                        _buildPushCard(),
+                        const SizedBox(height: 16),
+                        // Navegacion por secciones del modulo de avisos.
+                        _buildTabBar(),
+                        const SizedBox(height: 16),
+                        // Encabezado y visualizacion de actividad temporal.
+                        _buildActividadHeader(),
+                        const SizedBox(height: 8),
+                        _buildBarChart(),
+                        const SizedBox(height: 16),
+                        // Tarjetas de reportes operativos.
+                        _buildReporteGrid(),
+                        const SizedBox(height: 16),
+                        // Zona de descarga consolidada.
+                        _buildDescargarSection(),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+                _buildBottomNav(),
+              ],
             ),
-            _buildBottomNav(),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

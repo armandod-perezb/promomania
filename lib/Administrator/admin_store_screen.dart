@@ -3,6 +3,8 @@ import '../Core/Routes/app_routes.dart';
 import '../main.dart';
 import '../models/supermercado.dart';
 
+/// Pantalla para administrar comercios y su estado operativo.
+
 class ManageStoresScreen extends StatefulWidget {
   const ManageStoresScreen({super.key});
 
@@ -11,6 +13,7 @@ class ManageStoresScreen extends StatefulWidget {
 }
 
 class _ManageStoresScreenState extends State<ManageStoresScreen> {
+  // Define la seccion activa del menu inferior.
   int _selectedIndex = 3;
 
   static const Color primaryOrange = Color(0xFFFF5733);
@@ -24,29 +27,36 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildTopBar(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildTitleRow(),
-                    const SizedBox(height: 20),
-                    ..._stores.map((s) => _buildStoreCard(s)),
-                  ],
+    return AnimatedBuilder(
+      animation: promoService,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: bgColor,
+          body: SafeArea(
+            child: Column(
+              children: [
+                _buildTopBar(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Encabezado de gestion con accion para crear comercios.
+                        _buildTitleRow(),
+                        const SizedBox(height: 20),
+                        // Lista dinamica de comercios enlazada al estado del servicio.
+                        ..._stores.map((s) => _buildStoreCard(s)),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+                _buildBottomNav(),
+              ],
             ),
-            _buildBottomNav(),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -175,6 +185,7 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
   }
 
   void _showCrearComercioModal() {
+    // Modal de alta para registrar un nuevo comercio.
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -185,6 +196,7 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
 
   // ─── STORE CARD ─────────────────────────────────────────────────────────────
   Widget _buildStoreCard(Supermercado store) {
+    // Se marca en pausa cuando el estado no es activo.
     final isPaused = store.estado != 'activo';
 
     return Container(
@@ -313,6 +325,7 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
 
   /// Alterna el estado del supermercado
   void _toggleStatus(Supermercado store) {
+    // Alterna activo/inactivo conservando el resto de propiedades del comercio.
     final updated = store.copyWith(
       estado: store.estado == 'activo' ? 'inactivo' : 'activo',
     );
@@ -334,8 +347,7 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              promoService.supermercados.removeWhere((s) => s.id == store.id);
-              setState(() {});
+              promoService.deleteSupermercado(store.id);
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Supermercado eliminado')),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../Core/Routes/app_routes.dart';
 import '../main.dart';
 
+/// Pantalla principal del panel administrativo con metricas, actividad y accesos rapidos.
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
 
@@ -10,6 +11,7 @@ class AdminDashboardScreen extends StatefulWidget {
 }
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
+  // Indice seleccionado en la barra inferior de navegacion.
   int _selectedIndex = 0;
 
   static const Color primaryOrange = Color(0xFFFF5733);
@@ -23,39 +25,49 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F8),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _buildHeader(),
-                    const SizedBox(height: 16),
-                    _buildMetricsGrid(),
-                    const SizedBox(height: 16),
-                    _buildWeeklyRevenueChart(),
-                    const SizedBox(height: 16),
-                    _buildTopUsers(),
-                    const SizedBox(height: 16),
-                    _buildTopStores(),
-                    const SizedBox(height: 16),
-                    _buildGeoDistribution(),
-                    const SizedBox(height: 16),
-                    _buildRecentActivity(),
-                    const SizedBox(height: 16),
-                    _buildQuickActions(),
-                    const SizedBox(height: 16),
-                  ],
+    // Se usa AnimatedBuilder para repintar el dashboard cuando cambia promoService.
+    return AnimatedBuilder(
+      animation: promoService,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFF5F5F8),
+          body: SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // Resumen ejecutivo con KPIs principales y acceso rapido.
+                        _buildHeader(),
+                        const SizedBox(height: 16),
+                        // Bloques de conversion, engagement y salud general del sistema.
+                        _buildMetricsGrid(),
+                        const SizedBox(height: 16),
+                        // Visualizaciones y rankings para decisiones operativas.
+                        _buildWeeklyRevenueChart(),
+                        const SizedBox(height: 16),
+                        _buildTopUsers(),
+                        const SizedBox(height: 16),
+                        _buildTopStores(),
+                        const SizedBox(height: 16),
+                        _buildGeoDistribution(),
+                        const SizedBox(height: 16),
+                        _buildRecentActivity(),
+                        const SizedBox(height: 16),
+                        _buildQuickActions(),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+                // Navegacion persistente para cambiar de modulo administrativo.
+                _buildBottomNav(),
+              ],
             ),
-            _buildBottomNav(),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -125,19 +137,29 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          // Stats row
+          // KPIs en vivo basados en las colecciones actuales del servicio.
           Row(
             children: [
-              _headerStat(Icons.people_outline, '6', 'Usuarios', '+1 hoy'),
+              _headerStat(
+                Icons.people_outline,
+                promoService.usuarios.length.toString(),
+                'Usuarios',
+                '+1 hoy',
+              ),
               const SizedBox(width: 12),
               _headerStat(
                 Icons.confirmation_number_outlined,
-                '140',
-                'Tickets',
+                promoService.promociones.length.toString(),
+                'Promociones',
                 '+7 hoy',
               ),
               const SizedBox(width: 12),
-              _headerStat(Icons.attach_money, '\$4.2M', 'Revenue', '+18%'),
+              _headerStat(
+                Icons.storefront_outlined,
+                promoService.supermercados.length.toString(),
+                'Comercios',
+                '+18%',
+              ),
             ],
           ),
         ],
@@ -255,7 +277,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   icon: Icons.storefront,
                   iconColor: greenAccent,
                   iconBg: greenLight,
-                  value: '4',
+                  value: promoService.supermercados.length.toString(),
                   label: 'Comercios',
                   sublabel: 'Activos ahora',
                   badge: '+2',

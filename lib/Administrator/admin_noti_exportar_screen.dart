@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../Core/Routes/app_routes.dart';
 import '../main.dart';
 
+/// Pantalla para configurar y ejecutar exportaciones desde el modulo de avisos.
+
 // ── Colores ───────────────────────────────────────────────────────────────────
 const kOrange = Color(0xFFFF4500);
 const kNavyDark = Color(0xFF1A1F36);
@@ -26,68 +28,83 @@ class AdminNotiExportScreen extends StatefulWidget {
 }
 
 class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
+  // Estado local de la navegacion y preferencias de exportacion.
   int _selectedTab = 3; // Exportar activo
   int _bottomNav = 4; // Avisos activo
+  // Define si se adjunta informacion adicional (metadatos, trazas, etc.).
   bool _incluirDatos = true;
+  // Si esta activo, el archivo se empaqueta para reducir tamano.
   bool _comprimirArchivo = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kBgGray,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildTopBar(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 12),
-                    _buildAuditoriaCard(),
-                    const SizedBox(height: 12),
-                    _buildPushCard(),
-                    const SizedBox(height: 16),
-                    _buildTabBar(),
-                    const SizedBox(height: 16),
-                    _buildExportCard(
-                      icon: Icons.table_chart_outlined,
-                      iconColor: kOrange,
-                      title: 'Exportar CSV',
-                      subtitle: 'Datos tabulares para Excel',
-                      size: '2.4 MB',
+    return AnimatedBuilder(
+      animation: promoService,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: kBgGray,
+          body: SafeArea(
+            child: Column(
+              children: [
+                // Cabecera fija del modulo de avisos.
+                _buildTopBar(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 12),
+                        // Contexto de auditoria para ubicar al administrador.
+                        _buildAuditoriaCard(),
+                        const SizedBox(height: 12),
+                        // Resumen de comunicaciones push para referencia rapida.
+                        _buildPushCard(),
+                        const SizedBox(height: 16),
+                        // Tabs internas del centro de avisos.
+                        _buildTabBar(),
+                        const SizedBox(height: 16),
+                        // Tarjetas de salida por formato.
+                        _buildExportCard(
+                          icon: Icons.table_chart_outlined,
+                          iconColor: kOrange,
+                          title: 'Exportar CSV',
+                          subtitle: 'Datos tabulares para Excel',
+                          size: '2.4 MB',
+                        ),
+                        const SizedBox(height: 10),
+                        _buildExportCard(
+                          icon: Icons.code,
+                          iconColor: kCodeBlue,
+                          title: 'Exportar JSON',
+                          subtitle: 'Formato estructurado para APIs',
+                          size: '1.8 MB',
+                        ),
+                        const SizedBox(height: 10),
+                        _buildExportCard(
+                          icon: Icons.picture_as_pdf_outlined,
+                          iconColor: kOrange,
+                          title: 'Exportar PDF',
+                          subtitle: 'Reporte visual completo',
+                          size: '880 KB',
+                        ),
+                        const SizedBox(height: 16),
+                        // Configuracion de como se construye el archivo final.
+                        _buildConfigCard(),
+                        const SizedBox(height: 12),
+                        // Bloque informativo sobre destino y uso de exportaciones.
+                        _buildInfoCard(),
+                        const SizedBox(height: 24),
+                      ],
                     ),
-                    const SizedBox(height: 10),
-                    _buildExportCard(
-                      icon: Icons.code,
-                      iconColor: kCodeBlue,
-                      title: 'Exportar JSON',
-                      subtitle: 'Formato estructurado para APIs',
-                      size: '1.8 MB',
-                    ),
-                    const SizedBox(height: 10),
-                    _buildExportCard(
-                      icon: Icons.picture_as_pdf_outlined,
-                      iconColor: kOrange,
-                      title: 'Exportar PDF',
-                      subtitle: 'Reporte visual completo',
-                      size: '880 KB',
-                    ),
-                    const SizedBox(height: 16),
-                    _buildConfigCard(),
-                    const SizedBox(height: 12),
-                    _buildInfoCard(),
-                    const SizedBox(height: 24),
-                  ],
+                  ),
                 ),
-              ),
+                _buildBottomNav(),
+              ],
             ),
-            _buildBottomNav(),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

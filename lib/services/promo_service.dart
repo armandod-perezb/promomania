@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../models/usuario.dart';
 import '../models/supermercado.dart';
@@ -9,7 +10,7 @@ import '../models/comentario.dart';
 import '../models/valoracion.dart';
 import '../models/favorito.dart';
 
-class PromoService {
+class PromoService extends ChangeNotifier {
   // "Base de datos" en memoria
   List<Usuario> usuarios = [];
   List<Supermercado> supermercados = [];
@@ -100,17 +101,20 @@ class PromoService {
 
   void addUsuario(Usuario usuario) {
     usuarios.add(usuario);
+    notifyListeners();
   }
 
   void updateUsuario(Usuario usuario) {
     final index = usuarios.indexWhere((u) => u.id == usuario.id);
     if (index != -1) {
       usuarios[index] = usuario;
+      notifyListeners();
     }
   }
 
   void deleteUsuario(int id) {
     usuarios.removeWhere((u) => u.id == id);
+    notifyListeners();
   }
 
   // ========== PROMOCIONES ==========
@@ -138,17 +142,20 @@ class PromoService {
 
   void addPromocion(Promocion promocion) {
     promociones.add(promocion);
+    notifyListeners();
   }
 
   void updatePromocion(Promocion promocion) {
     final index = promociones.indexWhere((p) => p.codigo == promocion.codigo);
     if (index != -1) {
       promociones[index] = promocion;
+      notifyListeners();
     }
   }
 
   void deletePromocion(String codigo) {
     promociones.removeWhere((p) => p.codigo == codigo);
+    notifyListeners();
   }
 
   void incrementarVistas(String codigo) {
@@ -156,6 +163,7 @@ class PromoService {
     if (index != -1) {
       final promo = promociones[index];
       promociones[index] = promo.copyWith(vistas: promo.vistas + 1);
+      notifyListeners();
     }
   }
 
@@ -174,15 +182,18 @@ class PromoService {
     final index = supermercados.indexWhere((s) => s.id == updated.id);
     if (index != -1) {
       supermercados[index] = updated;
+      notifyListeners();
     }
   }
 
   void addSupermercado(Supermercado supermercado) {
     supermercados.add(supermercado);
+    notifyListeners();
   }
 
   void deleteSupermercado(int id) {
     supermercados.removeWhere((s) => s.id == id);
+    notifyListeners();
   }
 
   // ========== CATEGORIAS ==========
@@ -215,10 +226,12 @@ class PromoService {
 
   void addComentario(Comentario comentario) {
     comentarios.add(comentario);
+    notifyListeners();
   }
 
   void deleteComentario(int id) {
     comentarios.removeWhere((c) => c.id == id);
+    notifyListeners();
   }
 
   // ========== VALORACIONES ==========
@@ -239,10 +252,12 @@ class PromoService {
 
   void addValoracion(Valoracion valoracion) {
     valoraciones.add(valoracion);
+    notifyListeners();
   }
 
   void deleteValoracion(int id) {
     valoraciones.removeWhere((v) => v.id == id);
+    notifyListeners();
   }
 
   // ========== FAVORITOS ==========
@@ -258,6 +273,7 @@ class PromoService {
   void addFavorito(Favorito favorito) {
     if (!isFavorito(favorito.idUsuario, favorito.codigoPromocion)) {
       favoritos.add(favorito);
+      notifyListeners();
     }
   }
 
@@ -265,6 +281,7 @@ class PromoService {
     favoritos.removeWhere(
       (f) => f.idUsuario == idUsuario && f.codigoPromocion == codigoPromocion,
     );
+    notifyListeners();
   }
 
   void toggleFavorito(int idUsuario, String codigoPromocion) {

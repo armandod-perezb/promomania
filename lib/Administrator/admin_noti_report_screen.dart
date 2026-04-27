@@ -406,9 +406,14 @@ class _AdminNotiReportScreenState extends State<AdminNotiReportScreen> {
 
   // ── TAB BAR ──────────────────────────────────────────────────────────────────
   Widget _buildTabBar() {
+    final reportesBadge = promoService.getReportes().length;
     final tabs = [
       {'icon': Icons.bar_chart_outlined, 'label': 'Actividad', 'badge': 0},
-      {'icon': Icons.description_outlined, 'label': 'Reportes', 'badge': 0},
+      {
+        'icon': Icons.description_outlined,
+        'label': 'Reportes',
+        'badge': reportesBadge,
+      },
       {'icon': Icons.notifications_outlined, 'label': 'Alertas', 'badge': 1},
       {'icon': Icons.file_upload_outlined, 'label': 'Exportar', 'badge': 0},
     ];
@@ -619,33 +624,45 @@ class _AdminNotiReportScreenState extends State<AdminNotiReportScreen> {
 
   // ── REPORTE GRID ─────────────────────────────────────────────────────────────
   Widget _buildReporteGrid() {
+    final reportes = promoService.getReportes();
+    final reportesPendientes = reportes
+        .where((r) => r.estado == 'pendiente')
+        .length;
+    final reportesRevisados = reportes
+        .where((r) => r.estado == 'revisado')
+        .length;
+    final usuariosReportando = reportes.map((r) => r.idUsuario).toSet().length;
+    final reportesDescartados = reportes
+        .where((r) => r.estado == 'descartado')
+        .length;
+
     final items = [
       {
         'icon': Icons.calendar_today_outlined,
         'color': kOrange,
-        'label': 'Reporte Diario',
-        'value': '1',
+        'label': 'Reportes Totales',
+        'value': '${reportes.length}',
         'valueColor': kOrange,
       },
       {
         'icon': Icons.calendar_month_outlined,
         'color': kNavyDark,
-        'label': 'Reporte Semanal',
-        'value': '1',
+        'label': 'Pendientes',
+        'value': '$reportesPendientes',
         'valueColor': kTextDark,
       },
       {
         'icon': Icons.people_outline,
         'color': kGreen,
-        'label': 'Usuarios Activos',
-        'value': '1',
+        'label': 'Usuarios Reportando',
+        'value': '$usuariosReportando',
         'valueColor': kGreen,
       },
       {
         'icon': Icons.warning_amber_outlined,
         'color': kOrange,
-        'label': 'Errores Sistema',
-        'value': '1',
+        'label': 'Revisados/Descartados',
+        'value': '$reportesRevisados/$reportesDescartados',
         'valueColor': kOrange,
       },
     ];

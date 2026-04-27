@@ -6,9 +6,11 @@ import '../models/supermercado.dart';
 import '../models/categoria.dart';
 import '../models/tipo_promocion.dart';
 import '../models/promocion.dart';
+import '../models/promocion_horario.dart';
 import '../models/comentario.dart';
 import '../models/valoracion.dart';
 import '../models/favorito.dart';
+import '../models/reporte.dart';
 
 class PromoService extends ChangeNotifier {
   // "Base de datos" en memoria
@@ -17,9 +19,11 @@ class PromoService extends ChangeNotifier {
   List<Categoria> categorias = [];
   List<TipoPromocion> tiposPromocion = [];
   List<Promocion> promociones = [];
+  List<PromocionHorario> promocionesHorarios = [];
   List<Comentario> comentarios = [];
   List<Valoracion> valoraciones = [];
   List<Favorito> favoritos = [];
+  List<Reporte> reportes = [];
 
   bool loaded = false;
 
@@ -58,6 +62,11 @@ class PromoService extends ChangeNotifier {
           .map((p) => Promocion.fromJson(p as Map<String, dynamic>))
           .toList();
 
+        // Cargar horarios de promociones
+        promocionesHorarios = (data['promociones_horarios'] as List)
+          .map((h) => PromocionHorario.fromJson(h as Map<String, dynamic>))
+          .toList();
+
       // Cargar comentarios
       comentarios = (data['comentarios'] as List)
           .map((c) => Comentario.fromJson(c as Map<String, dynamic>))
@@ -71,6 +80,11 @@ class PromoService extends ChangeNotifier {
       // Cargar favoritos
       favoritos = (data['favoritos'] as List)
           .map((f) => Favorito.fromJson(f as Map<String, dynamic>))
+          .toList();
+
+        // Cargar reportes
+        reportes = (data['reportes'] as List)
+          .map((r) => Reporte.fromJson(r as Map<String, dynamic>))
           .toList();
 
       loaded = true;
@@ -155,6 +169,36 @@ class PromoService extends ChangeNotifier {
 
   void deletePromocion(String codigo) {
     promociones.removeWhere((p) => p.codigo == codigo);
+    notifyListeners();
+  }
+
+  // ========== HORARIOS DE PROMOCION ==========
+  List<PromocionHorario> getPromocionesHorarios() => promocionesHorarios;
+
+  List<PromocionHorario> getPromocionesHorariosByCodigo(
+    String codigoPromocion,
+  ) =>
+      promocionesHorarios
+          .where((h) => h.codigoPromocion == codigoPromocion)
+          .toList();
+
+  void addPromocionHorario(PromocionHorario promocionHorario) {
+    promocionesHorarios.add(promocionHorario);
+    notifyListeners();
+  }
+
+  void updatePromocionHorario(PromocionHorario promocionHorario) {
+    final index = promocionesHorarios.indexWhere(
+      (h) => h.id == promocionHorario.id,
+    );
+    if (index != -1) {
+      promocionesHorarios[index] = promocionHorario;
+      notifyListeners();
+    }
+  }
+
+  void deletePromocionHorario(int id) {
+    promocionesHorarios.removeWhere((h) => h.id == id);
     notifyListeners();
   }
 
@@ -297,5 +341,32 @@ class PromoService extends ChangeNotifier {
         ),
       );
     }
+  }
+
+  // ========== REPORTES ==========
+  List<Reporte> getReportes() => reportes;
+
+  List<Reporte> getReportesByUsuario(int idUsuario) =>
+      reportes.where((r) => r.idUsuario == idUsuario).toList();
+
+  List<Reporte> getReportesByPromocion(String codigoPromocion) =>
+      reportes.where((r) => r.codigoPromocion == codigoPromocion).toList();
+
+  void addReporte(Reporte reporte) {
+    reportes.add(reporte);
+    notifyListeners();
+  }
+
+  void updateReporte(Reporte reporte) {
+    final index = reportes.indexWhere((r) => r.id == reporte.id);
+    if (index != -1) {
+      reportes[index] = reporte;
+      notifyListeners();
+    }
+  }
+
+  void deleteReporte(int id) {
+    reportes.removeWhere((r) => r.id == id);
+    notifyListeners();
   }
 }

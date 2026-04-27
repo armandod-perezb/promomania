@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../main.dart';
+import '../models/promocion.dart';
+import '../models/promocion_horario.dart';
+import '../models/reporte.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODELOS
@@ -48,6 +51,10 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
       'https://images.unsplash.com/photo-1496747611176-843222e1e57c';
   static const String _storeImageUrl =
       'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85';
+
+  Promocion? _promo;
+  List<PromocionHorario> _horarios = [];
+  bool _routeDataResolved = false;
 
   bool _isFavorite = false;
   bool _descExpanded = false;
@@ -108,15 +115,79 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_routeDataResolved) return;
+    _routeDataResolved = true;
+
+    final args = ModalRoute.of(context)?.settings.arguments;
+    final codigo = args is String ? args : null;
+
+    final promoByCode = codigo != null
+        ? promoService.getPromocionByCodigo(codigo)
+        : null;
+    final fallbackPromo = promoService.getPromocionesAprobadas().isNotEmpty
+        ? promoService.getPromocionesAprobadas().first
+        : (promoService.getPromociones().isNotEmpty
+              ? promoService.getPromociones().first
+              : null);
+
+    _promo = promoByCode ?? fallbackPromo;
+    if (_promo != null) {
+      _horarios = promoService.getPromocionesHorariosByCodigo(_promo!.codigo);
+      _isFavorite = promoService.isFavorito(_activeUserId, _promo!.codigo);
+    }
+  }
+
+  @override
   void dispose() {
     _timer?.cancel();
     super.dispose();
   }
 
   int get _totalReviews => _ratingCounts.fold(0, (a, b) => a + b);
+  int get _activeUserId => sessionManager.usuarioActual?.id ?? 1;
+  int get _nextReporteId =>
+      (promoService.getReportes().isNotEmpty
+          ? promoService.getReportes().last.id
+          : 0) +
+      1;
+
+  String _horarioTexto() {
+    if (_horarios.isEmpty) return 'Horario no especificado';
+    return _horarios
+        .map((h) => '${h.diaSemana}: ${h.horaInicio} - ${h.horaFin}')
+        .join(' · ');
+  }
+
+  Future<void> _reportarPromocion() async {
+    if (_promo == null) return;
+
+    promoService.addReporte(
+      Reporte(
+        id: _nextReporteId,
+        motivo: 'Reporte enviado desde detalle de promoción',
+        fecha: DateTime.now().toIso8601String(),
+        estado: 'pendiente',
+        idUsuario: _activeUserId,
+        codigoPromocion: _promo!.codigo,
+      ),
+    );
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Reporte enviado. Será revisado por el admin.')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_promo == null) {
+      return const Scaffold(
+        body: Center(child: Text('No se encontró información de la promoción')),
+      );
+    }
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
@@ -159,13 +230,17 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   // ── Hero image ──────────────────────────────────────────────────────────────
 
   Widget _buildHeroImage() {
+    final promoImage = (_promo?.foto != null && _promo!.foto!.isNotEmpty)
+        ? _promo!.foto!
+        : _heroImageUrl;
+
     return SizedBox(
       height: 290,
       child: Stack(
         fit: StackFit.expand,
         children: [
           Image.network(
-            _heroImageUrl,
+            promoImage,
             fit: BoxFit.cover,
             alignment: Alignment.center,
           ),
@@ -262,6 +337,8 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   // ── Info principal ──────────────────────────────────────────────────────────
 
   Widget _buildMainInfo() {
+    final promo = _promo!;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 6),
       child: Column(
@@ -291,8 +368,8 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
           ),
           const SizedBox(height: 12),
           // Título
-          const Text(
-            'Colección Primavera 2026 — 35% OFF en toda la tienda',
+          Text(
+            promo.titulo,
             style: TextStyle(
               fontSize: 21,
               fontWeight: FontWeight.w800,
@@ -373,28 +450,29 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                   children: [
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
-                      children: const [
+                      children: [
                         Text(
-                          '\$97.500',
-                          style: TextStyle(
+                          '\$${promo.precio.toStringAsFixed(2)}',
+                          style: const TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.w900,
                             color: _primary,
                           ),
                         ),
-                        SizedBox(width: 10),
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 4),
-                          child: Text(
-                            '\$150.000',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFFB0B5CC),
-                              decoration: TextDecoration.lineThrough,
-                              fontWeight: FontWeight.w500,
+                        if ((promo.descuento ?? 0) > 0) ...[
+                          const SizedBox(width: 10),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Text(
+                              '${promo.descuento}% OFF',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Color(0xFFB0B5CC),
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                     const SizedBox(height: 4),
@@ -545,15 +623,25 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   // ── Stats ───────────────────────────────────────────────────────────────────
 
   Widget _buildStats() {
+    final promo = _promo!;
+    final reportesCount = promoService.getReportesByPromocion(promo.codigo).length;
+    final favoritosCount = promoService.favoritos
+        .where((f) => f.codigoPromocion == promo.codigo)
+        .length;
+
     final stats = [
-      _Stat(icon: Icons.visibility_outlined, value: '980', label: 'Vistas'),
+      _Stat(
+        icon: Icons.visibility_outlined,
+        value: '${promo.vistas}',
+        label: 'Vistas',
+      ),
       _Stat(icon: Icons.thumb_up_outlined, value: '267', label: 'Útil'),
       _Stat(
         icon: Icons.favorite_border_rounded,
-        value: '189',
+        value: '$favoritosCount',
         label: 'Guardados',
       ),
-      _Stat(icon: Icons.share_outlined, value: '98', label: 'Compartidos'),
+      _Stat(icon: Icons.report_outlined, value: '$reportesCount', label: 'Reportes'),
     ];
 
     return Padding(
@@ -608,8 +696,10 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   // ── Descripción ─────────────────────────────────────────────────────────────
 
   Widget _buildDescription() {
-    const fullText =
-        'La nueva colección Primavera 2026 de Trend Studio llega con todo. Piezas minimalistas y versátiles en lino, algodón orgánico y mezclas premium. Paletas de neutros con acentos de color. Toda la colección con 35% de descuento por lanzamiento.';
+    final fullText =
+      _promo?.descripcion?.trim().isNotEmpty == true
+      ? _promo!.descripcion!.trim()
+      : 'Esta promoción no tiene descripción ampliada.';
     const preview = 150;
 
     final tags = [
@@ -636,7 +726,9 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
           ),
           const SizedBox(height: 10),
           Text(
-            _descExpanded ? fullText : '${fullText.substring(0, preview)}...',
+            _descExpanded || fullText.length <= preview
+                ? fullText
+                : '${fullText.substring(0, preview)}...',
             style: const TextStyle(
               fontSize: 14,
               color: Color(0xFF5A5F72),
@@ -740,6 +832,9 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   // ── Tienda ──────────────────────────────────────────────────────────────────
 
   Widget _buildStoreSection() {
+    final promo = _promo!;
+    final supermercado = promoService.getSupermercado(promo.idSupermercado);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
       child: Column(
@@ -809,17 +904,17 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        children: const [
+                        children: [
                           Text(
-                            'Trend Studio',
-                            style: TextStyle(
+                            supermercado?.nombre ?? 'Tienda no disponible',
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
                               color: Color(0xFF1A1F2E),
                             ),
                           ),
-                          SizedBox(width: 5),
-                          Icon(
+                          const SizedBox(width: 5),
+                          const Icon(
                             Icons.verified_rounded,
                             color: Color(0xFF3B82F6),
                             size: 15,
@@ -827,9 +922,9 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                         ],
                       ),
                       const SizedBox(height: 3),
-                      const Text(
-                        'Moda · Ropa casual',
-                        style: TextStyle(
+                      Text(
+                        '${supermercado?.ciudad ?? 'Ciudad no disponible'} · Promoción',
+                        style: const TextStyle(
                           fontSize: 12.5,
                           color: Color(0xFF8A8FA8),
                         ),
@@ -916,6 +1011,9 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   // ── Ubicación ───────────────────────────────────────────────────────────────
 
   Widget _buildLocationSection() {
+    final promo = _promo!;
+    final supermercado = promoService.getSupermercado(promo.idSupermercado);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
       child: Column(
@@ -924,13 +1022,16 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
           // Info rows
           _locationRow(
             icon: Icons.location_on_outlined,
-            mainText: 'Calle 93 #14-20, Zona Rosa',
-            subText: 'Zona Rosa, Bogotá',
+            mainText:
+                supermercado?.direccion ??
+                promo.ubicacion ??
+                'Ubicación no especificada',
+            subText: supermercado?.ciudad,
           ),
           const SizedBox(height: 10),
           _locationRow(
             icon: Icons.access_time_rounded,
-            mainText: 'Lun – Sáb: 11:00 am – 8:00 pm · Dom: 12:00 pm – 6:00 pm',
+            mainText: _horarioTexto(),
           ),
           const SizedBox(height: 10),
           _locationRow(
@@ -1363,7 +1464,13 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
             // Favorito
             GestureDetector(
               onTap: () {
-                setState(() => _isFavorite = !_isFavorite);
+                promoService.toggleFavorito(_activeUserId, _promo!.codigo);
+                setState(
+                  () => _isFavorite = promoService.isFavorito(
+                    _activeUserId,
+                    _promo!.codigo,
+                  ),
+                );
                 HapticFeedback.lightImpact();
               },
               child: Container(
@@ -1431,7 +1538,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
             // Alerta
             _bottomIconBtn(
               icon: Icons.warning_amber_rounded,
-              onTap: () {},
+              onTap: _reportarPromocion,
               color: const Color(0xFFF5F6FA),
             ),
           ],

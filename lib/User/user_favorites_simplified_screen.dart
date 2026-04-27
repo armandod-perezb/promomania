@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Core/Routes/app_routes.dart';
 import '../main.dart';
 import '../widgets/promo_card.dart';
 
@@ -48,6 +49,13 @@ class _FavoritosSimplifiedScreenState extends State<FavoritosSimplifiedScreen> {
                   promocion: promo,
                   supermercado: supermercado,
                   isFavorite: true,
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.promotionDetails,
+                      arguments: promo.codigo,
+                    );
+                  },
                   onFavorite: () {
                     promoService.toggleFavorito(widget.idUsuario, promo.codigo);
                     setState(() {});

@@ -412,9 +412,14 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
 
   // ── TAB BAR ──────────────────────────────────────────────────────────────────
   Widget _buildTabBar() {
+    final reportesBadge = promoService.getReportes().length;
     final tabs = [
       {'icon': Icons.bar_chart_outlined, 'label': 'Actividad', 'badge': 0},
-      {'icon': Icons.description_outlined, 'label': 'Reportes', 'badge': 0},
+      {
+        'icon': Icons.description_outlined,
+        'label': 'Reportes',
+        'badge': reportesBadge,
+      },
       {'icon': Icons.notifications_outlined, 'label': 'Alertas', 'badge': 1},
       {'icon': Icons.file_upload_outlined, 'label': 'Exportar', 'badge': 0},
     ];

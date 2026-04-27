@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Core/Routes/app_routes.dart';
 import '../main.dart';
 import '../widgets/promo_card.dart';
 
@@ -36,12 +37,10 @@ class _ExploreSimplifiedScreenState extends State<ExploreSimplifiedScreen> {
                   onTap: () {
                     promoService.incrementarVistas(promo.codigo);
                     setState(() {});
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          '${promo.titulo} - ${promo.vistas + 1} vistas',
-                        ),
-                      ),
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.promotionDetails,
+                      arguments: promo.codigo,
                     );
                   },
                   onFavorite: () {

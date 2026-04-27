@@ -546,9 +546,14 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
   // ── Tab bar ───────────────────────────────────────────────────────────────────
 
   Widget _buildTabBar() {
+    final reportesBadge = promoService.getReportes().length;
     final tabs = [
       _TabDef(icon: Icons.timeline_rounded, label: 'Actividad'),
-      _TabDef(icon: Icons.bar_chart_rounded, label: 'Reportes'),
+      _TabDef(
+        icon: Icons.bar_chart_rounded,
+        label: 'Reportes',
+        badge: reportesBadge > 0 ? '$reportesBadge' : null,
+      ),
       _TabDef(icon: Icons.warning_amber_rounded, label: 'Alertas', badge: '3'),
       _TabDef(icon: Icons.download_outlined, label: 'Exportar'),
     ];

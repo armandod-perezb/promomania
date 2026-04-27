@@ -398,10 +398,14 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
 
   // Barra de pestanas internas del modulo de avisos
   Widget _tabBar() {
-    // badges: Actividad=0, Reportes=8, Alertas=1, Exportar=0
+    final reportesBadge = promoService.getReportes().length;
     final tabs = [
       {'icon': Icons.access_time_outlined, 'label': 'Actividad', 'badge': 0},
-      {'icon': Icons.description_outlined, 'label': 'Reportes', 'badge': 8},
+      {
+        'icon': Icons.description_outlined,
+        'label': 'Reportes',
+        'badge': reportesBadge,
+      },
       {'icon': Icons.notifications_outlined, 'label': 'Alertas', 'badge': 1},
       {'icon': Icons.file_upload_outlined, 'label': 'Exportar', 'badge': 0},
     ];

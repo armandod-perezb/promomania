@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../main.dart';
 import '../models/promocion.dart';
+import '../models/promocion_horario.dart';
 import '../models/supermercado.dart';
 
 class AddPromotion5Screen extends StatefulWidget {
@@ -155,6 +156,122 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
     }
   }
 
+  int _nextHorarioId() {
+    final horarios = promoService.getPromocionesHorarios();
+    return (horarios.isEmpty ? 0 : horarios.last.id) + 1;
+  }
+
+  String _normalizeHourTo24h(String rawHour, String? period) {
+    var hour = int.tryParse(rawHour.trim()) ?? 0;
+    var suffix = period?.toLowerCase().trim() ?? '';
+
+    if (suffix == 'pm' && hour < 12) hour += 12;
+    if (suffix == 'am' && hour == 12) hour = 0;
+    if (hour < 0) hour = 0;
+    if (hour > 23) hour = 23;
+
+    return '${hour.toString().padLeft(2, '0')}:00';
+  }
+
+  List<String> _extractDaysFromSchedule(String schedule) {
+    final normalized = schedule.toLowerCase();
+    final dayOrder = [
+      'lunes',
+      'martes',
+      'miercoles',
+      'jueves',
+      'viernes',
+      'sabado',
+      'domingo',
+    ];
+
+    final dayAliases = <String, String>{
+      'lun': 'lunes',
+      'lunes': 'lunes',
+      'mar': 'martes',
+      'martes': 'martes',
+      'mie': 'miercoles',
+      'mié': 'miercoles',
+      'mier': 'miercoles',
+      'miércoles': 'miercoles',
+      'miercoles': 'miercoles',
+      'jue': 'jueves',
+      'jueves': 'jueves',
+      'vie': 'viernes',
+      'viernes': 'viernes',
+      'sab': 'sabado',
+      'sáb': 'sabado',
+      'sabado': 'sabado',
+      'sábado': 'sabado',
+      'dom': 'domingo',
+      'domingo': 'domingo',
+    };
+
+    final range = RegExp(r'([a-záéíóú]{3,10})\s*-\s*([a-záéíóú]{3,10})');
+    final match = range.firstMatch(normalized);
+    if (match != null) {
+      final startAlias = match.group(1) ?? '';
+      final endAlias = match.group(2) ?? '';
+      final startDay = dayAliases[startAlias];
+      final endDay = dayAliases[endAlias];
+      if (startDay != null && endDay != null) {
+        final startIndex = dayOrder.indexOf(startDay);
+        final endIndex = dayOrder.indexOf(endDay);
+        if (startIndex != -1 && endIndex != -1 && startIndex <= endIndex) {
+          return dayOrder.sublist(startIndex, endIndex + 1);
+        }
+      }
+    }
+
+    final explicitDays = <String>[];
+    for (final entry in dayAliases.entries) {
+      if (normalized.contains(entry.key) && !explicitDays.contains(entry.value)) {
+        explicitDays.add(entry.value);
+      }
+    }
+
+    if (explicitDays.isNotEmpty) return explicitDays;
+    return ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+  }
+
+  List<String> _extractTimeRange(String schedule) {
+    final normalized = schedule.toLowerCase();
+    final timeRange = RegExp(
+      r'(\d{1,2})(?::\d{2})?\s*(am|pm)?\s*-\s*(\d{1,2})(?::\d{2})?\s*(am|pm)?',
+    );
+    final match = timeRange.firstMatch(normalized);
+    if (match == null) {
+      return ['09:00', '18:00'];
+    }
+
+    final start = _normalizeHourTo24h(match.group(1) ?? '9', match.group(2));
+    final end = _normalizeHourTo24h(match.group(3) ?? '18', match.group(4));
+    return [start, end];
+  }
+
+  void _savePromocionHorarios(Promocion promo, Map<String, dynamic> draft) {
+    final onlineOnly = (draft['onlineOnly'] as bool?) ?? false;
+    if (onlineOnly) return;
+
+    final schedule = (draft['schedule'] as String?)?.trim() ?? '';
+    final days = _extractDaysFromSchedule(schedule);
+    final timeRange = _extractTimeRange(schedule);
+    var nextId = _nextHorarioId();
+
+    for (final day in days) {
+      promoService.addPromocionHorario(
+        PromocionHorario(
+          id: nextId,
+          diaSemana: day,
+          horaInicio: timeRange[0],
+          horaFin: timeRange[1],
+          codigoPromocion: promo.codigo,
+        ),
+      );
+      nextId++;
+    }
+  }
+
   void _publishPromo() async {
     final draft = widget.draftData;
     final title = (draft['title'] as String?)?.trim() ?? '';
@@ -194,6 +311,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
     );
 
     promoService.addPromocion(promo);
+    _savePromocionHorarios(promo, draft);
 
     await Future.delayed(const Duration(milliseconds: 600));
     setState(() => _isPublishing = false);

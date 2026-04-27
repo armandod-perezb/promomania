@@ -110,20 +110,23 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
               ],
             ),
           ),
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: textDark,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Center(
-              child: Text(
-                'A',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
+          GestureDetector(
+            onTap: () => Navigator.pushNamed(context, AppRoutes.userProfile),
+            child: Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: textDark,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Center(
+                child: Text(
+                  'A',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
                 ),
               ),
             ),

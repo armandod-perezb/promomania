@@ -155,20 +155,23 @@ class _AdminNotiReportScreenState extends State<AdminNotiReportScreen> {
           ),
           const SizedBox(width: 14),
           // Avatar
-          Container(
-            width: 32,
-            height: 32,
-            decoration: const BoxDecoration(
-              color: kOrange,
-              shape: BoxShape.circle,
-            ),
-            child: const Center(
-              child: Text(
-                'A',
-                style: TextStyle(
-                  color: kWhite,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
+          GestureDetector(
+            onTap: () => Navigator.pushNamed(context, AppRoutes.userProfile),
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: const BoxDecoration(
+                color: kOrange,
+                shape: BoxShape.circle,
+              ),
+              child: const Center(
+                child: Text(
+                  'A',
+                  style: TextStyle(
+                    color: kWhite,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
                 ),
               ),
             ),

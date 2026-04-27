@@ -323,20 +323,23 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
             ],
           ),
           const SizedBox(width: 8),
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: _darkBg,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Center(
-              child: Text(
-                'A',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 14,
+          GestureDetector(
+            onTap: () => Navigator.pushNamed(context, AppRoutes.userProfile),
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: _darkBg,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Center(
+                child: Text(
+                  'A',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),

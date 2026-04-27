@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../main.dart';
+import 'add_promo3_screen.dart';
 
 class AddPromotion2Screen extends StatefulWidget {
   final String promoType;
+  final Map<String, dynamic> draftData;
 
-  const AddPromotion2Screen({super.key, this.promoType = 'descuento'});
+  const AddPromotion2Screen({
+    super.key,
+    this.promoType = 'descuento',
+    this.draftData = const <String, dynamic>{},
+  });
 
   @override
   State<AddPromotion2Screen> createState() => _AddPromotion2ScreenState();
@@ -23,20 +30,14 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
   final List<String?> _photos = List.filled(5, null);
 
   String _condition = 'Nuevo';
-  String _category = 'Aseo';
+  String _category = 'Electrónica';
   bool _isLoading = false;
 
-  final List<String> _categories = [
-    'Aseo',
+  late final List<String> _categories;
+  static const List<String> _fallbackCategories = [
     'Electrónica',
-    'Ropa',
     'Alimentos',
-    'Deportes',
-    'Hogar',
-    'Salud',
-    'Juguetes',
-    'Mascotas',
-    'Otros',
+    'Ropa',
   ];
 
   final List<_ConditionOption> _conditions = const [
@@ -56,6 +57,38 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
       subtitle: 'Restaurado a condición funcional',
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    final categoriasServicio = promoService
+        .getCategorias()
+        .map((c) => c.nombre)
+        .where((n) => n.trim().isNotEmpty)
+        .toList();
+    _categories = categoriasServicio.isNotEmpty
+        ? categoriasServicio
+        : _fallbackCategories;
+
+    _category = _categories.first;
+
+    final draft = widget.draftData;
+    _titleController.text = (draft['title'] as String?) ?? '';
+    _descController.text = (draft['description'] as String?) ?? '';
+    _codeController.text = (draft['code'] as String?) ?? '';
+
+    final draftCondition = draft['condition'] as String?;
+    if (draftCondition != null &&
+        _conditions.any((c) => c.id == draftCondition)) {
+      _condition = draftCondition;
+    }
+
+    final draftCategory = draft['category'] as String?;
+    if (draftCategory != null && _categories.contains(draftCategory)) {
+      _category = draftCategory;
+    }
+  }
 
   @override
   void dispose() {
@@ -707,10 +740,30 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
     );
   }
 
-  void _onNext() {
-    // Navigator.push(context, MaterialPageRoute(
-    //   builder: (_) => AddPromotion3Screen(...),
-    // ));
+  Future<void> _onNext() async {
+    setState(() => _isLoading = true);
+
+    final nextDraft = <String, dynamic>{
+      ...widget.draftData,
+      'promoType': widget.promoType,
+      'title': _titleController.text.trim(),
+      'description': _descController.text.trim(),
+      'code': _codeController.text.trim(),
+      'condition': _condition,
+      'category': _category,
+      'imageUrl': _photos.first,
+    };
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AddPromotion3Screen(draftData: nextDraft),
+      ),
+    );
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
   }
 }
 

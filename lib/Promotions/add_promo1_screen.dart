@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'add_promo2_screen.dart';
 
 // Modelo de tipo de promoción
 class PromoType {
@@ -81,8 +82,15 @@ class _AddPromotion1ScreenState extends State<AddPromotion1Screen> {
   ];
 
   void _onNext() {
-    // Navegar al paso 2 pasando el tipo seleccionado
-    // Navigator.push(context, MaterialPageRoute(builder: (_) => AddPromotion2Screen(promoType: _selectedId)));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AddPromotion2Screen(
+          promoType: _selectedId,
+          draftData: {'promoType': _selectedId},
+        ),
+      ),
+    );
   }
 
   @override

@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'add_promo5_screen.dart';
 
 class AddPromotion4Screen extends StatefulWidget {
-  const AddPromotion4Screen({super.key});
+  final Map<String, dynamic> draftData;
+
+  const AddPromotion4Screen({
+    super.key,
+    this.draftData = const <String, dynamic>{},
+  });
 
   @override
   State<AddPromotion4Screen> createState() => _AddPromotion4ScreenState();
@@ -27,6 +33,21 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    final draft = widget.draftData;
+
+    _storeNameController.text = (draft['storeName'] as String?) ?? '';
+    _phoneController.text = (draft['phone'] as String?) ?? '';
+    _websiteController.text = (draft['website'] as String?) ?? '';
+    _addressController.text = (draft['address'] as String?) ?? '';
+    _cityController.text = (draft['city'] as String?) ?? _cityController.text;
+    _scheduleController.text =
+        (draft['schedule'] as String?) ?? _scheduleController.text;
+    _onlineOnly = (draft['onlineOnly'] as bool?) ?? false;
+  }
+
+  @override
   void dispose() {
     _storeNameController.dispose();
     _phoneController.dispose();
@@ -43,10 +64,43 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
         _addressController.text.isNotEmpty;
   }
 
-  void _onNext() {
-    // Navigator.push(context, MaterialPageRoute(
-    //   builder: (_) => AddPromotion5Screen(...),
-    // ));
+  Future<void> _onNext() async {
+    setState(() => _isLoading = true);
+
+    final location = _onlineOnly
+        ? 'Solo en línea'
+        : [
+            _addressController.text.trim(),
+            _cityController.text.trim(),
+          ].where((e) => e.isNotEmpty).join(', ');
+
+    final nextDraft = <String, dynamic>{
+      ...widget.draftData,
+      'storeName': _storeNameController.text.trim(),
+      'phone': _phoneController.text.trim(),
+      'website': _websiteController.text.trim(),
+      'address': _addressController.text.trim(),
+      'city': _cityController.text.trim(),
+      'schedule': _scheduleController.text.trim(),
+      'onlineOnly': _onlineOnly,
+      'location': location,
+    };
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AddPromotion5Screen(
+          draftData: nextDraft,
+          promoTitle: nextDraft['title'] as String?,
+          location: nextDraft['location'] as String?,
+          imageUrl: nextDraft['imageUrl'] as String?,
+        ),
+      ),
+    );
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override

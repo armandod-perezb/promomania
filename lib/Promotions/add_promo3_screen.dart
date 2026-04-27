@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'add_promo4_screen.dart';
 
 class AddPromotion3Screen extends StatefulWidget {
-  const AddPromotion3Screen({super.key});
+  final Map<String, dynamic> draftData;
+
+  const AddPromotion3Screen({
+    super.key,
+    this.draftData = const <String, dynamic>{},
+  });
 
   @override
   State<AddPromotion3Screen> createState() => _AddPromotion3ScreenState();
@@ -22,6 +28,32 @@ class _AddPromotion3ScreenState extends State<AddPromotion3Screen> {
   DateTime? _fechaInicio;
   DateTime? _fechaFin;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final draft = widget.draftData;
+
+    final draftPrice = draft['price'];
+    if (draftPrice is num && draftPrice > 0) {
+      _priceController.text = draftPrice.toString();
+    }
+
+    final draftDiscount = draft['discount'];
+    if (draftDiscount is num && draftDiscount >= 0) {
+      _discountController.text = draftDiscount.toInt().toString();
+    }
+
+    final draftVigencia = draft['vigenciaType'] as String?;
+    if (draftVigencia == 'fechas' || draftVigencia == 'permanente') {
+      _vigenciaType = draftVigencia!;
+    }
+
+    final fechaInicio = _parseIsoDate(draft['fechaInicio'] as String?);
+    final fechaFin = _parseIsoDate(draft['fechaFin'] as String?);
+    _fechaInicio = fechaInicio;
+    _fechaFin = fechaFin;
+  }
 
   @override
   void dispose() {
@@ -76,10 +108,44 @@ class _AddPromotion3ScreenState extends State<AddPromotion3Screen> {
     return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
   }
 
-  void _onNext() {
-    // Navigator.push(context, MaterialPageRoute(
-    //   builder: (_) => AddPromotion4Screen(...),
-    // ));
+  DateTime? _parseIsoDate(String? value) {
+    if (value == null || value.isEmpty) return null;
+    return DateTime.tryParse(value);
+  }
+
+  String? _toIsoDate(DateTime? date) {
+    if (date == null) return null;
+    return DateTime(
+      date.year,
+      date.month,
+      date.day,
+    ).toIso8601String().split('T').first;
+  }
+
+  Future<void> _onNext() async {
+    setState(() => _isLoading = true);
+
+    final nextDraft = <String, dynamic>{
+      ...widget.draftData,
+      'price': double.tryParse(_priceController.text.replaceAll(',', '.')) ?? 0,
+      'discount': int.tryParse(_discountController.text.replaceAll('%', '')),
+      'vigenciaType': _vigenciaType,
+      'fechaInicio': _vigenciaType == 'fechas'
+          ? _toIsoDate(_fechaInicio)
+          : null,
+      'fechaFin': _vigenciaType == 'fechas' ? _toIsoDate(_fechaFin) : null,
+    };
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AddPromotion4Screen(draftData: nextDraft),
+      ),
+    );
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override

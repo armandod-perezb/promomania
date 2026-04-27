@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import '../main.dart';
+import '../models/promocion.dart';
+import '../models/supermercado.dart';
 
 class AddPromotion5Screen extends StatefulWidget {
   // Datos opcionales que vienen de los pasos anteriores
   final String? promoTitle;
   final String? location;
   final String? imageUrl;
+  final Map<String, dynamic> draftData;
 
   const AddPromotion5Screen({
     super.key,
     this.promoTitle,
     this.location,
     this.imageUrl,
+    this.draftData = const <String, dynamic>{},
   });
 
   @override
@@ -24,10 +29,175 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
 
   bool _isPublishing = false;
 
+  String get _previewTitle {
+    final draftTitle = (widget.draftData['title'] as String?)?.trim();
+    if (draftTitle != null && draftTitle.isNotEmpty) {
+      return draftTitle;
+    }
+    return (widget.promoTitle?.trim().isNotEmpty ?? false)
+        ? widget.promoTitle!.trim()
+        : 'Título de tu promo';
+  }
+
+  String get _previewLocation {
+    final draftLocation = (widget.draftData['location'] as String?)?.trim();
+    if (draftLocation != null && draftLocation.isNotEmpty) {
+      return draftLocation;
+    }
+    return (widget.location?.trim().isNotEmpty ?? false)
+        ? widget.location!.trim()
+        : 'Ubicación';
+  }
+
+  String? get _previewImage {
+    final draftImage = (widget.draftData['imageUrl'] as String?)?.trim();
+    if (draftImage != null && draftImage.isNotEmpty) {
+      return draftImage;
+    }
+    final image = widget.imageUrl?.trim();
+    if (image != null && image.isNotEmpty) {
+      return image;
+    }
+    return null;
+  }
+
+  String _normalizeCondition(String? condition) {
+    final value = condition?.toLowerCase().trim() ?? '';
+    if (value == 'usado') return 'usado';
+    if (value == 'reacondicionado') return 'reacondicionado';
+    return 'nuevo';
+  }
+
+  int _resolveCategoriaId(String? categoryName) {
+    final categorias = promoService.getCategorias();
+    if (categorias.isEmpty) return 1;
+
+    final normalized = categoryName?.toLowerCase().trim();
+    if (normalized == null || normalized.isEmpty) {
+      return categorias.first.id;
+    }
+
+    for (final categoria in categorias) {
+      if (categoria.nombre.toLowerCase().trim() == normalized) {
+        return categoria.id;
+      }
+    }
+    return categorias.first.id;
+  }
+
+  int _resolveTipoPromocionId(String? wizardType) {
+    final tipos = promoService.getTiposPromocion();
+    if (tipos.isEmpty) return 1;
+
+    String expectedName;
+    switch (wizardType) {
+      case 'combo':
+        expectedName = '2x1';
+        break;
+      case 'descuento':
+        expectedName = 'descuento';
+        break;
+      default:
+        expectedName = 'rebaja';
+        break;
+    }
+
+    for (final tipo in tipos) {
+      if (tipo.nombre.toLowerCase().contains(expectedName)) {
+        return tipo.id;
+      }
+    }
+    return tipos.first.id;
+  }
+
+  int _resolveSupermercadoId(Map<String, dynamic> draft) {
+    final allStores = promoService.getSupermercados();
+    final onlineOnly = (draft['onlineOnly'] as bool?) ?? false;
+    final storeName = (draft['storeName'] as String?)?.trim() ?? '';
+    final address = (draft['address'] as String?)?.trim();
+    final city = (draft['city'] as String?)?.trim();
+
+    if (onlineOnly || storeName.isEmpty) {
+      return allStores.isNotEmpty ? allStores.first.id : 1;
+    }
+
+    for (final store in allStores) {
+      if (store.nombre.toLowerCase().trim() == storeName.toLowerCase()) {
+        return store.id;
+      }
+    }
+
+    final newId = (allStores.isEmpty ? 0 : allStores.last.id) + 1;
+    final nuevoSupermercado = Supermercado(
+      id: newId,
+      nombre: storeName,
+      direccion: address,
+      ciudad: city,
+      estado: 'activo',
+    );
+    promoService.addSupermercado(nuevoSupermercado);
+    return newId;
+  }
+
+  String _buildPromoCode(String? requestedCode) {
+    final raw = requestedCode?.trim().toUpperCase() ?? '';
+    if (raw.isNotEmpty && promoService.getPromocionByCodigo(raw) == null) {
+      return raw;
+    }
+
+    var next = promoService.getPromociones().length + 1;
+    while (true) {
+      final candidate = 'PROMO${next.toString().padLeft(3, '0')}';
+      if (promoService.getPromocionByCodigo(candidate) == null) {
+        return candidate;
+      }
+      next++;
+    }
+  }
+
   void _publishPromo() async {
+    final draft = widget.draftData;
+    final title = (draft['title'] as String?)?.trim() ?? '';
+
+    if (title.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Faltan datos del título de la promoción'),
+        ),
+      );
+      return;
+    }
+
     setState(() => _isPublishing = true);
-    await Future.delayed(const Duration(seconds: 2));
+
+    final promo = Promocion(
+      codigo: _buildPromoCode(draft['code'] as String?),
+      titulo: title,
+      descripcion: (draft['description'] as String?)?.trim(),
+      precio: (draft['price'] as num?)?.toDouble() ?? 0,
+      descuento: draft['discount'] as int?,
+      condicionProducto: _normalizeCondition(draft['condition'] as String?),
+      ubicacion: (draft['location'] as String?)?.trim(),
+      url: (draft['website'] as String?)?.trim(),
+      foto: _previewImage,
+      tipoVigencia: (draft['vigenciaType'] == 'permanente')
+          ? 'permanente'
+          : 'por_fecha',
+      fechaInicio: draft['fechaInicio'] as String?,
+      fechaFin: draft['fechaFin'] as String?,
+      estado: 'pendiente',
+      vistas: 0,
+      idUsuario: sessionManager.usuarioActual?.id ?? 1,
+      idSupermercado: _resolveSupermercadoId(draft),
+      idCategoria: _resolveCategoriaId(draft['category'] as String?),
+      idTipoPromocion: _resolveTipoPromocionId(draft['promoType'] as String?),
+    );
+
+    promoService.addPromocion(promo);
+
+    await Future.delayed(const Duration(milliseconds: 600));
     setState(() => _isPublishing = false);
+
     if (mounted) {
       // Navegar a pantalla de éxito
       _showSuccessDialog();
@@ -308,9 +478,9 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
           // Imagen o placeholder
           Stack(
             children: [
-              widget.imageUrl != null
+              _previewImage != null
                   ? Image.network(
-                      widget.imageUrl!,
+                      _previewImage!,
                       width: double.infinity,
                       height: 180,
                       fit: BoxFit.cover,
@@ -353,9 +523,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
                 left: 14,
                 right: 14,
                 child: Text(
-                  widget.promoTitle?.isNotEmpty == true
-                      ? widget.promoTitle!
-                      : 'Título de tu promo',
+                  _previewTitle,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -384,9 +552,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  widget.location?.isNotEmpty == true
-                      ? widget.location!
-                      : 'Ubicación',
+                  _previewLocation,
                   style: const TextStyle(
                     fontSize: 13,
                     color: Color(0xFF8A8FA8),

@@ -208,7 +208,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
     ),
   );
 
-  // ÔöÇÔöÇÔöÇ AUDITOR├ìA ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  // Seccion de auditoria
   Widget _auditoria() => Container(
     decoration: BoxDecoration(
       color: kYellowBg,
@@ -255,7 +255,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
     ),
   );
 
-  // ÔöÇÔöÇÔöÇ PUSH CARD ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  // Tarjeta de estadisticas de notificaciones push
   Widget _pushCard() => Container(
     decoration: BoxDecoration(
       color: kNavy,
@@ -301,7 +301,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
                 ],
               ),
             ),
-            // Bot├│n Nueva Campa├▒a
+            // Boton Nueva Campana
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
               decoration: BoxDecoration(
@@ -396,7 +396,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
         ),
       );
 
-  // ÔöÇÔöÇÔöÇ TAB BAR ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  // Barra de pestanas internas del modulo de avisos
   Widget _tabBar() {
     // badges: Actividad=0, Reportes=8, Alertas=1, Exportar=0
     final tabs = [
@@ -484,7 +484,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
     );
   }
 
-  // ÔöÇÔöÇÔöÇ EXPORT CARD ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  // Tarjeta de exportacion por formato
   Widget _exportCard({
     required Widget iconWidget,
     required Color iconBg,
@@ -557,7 +557,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
     ),
   );
 
-  // ÔöÇÔöÇÔöÇ CONFIG CARD ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  // Tarjeta de configuracion de exportacion
   Widget _configCard() => Container(
     decoration: BoxDecoration(
       color: kWhite,
@@ -652,7 +652,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
     ),
   );
 
-  // ÔöÇÔöÇÔöÇ INFO CARD ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  // Tarjeta informativa sobre seguridad de exportaciones
   Widget _infoCard() => Container(
     decoration: BoxDecoration(
       color: kBlueBg,
@@ -698,7 +698,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
     ),
   );
 
-  // ÔöÇÔöÇÔöÇ BOTTOM NAV ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  // Barra de navegacion inferior principal
   Widget _bottomNav() {
     final items = [
       {'icon': Icons.grid_view_outlined, 'label': 'Panel'},

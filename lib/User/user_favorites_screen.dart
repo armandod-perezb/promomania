@@ -1,51 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../Core/Routes/app_routes.dart';
 import '../main.dart';
+import '../services/promo_service.dart';
+import '../models/promocion.dart';
+import '../models/supermercado.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODELOS
 // ─────────────────────────────────────────────────────────────────────────────
 
-enum _PromoUrgency { today, thisWeek, noRush }
-
-class _FavoritePromo {
-  final String id;
-  final String imageUrl;
-  final String title;
-  final String store;
-  final String category;
-  final Color categoryColor;
-  final String price;
-  final String originalPrice;
-  final String discount;
-  final String rating;
-  final String distance;
-  final String timeLeft;
-  final String savings;
-  final String emoji;
-  final _PromoUrgency urgency;
-  final String urgencyLabel;
-
-  const _FavoritePromo({
-    required this.id,
-    required this.imageUrl,
-    required this.title,
-    required this.store,
-    required this.category,
-    required this.categoryColor,
-    required this.price,
-    required this.originalPrice,
-    required this.discount,
-    required this.rating,
-    required this.distance,
-    required this.timeLeft,
-    required this.savings,
-    required this.emoji,
-    required this.urgency,
-    required this.urgencyLabel,
-  });
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PANTALLA MIS FAVORITOS
@@ -70,141 +35,23 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   int _selectedNavTab = 2; // Favoritos activo
   bool _showBanner = true;
 
-  final List<_FavoritePromo> _allPromos = const [
-    _FavoritePromo(
-      id: '1',
-      imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93',
-      title: 'Café + Pastel al precio de 1',
-      store: 'Coffee Lab',
-      category: 'COMIDA',
-      categoryColor: Color(0xFFFF4D2E),
-      price: '\$18.000',
-      originalPrice: '\$27.000 COP',
-      discount: '-33%',
-      rating: '4.9',
-      distance: '0.3 km',
-      timeLeft: '1 día',
-      savings: '\$9.000 COP',
-      emoji: '☕',
-      urgency: _PromoUrgency.today,
-      urgencyLabel: 'VENCE HOY',
-    ),
-    _FavoritePromo(
-      id: '2',
-      imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd',
-      title: '2x1 Hamburguesas Gourmet',
-      store: 'Burger House',
-      category: 'COMIDA',
-      categoryColor: Color(0xFFFF4D2E),
-      price: '\$28.000',
-      originalPrice: '\$56.000 COP',
-      discount: '-50%',
-      rating: '4.8',
-      distance: '0.1 km',
-      timeLeft: '2 días',
-      savings: '\$28.000 COP',
-      emoji: '🍔',
-      urgency: _PromoUrgency.thisWeek,
-      urgencyLabel: 'ESTA SEMANA',
-    ),
-    _FavoritePromo(
-      id: '3',
-      imageUrl: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9',
-      title: 'Kit Skincare 50% OFF',
-      store: 'Beauty Store',
-      category: 'BELLEZA',
-      categoryColor: Color(0xFFEC4899),
-      price: '\$65.000',
-      originalPrice: '\$130.000 COP',
-      discount: '-50%',
-      rating: '4.7',
-      distance: '2.1 km',
-      timeLeft: '3 días',
-      savings: '\$65.000 COP',
-      emoji: '💄',
-      urgency: _PromoUrgency.thisWeek,
-      urgencyLabel: 'ESTA SEMANA',
-    ),
-    _FavoritePromo(
-      id: '4',
-      imageUrl: 'https://images.unsplash.com/photo-1445205170230-053b83016050',
-      title: 'Colección Primavera 25% OFF',
-      store: 'Trend Studio',
-      category: 'MODA',
-      categoryColor: Color(0xFF8B5CF6),
-      price: '\$97.500',
-      originalPrice: '\$130.000 COP',
-      discount: '-25%',
-      rating: '4.4',
-      distance: '0.9 km',
-      timeLeft: '4 días',
-      savings: '\$52.500 COP',
-      emoji: '👗',
-      urgency: _PromoUrgency.thisWeek,
-      urgencyLabel: 'ESTA SEMANA',
-    ),
-    _FavoritePromo(
-      id: '5',
-      imageUrl: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9',
-      title: 'iPhone 15 Pro + AirPods',
-      store: 'Tech Zone',
-      category: 'TECNOLOGÍA',
-      categoryColor: Color(0xFF6366F1),
-      price: '\$3.654.000',
-      originalPrice: '\$4.299.000 COP',
-      discount: '-15%',
-      rating: '4.6',
-      distance: '1.8 km',
-      timeLeft: '1 año',
-      savings: '\$645.000 COP',
-      emoji: '📱',
-      urgency: _PromoUrgency.noRush,
-      urgencyLabel: 'SIN PRISA',
-    ),
-  ];
-
-  late List<_FavoritePromo> _visiblePromos;
-  final Set<String> _dismissed = {};
 
   @override
   void initState() {
     super.initState();
-    _visiblePromos = List.from(_allPromos);
-  }
-
-  void _dismiss(String id) {
-    setState(() {
-      _dismissed.add(id);
-      _visiblePromos.removeWhere((p) => p.id == id);
+    // Initialize PromoService
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<PromoService>().init();
     });
+  }
+
+  void _dismiss(String promoCode, PromoService promoService) {
+    // For demo, use first user as current user
+    final currentUser = promoService.getUsuarios().isNotEmpty 
+        ? promoService.getUsuarios().first.id 
+        : 1;
+    promoService.toggleFavorito(currentUser, promoCode);
     HapticFeedback.mediumImpact();
-  }
-
-  List<_FavoritePromo> get _filtered {
-    switch (_selectedTab) {
-      case 1:
-        return _visiblePromos
-            .where((p) => p.urgency == _PromoUrgency.today)
-            .toList();
-      case 3:
-        return [];
-      default:
-        return _visiblePromos;
-    }
-  }
-
-  // Estadísticas del header
-  double get _totalSavings {
-    double total = 0;
-    for (final p in _visiblePromos) {
-      final raw = p.savings
-          .replaceAll('\$', '')
-          .replaceAll(' COP', '')
-          .replaceAll('.', '')
-          .trim();
-      total += double.tryParse(raw) ?? 0;
-    }
-    return total;
   }
 
   String _formatCurrency(double v) {
@@ -219,32 +66,48 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
-      child: Scaffold(
-        backgroundColor: _lightBg,
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header que se desplaza con el contenido
-              _buildTopHeader(),
-              _buildSavingsCard(),
-              if (_showBanner) _buildInfoBanner(),
-              _buildTabBar(),
-              _buildPromoGroups(),
-              const SizedBox(height: 24),
-            ],
+    return Consumer<PromoService>(
+      builder: (context, promoService, child) {
+        // For demo, use first user as current user
+        final currentUser = promoService.getUsuarios().isNotEmpty 
+            ? promoService.getUsuarios().first.id 
+            : 1;
+        final favoritePromos = promoService.getFavoritosByUsuario(currentUser);
+        
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.dark,
+          child: Scaffold(
+            backgroundColor: _lightBg,
+            body: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header que se desplaza con el contenido
+                  _buildTopHeader(promoService),
+                  _buildSavingsCard(promoService),
+                  if (_showBanner) _buildInfoBanner(),
+                  _buildTabBar(promoService),
+                  _buildPromoGroups(promoService),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
+            bottomNavigationBar: _buildBottomNav(),
           ),
-        ),
-        bottomNavigationBar: _buildBottomNav(),
-      ),
+        );
+      },
     );
   }
 
   // ── Header ──────────────────────────────────────────────────────────────────
 
-  Widget _buildTopHeader() {
+  Widget _buildTopHeader(PromoService promoService) {
+    // For demo, use first user as current user
+    final currentUser = promoService.getUsuarios().isNotEmpty 
+        ? promoService.getUsuarios().first.id 
+        : 1;
+    final favoritePromos = promoService.getFavoritosByUsuario(currentUser);
+    
     return Container(
       color: Colors.white,
       padding: EdgeInsets.only(
@@ -277,7 +140,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                 const Icon(Icons.favorite_rounded, color: _primary, size: 14),
                 const SizedBox(width: 6),
                 Text(
-                  '${_visiblePromos.length}',
+                  '${favoritePromos.length}',
                   style: const TextStyle(
                     color: _primary,
                     fontSize: 12.5,
@@ -294,12 +157,35 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
 
   // ── Savings card ─────────────────────────────────────────────────────────────
 
-  Widget _buildSavingsCard() {
-    final total = _totalSavings;
+  Widget _buildSavingsCard(PromoService promoService) {
+    // For demo, use first user as current user
+    final currentUser = promoService.getUsuarios().isNotEmpty 
+        ? promoService.getUsuarios().first.id 
+        : 1;
+    final favoritePromos = promoService.getFavoritosByUsuario(currentUser);
+    
+    // Calculate total savings
+    double totalSavings = 0;
+    for (final favorito in favoritePromos) {
+      final promo = promoService.getPromocionByCodigo(favorito.codigoPromocion);
+      if (promo != null && promo.descuento != null) {
+        final discountAmount = promo.precio * (promo.descuento! / 100);
+        totalSavings += discountAmount;
+      }
+    }
+    
+    final total = totalSavings;
     final used = 1;
-    final urgent = _visiblePromos
-        .where((p) => p.urgency == _PromoUrgency.today)
-        .length;
+    
+    // Calculate urgent promotions (expiring today)
+    int urgent = 0;
+    for (final favorito in favoritePromos) {
+      final promo = promoService.getPromocionByCodigo(favorito.codigoPromocion);
+      if (promo != null) {
+        final urgency = promoService.getPromocionUrgency(promo);
+        if (urgency == 'today') urgent++;
+      }
+    }
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -351,16 +237,16 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                   alignment: Alignment.center,
                   children: [
                     CircularProgressIndicator(
-                      value: used / _visiblePromos.length.clamp(1, 100),
+                      value: used / favoritePromos.length.clamp(1, 100),
                       strokeWidth: 5,
-                      backgroundColor: Colors.white.withOpacity(0.12),
+                      backgroundColor: Colors.white.withValues(alpha: 0.12),
                       valueColor: const AlwaysStoppedAnimation<Color>(_primary),
                     ),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          '${((used / _visiblePromos.length.clamp(1, 100)) * 100).toInt()}%',
+                          '${((used / favoritePromos.length.clamp(1, 100)) * 100).toInt()}%',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 10,
@@ -404,7 +290,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
             ),
             child: FractionallySizedBox(
               alignment: Alignment.centerLeft,
-              widthFactor: used / _visiblePromos.length.clamp(1, 100),
+              widthFactor: used / favoritePromos.length.clamp(1, 100),
               child: Container(
                 decoration: BoxDecoration(
                   color: _primary,
@@ -417,7 +303,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _miniStat('${_visiblePromos.length}', 'guardadas'),
+              _miniStat('${favoritePromos.length}', 'guardadas'),
               _miniStat('$used', 'Usadas'),
               _miniStat('$urgent', 'Urgentes'),
             ],
@@ -515,26 +401,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
 
   // ── Tab bar ──────────────────────────────────────────────────────────────────
 
-  Widget _buildTabBar() {
-    final tabs = [
-      _TabItem(
-        icon: Icons.bookmark_border_rounded,
-        label: 'Todas',
-        badge: null,
-      ),
-      _TabItem(
-        icon: Icons.local_fire_department_outlined,
-        label: 'Por vencer',
-        badge: '1',
-      ),
-      _TabItem(icon: Icons.folder_outlined, label: 'Carpetas', badge: '4'),
-      _TabItem(
-        icon: Icons.check_circle_outline_rounded,
-        label: 'Usados',
-        badge: '1',
-      ),
-    ];
-
+  Widget _buildTabBar(PromoService promoService) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
       padding: const EdgeInsets.all(6),
@@ -550,128 +417,67 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
         ],
       ),
       child: Row(
-        children: List.generate(tabs.length, (i) {
-          final isActive = _selectedTab == i;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () {
-                setState(() => _selectedTab = i);
-                HapticFeedback.selectionClick();
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.symmetric(horizontal: 2),
-                padding: const EdgeInsets.symmetric(vertical: 11),
-                decoration: BoxDecoration(
-                  color: isActive
-                      ? const Color(0xFF111827)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Column(
-                  children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Icon(
-                          tabs[i].icon,
-                          size: 22,
-                          color: isActive
-                              ? Colors.white
-                              : const Color(0xFF9CA3AF),
-                        ),
-                        if (tabs[i].badge != null)
-                          Positioned(
-                            top: -10,
-                            right: -14,
-                            child: Container(
-                              constraints: const BoxConstraints(
-                                minWidth: 20,
-                                minHeight: 20,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: _primary,
-                                shape: BoxShape.circle,
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                tabs[i].badge!,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      tabs[i].label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 10.5,
-                        fontWeight: isActive
-                            ? FontWeight.w700
-                            : FontWeight.w500,
-                        color: isActive
-                            ? Colors.white
-                            : const Color(0xFF9CA3AF),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }),
+        children: [
+          _tabItem(0, 'Todas', promoService),
+          _tabItem(1, 'Por vencer', promoService),
+          _tabItem(2, 'Categorías', promoService),
+          _tabItem(3, 'Usados', promoService),
+        ],
       ),
     );
   }
 
   // ── Grupos de promos ─────────────────────────────────────────────────────────
 
-  Widget _buildPromoGroups() {
-    final promos = _filtered;
-
-    if (promos.isEmpty) {
-      return _buildEmptyState();
+  Widget _buildPromoGroups(PromoService promoService) {
+    // For demo, use first user as current user
+    final currentUser = promoService.getUsuarios().isNotEmpty 
+        ? promoService.getUsuarios().first.id 
+        : 1;
+    final favoritePromos = promoService.getFavoritosByUsuario(currentUser);
+    
+    // Get promotions by urgency
+    final promosByUrgency = promoService.getPromocionesByUrgency(currentUser);
+    
+    // Filter based on selected tab
+    List<Promocion> filteredPromos = [];
+    switch (_selectedTab) {
+      case 1: // Por vencer
+        filteredPromos = [...promosByUrgency['today']!, ...promosByUrgency['thisWeek']!];
+        break;
+      case 3: // Usados (not implemented yet)
+        filteredPromos = [];
+        break;
+      default: // Todas
+        filteredPromos = [
+          ...promosByUrgency['today']!,
+          ...promosByUrgency['thisWeek']!,
+          ...promosByUrgency['noRush']!
+        ];
     }
 
-    final today = promos
-        .where((p) => p.urgency == _PromoUrgency.today)
-        .toList();
-    final thisWeek = promos
-        .where((p) => p.urgency == _PromoUrgency.thisWeek)
-        .toList();
-    final noRush = promos
-        .where((p) => p.urgency == _PromoUrgency.noRush)
-        .toList();
+    if (filteredPromos.isEmpty) {
+      return _buildEmptyState();
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (today.isNotEmpty) ...[
+        if (promosByUrgency['today']!.isNotEmpty) ...[
           _buildGroupHeader(
             'Vencen hoy — ¡Actúa ya!',
             const Color(0xFFFF4D2E),
             '🔥',
           ),
-          ...today.map((p) => _buildSwipeCard(p)).toList(),
+          ...promosByUrgency['today']!.map((p) => _buildSwipeCard(p, promoService)).toList(),
         ],
-        if (thisWeek.isNotEmpty) ...[
+        if (promosByUrgency['thisWeek']!.isNotEmpty) ...[
           _buildGroupHeader('Esta semana', const Color(0xFFF59E0B), '⏳'),
-          ...thisWeek.map((p) => _buildSwipeCard(p)).toList(),
+          ...promosByUrgency['thisWeek']!.map((p) => _buildSwipeCard(p, promoService)).toList(),
         ],
-        if (noRush.isNotEmpty) ...[
+        if (promosByUrgency['noRush']!.isNotEmpty) ...[
           _buildGroupHeader('Sin prisa', const Color(0xFF10B981), '🟢'),
-          ...noRush.map((p) => _buildSwipeCard(p)).toList(),
+          ...promosByUrgency['noRush']!.map((p) => _buildSwipeCard(p, promoService)).toList(),
         ],
       ],
     );
@@ -708,11 +514,11 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
     );
   }
 
-  Widget _buildSwipeCard(_FavoritePromo promo) {
+  Widget _buildSwipeCard(Promocion promo, PromoService promoService) {
     return Dismissible(
-      key: Key(promo.id),
+      key: Key(promo.codigo),
       direction: DismissDirection.endToStart,
-      onDismissed: (_) => _dismiss(promo.id),
+      onDismissed: (_) => _dismiss(promo.codigo, promoService),
       background: Container(
         margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
         decoration: BoxDecoration(
@@ -737,22 +543,55 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
           ],
         ),
       ),
-      child: _buildPromoCard(promo),
+      child: _buildPromoCard(promo, promoService),
     );
   }
 
-  Widget _buildPromoCard(_FavoritePromo p) {
+  Widget _buildPromoCard(Promocion promo, PromoService promoService) {
+    final supermercado = promoService.getSupermercado(promo.idSupermercado);
+    final categoria = promoService.getCategoria(promo.idCategoria);
+    final categoriaStyle = promoService.getCategoriaStyle(promo.idCategoria);
+    final precioConDescuento = promoService.getPrecioConDescuento(promo);
+    final rating = promoService.getPromocionRating(promo.codigo);
+    final urgency = promoService.getPromocionUrgency(promo);
+    
+    // Determine urgency color and label
     Color urgencyColor;
-    switch (p.urgency) {
-      case _PromoUrgency.today:
+    String urgencyLabel;
+    switch (urgency) {
+      case 'today':
         urgencyColor = _primary;
+        urgencyLabel = 'VENCE HOY';
         break;
-      case _PromoUrgency.thisWeek:
+      case 'thisWeek':
         urgencyColor = _amber;
+        urgencyLabel = 'ESTA SEMANA';
         break;
-      case _PromoUrgency.noRush:
+      default:
         urgencyColor = _green;
-        break;
+        urgencyLabel = 'SIN PRISA';
+    }
+    
+    final discount = promo.descuento != null ? '-${promo.descuento}%' : '';
+    
+    // Format time display
+    String timeDisplay = 'permanente';
+    if (promo.fechaFin != null) {
+      try {
+        final fechaFin = DateTime.parse(promo.fechaFin!);
+        final ahora = DateTime.now();
+        final diferencia = fechaFin.difference(ahora);
+        
+        if (diferencia.inDays > 0) {
+          timeDisplay = '${diferencia.inDays} días';
+        } else if (diferencia.inHours > 0) {
+          timeDisplay = '${diferencia.inHours} horas';
+        } else {
+          timeDisplay = '${diferencia.inMinutes} min';
+        }
+      } catch (e) {
+        timeDisplay = 'permanente';
+      }
     }
 
     return Container(
@@ -762,7 +601,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -784,7 +623,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.network(p.imageUrl, fit: BoxFit.cover),
+                        _buildPromoImage(promo, categoriaStyle['emoji'], 50),
                         Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -797,28 +636,29 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                             ),
                           ),
                         ),
-                        Positioned(
-                          top: 4,
-                          left: 4,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 4,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _primary,
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: Text(
-                              p.discount,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 8,
-                                fontWeight: FontWeight.w800,
+                        if (discount.isNotEmpty)
+                          Positioned(
+                            top: 4,
+                            left: 4,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _primary,
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Text(
+                                discount,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w800,
+                                ),
                               ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -834,7 +674,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                         children: [
                           Flexible(
                             child: Text(
-                              p.store,
+                              supermercado?.nombre ?? 'Tienda',
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 10,
@@ -849,11 +689,11 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: urgencyColor.withOpacity(0.12),
+                              color: urgencyColor.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(5),
                             ),
                             child: Text(
-                              p.urgencyLabel,
+                              urgencyLabel,
                               style: TextStyle(
                                 color: urgencyColor,
                                 fontSize: 8,
@@ -865,7 +705,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        p.title,
+                        promo.titulo,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -880,22 +720,24 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                       Row(
                         children: [
                           Text(
-                            p.price,
+                            '\$${precioConDescuento.toStringAsFixed(2)}',
                             style: const TextStyle(
                               fontSize: 13.5,
                               fontWeight: FontWeight.w900,
                               color: Color(0xFF1A1F2E),
                             ),
                           ),
-                          const SizedBox(width: 5),
-                          Text(
-                            p.originalPrice,
-                            style: const TextStyle(
-                              fontSize: 9.5,
-                              color: Color(0xFFB0B5CC),
-                              decoration: TextDecoration.lineThrough,
+                          if (promo.descuento != null && promo.descuento! > 0) ...[
+                            const SizedBox(width: 5),
+                            Text(
+                              '\$${promo.precio.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 9.5,
+                                color: Color(0xFFB0B5CC),
+                                decoration: TextDecoration.lineThrough,
+                              ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                       const SizedBox(height: 2),
@@ -909,30 +751,11 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                           ),
                           const SizedBox(width: 2),
                           Text(
-                            p.rating,
+                            rating.toStringAsFixed(1),
                             style: const TextStyle(
                               fontSize: 9.5,
                               color: Color(0xFF5A5F72),
                               fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const Text(
-                            ' · ',
-                            style: TextStyle(
-                              color: Color(0xFFB0B5CC),
-                              fontSize: 8,
-                            ),
-                          ),
-                          const Icon(
-                            Icons.location_on_outlined,
-                            size: 9,
-                            color: Color(0xFFB0B5CC),
-                          ),
-                          Text(
-                            p.distance,
-                            style: const TextStyle(
-                              fontSize: 9.5,
-                              color: Color(0xFF8A8FA8),
                             ),
                           ),
                           const Text(
@@ -949,7 +772,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                           ),
                           const SizedBox(width: 2),
                           Text(
-                            p.timeLeft,
+                            timeDisplay,
                             style: const TextStyle(
                               fontSize: 9.5,
                               color: Color(0xFF8A8FA8),
@@ -964,31 +787,34 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
                 // Botón Ver Promo
                 Column(
                   children: [
-                    Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: _primary,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: _primary.withOpacity(0.35),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.bolt_rounded,
-                        color: Colors.white,
-                        size: 18,
+                    GestureDetector(
+                      onTap: () => _openPromotionDetails(promo.codigo),
+                      child: Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: _primary,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: _primary.withValues(alpha: 0.35),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.arrow_forward_rounded,
+                          color: Colors.white,
+                          size: 18,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 3),
-                    const Text(
-                      'Ver Promo',
+                    const SizedBox(height: 2),
+                    Text(
+                      'Ver',
                       style: TextStyle(
-                        fontSize: 8,
+                        fontSize: 9,
                         color: _primary,
                         fontWeight: FontWeight.w700,
                       ),
@@ -998,42 +824,37 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
               ],
             ),
           ),
-          // Footer de ahorro
+          // Footer con ahorro
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
             decoration: BoxDecoration(
-              color: _green.withOpacity(0.07),
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(18),
-              ),
-              border: Border(
-                top: BorderSide(color: _green.withOpacity(0.15), width: 1),
+              color: const Color(0xFFF5F6FA),
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(18),
+                bottomRight: Radius.circular(18),
               ),
             ),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(
-                  Icons.savings_outlined,
-                  color: Color(0xFF10B981),
-                  size: 12,
-                ),
-                const SizedBox(width: 5),
+                if (promo.descuento != null && promo.descuento! > 0)
+                  Text(
+                    'Ahorras \$${(promo.precio * promo.descuento! / 100).toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w800,
+                      color: _green,
+                    ),
+                  )
+                else
+                  const SizedBox.shrink(),
                 Text(
-                  'Ahorras si usas esta promo',
+                  categoria?.nombre ?? 'Categoría',
                   style: TextStyle(
                     fontSize: 10,
-                    color: _green.withOpacity(0.8),
+                    color: Color(int.parse(categoriaStyle['color']!.replaceFirst('#', '0xFF'))),
                     fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  p.savings,
-                  style: const TextStyle(
-                    fontSize: 11.5,
-                    color: _green,
-                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ],
@@ -1042,6 +863,170 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
         ],
       ),
     );
+  }
+
+  // ── Helper Methods ────────────────────────────────────────────────────────────
+
+  Widget _tabItem(int index, String label, PromoService promoService) {
+    final isActive = _selectedTab == index;
+    
+    // For demo, use first user as current user
+    final currentUser = promoService.getUsuarios().isNotEmpty 
+        ? promoService.getUsuarios().first.id 
+        : 1;
+    final favoritePromos = promoService.getFavoritosByUsuario(currentUser);
+    final promosByUrgency = promoService.getPromocionesByUrgency(currentUser);
+    
+    // Calculate badge counts
+    String? badge;
+    if (index == 0) {
+      badge = favoritePromos.length.toString();
+    } else if (index == 1) {
+      final urgentCount = promosByUrgency['today']!.length + promosByUrgency['thisWeek']!.length;
+      badge = urgentCount > 0 ? urgentCount.toString() : null;
+    }
+    
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() => _selectedTab = index);
+          HapticFeedback.selectionClick();
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.symmetric(horizontal: 2),
+          padding: const EdgeInsets.symmetric(vertical: 11),
+          decoration: BoxDecoration(
+            color: isActive
+                ? const Color(0xFF111827)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Column(
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(
+                    _getTabIcon(index),
+                    size: 22,
+                    color: isActive
+                        ? Colors.white
+                        : const Color(0xFF9CA3AF),
+                  ),
+                  if (badge != null)
+                    Positioned(
+                      top: -10,
+                      right: -14,
+                      child: Container(
+                        constraints: const BoxConstraints(
+                          minWidth: 20,
+                          minHeight: 20,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _primary,
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          badge,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: isActive
+                      ? FontWeight.w700
+                      : FontWeight.w500,
+                  color: isActive
+                      ? Colors.white
+                      : const Color(0xFF9CA3AF),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  IconData _getTabIcon(int index) {
+    switch (index) {
+      case 0:
+        return Icons.bookmark_border_rounded;
+      case 1:
+        return Icons.local_fire_department_outlined;
+      case 2:
+        return Icons.folder_outlined;
+      case 3:
+        return Icons.check_circle_outline_rounded;
+      default:
+        return Icons.help_outline;
+    }
+  }
+
+  Widget _buildPromoImage(Promocion promo, String? emoji, double height) {
+    // Check if we have cached image bytes
+    final imageBytes = context.read<PromoService>().getImageBytes(promo.codigo);
+    
+    if (imageBytes != null) {
+      return Image.memory(
+        imageBytes,
+        height: height,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildImageFallback(emoji, height),
+      );
+    }
+    
+    // Try network image if available
+    if (promo.foto != null && promo.foto!.isNotEmpty) {
+      return Image.network(
+        promo.foto!,
+        height: height,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildImageFallback(emoji, height),
+      );
+    }
+    
+    // Fallback to emoji
+    return _buildImageFallback(emoji, height);
+  }
+
+  Widget _buildImageFallback(String? emoji, double height) {
+    return Container(
+      height: height,
+      width: double.infinity,
+      color: Colors.grey[200],
+      child: Center(
+        child: Text(
+          emoji ?? '📦',
+          style: TextStyle(fontSize: height * 0.4),
+        ),
+      ),
+    );
+  }
+
+  void _openPromotionDetails(String promoCode) {
+    HapticFeedback.lightImpact();
+    Navigator.pushNamed(context, AppRoutes.promotionDetails, arguments: promoCode);
   }
 
   // ── Empty state ──────────────────────────────────────────────────────────────

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
@@ -28,12 +29,30 @@ class PromoService extends ChangeNotifier {
   List<Reporte> reportes = [];
 
   bool loaded = false;
+  String? loadError;
+  
+  // Cache de imágenes en memoria para web
+  final Map<String, Uint8List> _imageCache = {};
+  
+  // Getters para acceso a imágenes
+  Uint8List? getImageBytes(String codigo) => _imageCache[codigo];
+  
+  void setImageBytes(String codigo, Uint8List bytes) {
+    _imageCache[codigo] = bytes;
+    notifyListeners();
+  }
+  
+  void clearImageCache() {
+    _imageCache.clear();
+    notifyListeners();
+  }
 
   /// Inicializa los datos desde el JSON
   Future<void> init() async {
     if (loaded) return;
 
     try {
+      loadError = null;
       final response = await rootBundle.loadString(
         'assets/data/promomania_data.json',
       );
@@ -90,9 +109,12 @@ class PromoService extends ChangeNotifier {
           .toList();
 
       loaded = true;
+      notifyListeners();
     } catch (e) {
       print('Error cargando datos: $e');
+      loadError = e.toString();
       loaded = false;
+      notifyListeners();
     }
   }
 
@@ -433,5 +455,148 @@ class PromoService extends ChangeNotifier {
   void deleteReporte(int id) {
     reportes.removeWhere((r) => r.id == id);
     notifyListeners();
+  }
+
+  // ========== HELPER METHODS FOR UI ==========
+  
+  /// Obtiene flash deals - top N promociones por descuento (o vistas si descuento es null)
+  List<Promocion> getFlashDeals({int limit = 5}) {
+    final aprobadas = getPromocionesAprobadas();
+    aprobadas.sort((a, b) {
+      // Primero ordenar por descuento (mayor a menor)
+      if (a.descuento != null && b.descuento != null) {
+        return b.descuento!.compareTo(a.descuento!);
+      }
+      // Si una tiene descuento y la otra no, la que tiene descuento va primero
+      if (a.descuento != null) return -1;
+      if (b.descuento != null) return 1;
+      // Si ninguna tiene descuento, ordenar por vistas
+      return b.vistas.compareTo(a.vistas);
+    });
+    return aprobadas.take(limit).toList();
+  }
+  
+  /// Obtiene nearby stores - simula distancia/tiempo por id hasta tener GPS
+  List<Map<String, dynamic>> getNearbyStores({int limit = 5}) {
+    final supermercadosConPromos = <int, List<Promocion>>{};
+    
+    // Agrupar promociones por supermercado
+    for (final promo in getPromocionesAprobadas()) {
+      if (!supermercadosConPromos.containsKey(promo.idSupermercado)) {
+        supermercadosConPromos[promo.idSupermercado] = [];
+      }
+      supermercadosConPromos[promo.idSupermercado]!.add(promo);
+    }
+    
+    final nearbyStores = <Map<String, dynamic>>[];
+    
+    for (final entry in supermercadosConPromos.entries) {
+      final supermercado = getSupermercado(entry.key);
+      if (supermercado != null) {
+        // Simular distancia/tiempo por id (más pequeño = más cercano)
+        final simulatedDistance = (entry.key * 0.5 + 1.0).toStringAsFixed(1);
+        final simulatedTime = '${entry.key * 2 + 5} min';
+        
+        nearbyStores.add({
+          'supermercado': supermercado,
+          'promociones': entry.value,
+          'distancia': '$simulatedDistance km',
+          'tiempo': simulatedTime,
+        });
+      }
+    }
+    
+    // Ordenar por distancia (simulada por id)
+    nearbyStores.sort((a, b) => a['supermercado'].id.compareTo(b['supermercado'].id));
+    
+    return nearbyStores.take(limit).toList();
+  }
+  
+  /// Calcula urgencia de una promoción
+  String getPromocionUrgency(Promocion promo) {
+    if (promo.tipoVigencia == 'permanente' || promo.fechaFin == null) {
+      return 'noRush';
+    }
+    
+    try {
+      final fechaFin = DateTime.parse(promo.fechaFin!);
+      final ahora = DateTime.now();
+      final diferencia = fechaFin.difference(ahora);
+      
+      if (diferencia.isNegative) {
+        return 'expired';
+      } else if (diferencia.inDays <= 1) {
+        return 'today';
+      } else if (diferencia.inDays <= 7) {
+        return 'thisWeek';
+      } else {
+        return 'noRush';
+      }
+    } catch (e) {
+      return 'noRush';
+    }
+  }
+  
+  /// Obtiene promociones por urgencia para un usuario
+  Map<String, List<Promocion>> getPromocionesByUrgency(int idUsuario) {
+    final favoritos = getFavoritosByUsuario(idUsuario);
+    final promocionesFavoritas = favoritos
+        .map((f) => getPromocionByCodigo(f.codigoPromocion))
+        .where((p) => p != null)
+        .cast<Promocion>()
+        .toList();
+    
+    final result = <String, List<Promocion>>{
+      'today': [],
+      'thisWeek': [],
+      'noRush': [],
+    };
+    
+    for (final promo in promocionesFavoritas) {
+      final urgency = getPromocionUrgency(promo);
+      if (urgency != 'expired') {
+        result[urgency]!.add(promo);
+      }
+    }
+    
+    return result;
+  }
+  
+  /// Obtiene emoji y color por categoría
+  Map<String, String> getCategoriaStyle(int idCategoria) {
+    final categoria = getCategoria(idCategoria);
+    if (categoria == null) {
+      return {'emoji': '📦', 'color': '#808080'};
+    }
+    
+    final styles = <String, Map<String, String>>{
+      'Electrónica': {'emoji': '📱', 'color': '#2196F3'},
+      'Alimentos': {'emoji': '🍎', 'color': '#4CAF50'},
+      'Ropa': {'emoji': '👕', 'color': '#FF9800'},
+    };
+    
+    return styles[categoria.nombre] ?? {'emoji': '📦', 'color': '#808080'};
+  }
+  
+  /// Calcula precio con descuento
+  double getPrecioConDescuento(Promocion promo) {
+    if (promo.descuento == null || promo.descuento == 0) {
+      return promo.precio;
+    }
+    return promo.precio * (1 - promo.descuento! / 100);
+  }
+  
+  /// Obtiene rating promedio de una promoción
+  double getPromocionRating(String codigoPromocion) {
+    final valoraciones = getValoracionesByPromocion(codigoPromocion);
+    if (valoraciones.isEmpty) return 0.0;
+    
+    final positivas = valoraciones.where((v) => v.tipo == 'positiva').length;
+    return (positivas / valoraciones.length) * 5.0; // Escala de 0 a 5
+  }
+  
+  /// Obtiene número de reseñas de una promoción
+  int getPromocionReviewsCount(String codigoPromocion) {
+    return getComentariosByPromocion(codigoPromocion).length;
   }
 }

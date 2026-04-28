@@ -1,89 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../Core/Routes/app_routes.dart';
 import '../main.dart';
+import '../services/promo_service.dart';
+import '../models/promocion.dart';
+import '../models/supermercado.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODELOS
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _FlashDeal {
-  final String title;
-  final String store;
-  final String category;
-  final String price;
-  final String originalPrice;
-  final String discount;
-  final String rating;
-  final String emoji;
-  final Color accentColor;
-
-  const _FlashDeal({
-    required this.title,
-    required this.store,
-    required this.category,
-    required this.price,
-    required this.originalPrice,
-    required this.discount,
-    required this.rating,
-    required this.emoji,
-    required this.accentColor,
-  });
-}
-
-class _NearbyStore {
-  final String name;
-  final String category;
-  final String distance;
-  final String time;
-  final String rating;
-  final String emoji;
-  final Color bgColor;
-
-  const _NearbyStore({
-    required this.name,
-    required this.category,
-    required this.distance,
-    required this.time,
-    required this.rating,
-    required this.emoji,
-    required this.bgColor,
-  });
-}
-
-class _PromoCard {
-  final String title;
-  final String store;
-  final String category;
-  final Color categoryColor;
-  final String? imageUrl;
-  final String price;
-  final String originalPrice;
-  final String discount;
-  final Color discountColor;
-  final String rating;
-  final String reviews;
-  final String time;
-  final String emoji;
-  final bool isFavorite;
-
-  const _PromoCard({
-    required this.title,
-    required this.store,
-    required this.category,
-    required this.categoryColor,
-    this.imageUrl,
-    required this.price,
-    required this.originalPrice,
-    required this.discount,
-    required this.discountColor,
-    required this.rating,
-    required this.reviews,
-    required this.time,
-    required this.emoji,
-    this.isFavorite = false,
-  });
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PANTALLA PRINCIPAL
@@ -113,165 +40,6 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   final List<String> _sortOptions = ['Relevancia', 'Precio', 'Rating', 'Cerca'];
 
-  final List<_FlashDeal> _flashDeals = const [
-    _FlashDeal(
-      title: 'Café Especial',
-      store: 'Coffee Lab',
-      category: 'Café',
-      price: '\$8.000',
-      originalPrice: '\$12.000',
-      discount: '-35%',
-      rating: '4.8',
-      emoji: '☕',
-      accentColor: Color(0xFF8B4513),
-    ),
-    _FlashDeal(
-      title: 'Bowl Açaí',
-      store: 'Fresh & Co.',
-      category: 'Salud',
-      price: '\$18.000',
-      originalPrice: '\$24.000',
-      discount: '-25%',
-      rating: '4.1',
-      emoji: '🫐',
-      accentColor: Color(0xFF6B21A8),
-    ),
-    _FlashDeal(
-      title: 'Jugo Natural 1L',
-      store: 'NaturaCo',
-      category: 'Bebidas',
-      price: '\$12.000',
-      originalPrice: '\$15.000',
-      discount: '-20%',
-      rating: '4.0',
-      emoji: '🥤',
-      accentColor: Color(0xFFD97706),
-    ),
-  ];
-
-  final List<_NearbyStore> _nearbyStores = const [
-    _NearbyStore(
-      name: 'Burger House',
-      category: 'Comida',
-      distance: '0.1km',
-      time: '15 min',
-      rating: '4.8',
-      emoji: '🍔',
-      bgColor: Color(0xFFFFF3E0),
-    ),
-    _NearbyStore(
-      name: 'Coffee Lab',
-      category: 'Café',
-      distance: '0.3km',
-      time: '8 min',
-      rating: '4.7',
-      emoji: '☕',
-      bgColor: Color(0xFFF3E5F5),
-    ),
-    _NearbyStore(
-      name: 'SportMax',
-      category: 'Deportes',
-      distance: '1.2km',
-      time: '25 min',
-      rating: '4.5',
-      emoji: '🏋️',
-      bgColor: Color(0xFFE8F5E9),
-    ),
-  ];
-
-  final List<_PromoCard> _promos = const [
-    _PromoCard(
-      title: '2x1 Hamburguesas Gourmet',
-      store: 'Burger House',
-      category: 'Comida',
-      categoryColor: Color(0xFFFF4D2E),
-      imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd',
-      price: '\$28.000',
-      originalPrice: '\$56.000',
-      discount: '-50%',
-      discountColor: Color(0xFFFF4D2E),
-      rating: '4.9',
-      reviews: '432',
-      time: '2 días',
-      emoji: '🍔',
-    ),
-    _PromoCard(
-      title: '40% OFF Zapatillas Nike',
-      store: 'NorthFeet',
-      category: 'Deportes',
-      categoryColor: Color(0xFF3B82F6),
-      imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff',
-      price: '\$180.000',
-      originalPrice: '\$300.000',
-      discount: '-40%',
-      discountColor: Color(0xFF3B82F6),
-      rating: '4.5',
-      reviews: '1128',
-      time: '1 min',
-      emoji: '👟',
-      isFavorite: true,
-    ),
-    _PromoCard(
-      title: 'Café Especial + Pastel',
-      store: 'Coffee Lab',
-      category: 'Comida',
-      categoryColor: Color(0xFFFF4D2E),
-      imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93',
-      price: '\$18.000',
-      originalPrice: '\$27.000',
-      discount: '-33%',
-      discountColor: Color(0xFFFF4D2E),
-      rating: '4.9',
-      reviews: '220',
-      time: '1 día',
-      emoji: '☕',
-    ),
-    _PromoCard(
-      title: 'Kit Skincare Completo',
-      store: 'Glow Studio',
-      category: 'Belleza',
-      categoryColor: Color(0xFFEC4899),
-      imageUrl: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9',
-      price: '\$65.000',
-      originalPrice: '\$98.000',
-      discount: '-30%',
-      discountColor: Color(0xFFEC4899),
-      rating: '4.7',
-      reviews: '156',
-      time: '3 días',
-      emoji: '💄',
-    ),
-    _PromoCard(
-      title: 'iPhone 15 Pro — Oferta',
-      store: 'Tech Zone',
-      category: 'Tecnología',
-      categoryColor: Color(0xFF6366F1),
-      imageUrl: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9',
-      price: '\$3.654.000',
-      originalPrice: '\$4.300.000',
-      discount: '-15%',
-      discountColor: Color(0xFF6366F1),
-      rating: '4.6',
-      reviews: '263',
-      time: '1 año',
-      emoji: '📱',
-    ),
-    _PromoCard(
-      title: 'Colección Primavera 2025',
-      store: 'Trend Studio',
-      category: 'Moda',
-      categoryColor: Color(0xFFF59E0B),
-      imageUrl: 'https://images.unsplash.com/photo-1445205170230-053b83016050',
-      price: '\$97.500',
-      originalPrice: '\$130.000',
-      discount: '-25%',
-      discountColor: Color(0xFFF59E0B),
-      rating: '4.4',
-      reviews: '67',
-      time: '4 min',
-      emoji: '👗',
-    ),
-  ];
 
   @override
   void initState() {
@@ -282,6 +50,11 @@ class _ExploreScreenState extends State<ExploreScreen>
     );
     _bannerFade = CurvedAnimation(parent: _bannerCtrl, curve: Curves.easeOut);
     _bannerCtrl.forward();
+
+    // Initialize PromoService
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<PromoService>().init();
+    });
 
     // Simular countdown
     Future.delayed(const Duration(seconds: 1), _tickTimer);
@@ -312,30 +85,75 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF5F6FA),
-        body: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(child: _buildHeader()),
-            SliverToBoxAdapter(child: _buildSearchBar()),
-            SliverToBoxAdapter(child: _buildHeroBanner()),
-            SliverToBoxAdapter(child: _buildFlashDealsSection()),
-            SliverToBoxAdapter(child: _buildNearbySection()),
-            SliverToBoxAdapter(child: _buildAllPromosHeader()),
-            _buildPromosGrid(),
-            const SliverToBoxAdapter(child: SizedBox(height: 24)),
-          ],
-        ),
-        bottomNavigationBar: _buildBottomNav(),
-      ),
+    return Consumer<PromoService>(
+      builder: (context, promoService, child) {
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.dark,
+          child: Scaffold(
+            backgroundColor: const Color(0xFFF5F6FA),
+            body: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(child: _buildHeader(promoService)),
+                SliverToBoxAdapter(child: _buildSearchBar()),
+                SliverToBoxAdapter(child: _buildHeroBanner()),
+                if (promoService.loaded && promoService.loadError == null)
+                  SliverToBoxAdapter(child: _buildFlashDealsSection(promoService)),
+                if (promoService.loaded && promoService.loadError == null)
+                  SliverToBoxAdapter(child: _buildNearbySection(promoService)),
+                if (promoService.loaded && promoService.loadError == null)
+                  SliverToBoxAdapter(child: _buildAllPromosHeader(promoService)),
+                if (promoService.loaded && promoService.loadError == null)
+                  _buildPromosGrid(promoService),
+                if (!promoService.loaded && promoService.loadError == null)
+                  const SliverFillRemaining(
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                if (promoService.loadError != null)
+                  SliverFillRemaining(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, size: 64, color: Colors.grey),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Error al cargar datos',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            promoService.loadError!,
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () => promoService.init(),
+                            child: const Text('Reintentar'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                const SliverToBoxAdapter(child: SizedBox(height: 24)),
+              ],
+            ),
+            bottomNavigationBar: _buildBottomNav(),
+          ),
+        );
+      },
     );
   }
 
   // ── Header ────────────────────────────────────────────────────────────────
 
-  Widget _buildHeader() {
+  Widget _buildHeader(PromoService promoService) {
+    // Get current user (for demo, using first user)
+    final currentUser = promoService.getUsuarios().isNotEmpty 
+        ? promoService.getUsuarios().first 
+        : null;
+    final userCity = currentUser?.ciudad ?? 'Bogotá';
+    
     return Container(
       color: Colors.white,
       padding: EdgeInsets.only(
@@ -349,14 +167,14 @@ class _ExploreScreenState extends State<ExploreScreen>
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Row(
                   children: [
-                    Icon(Icons.location_on, color: _primary, size: 14),
-                    SizedBox(width: 4),
+                    const Icon(Icons.location_on, color: _primary, size: 14),
+                    const SizedBox(width: 4),
                     Text(
-                      'Bogotá, Colombia',
-                      style: TextStyle(
+                      '$userCity, Colombia',
+                      style: const TextStyle(
                         fontSize: 12,
                         color: _primary,
                         fontWeight: FontWeight.w600,
@@ -364,10 +182,10 @@ class _ExploreScreenState extends State<ExploreScreen>
                     ),
                   ],
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
-                  'Buenos días',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                  'Buenos días${currentUser != null ? ', ${currentUser.nombre.split(' ').first}' : ''}',
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
                 ),
               ],
             ),
@@ -410,8 +228,13 @@ class _ExploreScreenState extends State<ExploreScreen>
               color: _darkBg,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Center(
-              child: Text('JD', style: TextStyle(color: Colors.white)),
+            child: Center(
+              child: Text(
+                currentUser != null 
+                    ? currentUser.nombre.split(' ').map((name) => name[0]).take(2).join().toUpperCase()
+                    : 'U',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              ),
             ),
           ),
         ],
@@ -573,7 +396,9 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   // ── Flash Deals ───────────────────────────────────────────────────────────
 
-  Widget _buildFlashDealsSection() {
+  Widget _buildFlashDealsSection(PromoService promoService) {
+    final flashDeals = promoService.getFlashDeals(limit: 5);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -636,8 +461,8 @@ class _ExploreScreenState extends State<ExploreScreen>
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _flashDeals.length,
-            itemBuilder: (_, i) => _buildFlashDealCard(_flashDeals[i]),
+            itemCount: flashDeals.length,
+            itemBuilder: (_, i) => _buildFlashDealCard(flashDeals[i], promoService),
           ),
         ),
       ],
@@ -667,16 +492,67 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   // ── Navegación ───────────────────────────────────────────────────────────
 
-  void _openPromotionDetails() {
+  void _openPromotionDetails(String promoCode) {
     HapticFeedback.lightImpact();
-    Navigator.pushNamed(context, AppRoutes.promotionDetails);
+    Navigator.pushNamed(context, AppRoutes.promotionDetails, arguments: promoCode);
+  }
+
+  // Helper method to build promo images with fallback
+  Widget _buildPromoImage(Promocion promo, String? emoji, double height) {
+    // Check if we have cached image bytes
+    final imageBytes = context.read<PromoService>().getImageBytes(promo.codigo);
+    
+    if (imageBytes != null) {
+      return Image.memory(
+        imageBytes,
+        height: height,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildImageFallback(emoji, height),
+      );
+    }
+    
+    // Try network image if available
+    if (promo.foto != null && promo.foto!.isNotEmpty) {
+      return Image.network(
+        promo.foto!,
+        height: height,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildImageFallback(emoji, height),
+      );
+    }
+    
+    // Fallback to emoji
+    return _buildImageFallback(emoji, height);
+  }
+
+  Widget _buildImageFallback(String? emoji, double height) {
+    return Container(
+      height: height,
+      width: double.infinity,
+      color: Colors.grey[200],
+      child: Center(
+        child: Text(
+          emoji ?? '📦',
+          style: TextStyle(fontSize: height * 0.4),
+        ),
+      ),
+    );
   }
 
   // ── Card NUEVA estilo imagen ─────────────────────────────────────────────
 
-  Widget _buildFlashDealCard(_FlashDeal deal) {
+  Widget _buildFlashDealCard(Promocion promo, PromoService promoService) {
+    final supermercado = promoService.getSupermercado(promo.idSupermercado);
+    final categoria = promoService.getCategoria(promo.idCategoria);
+    final categoriaStyle = promoService.getCategoriaStyle(promo.idCategoria);
+    final precioConDescuento = promoService.getPrecioConDescuento(promo);
+    final rating = promoService.getPromocionRating(promo.codigo);
+    final discount = promo.descuento != null ? '-${promo.descuento}%' : '';
+    
     return GestureDetector(
-      onTap: _openPromotionDetails,
+      onTap: () => _openPromotionDetails(promo.codigo),
       child: Container(
         width: 170,
         margin: const EdgeInsets.only(right: 14),
@@ -701,36 +577,32 @@ class _ExploreScreenState extends State<ExploreScreen>
               ),
               child: Stack(
                 children: [
-                  Image.network(
-                    _getImageByCategory(deal.category),
-                    height: 100,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+                  _buildPromoImage(promo, categoriaStyle['emoji'], 100),
 
                   // 🔴 DESCUENTO
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        deal.discount,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
+                  if (discount.isNotEmpty)
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          discount,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -742,7 +614,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    deal.title,
+                    promo.titulo,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -753,7 +625,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    deal.store,
+                    supermercado?.nombre ?? 'Tienda',
                     style: const TextStyle(
                       fontSize: 11,
                       color: Color(0xFF8A8FA8),
@@ -765,22 +637,24 @@ class _ExploreScreenState extends State<ExploreScreen>
                   Row(
                     children: [
                       Text(
-                        deal.price,
+                        '\$${precioConDescuento.toStringAsFixed(2)}',
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w900,
                           color: Colors.red,
                         ),
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        deal.originalPrice,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Color(0xFFB0B5CC),
-                          decoration: TextDecoration.lineThrough,
+                      if (promo.descuento != null && promo.descuento! > 0) ...[
+                        const SizedBox(width: 6),
+                        Text(
+                          '\$${promo.precio.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFFB0B5CC),
+                            decoration: TextDecoration.lineThrough,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
 
@@ -796,7 +670,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        deal.rating,
+                        rating.toStringAsFixed(1),
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -830,7 +704,9 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   // ── Tiendas cerca ─────────────────────────────────────────────────────────
 
-  Widget _buildNearbySection() {
+  Widget _buildNearbySection(PromoService promoService) {
+    final nearbyStores = promoService.getNearbyStores(limit: 5);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -869,8 +745,8 @@ class _ExploreScreenState extends State<ExploreScreen>
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _nearbyStores.length,
-            itemBuilder: (_, i) => _buildNearbyCard(_nearbyStores[i]),
+            itemCount: nearbyStores.length,
+            itemBuilder: (_, i) => _buildNearbyCard(nearbyStores[i], promoService),
           ),
         ),
       ],
@@ -879,7 +755,21 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   // ── Card moderna con imagen ───────────────────────────────────────────────
 
-  Widget _buildNearbyCard(_NearbyStore store) {
+  Widget _buildNearbyCard(Map<String, dynamic> storeData, PromoService promoService) {
+    final supermercado = storeData['supermercado'] as Supermercado;
+    final promociones = storeData['promociones'] as List<Promocion>;
+    final distancia = storeData['distancia'] as String;
+    final tiempo = storeData['tiempo'] as String;
+    
+    // Calculate average rating from promotions
+    double avgRating = 0;
+    if (promociones.isNotEmpty) {
+      final totalRating = promociones
+          .map((p) => promoService.getPromocionRating(p.codigo))
+          .reduce((a, b) => a + b);
+      avgRating = totalRating / promociones.length;
+    }
+    
     return Container(
       width: 180,
       margin: const EdgeInsets.only(right: 14),
@@ -902,11 +792,13 @@ class _ExploreScreenState extends State<ExploreScreen>
             borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
             child: Stack(
               children: [
-                Image.network(
-                  _getStoreImage(store.name),
+                Container(
                   height: 110,
                   width: double.infinity,
-                  fit: BoxFit.cover,
+                  color: Colors.grey[200],
+                  child: promociones.isNotEmpty
+                      ? _buildPromoImage(promociones.first, '🏪', 110)
+                      : const Center(child: Icon(Icons.store, size: 40, color: Colors.grey)),
                 ),
 
                 // 📍 DISTANCIA (overlay)
@@ -923,7 +815,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      store.distance,
+                      distancia,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 10.5,
@@ -934,34 +826,35 @@ class _ExploreScreenState extends State<ExploreScreen>
                 ),
 
                 // ⭐ RATING (overlay)
-                Positioned(
-                  right: 8,
-                  bottom: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.7),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.star, size: 10, color: Colors.yellow),
-                        const SizedBox(width: 3),
-                        Text(
-                          store.rating,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w700,
+                if (avgRating > 0)
+                  Positioned(
+                    right: 8,
+                    bottom: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.star, size: 10, color: Colors.yellow),
+                          const SizedBox(width: 3),
+                          Text(
+                            avgRating.toStringAsFixed(1),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
@@ -973,7 +866,7 @@ class _ExploreScreenState extends State<ExploreScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  store.name,
+                  supermercado.nombre,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -986,7 +879,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                 Row(
                   children: [
                     Text(
-                      store.category,
+                      '${promociones.length} promos',
                       style: const TextStyle(
                         fontSize: 11,
                         color: Color(0xFF8A8FA8),
@@ -1000,7 +893,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                     ),
                     const SizedBox(width: 3),
                     Text(
-                      store.time,
+                      tiempo,
                       style: const TextStyle(
                         fontSize: 11,
                         color: Color(0xFF8A8FA8),
@@ -1016,24 +909,47 @@ class _ExploreScreenState extends State<ExploreScreen>
     );
   }
 
-  // ── Imágenes dinámicas ────────────────────────────────────────────────────
-
-  String _getStoreImage(String name) {
-    switch (name) {
-      case 'Burger House':
-        return 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd';
-      case 'Coffee Lab':
-        return 'https://images.unsplash.com/photo-1509042239860-f550ce710b93';
-      case 'SportMax':
-        return 'https://images.unsplash.com/photo-1517649763962-0c623066013b';
-      default:
-        return 'https://images.unsplash.com/photo-1492724441997-5dc865305da7';
+  
+  Widget _buildPromoGridCard(Promocion promo, PromoService promoService) {
+    final supermercado = promoService.getSupermercado(promo.idSupermercado);
+    final categoria = promoService.getCategoria(promo.idCategoria);
+    final categoriaStyle = promoService.getCategoriaStyle(promo.idCategoria);
+    final precioConDescuento = promoService.getPrecioConDescuento(promo);
+    final rating = promoService.getPromocionRating(promo.codigo);
+    final reviewsCount = promoService.getPromocionReviewsCount(promo.codigo);
+    final urgency = promoService.getPromocionUrgency(promo);
+    
+    // For demo, use first user as current user
+    final currentUser = promoService.getUsuarios().isNotEmpty 
+        ? promoService.getUsuarios().first.id 
+        : 1;
+    final isFavorite = promoService.isFavorito(currentUser, promo.codigo);
+    
+    // Format time display
+    String timeDisplay = 'permanente';
+    if (promo.fechaFin != null) {
+      try {
+        final fechaFin = DateTime.parse(promo.fechaFin!);
+        final ahora = DateTime.now();
+        final diferencia = fechaFin.difference(ahora);
+        
+        if (diferencia.inDays > 0) {
+          timeDisplay = '${diferencia.inDays} días';
+        } else if (diferencia.inHours > 0) {
+          timeDisplay = '${diferencia.inHours} horas';
+        } else {
+          timeDisplay = '${diferencia.inMinutes} min';
+        }
+      } catch (e) {
+        timeDisplay = 'permanente';
+      }
     }
-  }
-
-  Widget _buildPromoGridCard(_PromoCard p) {
+    
+    final discount = promo.descuento != null ? '-${promo.descuento}%' : '';
+    final categoryColor = Color(int.parse(categoriaStyle['color']!.replaceFirst('#', '0xFF')));
+    
     return GestureDetector(
-      onTap: _openPromotionDetails,
+      onTap: () => _openPromotionDetails(promo.codigo),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -1061,17 +977,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                   fit: StackFit.expand,
                   children: [
                     // Imagen o fallback
-                    p.imageUrl != null
-                        ? Image.network(p.imageUrl!, fit: BoxFit.cover)
-                        : Container(
-                            color: p.categoryColor.withValues(alpha: 0.15),
-                            child: Center(
-                              child: Text(
-                                p.emoji,
-                                style: const TextStyle(fontSize: 50),
-                              ),
-                            ),
-                          ),
+                    _buildPromoImage(promo, categoriaStyle['emoji'], 126),
 
                     // 🔥 OVERLAY OSCURO
                     Container(
@@ -1088,52 +994,58 @@ class _ExploreScreenState extends State<ExploreScreen>
                     ),
 
                     // 🔥 DESCUENTO (arriba izquierda)
-                    Positioned(
-                      top: 10,
-                      left: 10,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.redAccent,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          p.discount,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
+                    if (discount.isNotEmpty)
+                      Positioned(
+                        top: 10,
+                        left: 10,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            discount,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
                     // 🔥 FAVORITO (círculo blanco flotante)
                     Positioned(
                       top: 10,
                       right: 10,
-                      child: Container(
-                        width: 34,
-                        height: 34,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.15),
-                              blurRadius: 8,
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          p.isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: p.isFavorite
-                              ? Colors.red
-                              : const Color(0xFFB0B5CC),
-                          size: 18,
+                      child: GestureDetector(
+                        onTap: () {
+                          promoService.toggleFavorito(currentUser, promo.codigo);
+                        },
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.15),
+                                blurRadius: 8,
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            isFavorite ? Icons.favorite : Icons.favorite_border,
+                            color: isFavorite
+                                ? Colors.red
+                                : const Color(0xFFB0B5CC),
+                            size: 18,
+                          ),
                         ),
                       ),
                     ),
@@ -1155,13 +1067,13 @@ class _ExploreScreenState extends State<ExploreScreen>
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: p.categoryColor.withValues(alpha: 0.12),
+                      color: categoryColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      p.category,
+                      categoria?.nombre ?? 'Categoría',
                       style: TextStyle(
-                        color: p.categoryColor,
+                        color: categoryColor,
                         fontSize: 10.5,
                         fontWeight: FontWeight.w700,
                       ),
@@ -1172,7 +1084,7 @@ class _ExploreScreenState extends State<ExploreScreen>
 
                   // 🔥 TÍTULO
                   Text(
-                    p.title,
+                    promo.titulo,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -1186,7 +1098,7 @@ class _ExploreScreenState extends State<ExploreScreen>
 
                   // 🔥 STORE
                   Text(
-                    p.store,
+                    supermercado?.nombre ?? 'Tienda',
                     style: const TextStyle(
                       fontSize: 11,
                       color: Color(0xFF8A8FA8),
@@ -1199,22 +1111,24 @@ class _ExploreScreenState extends State<ExploreScreen>
                   Row(
                     children: [
                       Text(
-                        p.price,
+                        '\$${precioConDescuento.toStringAsFixed(2)}',
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
                           color: Colors.redAccent,
                         ),
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        p.originalPrice,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Color(0xFFB0B5CC),
-                          decoration: TextDecoration.lineThrough,
+                      if (promo.descuento != null && promo.descuento! > 0) ...[
+                        const SizedBox(width: 6),
+                        Text(
+                          '\$${promo.precio.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Color(0xFFB0B5CC),
+                            decoration: TextDecoration.lineThrough,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
 
@@ -1230,7 +1144,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        p.rating,
+                        rating.toStringAsFixed(1),
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -1238,7 +1152,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        '(${p.reviews})',
+                        '($reviewsCount)',
                         style: const TextStyle(
                           fontSize: 10,
                           color: Color(0xFF8A8FA8),
@@ -1252,10 +1166,10 @@ class _ExploreScreenState extends State<ExploreScreen>
                       ),
                       const SizedBox(width: 3),
                       Text(
-                        p.time,
+                        timeDisplay,
                         style: const TextStyle(
                           fontSize: 10,
-                          color: Color(0xFF8A8FA8),
+                          color: Color(0xFFB0B5CC),
                         ),
                       ),
                     ],
@@ -1270,7 +1184,7 @@ class _ExploreScreenState extends State<ExploreScreen>
   }
 
   /// TODAS LAS PROMO
-  Widget _buildAllPromosHeader() {
+  Widget _buildAllPromosHeader(PromoService promoService) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 12),
       child: Row(
@@ -1330,7 +1244,8 @@ class _ExploreScreenState extends State<ExploreScreen>
     );
   }
 
-  SliverPadding _buildPromosGrid() {
+  SliverPadding _buildPromosGrid(PromoService promoService) {
+    final promociones = promoService.getPromocionesAprobadas();
     final screenWidth = MediaQuery.of(context).size.width;
     final isNarrow = screenWidth < 400;
     final crossAxisCount = _gridView ? 1 : 2;
@@ -1348,13 +1263,14 @@ class _ExploreScreenState extends State<ExploreScreen>
           childAspectRatio: childAspectRatio,
         ),
         delegate: SliverChildBuilderDelegate(
-          (context, index) => _buildPromoGridCard(_promos[index]),
-          childCount: _promos.length,
+          (context, index) => _buildPromoGridCard(promociones[index], promoService),
+          childCount: promociones.length,
         ),
       ),
     );
   }
 
+  
   // ── Bottom Nav ────────────────────────────────────────────────────────────
 
   Widget _buildBottomNav() {

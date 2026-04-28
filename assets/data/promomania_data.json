@@ -10,7 +10,8 @@
       "correo": "admin@gmail.com",
       "password": "123",
       "rol": "admin",
-      "estado": "activo"
+      "estado": "activo",
+      "ciudad": "Medellín"
     },
     {
       "id": 2,
@@ -18,7 +19,8 @@
       "correo": "juan@gmail.com",
       "password": "pass123",
       "rol": "usuario",
-      "estado": "activo"
+      "estado": "activo",
+      "ciudad": "Medellín"
     },
     {
       "id": 3,
@@ -26,7 +28,8 @@
       "correo": "maria@gmail.com",
       "password": "pass456",
       "rol": "usuario",
-      "estado": "activo"
+      "estado": "activo",
+      "ciudad": "Bogotá"
     }
   ],
   "supermercados": [
@@ -101,7 +104,9 @@
       "id_usuario": 2,
       "id_supermercado": 1,
       "id_categoria": 1,
-      "id_tipo_promocion": 1
+      "id_tipo_promocion": 1,
+      "lat": 6.244203,
+      "lng": -75.581211
     },
     {
       "codigo": "PROMO002",
@@ -121,7 +126,9 @@
       "id_usuario": 3,
       "id_supermercado": 2,
       "id_categoria": 3,
-      "id_tipo_promocion": 2
+      "id_tipo_promocion": 2,
+      "lat": 4.710986,
+      "lng": -74.072092
     },
     {
       "codigo": "PROMO003",
@@ -141,7 +148,119 @@
       "id_usuario": 2,
       "id_supermercado": 1,
       "id_categoria": 2,
-      "id_tipo_promocion": 3
+      "id_tipo_promocion": 3,
+      "lat": 6.244203,
+      "lng": -75.581211
+    },
+    {
+      "codigo": "PROMO004",
+      "titulo": "Smartphones en Oferta",
+      "descripcion": "Los últimos modelos de smartphones con gran descuento",
+      "precio": 899.99,
+      "descuento": 30,
+      "condicion_producto": "nuevo",
+      "ubicacion": "Electrónica",
+      "url": "https://ejemplo.com/promo4",
+      "foto": "https://via.placeholder.com/300x200?text=Smartphones",
+      "tipo_vigencia": "por_fecha",
+      "fecha_inicio": "2026-04-15",
+      "fecha_fin": "2026-05-15",
+      "estado": "aprobada",
+      "vistas": 189,
+      "id_usuario": 3,
+      "id_supermercado": 2,
+      "id_categoria": 1,
+      "id_tipo_promocion": 1,
+      "lat": 4.710986,
+      "lng": -74.072092
+    },
+    {
+      "codigo": "PROMO005",
+      "titulo": "Pantalones Jeans",
+      "descripcion": "Jeans de alta calidad a precio reducido",
+      "precio": 79.99,
+      "descuento": 25,
+      "condicion_producto": "nuevo",
+      "ubicacion": "Ropa",
+      "url": "https://ejemplo.com/promo5",
+      "foto": "https://via.placeholder.com/300x200?text=Jeans",
+      "tipo_vigencia": "permanente",
+      "fecha_inicio": null,
+      "fecha_fin": null,
+      "estado": "aprobada",
+      "vistas": 267,
+      "id_usuario": 2,
+      "id_supermercado": 1,
+      "id_categoria": 3,
+      "id_tipo_promocion": 3,
+      "lat": 6.244203,
+      "lng": -75.581211
+    },
+    {
+      "codigo": "PROMO006",
+      "titulo": "Frutas Frescas",
+      "descripcion": "Manzanas, peras y naranjas en oferta especial",
+      "precio": 12.50,
+      "descuento": 40,
+      "condicion_producto": "fresco",
+      "ubicacion": "Produce",
+      "url": "https://ejemplo.com/promo6",
+      "foto": "https://via.placeholder.com/300x200?text=Frutas",
+      "tipo_vigencia": "por_fecha",
+      "fecha_inicio": "2026-04-20",
+      "fecha_fin": "2026-04-25",
+      "estado": "aprobada",
+      "vistas": 423,
+      "id_usuario": 3,
+      "id_supermercado": 2,
+      "id_categoria": 2,
+      "id_tipo_promocion": 1,
+      "lat": 4.710986,
+      "lng": -74.072092
+    },
+    {
+      "codigo": "PROMO007",
+      "titulo": "Laptops Gaming",
+      "descripcion": "Potentes laptops para gaming con descuento especial",
+      "precio": 2299.99,
+      "descuento": 15,
+      "condicion_producto": "nuevo",
+      "ubicacion": "Computación",
+      "url": "https://ejemplo.com/promo7",
+      "foto": "https://via.placeholder.com/300x200?text=Laptops",
+      "tipo_vigencia": "por_fecha",
+      "fecha_inicio": "2026-04-01",
+      "fecha_fin": "2026-04-30",
+      "estado": "aprobada",
+      "vistas": 156,
+      "id_usuario": 2,
+      "id_supermercado": 1,
+      "id_categoria": 1,
+      "id_tipo_promocion": 1,
+      "lat": 6.244203,
+      "lng": -75.581211
+    },
+    {
+      "codigo": "PROMO008",
+      "titulo": "Zapatos Deportivos",
+      "descripcion": "Zapatillas para running y entrenamiento",
+      "precio": 129.99,
+      "descuento": 35,
+      "condicion_producto": "nuevo",
+      "ubicacion": "Calzado",
+      "url": "https://ejemplo.com/promo8",
+      "foto": "https://via.placeholder.com/300x200?text=Zapatillas",
+      "tipo_vigencia": "permanente",
+      "fecha_inicio": null,
+      "fecha_fin": null,
+      "estado": "aprobada",
+      "vistas": 298,
+      "id_usuario": 3,
+      "id_supermercado": 2,
+      "id_categoria": 3,
+      "id_tipo_promocion": 3,
+      "lat": 4.710986,
+      "lng": -74.072092
     }
   ],
   "promociones_horarios": [

@@ -17,6 +17,8 @@ class Promocion {
   final int idSupermercado;
   final int idCategoria;
   final int idTipoPromocion;
+  final double? lat;
+  final double? lng;
 
   Promocion({
     required this.codigo,
@@ -37,6 +39,8 @@ class Promocion {
     required this.idSupermercado,
     required this.idCategoria,
     required this.idTipoPromocion,
+    this.lat,
+    this.lng,
   });
 
   factory Promocion.fromJson(Map<String, dynamic> json) {
@@ -59,6 +63,8 @@ class Promocion {
       idSupermercado: json['id_supermercado'] as int,
       idCategoria: json['id_categoria'] as int,
       idTipoPromocion: json['id_tipo_promocion'] as int,
+      lat: json['lat'] as double?,
+      lng: json['lng'] as double?,
     );
   }
 
@@ -82,6 +88,8 @@ class Promocion {
       'id_supermercado': idSupermercado,
       'id_categoria': idCategoria,
       'id_tipo_promocion': idTipoPromocion,
+      'lat': lat,
+      'lng': lng,
     };
   }
 
@@ -104,6 +112,8 @@ class Promocion {
     int? idSupermercado,
     int? idCategoria,
     int? idTipoPromocion,
+    double? lat,
+    double? lng,
   }) {
     return Promocion(
       codigo: codigo ?? this.codigo,
@@ -124,6 +134,8 @@ class Promocion {
       idSupermercado: idSupermercado ?? this.idSupermercado,
       idCategoria: idCategoria ?? this.idCategoria,
       idTipoPromocion: idTipoPromocion ?? this.idTipoPromocion,
+      lat: lat ?? this.lat,
+      lng: lng ?? this.lng,
     );
   }
 }

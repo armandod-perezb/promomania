@@ -1,24 +1,8 @@
-// ============================================================================
-// ARCHIVO: manage_promotions_screen.dart
-// PROPÓSITO: Pantalla de gestión CRUD completa de promociones del panel admin.
-//            Permite crear, editar, aprobar/rechazar y eliminar promociones.
-//            Incluye el modal CrearPromoModal como widget independiente en el
-//            mismo archivo.
-// PATRÓN: StatefulWidget con AnimatedBuilder sobre ChangeNotifier global.
-//         Lógica de negocio delegada a promoService (servicio global).
-// ============================================================================
-// ============================================================================
-// ARCHIVO: manage_promotions_screen.dart
-// ============================================================================
-
 import 'package:flutter/material.dart';
 import '../Core/Routes/app_routes.dart';
 import '../main.dart';
 import '../models/promocion.dart';
 
-// ============================================================================
-// WIDGET PRINCIPAL: ManagePromotionsScreen
-// ============================================================================
 class ManagePromotionsScreen extends StatefulWidget {
   const ManagePromotionsScreen({super.key});
 
@@ -34,6 +18,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
   static const Color textGray = Color(0xFF8A8A9A);
   static const Color greenAccent = Color(0xFF2ECC71);
   static const Color bgColor = Color(0xFFF5F5F8);
+  static const Color yellowAccent = Color(0xFFF39C12); // Para 'pendiente'
 
   List<Promocion> get _promos => promoService.promociones;
 
@@ -196,8 +181,10 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
+  // ============================================================================
+  // PROMO CARD — con badge de estado tri-color y botones aprobar/rechazar
+  // ============================================================================
   Widget _buildPromoCard(Promocion promo) {
-    final bool isActive = promo.estado == 'aprobada';
     final badge = '${promo.descuento ?? 0}%';
 
     return Container(
@@ -215,11 +202,13 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
       ),
       child: Column(
         children: [
+          // ── Header ──────────────────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Badge de descuento
                 Container(
                   width: 56,
                   height: 56,
@@ -256,6 +245,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
                             child: Text(
@@ -270,7 +260,9 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          _statusBadge(isActive),
+                          // ── BADGE DE ESTADO TRI-COLOR ──────────────────────
+                          // aprobada → verde | pendiente → amarillo | rechazada → rojo
+                          _estadoBadge(promo.estado),
                         ],
                       ),
                       const SizedBox(height: 5),
@@ -292,7 +284,6 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      // Muestra fechas o "Permanente" según tipoVigencia
                       Row(
                         children: [
                           const Icon(
@@ -313,7 +304,6 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      // Muestra condición del producto
                       Row(
                         children: [
                           const Icon(
@@ -337,7 +327,11 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
               ],
             ),
           ),
+
+          // ── Código promocional ───────────────────────────────────────────────
           _buildCodeSection(promo.codigo),
+
+          // ── Stats ────────────────────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
             child: Row(
@@ -350,33 +344,29 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
               ],
             ),
           ),
+
+          // ── Botones de acción ────────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.all(14),
-            child: Row(
+            child: Column(
               children: [
-                Expanded(
-                  child: _outlineBtn(
-                    icon: Icons.edit_outlined,
-                    label: 'Editar',
-                    onTap: () => _editPromo(promo),
-                  ),
+                // Fila 1: Editar + Eliminar
+                Row(
+                  children: [
+                    Expanded(
+                      child: _outlineBtn(
+                        icon: Icons.edit_outlined,
+                        label: 'Editar',
+                        onTap: () => _editPromo(promo),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    _deleteBtn(onTap: () => _confirmDelete(promo)),
+                  ],
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: isActive
-                      ? _solidBtn(
-                          icon: Icons.check_circle_outline,
-                          label: 'Aprobada',
-                          onTap: () => _changeStatus(promo, 'rechazada'),
-                        )
-                      : _solidBtn(
-                          icon: Icons.check_circle_outline,
-                          label: 'Aprobar',
-                          onTap: () => _changeStatus(promo, 'aprobada'),
-                        ),
-                ),
-                const SizedBox(width: 10),
-                _deleteBtn(onTap: () => _confirmDelete(promo)),
+                const SizedBox(height: 10),
+                // Fila 2: Aprobar / Rechazar — cambia según estado actual
+                _buildApprovalButtons(promo),
               ],
             ),
           ),
@@ -385,15 +375,181 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
+  // ============================================================================
+  // BADGE DE ESTADO TRI-COLOR
+  // verde   → aprobada
+  // amarillo→ pendiente
+  // rojo    → rechazada (o cualquier otro valor)
+  // ============================================================================
+  Widget _estadoBadge(String estado) {
+    Color color;
+    String label;
+    IconData icon;
+
+    switch (estado) {
+      case 'aprobada':
+        color = greenAccent;
+        label = 'Aprobada';
+        icon = Icons.check_circle_outline;
+        break;
+      case 'pendiente':
+        color = yellowAccent;
+        label = 'Pendiente';
+        icon = Icons.hourglass_top_outlined;
+        break;
+      default: // 'rechazada'
+        color = Colors.red;
+        label = 'Rechazada';
+        icon = Icons.cancel_outlined;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 11, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================================
+  // BOTONES DE APROBACIÓN — lógica según estado actual
+  //
+  //  pendiente  → [✓ Aprobar]  [✗ Rechazar]
+  //  aprobada   → [✗ Rechazar] (ya aprobada, solo puede revertirse)
+  //  rechazada  → [✓ Aprobar]  (ya rechazada, solo puede reaprobarse)
+  // ============================================================================
+  Widget _buildApprovalButtons(Promocion promo) {
+    switch (promo.estado) {
+      case 'pendiente':
+        // Ambos botones visibles: el admin decide
+        return Row(
+          children: [
+            Expanded(
+              child: _aprobarBtn(onTap: () => _changeStatus(promo, 'aprobada')),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _rechazarBtn(
+                onTap: () => _changeStatus(promo, 'rechazada'),
+              ),
+            ),
+          ],
+        );
+
+      case 'aprobada':
+        // Solo mostrar opción de revocar aprobación
+        return _rechazarBtn(
+          label: 'Revocar aprobación',
+          onTap: () => _changeStatus(promo, 'rechazada'),
+        );
+
+      default: // 'rechazada'
+        // Solo mostrar opción de aprobar nuevamente
+        return _aprobarBtn(
+          label: 'Aprobar de nuevo',
+          onTap: () => _changeStatus(promo, 'aprobada'),
+        );
+    }
+  }
+
+  // Botón verde "Aprobar"
+  Widget _aprobarBtn({String label = 'Aprobar', required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 11),
+        decoration: BoxDecoration(
+          color: greenAccent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.check_circle_outline,
+              size: 15,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Botón rojo "Rechazar"
+  Widget _rechazarBtn({
+    String label = 'Rechazar',
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 11),
+        decoration: BoxDecoration(
+          color: Colors.red.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.red.withOpacity(0.3), width: 1.5),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.cancel_outlined, size: 15, color: Colors.red),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.red,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ============================================================================
+  // CHANGE STATUS
+  // ============================================================================
   void _changeStatus(Promocion promo, String nuevoEstado) {
     final updated = promo.copyWith(estado: nuevoEstado);
     promoService.updatePromocion(updated);
     setState(() {});
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Promoción: $nuevoEstado')));
+    final msg = nuevoEstado == 'aprobada'
+        ? '✓ Promoción aprobada'
+        : '✗ Promoción rechazada';
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
+  // ============================================================================
+  // EDIT PROMO
+  // ============================================================================
   void _editPromo(Promocion promo) {
     final tituloCtrl = TextEditingController(text: promo.titulo);
     final descCtrl = TextEditingController(text: promo.descripcion ?? '');
@@ -443,6 +599,9 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
+  // ============================================================================
+  // CONFIRM DELETE
+  // ============================================================================
   void _confirmDelete(Promocion promo) {
     showDialog(
       context: context,
@@ -470,39 +629,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
-  Widget _statusBadge(bool isActive) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: isActive
-            ? greenAccent.withOpacity(0.1)
-            : Colors.red.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 5,
-            height: 5,
-            decoration: BoxDecoration(
-              color: isActive ? greenAccent : Colors.red,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 4),
-          Text(
-            isActive ? 'Activa' : 'Expirada',
-            style: TextStyle(
-              color: isActive ? greenAccent : Colors.red,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // ── Widgets auxiliares ───────────────────────────────────────────────────────
 
   Widget _buildCodeSection(String code) {
     return Container(
@@ -576,9 +703,8 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
-  Widget _verticalDivider() {
-    return Container(width: 1, height: 36, color: const Color(0xFFEEEEF2));
-  }
+  Widget _verticalDivider() =>
+      Container(width: 1, height: 36, color: const Color(0xFFEEEEF2));
 
   Widget _conversionStat(int pct) {
     return Expanded(
@@ -635,38 +761,6 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
-  Widget _solidBtn({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 11),
-        decoration: BoxDecoration(
-          color: textDark,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 15, color: Colors.white),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _deleteBtn({required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
@@ -681,6 +775,8 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
       ),
     );
   }
+
+  // ── Navegación ───────────────────────────────────────────────────────────────
 
   String _routeForIndex(int index) {
     switch (index) {
@@ -768,17 +864,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
 }
 
 // ============================================================================
-// WIDGET SECUNDARIO: CrearPromoModal — VERSIÓN COMPLETA
-// Campos agregados vs versión anterior:
-//   ✅ condicionProducto  → SegmentedButton (nuevo/usado/reacondicionado)
-//   ✅ tipoVigencia       → SegmentedButton (por_fecha/permanente)
-//   ✅ fechaInicio        → DatePicker (solo visible si tipoVigencia == 'por_fecha')
-//   ✅ fechaFin           → DatePicker (solo visible si tipoVigencia == 'por_fecha')
-//   ✅ ubicacion          → TextField opcional
-//   ✅ url                → TextField opcional
-//   ✅ idSupermercado     → TextField numérico (antes hardcoded en 1)
-//   ✅ idCategoria        → TextField numérico (antes hardcoded en 1)
-//   ✅ idTipoPromocion    → TextField numérico (antes hardcoded en 1)
+// CrearPromoModal — sin cambios respecto a la versión anterior completa
 // ============================================================================
 class CrearPromoModal extends StatefulWidget {
   const CrearPromoModal({super.key});
@@ -788,12 +874,10 @@ class CrearPromoModal extends StatefulWidget {
 }
 
 class _CrearPromoModalState extends State<CrearPromoModal> {
-  // ── Paleta local ────────────────────────────────────────────────────────────
   static const Color primaryOrange = Color(0xFFFF5733);
   static const Color textDark = Color(0xFF1A1A2E);
   static const Color textGray = Color(0xFF8A8A9A);
 
-  // ── Controladores de texto ──────────────────────────────────────────────────
   final _codigo = TextEditingController();
   final _titulo = TextEditingController();
   final _descripcion = TextEditingController();
@@ -807,12 +891,8 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
   final _idCategoria = TextEditingController(text: '1');
   final _idTipoPromocion = TextEditingController(text: '1');
 
-  // ── Estado de selectors ─────────────────────────────────────────────────────
-  // condicionProducto: 'nuevo' | 'usado' | 'reacondicionado'
   String _condicionProducto = 'nuevo';
-  // tipoVigencia: 'por_fecha' | 'permanente'
   String _tipoVigencia = 'por_fecha';
-  // estado siempre inicia en 'pendiente'
   final String _estado = 'pendiente';
 
   @override
@@ -832,9 +912,6 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
     super.dispose();
   }
 
-  // ── DatePicker reutilizable ─────────────────────────────────────────────────
-  // Abre el selector de fecha de Material y escribe en formato YYYY-MM-DD,
-  // coherente con el fromJson del modelo.
   Future<void> _pickDate(TextEditingController ctrl) async {
     final picked = await showDatePicker(
       context: context,
@@ -854,9 +931,10 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
     }
   }
 
-  // ── Validación y persistencia ───────────────────────────────────────────────
+  void _snack(String msg) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+
   void _crearPromocion() {
-    // Campos obligatorios: código, título, precio
     if (_codigo.text.isEmpty) {
       _snack('El código es obligatorio');
       return;
@@ -869,7 +947,6 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
       _snack('El precio es obligatorio');
       return;
     }
-    // Fechas requeridas solo cuando tipoVigencia == 'por_fecha'
     if (_tipoVigencia == 'por_fecha') {
       if (_fechaInicio.text.isEmpty || _fechaFin.text.isEmpty) {
         _snack('Ingresa fecha de inicio y fin');
@@ -883,28 +960,20 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
       descripcion: _descripcion.text.isEmpty ? null : _descripcion.text,
       precio: double.tryParse(_precio.text) ?? 0.0,
       descuento: int.tryParse(_descuento.text),
-      condicionProducto: _condicionProducto, // ✅ seleccionable
-      ubicacion: _ubicacion.text.isEmpty ? null : _ubicacion.text, // ✅
-      url: _url.text.isEmpty ? null : _url.text, // ✅
+      condicionProducto: _condicionProducto,
+      ubicacion: _ubicacion.text.isEmpty ? null : _ubicacion.text,
+      url: _url.text.isEmpty ? null : _url.text,
       foto: null,
       fotoEsLocal: false,
-      tipoVigencia: _tipoVigencia, // ✅ seleccionable
-      fechaInicio:
-          _tipoVigencia ==
-              'por_fecha' // ✅
-          ? _fechaInicio.text
-          : null,
-      fechaFin:
-          _tipoVigencia ==
-              'por_fecha' // ✅
-          ? _fechaFin.text
-          : null,
+      tipoVigencia: _tipoVigencia,
+      fechaInicio: _tipoVigencia == 'por_fecha' ? _fechaInicio.text : null,
+      fechaFin: _tipoVigencia == 'por_fecha' ? _fechaFin.text : null,
       estado: _estado,
       vistas: 0,
       idUsuario: sessionManager.usuarioActual?.id ?? 1,
-      idSupermercado: int.tryParse(_idSupermercado.text) ?? 1, // ✅ editable
-      idCategoria: int.tryParse(_idCategoria.text) ?? 1, // ✅ editable
-      idTipoPromocion: int.tryParse(_idTipoPromocion.text) ?? 1, // ✅ editable
+      idSupermercado: int.tryParse(_idSupermercado.text) ?? 1,
+      idCategoria: int.tryParse(_idCategoria.text) ?? 1,
+      idTipoPromocion: int.tryParse(_idTipoPromocion.text) ?? 1,
     );
 
     promoService.addPromocion(nuevaPromo);
@@ -912,12 +981,6 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
     Navigator.pop(context);
   }
 
-  void _snack(String msg) =>
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-
-  // ── Helpers de UI ───────────────────────────────────────────────────────────
-
-  // Etiqueta de sección estandarizada
   Widget _label(String text) => Padding(
     padding: const EdgeInsets.only(bottom: 6),
     child: Text(
@@ -931,7 +994,6 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
     ),
   );
 
-  // TextField genérico reutilizable con estilo consistente
   Widget _field(
     TextEditingController ctrl, {
     String hint = '',
@@ -966,7 +1028,6 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
     ),
   );
 
-  // Fila de chips de selección única (reemplaza DropdownButton por algo más visual)
   Widget _chipSelector({
     required List<String> options,
     required List<String> labels,
@@ -1004,11 +1065,9 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
     );
   }
 
-  // ── BUILD ───────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Container(
-      // 92% de altura para acomodar los campos adicionales
       height: MediaQuery.of(context).size.height * 0.92,
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -1017,7 +1076,6 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
       child: Column(
         children: [
           const SizedBox(height: 10),
-          // Drag handle
           Container(
             width: 40,
             height: 4,
@@ -1031,7 +1089,6 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
               children: [
-                // ── Título del modal ─────────────────────────────────────────
                 const Text(
                   'Crear Promoción',
                   style: TextStyle(
@@ -1042,17 +1099,14 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                 ),
                 const SizedBox(height: 20),
 
-                // ── CÓDIGO * ─────────────────────────────────────────────────
                 _label('CÓDIGO *'),
                 _field(_codigo, hint: 'PROMO2024'),
                 const SizedBox(height: 14),
 
-                // ── TÍTULO * ─────────────────────────────────────────────────
                 _label('TÍTULO *'),
                 _field(_titulo, hint: 'Descuento especial en frutas'),
                 const SizedBox(height: 14),
 
-                // ── DESCRIPCIÓN ──────────────────────────────────────────────
                 _label('DESCRIPCIÓN'),
                 _field(
                   _descripcion,
@@ -1061,7 +1115,6 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                 ),
                 const SizedBox(height: 14),
 
-                // ── PRECIO * + DESCUENTO % ───────────────────────────────────
                 Row(
                   children: [
                     Expanded(
@@ -1095,8 +1148,6 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                 ),
                 const SizedBox(height: 14),
 
-                // ── CONDICIÓN DEL PRODUCTO ───────────────────────────────────
-                // Chips: nuevo / usado / reacondicionado
                 _label('CONDICIÓN DEL PRODUCTO'),
                 _chipSelector(
                   options: ['nuevo', 'usado', 'reacondicionado'],
@@ -1106,8 +1157,6 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                 ),
                 const SizedBox(height: 14),
 
-                // ── TIPO DE VIGENCIA ─────────────────────────────────────────
-                // Chips: por_fecha / permanente
                 _label('TIPO DE VIGENCIA'),
                 _chipSelector(
                   options: ['por_fecha', 'permanente'],
@@ -1117,8 +1166,6 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                 ),
                 const SizedBox(height: 14),
 
-                // ── FECHAS (solo si tipoVigencia == 'por_fecha') ─────────────
-                // Se ocultan automáticamente al seleccionar 'permanente'
                 if (_tipoVigencia == 'por_fecha') ...[
                   Row(
                     children: [
@@ -1166,12 +1213,10 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                   const SizedBox(height: 14),
                 ],
 
-                // ── UBICACIÓN (opcional) ─────────────────────────────────────
                 _label('UBICACIÓN'),
                 _field(_ubicacion, hint: 'Ej: Calle 80 #45-12, Bogotá'),
                 const SizedBox(height: 14),
 
-                // ── URL (opcional) ───────────────────────────────────────────
                 _label('URL'),
                 _field(
                   _url,
@@ -1180,8 +1225,6 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                 ),
                 const SizedBox(height: 14),
 
-                // ── IDs de relación ──────────────────────────────────────────
-                // Fila 1: Supermercado + Categoría
                 Row(
                   children: [
                     Expanded(
@@ -1215,7 +1258,6 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                 ),
                 const SizedBox(height: 14),
 
-                // Fila 2: Tipo de promoción
                 _label('ID TIPO PROMOCIÓN *'),
                 _field(
                   _idTipoPromocion,
@@ -1224,10 +1266,8 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                 ),
                 const SizedBox(height: 24),
 
-                // ── BOTONES ──────────────────────────────────────────────────
                 Row(
                   children: [
-                    // Cancelar: flex 1
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(context),
@@ -1249,7 +1289,6 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    // Crear Promoción: flex 2
                     Expanded(
                       flex: 2,
                       child: ElevatedButton.icon(

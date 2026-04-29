@@ -159,21 +159,21 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 Icons.people_outline,
                 promoService.usuarios.length.toString(),     // Cantidad real de usuarios
                 'Usuarios',
-                '+1 hoy',
+                '+50%',
               ),
               const SizedBox(width: 12),
               _headerStat(
                 Icons.confirmation_number_outlined,
-                promoService.promociones.length.toString(),  // Cantidad real de promos
-                'Promociones',
-                '+7 hoy',
+                promoService.promociones.length.toString(),  // Cantidad real de tickets
+                'Tickets',
+                '+32%',
               ),
               const SizedBox(width: 12),
               _headerStat(
-                Icons.storefront_outlined,
-                promoService.supermercados.length.toString(), // Cantidad real de comercios
-                'Comercios',
-                '+18%',
+                Icons.attach_money,
+                '\$4.2M',                                     // Revenue
+                'Revenue',
+                '+32%',
               ),
             ],
           ),
@@ -198,51 +198,72 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   /// Mini-card de estadística usada dentro del header.
   /// Recibe: ícono, valor numérico, etiqueta y badge de tendencia.
   Widget _headerStat(IconData icon, String value, String label, String badge) {
-    return Expanded( // Expanded hace que cada stat ocupe el mismo ancho disponible
+    return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,                    // Contraste sobre el fondo naranja
-          borderRadius: BorderRadius.circular(14),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(icon, color: Colors.white70, size: 16),
-                // Badge de tendencia (ej. "+1 hoy")
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.white24,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    badge,
+            // Ícono en la izquierda
+            Icon(icon, color: primaryOrange, size: 24),
+            const SizedBox(width: 8),
+            // Valor y label en el centro
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    value,
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w600,
+                      color: textDark,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            // Número grande (el KPI principal)
-            Text(
-              value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      color: textGray,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
-            Text(
-              label,
-              style: const TextStyle(color: Colors.white70, fontSize: 11),
+            const SizedBox(width: 6),
+            // Badge de tendencia en la derecha
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+              decoration: BoxDecoration(
+                color: greenAccent.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.trending_up, color: greenAccent, size: 10),
+                  const SizedBox(width: 2),
+                  Text(
+                    badge,
+                    style: const TextStyle(
+                      color: greenAccent,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
           ],
         ),

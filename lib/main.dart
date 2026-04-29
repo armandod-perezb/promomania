@@ -32,8 +32,10 @@ import 'Administrator/admin_noti_exportar_screen.dart';
 import 'services/promo_service.dart';
 import 'services/session_manager.dart';
 
-// 👇 IMPORTA TU ONBOARDING (agregado)
-import 'Onboarding/onboarding1_screen.dart';
+
+initialRoute: sessionManager.isOnboardingSeen()
+    ? AppRoutes.login
+    : AppRoutes.onboarding1,
 
 final sessionManager = SessionManager();
 final promoService = PromoService();

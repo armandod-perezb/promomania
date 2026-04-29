@@ -1,8 +1,12 @@
-import 'package:flutter/material.dart';
-import '../Core/Routes/app_routes.dart';
-import '../main.dart';
-import '../models/usuario.dart';
+// Importaciones necesarias para la pantalla de registro
+import 'package:flutter/material.dart';           // UI framework principal
+import '../Core/Routes/app_routes.dart';         // Definición de rutas de navegación
+import '../main.dart';                            // Para acceso a servicios globales (promoService, sessionManager)
+import '../models/usuario.dart';                  // Modelo de datos para usuarios
 
+/// Pantalla de registro de nuevos usuarios
+/// Permite crear cuenta con nombre, email y contraseña
+/// Incluye validación de campos y términos y condiciones
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -11,22 +15,26 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmController = TextEditingController();
+  // Controladores para los campos de texto del formulario
+  final TextEditingController _nameController = TextEditingController();    // Campo de nombre
+  final TextEditingController _emailController = TextEditingController();   // Campo de email
+  final TextEditingController _passwordController = TextEditingController(); // Campo de contraseña
+  final TextEditingController _confirmController = TextEditingController(); // Campo de confirmación
 
-  bool _obscurePassword = true;
-  bool _obscureConfirm = true;
-  bool _acceptTerms = false;
-  bool _isLoading = false;
+  // Variables de estado de UI
+  bool _obscurePassword = true;    // Ocultar/mostrar contraseña
+  bool _obscureConfirm = true;     // Ocultar/mostrar confirmación
+  bool _acceptTerms = false;       // Aceptación de términos y condiciones
+  bool _isLoading = false;         // Estado de carga durante registro
 
-  static const Color _primary = Color(0xFFFF4D2E);
-  static const Color _darkBg = Color(0xFF1A1F2E);
-  static const Color _lightBg = Color(0xFFF8F9FB);
+  // Colores constantes de la aplicación
+  static const Color _primary = Color(0xFFFF4D2E);    // Color primario rojo/naranja
+  static const Color _darkBg = Color(0xFF1A1F2E);     // Fondo oscuro para header
+  static const Color _lightBg = Color(0xFFF8F9FB);   // Fondo claro principal
 
   @override
   void dispose() {
+    // Liberar recursos de los controladores para evitar memory leaks
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -34,14 +42,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  /// Getter que determina si el formulario es válido para registro
+  /// Verifica: campos no vacíos, contraseña de 8+ caracteres, coincidencia de contraseñas y términos aceptados
   bool get _canRegister =>
-      _nameController.text.isNotEmpty &&
-      _emailController.text.isNotEmpty &&
-      _passwordController.text.length >= 8 &&
-      _passwordController.text == _confirmController.text &&
-      _acceptTerms;
+      _nameController.text.isNotEmpty &&           // Nombre no vacío
+      _emailController.text.isNotEmpty &&          // Email no vacío
+      _passwordController.text.length >= 8 &&     // Contraseña mínimo 8 caracteres
+      _passwordController.text == _confirmController.text && // Contraseñas coinciden
+      _acceptTerms;                                // Términos aceptados
 
+  /// Método principal para registrar un nuevo usuario
+  /// Valida formulario, verifica email duplicado, crea usuario y guarda sesión
   void _register() async {
+    // Validar que el formulario esté completo antes de continuar
     if (!_canRegister) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -51,60 +64,66 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    final email = _emailController.text.trim();
-    final nombre = _nameController.text.trim();
-    final password = _passwordController.text;
+    // Obtener y limpiar datos del formulario
+    final email = _emailController.text.trim();    // Email sin espacios
+    final nombre = _nameController.text.trim();    // Nombre sin espacios
+    final password = _passwordController.text;    // Contraseña (no se limpia)
 
+    // Activar estado de carga
     setState(() => _isLoading = true);
 
     try {
-      // Validar que el email no exista ya
+      // Validar que el email no exista ya en el sistema
       final usuarioExistente = promoService.getUsuarioByEmail(email);
       if (usuarioExistente != null) {
-        if (mounted) {
+        if (mounted) {  // Verificar que el widget aún está montado
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('El email ya está registrado')),
           );
         }
-        setState(() => _isLoading = false);
-        return;
+        setState(() => _isLoading = false);  // Detener carga
+        return;  // Salir del método
       }
 
-      // Crear nuevo usuario (generamos un ID simple)
+      // Crear nuevo usuario con ID auto-incremental
       final nuevoId =
           (promoService.getUsuarios().isNotEmpty
-              ? promoService.getUsuarios().last.id
-              : 0) +
-          1;
+              ? promoService.getUsuarios().last.id  // Último ID existente
+              : 0) + 1;  // Si no hay usuarios, empezar en 1
 
+      // Crear objeto Usuario con datos del formulario
       final nuevoUsuario = Usuario(
         id: nuevoId,
         nombre: nombre,
         correo: email,
-        password: password, // En producción: usar bcrypt
-        rol: 'user',
-        estado: 'activo',
+        password: password, // NOTA: En producción usar hashing (bcrypt)
+        rol: 'user',         // Rol por defecto para usuarios normales
+        estado: 'activo',    // Estado inicial del usuario
       );
 
-      // Guardar usuario en la base de datos
+      // Guardar nuevo usuario en la base de datos del servicio
       promoService.addUsuario(nuevoUsuario);
 
-      // Guardar sesión
+      // Guardar sesión del usuario para mantenerlo autenticado
       await sessionManager.guardarSesion(nuevoUsuario);
 
+      // Si el widget aún está montado, mostrar éxito y navegar
       if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('¡Registro exitoso!')));
+        // Navegar a pantalla principal reemplazando la ruta actual
         Navigator.pushReplacementNamed(context, AppRoutes.userHome);
       }
     } catch (e) {
+      // Manejar errores durante el proceso de registro
       if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
+      // Siempre detener el estado de carga al finalizar
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -114,29 +133,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _lightBg,
+      backgroundColor: _lightBg,  // Fondo claro principal
       body: Column(
         children: [
+          // Header con título y botón de retroceso
           _buildHeader(),
+          // Contenido del formulario scrollable
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Campo de nombre
                   _buildField(
                     label: 'NOMBRE',
                     hint: 'John Doe',
                     controller: _nameController,
                   ),
                   const SizedBox(height: 18),
+                  // Campo de email
                   _buildField(
                     label: 'CORREO',
                     hint: 'example@gmail.com',
                     controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType: TextInputType.emailAddress,  // Teclado con @ y .com
                   ),
                   const SizedBox(height: 18),
+                  // Campo de contraseña
                   _buildPasswordField(
                     label: 'CONTRASEÑA',
                     controller: _passwordController,
@@ -145,6 +169,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         setState(() => _obscurePassword = !_obscurePassword),
                   ),
                   const SizedBox(height: 18),
+                  // Campo de confirmación de contraseña
                   _buildPasswordField(
                     label: 'CONFIRMA CONTRASEÑA',
                     controller: _confirmController,
@@ -153,10 +178,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         setState(() => _obscureConfirm = !_obscureConfirm),
                   ),
                   const SizedBox(height: 20),
+                  // Checkbox de términos y condiciones
                   _buildTermsRow(),
                   const SizedBox(height: 28),
+                  // Botón principal de registro
                   _buildRegisterButton(),
                   const SizedBox(height: 20),
+                  // Enlace para iniciar sesión
                   _buildLoginLink(),
                 ],
               ),
@@ -167,13 +195,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  /// Construye el header superior con título y botón de retroceso
+  /// Muestra: botón de volver, título "Registro" y subtítulo informativo
   Widget _buildHeader() {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
-        color: _darkBg,
+        color: _darkBg,  // Fondo oscuro
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(28),
+          bottomLeft: Radius.circular(28),  // Bordes redondeados inferiores
           bottomRight: Radius.circular(28),
         ),
       ),
@@ -181,13 +211,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Botón de retroceso
           GestureDetector(
-            onTap: () => Navigator.pop(context),
+            onTap: () => Navigator.pop(context),  // Volver a pantalla anterior
             child: Container(
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.12),
+                color: Colors.white.withOpacity(0.12),  // Fondo semitransparente
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
@@ -198,6 +229,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           const SizedBox(width: 14),
+          // Columna con título y subtítulo
           const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -212,7 +244,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               SizedBox(height: 4),
               Text(
                 'Por favor, regístrate para empezar',
-                style: TextStyle(color: Color(0xFFB0B5CC), fontSize: 13),
+                style: TextStyle(color: Color(0xFFB0B5CC), fontSize: 13),  // Gris claro
               ),
             ],
           ),
@@ -221,6 +253,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  /// Construye un campo de texto genérico para el formulario
+  /// Muestra: etiqueta, campo de entrada con estilo personalizado
+  /// Parámetros:
+  /// - label: etiqueta del campo (ej: 'NOMBRE')
+  /// - hint: texto placeholder (ej: 'John Doe')
+  /// - controller: controlador del campo
+  /// - keyboardType: tipo de teclado (opcional)
   Widget _buildField({
     required String label,
     required String hint,
@@ -230,12 +269,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Etiqueta del campo
         Text(label, style: _labelStyle()),
         const SizedBox(height: 10),
+        // Campo de texto con validación en tiempo real
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
-          onChanged: (_) => setState(() {}),
+          onChanged: (_) => setState(() {}),  // Actualizar UI al cambiar texto
           style: _inputTextStyle(),
           decoration: _inputDecoration(hint: hint),
         ),
@@ -243,6 +284,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  /// Construye un campo de contraseña con toggle de visibilidad
+  /// Muestra: etiqueta, campo oculto y botón para mostrar/ocultar
+  /// Parámetros:
+  /// - label: etiqueta del campo
+  /// - controller: controlador del campo
+  /// - obscure: estado de visibilidad actual
+  /// - onToggle: callback al cambiar visibilidad
   Widget _buildPasswordField({
     required String label,
     required TextEditingController controller,
@@ -252,23 +300,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Etiqueta del campo
         Text(label, style: _labelStyle()),
         const SizedBox(height: 10),
+        // Campo de contraseña con ocultación
         TextFormField(
           controller: controller,
-          obscureText: obscure,
-          obscuringCharacter: '•',
-          onChanged: (_) => setState(() {}),
+          obscureText: obscure,                    // Ocultar texto
+          obscuringCharacter: '•',                // Carácter de ocultación
+          onChanged: (_) => setState(() {}),      // Actualizar UI al cambiar
           style: _inputTextStyle(),
           decoration: _inputDecoration(
-            hint: '••••••••••',
+            hint: '••••••••••',  // Placeholder con puntos
             suffix: GestureDetector(
-              onTap: onToggle,
+              onTap: onToggle,  // Toggle visibilidad
               child: Icon(
                 obscure
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                color: const Color(0xFFB0B5CC),
+                    ? Icons.visibility_outlined      // Icono de mostrar
+                    : Icons.visibility_off_outlined, // Icono de ocultar
+                color: const Color(0xFFB0B5CC),  // Gris claro
                 size: 20,
               ),
             ),
@@ -278,37 +328,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  /// Construye la fila de términos y condiciones
+  /// Muestra: checkbox personalizado y texto con enlaces destacados
   Widget _buildTermsRow() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        // Checkbox personalizado
         SizedBox(
           width: 20,
           height: 20,
           child: Checkbox(
             value: _acceptTerms,
-            onChanged: (v) => setState(() => _acceptTerms = v ?? false),
-            activeColor: _primary,
+            onChanged: (v) => setState(() => _acceptTerms = v ?? false),  // Actualizar estado
+            activeColor: _primary,  // Color cuando está activo
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(4),
             ),
-            side: const BorderSide(color: Color(0xFFCDD0DB), width: 1.5),
+            side: const BorderSide(color: Color(0xFFCDD0DB), width: 1.5),  // Borde gris claro
           ),
         ),
         const SizedBox(width: 10),
+        // Texto con enlaces destacados
         RichText(
           text: const TextSpan(
             text: 'Acepto los ',
-            style: TextStyle(color: Color(0xFF8A8FA8), fontSize: 13.5),
+            style: TextStyle(color: Color(0xFF8A8FA8), fontSize: 13.5),  // Gris claro
             children: [
               TextSpan(
                 text: 'Términos',
-                style: TextStyle(color: _primary, fontWeight: FontWeight.w700),
+                style: TextStyle(color: _primary, fontWeight: FontWeight.w700),  // Rojo primario
               ),
               TextSpan(text: ' y '),
               TextSpan(
                 text: 'Condiciones',
-                style: TextStyle(color: _primary, fontWeight: FontWeight.w700),
+                style: TextStyle(color: _primary, fontWeight: FontWeight.w700),  // Rojo primario
               ),
             ],
           ),
@@ -317,24 +371,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  /// Construye el botón principal de registro
+  /// Muestra: estado de carga con spinner o texto "Registrarse"
   Widget _buildRegisterButton() {
     return SizedBox(
       width: double.infinity,
       height: 54,
       child: ElevatedButton(
+        // Habilitar solo si formulario es válido y no está cargando
         onPressed: _canRegister && !_isLoading ? _register : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: _primary,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: _primary.withOpacity(0.45),
-          disabledForegroundColor: Colors.white,
+          backgroundColor: _primary,                    // Fondo primario
+          foregroundColor: Colors.white,               // Texto blanco
+          disabledBackgroundColor: _primary.withOpacity(0.45),  // Fondo deshabilitado
+          disabledForegroundColor: Colors.white,      // Texto deshabilitado
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          elevation: 0,
+          elevation: 0,  // Sin elevación
         ),
         child: _isLoading
-            ? const SizedBox(
+            ? // Mostrar spinner durante carga
+            const SizedBox(
                 width: 22,
                 height: 22,
                 child: CircularProgressIndicator(
@@ -342,7 +400,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   strokeWidth: 2.5,
                 ),
               )
-            : const Text(
+            : // Mostrar texto normal
+            const Text(
                 'Registrarse',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
               ),
@@ -350,20 +409,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  /// Construye el enlace para iniciar sesión
+  /// Muestra: texto descriptivo y enlace clickeable para volver al login
   Widget _buildLoginLink() {
     return Center(
       child: RichText(
         text: TextSpan(
           text: '¿Ya tienes una cuenta? ',
-          style: const TextStyle(color: Color(0xFF8A8FA8), fontSize: 13.5),
+          style: const TextStyle(color: Color(0xFF8A8FA8), fontSize: 13.5),  // Gris claro
           children: [
+            // Enlace clickeable para iniciar sesión
             WidgetSpan(
               child: GestureDetector(
-                onTap: () => Navigator.pop(context),
+                onTap: () => Navigator.pop(context),  // Volver a pantalla de login
                 child: const Text(
                   'Inicia sesión',
                   style: TextStyle(
-                    color: _primary,
+                    color: _primary,                    // Rojo primario
                     fontWeight: FontWeight.w700,
                     fontSize: 13.5,
                   ),
@@ -376,40 +438,52 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // ── Helpers de estilo ────────────────────────────────────────────────────────
+  // ── HELPERS DE ESTILO ─────────────────────────────────────────────────────────
 
+  /// Estilo para etiquetas de campos del formulario
+  /// Características: tamaño pequeño, negrita, espaciado entre letras
   TextStyle _labelStyle() => const TextStyle(
     fontSize: 11.5,
     fontWeight: FontWeight.w700,
-    color: Color(0xFF1A1F2E),
-    letterSpacing: 0.8,
+    color: Color(0xFF1A1F2E),  // Gris oscuro
+    letterSpacing: 0.8,        // Espaciado entre letras
   );
 
+  /// Estilo para texto de entrada de campos
+  /// Características: tamaño estándar, color oscuro
   TextStyle _inputTextStyle() =>
-      const TextStyle(fontSize: 14, color: Color(0xFF1A1F2E));
+      const TextStyle(fontSize: 14, color: Color(0xFF1A1F2E));  // Gris oscuro
 
+  /// Decoración personalizada para campos de texto
+  /// Muestra: placeholder, bordes redondeados, colores de estado
+  /// Parámetros:
+  /// - hint: texto placeholder
+  /// - suffix: widget adicional (opcional, ej: icono de visibilidad)
   InputDecoration _inputDecoration({required String hint, Widget? suffix}) =>
       InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Color(0xFFCDD0DB), fontSize: 14),
-        suffixIcon: suffix,
+        hintStyle: const TextStyle(color: Color(0xFFCDD0DB), fontSize: 14),  // Gris muy claro
+        suffixIcon: suffix,  // Icono adicional
         filled: true,
-        fillColor: Colors.white,
+        fillColor: Colors.white,  // Fondo blanco
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 18,
           vertical: 16,
         ),
+        // Borde por defecto
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE8EAF0), width: 1.5),
+          borderSide: const BorderSide(color: Color(0xFFE8EAF0), width: 1.5),  // Gris claro
         ),
+        // Borde cuando está habilitado
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE8EAF0), width: 1.5),
+          borderSide: const BorderSide(color: Color(0xFFE8EAF0), width: 1.5),  // Gris claro
         ),
+        // Borde cuando está enfocado
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: _primary, width: 1.8),
+          borderSide: const BorderSide(color: _primary, width: 1.8),  // Rojo primario
         ),
       );
 }

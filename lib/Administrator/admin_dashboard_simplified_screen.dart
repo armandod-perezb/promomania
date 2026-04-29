@@ -15,16 +15,21 @@ class _AdminDashboardSimplifiedScreenState
   // Construye un resumen de usuarios, promociones y actividad agregada.
   @override
   Widget build(BuildContext context) {
+    // AnimatedBuilder escucha a promoService (ChangeNotifier).
+    // Cada vez que los datos cambian, Flutter reconstruye solo este widget
+    // sin necesidad de llamar setState() manualmente.
     return AnimatedBuilder(
       animation: promoService,
       builder: (context, _) {
-        // Snapshot de entidades para calcular indicadores agregados del panel.
+        // Se obtienen copias de las listas actuales del servicio global.
+        // Estas llamadas devuelven los datos en tiempo real almacenados en memoria.
         final usuarios = promoService.getUsuarios();
         final promociones = promoService.getPromociones();
         final supermercados = promoService.getSupermercados();
         final comentarios = promoService.getComentarios();
 
-        // Estadísticas
+        // ── Cálculo de estadísticas derivadas ──
+        // .where() filtra la lista por condición y .length cuenta los resultados.
         final promocionesAprobadas = promociones
             .where((p) => p.estado == 'aprobada')
             .length;
@@ -34,7 +39,9 @@ class _AdminDashboardSimplifiedScreenState
         final promocionesRechazadas = promociones
             .where((p) => p.estado == 'rechazada')
             .length;
-        // Acumulado de alcance bruto de todas las promociones.
+
+        // .fold() recorre toda la lista acumulando un valor.
+        // Aquí suma el campo 'vistas' de cada promoción para obtener el total global.
         final totalVistas = promociones.fold<int>(
           0,
           (sum, p) => sum + p.vistas,
@@ -43,54 +50,62 @@ class _AdminDashboardSimplifiedScreenState
         return Scaffold(
           appBar: AppBar(
             title: const Text('Panel de Administración'),
-            elevation: 0,
+            elevation: 0, // Sin sombra bajo el AppBar
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Matriz de KPIs base para lectura rapida del estado del sistema.
+                // ── Cuadrícula 2×2 de KPIs principales ──
+                // GridView.count crea una cuadrícula con un número fijo de columnas.
+                // shrinkWrap: true hace que ocupe solo el espacio que necesita
+                // (necesario porque está dentro de un SingleChildScrollView).
+                // NeverScrollableScrollPhysics evita conflicto de scroll entre
+                // el GridView y el SingleChildScrollView que lo contiene.
                 GridView.count(
-                  crossAxisCount: 2,
+                  crossAxisCount: 2,                              // 2 columnas
                   shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
+                  physics: const NeverScrollableScrollPhysics(),  // Sin scroll propio
+                  mainAxisSpacing: 12,                            // Espacio vertical entre cards
+                  crossAxisSpacing: 12,                           // Espacio horizontal entre cards
                   children: [
                     _StatCard(
                       title: 'Usuarios',
-                      value: usuarios.length.toString(),
+                      value: usuarios.length.toString(),          // Dato en tiempo real
                       icon: Icons.people,
                       color: Colors.blue,
                     ),
                     _StatCard(
                       title: 'Promociones',
-                      value: promociones.length.toString(),
+                      value: promociones.length.toString(),       // Dato en tiempo real
                       icon: Icons.local_offer,
                       color: Colors.orange,
                     ),
                     _StatCard(
                       title: 'Supermercados',
-                      value: supermercados.length.toString(),
+                      value: supermercados.length.toString(),     // Dato en tiempo real
                       icon: Icons.store,
                       color: Colors.green,
                     ),
                     _StatCard(
                       title: 'Comentarios',
-                      value: comentarios.length.toString(),
+                      value: comentarios.length.toString(),       // Dato en tiempo real
                       icon: Icons.comment,
                       color: Colors.purple,
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
-                // Desglose por estado para detectar cuellos de revision/aprobacion.
+
+                // ── Sección: desglose de promociones por estado ──
                 const Text(
                   'Estado de Promociones',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
+
+                // Card verde → promociones aprobadas
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -107,12 +122,14 @@ class _AdminDashboardSimplifiedScreenState
                   ),
                 ),
                 const SizedBox(height: 8),
+
+                // Card amarilla → promociones pendientes de revisión
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.yellow[50],
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.yellow[700]!),
+                    border: Border.all(color: Colors.yellow[700]!), // ! afirma que no es null
                   ),
                   child: ListTile(
                     title: const Text('Pendientes'),
@@ -123,6 +140,8 @@ class _AdminDashboardSimplifiedScreenState
                   ),
                 ),
                 const SizedBox(height: 8),
+
+                // Card roja → promociones rechazadas
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -139,7 +158,9 @@ class _AdminDashboardSimplifiedScreenState
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Indicador global de visibilidad acumulada de contenido promocional.
+
+                // ── Indicador de vistas totales acumuladas ──
+                // Muestra el alcance global de todas las promociones combinadas.
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -157,6 +178,7 @@ class _AdminDashboardSimplifiedScreenState
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      // Número grande en azul para destacar el KPI de visibilidad
                       Text(
                         totalVistas.toString(),
                         style: const TextStyle(
@@ -177,11 +199,14 @@ class _AdminDashboardSimplifiedScreenState
   }
 }
 
+/// Widget reutilizable para cada tarjeta del grid de KPIs.
+/// Es un StatelessWidget porque no maneja estado propio;
+/// solo muestra la información que recibe por parámetros.
 class _StatCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color color;
+  final String title;  // Nombre del KPI (ej. "Usuarios")
+  final String value;  // Valor numérico ya convertido a String
+  final IconData icon; // Ícono representativo de la categoría
+  final Color color;   // Color temático de la card (fondo, borde e ícono)
 
   const _StatCard({
     required this.title,
@@ -194,17 +219,19 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        // Color por categoria para diferenciar cada tarjeta del grid.
+        // withOpacity(0.1) crea un fondo muy suave del color de la categoría,
+        // manteniendo legibilidad y diferenciando visualmente cada card.
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color),
+        border: Border.all(color: color), // Borde del mismo color para coherencia
       ),
       padding: const EdgeInsets.all(12),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center, // Centra el contenido verticalmente
         children: [
-          Icon(icon, color: color, size: 32),
+          Icon(icon, color: color, size: 32),  // Ícono grande del color temático
           const SizedBox(height: 8),
+          // Número principal del KPI en grande y en negrita
           Text(
             value,
             style: TextStyle(
@@ -214,6 +241,7 @@ class _StatCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
+          // Etiqueta descriptiva debajo del número
           Text(
             title,
             style: const TextStyle(fontSize: 12),

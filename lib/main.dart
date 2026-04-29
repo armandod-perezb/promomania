@@ -32,6 +32,9 @@ import 'Administrator/admin_noti_exportar_screen.dart';
 import 'services/promo_service.dart';
 import 'services/session_manager.dart';
 
+// 👇 IMPORTA TU ONBOARDING (agregado)
+import 'Onboarding/onboarding1_screen.dart';
+
 final sessionManager = SessionManager();
 final promoService = PromoService();
 
@@ -48,7 +51,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -57,7 +59,10 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.login,
+
+      // 👇 CAMBIO PRINCIPAL AQUÍ
+      initialRoute: AppRoutes.onboarding1,
+
       onGenerateRoute: (settings) {
         if (settings.name == AppRoutes.verifyCode) {
           final email = settings.arguments is String
@@ -79,7 +84,11 @@ class MyApp extends StatelessWidget {
         }
         return null;
       },
+
       routes: {
+        // 👇 NUEVA RUTA AGREGADA
+        AppRoutes.onboarding1: (context) => const Onboarding1Screen(),
+
         AppRoutes.login: (context) => const LoginScreen(),
         AppRoutes.register: (context) => const RegisterScreen(),
         AppRoutes.forgotPassword: (context) => const ForgotPasswordScreen(),

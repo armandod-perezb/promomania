@@ -1,30 +1,3 @@
-// ============================================================================
-// ARCHIVO: app_routes.dart
-// AUTORA: Nicely Meza
-//
-// PROPÓSITO:
-// Centralizar TODAS las rutas nombradas de la aplicación en un solo lugar.
-//
-// ¿POR QUÉ ES IMPORTANTE?
-// - Evita "hardcodear" strings en todo el proyecto (ej: '/login' escrito mil veces).
-// - Reduce errores tipográficos.
-// - Facilita mantenimiento y escalabilidad.
-// - Permite refactorizar rutas sin romper toda la app.
-//
-// PATRÓN UTILIZADO:
-// Clase estática (sin instanciar) con constantes globales.
-//
-// DECISIÓN DE DISEÑO:
-// Se usa `static const` porque:
-// ✔ No cambia en tiempo de ejecución
-// ✔ Es más eficiente (se define en compile-time)
-// ✔ Accesible desde cualquier parte sin crear objetos
-//
-// EJEMPLO DE USO:
-// Navigator.pushNamed(context, AppRoutes.login);
-//
-// ============================================================================
-
 class AppRoutes {
 
   // ==========================================================================
@@ -53,7 +26,10 @@ class AppRoutes {
   // Flujo de introducción a la app (pantallas iniciales tipo tutorial)
   // ==========================================================================
   
-  // Pantalla inicial onboarding
+  // 👇 ESTA ES LA LÍNEA QUE NECESITAS AGREGAR
+  static const onboarding1 = '/onboarding1';
+
+  // Pantalla inicial onboarding (la puedes dejar si ya la usabas)
   static const onboarding = '/onboarding';
 
   // Pantallas progresivas del onboarding

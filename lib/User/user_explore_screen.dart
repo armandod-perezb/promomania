@@ -75,63 +75,68 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _buildHeader(promoService)),
-          SliverToBoxAdapter(child: _buildSearchBar()),
-          SliverToBoxAdapter(child: _buildHeroBanner()),
-          if (promoService.loaded && promoService.loadError == null)
-            SliverToBoxAdapter(child: _buildFlashDealsSection(promoService)),
-          if (promoService.loaded && promoService.loadError == null)
-            SliverToBoxAdapter(child: _buildNearbySection(promoService)),
-          if (promoService.loaded && promoService.loadError == null)
-            SliverToBoxAdapter(child: _buildAllPromosHeader(promoService)),
-          if (promoService.loaded && promoService.loadError == null)
-            _buildPromosGrid(promoService),
-          if (!promoService.loaded && promoService.loadError == null)
-            const SliverFillRemaining(
-              child: Center(child: CircularProgressIndicator()),
-            ),
-          if (promoService.loadError != null)
-            SliverFillRemaining(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Error al cargar datos',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      promoService.loadError!,
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () => promoService.init(),
-                      child: const Text('Reintentar'),
-                    ),
-                  ],
+    return AnimatedBuilder(
+      animation: promoService,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFF5F6FA),
+          body: CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(child: _buildHeader(promoService)),
+              SliverToBoxAdapter(child: _buildSearchBar()),
+              SliverToBoxAdapter(child: _buildHeroBanner()),
+              if (promoService.loaded && promoService.loadError == null)
+                SliverToBoxAdapter(child: _buildFlashDealsSection(promoService)),
+              if (promoService.loaded && promoService.loadError == null)
+                SliverToBoxAdapter(child: _buildNearbySection(promoService)),
+              if (promoService.loaded && promoService.loadError == null)
+                SliverToBoxAdapter(child: _buildAllPromosHeader(promoService)),
+              if (promoService.loaded && promoService.loadError == null)
+                _buildPromosGrid(promoService),
+              if (!promoService.loaded && promoService.loadError == null)
+                const SliverFillRemaining(
+                  child: Center(child: CircularProgressIndicator()),
                 ),
-              ),
-            ),
-          const SliverToBoxAdapter(child: SizedBox(height: 24)),
-        ],
-      ),
-      bottomNavigationBar: _buildBottomNav(),
+              if (promoService.loadError != null)
+                SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Error al cargar datos',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          promoService.loadError!,
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => promoService.init(),
+                          child: const Text('Reintentar'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              const SliverToBoxAdapter(child: SizedBox(height: 24)),
+            ],
+          ),
+          bottomNavigationBar: _buildBottomNav(),
+        );
+      },
     );
   }
 
@@ -941,8 +946,7 @@ class _ExploreScreenState extends State<ExploreScreen>
     final currentUser = promoService.getUsuarios().isNotEmpty
         ? promoService.getUsuarios().first.id
         : 1;
-    final isFavorite = promoService.isFavorito(currentUser, promo.codigo);
-
+    
     // Format time display
     String timeDisplay = 'permanente';
     if (promo.fechaFin != null) {
@@ -1063,8 +1067,10 @@ class _ExploreScreenState extends State<ExploreScreen>
                             ],
                           ),
                           child: Icon(
-                            isFavorite ? Icons.favorite : Icons.favorite_border,
-                            color: isFavorite
+                            promoService.isFavorito(currentUser, promo.codigo) 
+                                ? Icons.favorite 
+                                : Icons.favorite_border,
+                            color: promoService.isFavorito(currentUser, promo.codigo)
                                 ? Colors.red
                                 : const Color(0xFFB0B5CC),
                             size: 18,

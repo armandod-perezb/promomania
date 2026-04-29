@@ -182,48 +182,53 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
 
   @override
   Widget build(BuildContext context) {
-    if (_promo == null) {
-      return const Scaffold(
-        body: Center(child: Text('No se encontró información de la promoción')),
-      );
-    }
+    return AnimatedBuilder(
+      animation: promoService,
+      builder: (context, _) {
+        if (_promo == null) {
+          return const Scaffold(
+            body: Center(child: Text('No se encontró información de la promoción')),
+          );
+        }
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: Scaffold(
-        backgroundColor: _lightBg,
-        body: Stack(
-          children: [
-            // Contenido scrollable
-            SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 100),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeroImage(),
-                  _buildMainInfo(),
-                  _buildDivider(),
-                  _buildCountdown(),
-                  _buildDivider(),
-                  _buildStats(),
-                  _buildDivider(),
-                  _buildDescription(),
-                  _buildDivider(),
-                  _buildStoreSection(),
-                  _buildDivider(),
-                  _buildLocationSection(),
-                  _buildDivider(),
-                  _buildReviewsSection(),
-                  _buildViewAllReviews(),
-                  const SizedBox(height: 24),
-                ],
-              ),
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.light,
+          child: Scaffold(
+            backgroundColor: _lightBg,
+            body: Stack(
+              children: [
+                // Contenido scrollable
+                SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 100),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeroImage(),
+                      _buildMainInfo(),
+                      _buildDivider(),
+                      _buildCountdown(),
+                      _buildDivider(),
+                      _buildStats(),
+                      _buildDivider(),
+                      _buildDescription(),
+                      _buildDivider(),
+                      _buildStoreSection(),
+                      _buildDivider(),
+                      _buildLocationSection(),
+                      _buildDivider(),
+                      _buildReviewsSection(),
+                      _buildViewAllReviews(),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+                // Bottom bar fijo
+                _buildBottomBar(),
+              ],
             ),
-            // Bottom bar fijo
-            _buildBottomBar(),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -280,7 +285,13 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                           : Icons.favorite_border_rounded,
                       iconColor: _isFavorite ? _primary : Colors.white,
                       onTap: () {
-                        setState(() => _isFavorite = !_isFavorite);
+                        promoService.toggleFavorito(_activeUserId, _promo!.codigo);
+                        setState(
+                          () => _isFavorite = promoService.isFavorito(
+                            _activeUserId,
+                            _promo!.codigo,
+                          ),
+                        );
                         HapticFeedback.lightImpact();
                       },
                     ),

@@ -9,19 +9,24 @@ import '../main.dart';
 // MODELOS
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Enum que clasifica cada evento de auditoría por categoría.
+/// Un enum es un tipo de dato con un conjunto fijo de valores posibles;
+/// aquí sirve para filtrar la lista sin usar Strings "mágicos" como "user".
 enum _ActivityType { user, promo, store, system }
 
+/// Modelo de datos inmutable que representa un evento de auditoría.
+/// Es "const" porque ninguno de sus campos cambia una vez creado (inmutable).
 class _ActivityItem {
-  final String actor;
-  final String actorInitial;
-  final Color actorColor;
-  final String action;
-  final String title;
-  final List<String> details;
-  final String time;
-  final _ActivityType type;
-  final String? badge;
-  final Color? badgeColor;
+  final String actor;           // Nombre del actor (usuario, comercio o sistema)
+  final String actorInitial;    // Inicial para el avatar circular
+  final Color actorColor;       // Color único que identifica al actor
+  final String action;          // Verbo de la acción (canjeó, creó, eliminó…)
+  final String title;           // Nombre de la entidad afectada
+  final List<String> details;   // Líneas de detalle adicionales (fecha, lugar…)
+  final String time;            // Tiempo relativo desde el evento (ej. "Hace 2m")
+  final _ActivityType type;     // Categoría del evento para el filtro
+  final String? badge;          // Etiqueta visual del tipo de evento (opcional)
+  final Color? badgeColor;      // Color de la etiqueta (opcional)
 
   const _ActivityItem({
     required this.actor,
@@ -48,23 +53,30 @@ class AdminAuditScreen extends StatefulWidget {
   State<AdminAuditScreen> createState() => _AdminAuditScreenState();
 }
 
+/// State con TickerProviderStateMixin porque en el futuro puede alojar
+/// AnimationControllers; también permite que sus hijos usen vsync: this.
 class _AdminAuditScreenState extends State<AdminAuditScreen>
     with TickerProviderStateMixin {
-  // Colores base para mantener una identidad visual consistente en auditoria.
-  static const Color _primary = Color(0xFFFF4D2E);
-  static const Color _darkBg = Color(0xFF1A1F2E);
-  static const Color _green = Color(0xFF10B981);
-  static const Color _blue = Color(0xFF3B82F6);
-  static const Color _purple = Color(0xFF8B5CF6);
-  static const Color _amber = Color(0xFFF59E0B);
-  static const Color _pink = Color(0xFFEC4899);
-  static const Color _lightBg = Color(0xFFF5F6FA);
 
-  int _selectedTab = 0; // Actividad/Reportes/Alertas/Exportar
-  int _selectedFilter = 0; // Todas/Usuarios/Promos/Comercios
-  int _selectedNavTab = 4; // Avisos activo
+  // ── Paleta de colores centralizada ──────────────────────────────────────────
+  // Definidas como constantes estáticas para que no se recreen en cada build.
+  static const Color _primary  = Color(0xFFFF4D2E); // Naranja/rojo de la marca
+  static const Color _darkBg   = Color(0xFF1A1F2E); // Fondo oscuro de cards premium
+  static const Color _green    = Color(0xFF10B981); // Verde para estados positivos
+  static const Color _blue     = Color(0xFF3B82F6); // Azul para promos y push
+  static const Color _purple   = Color(0xFF8B5CF6); // Morado para sistema/vistas
+  static const Color _amber    = Color(0xFFF59E0B); // Ámbar para alertas/expirados
+  static const Color _pink     = Color(0xFFEC4899); // Rosa para ciertos usuarios
+  static const Color _lightBg  = Color(0xFFF5F6FA); // Fondo gris muy claro
 
-  // Dataset de actividad reciente usado por la lista y los filtros de auditoria.
+  // ── Índices de estado de navegación ─────────────────────────────────────────
+  int _selectedTab = 0;       // Tab activo dentro de la auditoría (Actividad/Reportes/…)
+  int _selectedFilter = 0;    // Filtro activo de la lista (Todas/Usuarios/Promos/…)
+  int _selectedNavTab = 4;    // Tab activo en la barra inferior (4 = Avisos)
+
+  // ── Dataset de actividad ─────────────────────────────────────────────────────
+  // Lista constante de eventos de ejemplo. En producción vendría del backend.
+  // Se usa 'const' para que Flutter no recree los objetos en cada rebuild.
   final List<_ActivityItem> _activities = const [
     _ActivityItem(
       actor: 'Maria Garcia',
@@ -176,8 +188,11 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
     ),
   ];
 
+  /// Getter que devuelve la lista filtrada según el chip activo.
+  /// Un getter en Dart es una propiedad calculada: no almacena datos,
+  /// sino que los calcula cada vez que se accede (como un método sin paréntesis).
+  /// .where() filtra sin modificar la lista original; .toList() la materializa.
   List<_ActivityItem> get _filtered {
-    // Aplica el filtro seleccionado sin mutar la coleccion base.
     switch (_selectedFilter) {
       case 1:
         return _activities.where((a) => a.type == _ActivityType.user).toList();
@@ -186,47 +201,49 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
       case 3:
         return _activities.where((a) => a.type == _ActivityType.store).toList();
       default:
-        return _activities;
+        return _activities; // case 0: devuelve todos sin filtrar
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // AnnotatedRegion controla el color de los íconos de la barra de estado
+    // del sistema operativo (hora, batería…). SystemUiOverlayStyle.dark
+    // los pone en color oscuro, apropiado sobre fondos claros.
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
         backgroundColor: _lightBg,
         body: Column(
           children: [
-            // Encabezado administrativo con identidad del modulo.
-            _buildAdminTopBar(),
+            _buildAdminTopBar(),  // Barra de marca + notificaciones + avatar
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    // Bloque blanco superior: header + card de push + tabs
                     Container(
                       color: Colors.white,
                       child: Column(
                         children: [
-                          // Resumen de contexto + tarjeta de push + tabs.
-                          _buildPageHeader(),
-                          _buildPushNotifCard(),
+                          _buildPageHeader(),      // Título "Auditoría"
+                          _buildPushNotifCard(),   // Card oscura con estadísticas push
                           const SizedBox(height: 4),
-                          _buildStatsRow(),
-                          _buildTabBar(),
+                          _buildStatsRow(),        // Vacío por ahora (SizedBox.shrink)
+                          _buildTabBar(),          // Tabs: Actividad/Reportes/Alertas/Exportar
                         ],
                       ),
                     ),
                     const SizedBox(height: 8),
+                    // Bloque blanco inferior: filtros + lista de eventos
                     Container(
                       color: Colors.white,
                       child: Column(
                         children: [
-                          // Herramientas de consulta: filtros y listado de eventos.
-                          _buildFilterChips(),
-                          _buildActivityHeader(),
-                          _buildActivityList(),
-                          _buildVerMas(),
+                          _buildFilterChips(),     // Chips horizontales de filtro
+                          _buildActivityHeader(),  // Título "Actividad en Tiempo Real"
+                          _buildActivityList(),    // Lista de eventos filtrados
+                          _buildVerMas(),          // Botón "Ver más actividad"
                         ],
                       ),
                     ),
@@ -237,17 +254,21 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
             ),
           ],
         ),
-        bottomNavigationBar: _buildBottomNav(),
+        bottomNavigationBar: _buildBottomNav(), // Barra fija inferior de 5 tabs
       ),
     );
   }
 
   // ── Admin top bar ─────────────────────────────────────────────────────────────
 
+  /// Barra superior con logo de la app, nombre del panel,
+  /// ícono de notificaciones con punto rojo y avatar del admin.
   Widget _buildAdminTopBar() {
     return Container(
       color: Colors.white,
       padding: EdgeInsets.only(
+        // padding.top es la altura de la barra de estado del sistema (notch, etc.).
+        // Se suma 8 px extra de margen visual.
         top: MediaQuery.of(context).padding.top + 8,
         left: 16,
         right: 16,
@@ -255,6 +276,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
       ),
       child: Row(
         children: [
+          // ── Logo de la marca ──
           Container(
             width: 34,
             height: 34,
@@ -269,6 +291,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
             ),
           ),
           const SizedBox(width: 8),
+          // ── Nombre y subtítulo del panel ──
           const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -278,7 +301,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                   fontSize: 9,
                   fontWeight: FontWeight.w800,
                   color: Color(0xFFB0B5CC),
-                  letterSpacing: 1.2,
+                  letterSpacing: 1.2, // Espaciado entre letras para legibilidad
                 ),
               ),
               Text(
@@ -291,7 +314,9 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
               ),
             ],
           ),
+          // Spacer empuja el resto de widgets hacia la derecha
           const Spacer(),
+          // ── Ícono de notificaciones con punto indicador ──
           Stack(
             children: [
               Container(
@@ -307,6 +332,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                   size: 20,
                 ),
               ),
+              // Punto rojo posicionado encima del ícono con Positioned
               Positioned(
                 top: 6,
                 right: 6,
@@ -316,6 +342,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                   decoration: BoxDecoration(
                     color: _primary,
                     shape: BoxShape.circle,
+                    // Borde blanco para separar el punto del ícono de fondo
                     border: Border.all(color: Colors.white, width: 1.5),
                   ),
                 ),
@@ -323,6 +350,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
             ],
           ),
           const SizedBox(width: 8),
+          // ── Avatar del admin (navega al perfil al tocar) ──
           GestureDetector(
             onTap: () => Navigator.pushNamed(context, AppRoutes.userProfile),
             child: Container(
@@ -351,11 +379,13 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
 
   // ── Page header ───────────────────────────────────────────────────────────────
 
+  /// Encabezado de sección con ícono, título "Auditoría" y subtítulo.
   Widget _buildPageHeader() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       child: Row(
         children: [
+          // Ícono de escudo/política con fondo ámbar translúcido
           Container(
             width: 36,
             height: 36,
@@ -392,6 +422,8 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
 
   // ── Push Notification card ────────────────────────────────────────────────────
 
+  /// Card oscura premium que muestra el estado de las notificaciones push
+  /// con tres métricas: enviadas, tasa de apertura y clics.
   Widget _buildPushNotifCard() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 4, 14, 12),
@@ -403,7 +435,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
             BoxShadow(
               color: _darkBg.withOpacity(0.2),
               blurRadius: 14,
-              offset: const Offset(0, 5),
+              offset: const Offset(0, 5), // Sombra hacia abajo
             ),
           ],
         ),
@@ -411,13 +443,12 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ── Fila superior: badge de tipo + botón "Nueva Campaña" ──
             Row(
               children: [
+                // Badge azul translúcido que identifica la sección
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 9,
-                    vertical: 4,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                   decoration: BoxDecoration(
                     color: const Color(0xFF3B82F6).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(8),
@@ -442,11 +473,9 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                   ),
                 ),
                 const Spacer(),
+                // Botón de acción principal (sin navegación implementada aún)
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: _primary,
                     borderRadius: BorderRadius.circular(10),
@@ -469,20 +498,22 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
               ],
             ),
             const SizedBox(height: 12),
+            // Descripción con opacidad reducida para no competir con los números
             Text(
               'Llega a tus usuarios en tiempo\nreal con mensajes personalizados',
               style: TextStyle(
                 color: Colors.white.withOpacity(0.7),
                 fontSize: 12.5,
-                height: 1.45,
+                height: 1.45, // Interlineado para el salto de línea
               ),
             ),
             const SizedBox(height: 16),
-            // Stats row dentro del card
+            // ── Fila de 3 métricas separadas por divisores verticales ──
             Row(
               children: [
                 _darkStat('4.2K', '↑ +14%', 'Enviadas'),
                 _darkStatDivider(),
+                // highlight: true pone el valor en color ámbar para destacarlo
                 _darkStat('89%', '↑ +8%', 'Tasa', highlight: true),
                 _darkStatDivider(),
                 _darkStat('2.8K', '↑ +11%', 'Clics'),
@@ -494,11 +525,13 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
     );
   }
 
+  /// Mini-stat vertical dentro de la card oscura.
+  /// [highlight] cambia el color del valor a ámbar para resaltarlo visualmente.
   Widget _darkStat(
     String val,
     String change,
     String label, {
-    bool highlight = false,
+    bool highlight = false, // Parámetro nombrado con valor por defecto false
   }) {
     return Expanded(
       child: Column(
@@ -506,6 +539,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
           Text(
             val,
             style: TextStyle(
+              // Si highlight es true → ámbar; si no → blanco
               color: highlight ? _amber : Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.w900,
@@ -515,7 +549,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
           Text(
             change,
             style: const TextStyle(
-              color: Color(0xFF10B981),
+              color: Color(0xFF10B981), // Verde para variaciones positivas
               fontSize: 10.5,
               fontWeight: FontWeight.w600,
             ),
@@ -533,25 +567,34 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
     );
   }
 
+  /// Línea vertical blanca semitransparente que separa las tres métricas.
   Widget _darkStatDivider() =>
       Container(width: 1, height: 40, color: Colors.white.withOpacity(0.1));
 
   // ── Stats row ─────────────────────────────────────────────────────────────────
 
+  /// Sección reservada para estadísticas adicionales del tab Actividad.
+  /// SizedBox.shrink() es el widget más liviano para no ocupar espacio
+  /// cuando no hay contenido (equivale a un widget de tamaño 0×0).
   Widget _buildStatsRow() {
-    // Solo visible en tab Actividad
     return const SizedBox.shrink();
   }
 
   // ── Tab bar ───────────────────────────────────────────────────────────────────
 
+  /// Barra de tabs internos de la auditoría: Actividad, Reportes, Alertas, Exportar.
+  /// El badge de Reportes se obtiene en tiempo real del promoService.
   Widget _buildTabBar() {
+    // Cantidad de reportes activos (dato en vivo del servicio global)
     final reportesBadge = promoService.getReportes().length;
+
+    // Lista de definiciones de tabs (modelo auxiliar _TabDef al final del archivo)
     final tabs = [
       _TabDef(icon: Icons.timeline_rounded, label: 'Actividad'),
       _TabDef(
         icon: Icons.bar_chart_rounded,
         label: 'Reportes',
+        // Si hay reportes muestra el número; si no, no muestra badge (null)
         badge: reportesBadge > 0 ? '$reportesBadge' : null,
       ),
       _TabDef(icon: Icons.warning_amber_rounded, label: 'Alertas', badge: '3'),
@@ -559,21 +602,25 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
     ];
 
     return Container(
+      // Línea divisora en la parte inferior del tab bar
       decoration: const BoxDecoration(
         border: Border(bottom: BorderSide(color: Color(0xFFF0F1F5), width: 1)),
       ),
       child: Row(
+        // List.generate crea una lista de widgets a partir de un índice,
+        // evitando escribir cada tab manualmente.
         children: List.generate(tabs.length, (i) {
           final isActive = _selectedTab == i;
           final t = tabs[i];
           return Expanded(
             child: GestureDetector(
-              onTap: () => _onAuditTabTap(i),
+              onTap: () => _onAuditTabTap(i), // Navega al sub-módulo correspondiente
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
+                      // Solo el tab activo tiene línea naranja en la parte inferior
                       color: isActive ? _primary : Colors.transparent,
                       width: 2.5,
                     ),
@@ -581,18 +628,20 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                 ),
                 child: Column(
                   children: [
+                    // Stack permite superponer el badge encima del ícono
                     Stack(
-                      clipBehavior: Clip.none,
+                      clipBehavior: Clip.none, // Permite que el badge salga del bounds
                       children: [
                         Icon(
                           t.icon,
                           size: 20,
                           color: isActive ? _primary : const Color(0xFFB0B5CC),
                         ),
+                        // El badge solo se muestra si t.badge no es null
                         if (t.badge != null)
                           Positioned(
                             top: -4,
-                            right: -8,
+                            right: -8, // Sale a la derecha del ícono
                             child: Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 4,
@@ -603,7 +652,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                t.badge!,
+                                t.badge!,  // ! afirma que no es null (ya lo chequeamos)
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 8,
@@ -619,9 +668,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                       t.label,
                       style: TextStyle(
                         fontSize: 10,
-                        fontWeight: isActive
-                            ? FontWeight.w800
-                            : FontWeight.w500,
+                        fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
                         color: isActive ? _primary : const Color(0xFFB0B5CC),
                       ),
                     ),
@@ -637,28 +684,32 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
 
   // ── Filter chips ──────────────────────────────────────────────────────────────
 
+  /// Fila horizontal de chips para filtrar la lista de actividad por categoría.
+  /// Usa SingleChildScrollView horizontal para que quepan sin overflow.
   Widget _buildFilterChips() {
     final filters = ['🔵 Todas', '👤 Usuarios', '🏷 Promos', '🏪 Comercios'];
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 4),
       child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
+        scrollDirection: Axis.horizontal, // Scroll solo en el eje X
         child: Row(
           children: List.generate(filters.length, (i) {
             final isActive = _selectedFilter == i;
             return GestureDetector(
               onTap: () {
+                // setState() le dice a Flutter que _selectedFilter cambió
+                // y que debe reconstruir el widget con el nuevo valor.
                 setState(() => _selectedFilter = i);
+                // HapticFeedback.selectionClick() genera vibración suave al seleccionar
                 HapticFeedback.selectionClick();
               },
               child: AnimatedContainer(
+                // AnimatedContainer interpola automáticamente entre el estado anterior
+                // y el nuevo en 180ms, animando color y borde sin código extra.
                 duration: const Duration(milliseconds: 180),
                 margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 7,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                 decoration: BoxDecoration(
                   color: isActive ? _darkBg : Colors.white,
                   borderRadius: BorderRadius.circular(20),
@@ -685,11 +736,13 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
 
   // ── Activity header ───────────────────────────────────────────────────────────
 
+  /// Encabezado de la lista con punto verde "en vivo" y botón de actualizar.
   Widget _buildActivityHeader() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
       child: Row(
         children: [
+          // Punto verde que simboliza actividad en tiempo real
           Container(
             width: 8,
             height: 8,
@@ -708,6 +761,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
             ),
           ),
           const Spacer(),
+          // Botón "Actualizar" (solo genera haptic; sin lógica de recarga aún)
           GestureDetector(
             onTap: () => HapticFeedback.lightImpact(),
             child: Container(
@@ -718,11 +772,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
               ),
               child: const Row(
                 children: [
-                  Icon(
-                    Icons.refresh_rounded,
-                    size: 13,
-                    color: Color(0xFF8A8FA8),
-                  ),
+                  Icon(Icons.refresh_rounded, size: 13, color: Color(0xFF8A8FA8)),
                   SizedBox(width: 4),
                   Text(
                     'Actualizar',
@@ -743,13 +793,16 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
 
   // ── Activity list ─────────────────────────────────────────────────────────────
 
+  /// Renderiza la lista de eventos filtrados como una columna de items.
+  /// Usa el getter _filtered para obtener solo los eventos del tipo seleccionado.
   Widget _buildActivityList() {
-    final items = _filtered;
+    final items = _filtered; // Llama al getter que aplica el filtro actual
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14),
       child: Column(
         children: List.generate(items.length, (i) {
           final item = items[i];
+          // isLast se usa para no dibujar la línea de tiempo bajo el último item
           final isLast = i == items.length - 1;
           return _buildActivityItem(item, isLast: isLast);
         }),
@@ -757,17 +810,24 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
     );
   }
 
+  /// Construye la fila de un evento individual con:
+  /// - Línea de tiempo vertical (conecta los eventos entre sí)
+  /// - Avatar circular con la inicial y color del actor
+  /// - Caja de detalle con título, badge y líneas de información
   Widget _buildActivityItem(_ActivityItem item, {bool isLast = false}) {
+    // IntrinsicHeight hace que todos los hijos de la fila tengan la misma altura,
+    // necesario para que la línea de tiempo llegue exactamente al siguiente item.
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Línea de tiempo
+          // ── Columna izquierda: avatar + línea de tiempo ──
           SizedBox(
             width: 40,
             child: Column(
               children: [
                 const SizedBox(height: 2),
+                // Avatar circular con color e inicial del actor
                 Container(
                   width: 34,
                   height: 34,
@@ -790,6 +850,9 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                     ),
                   ),
                 ),
+                // La línea de tiempo solo aparece si NO es el último item.
+                // Expanded hace que ocupe todo el espacio restante de la columna,
+                // conectando visualmente este item con el siguiente.
                 if (!isLast)
                   Expanded(
                     child: Container(
@@ -802,18 +865,21 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
             ),
           ),
           const SizedBox(width: 10),
-          // Contenido
+          // ── Columna derecha: nombre + acción + caja de detalle ──
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Fila: texto del actor+acción a la izquierda, hora a la derecha
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         child: RichText(
+                          // RichText permite mezclar estilos en una sola línea:
+                          // nombre en negrita + acción en texto normal.
                           text: TextSpan(
                             children: [
                               TextSpan(
@@ -846,16 +912,13 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                     ],
                   ),
                   const SizedBox(height: 5),
-                  // Caja del evento
+                  // ── Caja de detalle del evento ──
                   Container(
                     padding: const EdgeInsets.all(11),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF8F9FC),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: const Color(0xFFEEF0F6),
-                        width: 1,
-                      ),
+                      border: Border.all(color: const Color(0xFFEEF0F6), width: 1),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -873,6 +936,9 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                                 ),
                               ),
                             ),
+                            // El badge solo se renderiza si item.badge no es null.
+                            // ...[widgets] es el spread operator: inserta los
+                            // widgets de la lista directamente en la lista padre.
                             if (item.badge != null) ...[
                               const SizedBox(width: 8),
                               Container(
@@ -897,8 +963,11 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                             ],
                           ],
                         ),
+                        // Líneas de detalle (fecha, lugar, código…)
+                        // Solo se muestran si la lista no está vacía.
                         if (item.details.isNotEmpty) ...[
                           const SizedBox(height: 5),
+                          // .map() transforma cada String en un widget Text
                           ...item.details.map(
                             (d) => Padding(
                               padding: const EdgeInsets.only(top: 2),
@@ -927,13 +996,16 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
 
   // ── Ver más ───────────────────────────────────────────────────────────────────
 
+  /// Botón que simula cargar más eventos.
+  /// Por ahora solo genera feedback háptico; la lógica de paginación
+  /// se implementaría aquí (ej. llamada al backend con offset).
   Widget _buildVerMas() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
       child: GestureDetector(
         onTap: () => HapticFeedback.lightImpact(),
         child: Container(
-          width: double.infinity,
+          width: double.infinity, // Ocupa todo el ancho disponible
           padding: const EdgeInsets.symmetric(vertical: 13),
           decoration: BoxDecoration(
             color: _lightBg,
@@ -959,16 +1031,19 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
 
   // ── Bottom nav ────────────────────────────────────────────────────────────────
 
+  /// Barra de navegación inferior con 5 módulos del panel admin.
+  /// El tab activo (_selectedNavTab = 4, Avisos) se resalta con naranja.
   Widget _buildBottomNav() {
     final tabs = [
-      _NavItem(icon: Icons.dashboard_outlined, label: 'Panel'),
-      _NavItem(icon: Icons.people_outline_rounded, label: 'Usuarios'),
-      _NavItem(icon: Icons.local_offer_outlined, label: 'Promos'),
-      _NavItem(icon: Icons.storefront_outlined, label: 'Comercios'),
-      _NavItem(icon: Icons.notifications_outlined, label: 'Avisos'),
+      _NavItem(icon: Icons.dashboard_outlined,       label: 'Panel'),
+      _NavItem(icon: Icons.people_outline_rounded,   label: 'Usuarios'),
+      _NavItem(icon: Icons.local_offer_outlined,     label: 'Promos'),
+      _NavItem(icon: Icons.storefront_outlined,      label: 'Comercios'),
+      _NavItem(icon: Icons.notifications_outlined,   label: 'Avisos'),
     ];
 
     return Container(
+      // padding.bottom añade espacio para el home indicator en iPhones sin botón físico
       height: 60 + MediaQuery.of(context).padding.bottom,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -976,7 +1051,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
           BoxShadow(
             color: Colors.black.withOpacity(0.07),
             blurRadius: 12,
-            offset: const Offset(0, -2),
+            offset: const Offset(0, -2), // Sombra hacia arriba
           ),
         ],
       ),
@@ -986,18 +1061,18 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
           final isActive = _selectedNavTab == i;
           return GestureDetector(
             onTap: () => _onBottomNavTap(i),
+            // HitTestBehavior.opaque hace que toda el área del SizedBox
+            // sea táctil, aunque tenga fondo transparente.
             behavior: HitTestBehavior.opaque,
             child: SizedBox(
               width: 62,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // AnimatedContainer anima el fondo naranja al seleccionar un tab
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: isActive
                           ? _primary.withOpacity(0.1)
@@ -1028,42 +1103,42 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
     );
   }
 
+  // ── Métodos de navegación ─────────────────────────────────────────────────────
+
+  /// Traduce el índice del bottom nav a la ruta del módulo correspondiente.
   String _routeForIndex(int index) {
     switch (index) {
-      case 0:
-        return AppRoutes.adminDashboard;
-      case 1:
-        return AppRoutes.manageUsers;
-      case 2:
-        return AppRoutes.managePromotions;
-      case 3:
-        return AppRoutes.manageStores;
-      default:
-        return AppRoutes.manageNotifications;
+      case 0: return AppRoutes.adminDashboard;
+      case 1: return AppRoutes.manageUsers;
+      case 2: return AppRoutes.managePromotions;
+      case 3: return AppRoutes.manageStores;
+      default: return AppRoutes.manageNotifications;
     }
   }
 
+  /// Traduce el índice del tab de auditoría a su ruta específica.
+  /// Cada sub-pantalla de auditoría tiene su propia ruta en AppRoutes.
   String _notiRouteForTab(int index) {
     switch (index) {
-      case 0:
-        return AppRoutes.adminNotiActivity;
-      case 1:
-        return AppRoutes.adminNotiReport;
-      case 2:
-        return AppRoutes.adminNotiAlert;
-      default:
-        return AppRoutes.adminNotiExport;
+      case 0: return AppRoutes.adminNotiActivity;
+      case 1: return AppRoutes.adminNotiReport;
+      case 2: return AppRoutes.adminNotiAlert;
+      default: return AppRoutes.adminNotiExport;
     }
   }
 
+  /// Maneja el tap en los tabs internos de auditoría.
+  /// pushReplacementNamed reemplaza la pantalla actual sin apilar una nueva,
+  /// evitando que el botón "atrás" regrese al tab anterior.
   void _onAuditTabTap(int index) {
-    if (index == _selectedTab) return;
+    if (index == _selectedTab) return; // No navega si ya está activo
     HapticFeedback.selectionClick();
     Navigator.pushReplacementNamed(context, _notiRouteForTab(index));
   }
 
+  /// Maneja el tap en la barra de navegación inferior.
   void _onBottomNavTap(int index) {
-    if (index == _selectedNavTab) return;
+    if (index == _selectedNavTab) return; // No navega si ya está activo
     HapticFeedback.selectionClick();
     Navigator.pushReplacementNamed(context, _routeForIndex(index));
   }
@@ -1073,13 +1148,16 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
 // MODELOS AUXILIARES
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Definición de un tab de auditoría: ícono, etiqueta y badge opcional.
+/// Se separó en un modelo para que _buildTabBar sea más limpio y legible.
 class _TabDef {
   final IconData icon;
   final String label;
-  final String? badge;
+  final String? badge; // null = sin badge; String = muestra el valor en rojo
   const _TabDef({required this.icon, required this.label, this.badge});
 }
 
+/// Definición de un ítem del bottom nav: solo ícono y etiqueta.
 class _NavItem {
   final IconData icon;
   final String label;

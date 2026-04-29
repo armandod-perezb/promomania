@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import '../Core/Routes/app_routes.dart';
 import '../main.dart';
 import '../services/promo_service.dart';
@@ -39,13 +38,9 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   @override
   void initState() {
     super.initState();
-    // Initialize PromoService
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<PromoService>().init();
-    });
   }
 
-  void _dismiss(String promoCode, PromoService promoService) {
+  void _dismiss(String promoCode) {
     // For demo, use first user as current user
     final currentUser = promoService.getUsuarios().isNotEmpty 
         ? promoService.getUsuarios().first.id 
@@ -66,42 +61,38 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PromoService>(
-      builder: (context, promoService, child) {
-        // For demo, use first user as current user
-        final currentUser = promoService.getUsuarios().isNotEmpty 
-            ? promoService.getUsuarios().first.id 
-            : 1;
-        final favoritePromos = promoService.getFavoritosByUsuario(currentUser);
-        
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle.dark,
-          child: Scaffold(
-            backgroundColor: _lightBg,
-            body: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header que se desplaza con el contenido
-                  _buildTopHeader(promoService),
-                  _buildSavingsCard(promoService),
-                  if (_showBanner) _buildInfoBanner(),
-                  _buildTabBar(promoService),
-                  _buildPromoGroups(promoService),
-                  const SizedBox(height: 24),
-                ],
-              ),
-            ),
-            bottomNavigationBar: _buildBottomNav(),
+    // For demo, use first user as current user
+    final currentUser = promoService.getUsuarios().isNotEmpty 
+        ? promoService.getUsuarios().first.id 
+        : 1;
+    final favoritePromos = promoService.getFavoritosByUsuario(currentUser);
+    
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark,
+      child: Scaffold(
+        backgroundColor: _lightBg,
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header que se desplaza con el contenido
+              _buildTopHeader(),
+              _buildSavingsCard(),
+              if (_showBanner) _buildInfoBanner(),
+              _buildTabBar(),
+              _buildPromoGroups(),
+              const SizedBox(height: 24),
+            ],
           ),
-        );
-      },
+        ),
+        bottomNavigationBar: _buildBottomNav(),
+      ),
     );
   }
 
   // ── Header ──────────────────────────────────────────────────────────────────
 
-  Widget _buildTopHeader(PromoService promoService) {
+  Widget _buildTopHeader() {
     // For demo, use first user as current user
     final currentUser = promoService.getUsuarios().isNotEmpty 
         ? promoService.getUsuarios().first.id 
@@ -157,7 +148,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
 
   // ── Savings card ─────────────────────────────────────────────────────────────
 
-  Widget _buildSavingsCard(PromoService promoService) {
+  Widget _buildSavingsCard() {
     // For demo, use first user as current user
     final currentUser = promoService.getUsuarios().isNotEmpty 
         ? promoService.getUsuarios().first.id 
@@ -401,7 +392,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
 
   // ── Tab bar ──────────────────────────────────────────────────────────────────
 
-  Widget _buildTabBar(PromoService promoService) {
+  Widget _buildTabBar() {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
       padding: const EdgeInsets.all(6),
@@ -418,10 +409,10 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
       ),
       child: Row(
         children: [
-          _tabItem(0, 'Todas', promoService),
-          _tabItem(1, 'Por vencer', promoService),
-          _tabItem(2, 'Categorías', promoService),
-          _tabItem(3, 'Usados', promoService),
+          _tabItem(0, 'Todas'),
+          _tabItem(1, 'Por vencer'),
+          _tabItem(2, 'Categorías'),
+          _tabItem(3, 'Usados'),
         ],
       ),
     );
@@ -429,7 +420,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
 
   // ── Grupos de promos ─────────────────────────────────────────────────────────
 
-  Widget _buildPromoGroups(PromoService promoService) {
+  Widget _buildPromoGroups() {
     // For demo, use first user as current user
     final currentUser = promoService.getUsuarios().isNotEmpty 
         ? promoService.getUsuarios().first.id 
@@ -469,15 +460,15 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
             const Color(0xFFFF4D2E),
             '🔥',
           ),
-          ...promosByUrgency['today']!.map((p) => _buildSwipeCard(p, promoService)).toList(),
+          ...promosByUrgency['today']!.map((p) => _buildSwipeCard(p)).toList(),
         ],
         if (promosByUrgency['thisWeek']!.isNotEmpty) ...[
           _buildGroupHeader('Esta semana', const Color(0xFFF59E0B), '⏳'),
-          ...promosByUrgency['thisWeek']!.map((p) => _buildSwipeCard(p, promoService)).toList(),
+          ...promosByUrgency['thisWeek']!.map((p) => _buildSwipeCard(p)).toList(),
         ],
         if (promosByUrgency['noRush']!.isNotEmpty) ...[
           _buildGroupHeader('Sin prisa', const Color(0xFF10B981), '🟢'),
-          ...promosByUrgency['noRush']!.map((p) => _buildSwipeCard(p, promoService)).toList(),
+          ...promosByUrgency['noRush']!.map((p) => _buildSwipeCard(p)).toList(),
         ],
       ],
     );
@@ -514,11 +505,11 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
     );
   }
 
-  Widget _buildSwipeCard(Promocion promo, PromoService promoService) {
+  Widget _buildSwipeCard(Promocion promo) {
     return Dismissible(
       key: Key(promo.codigo),
       direction: DismissDirection.endToStart,
-      onDismissed: (_) => _dismiss(promo.codigo, promoService),
+      onDismissed: (_) => _dismiss(promo.codigo),
       background: Container(
         margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
         decoration: BoxDecoration(
@@ -543,11 +534,11 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
           ],
         ),
       ),
-      child: _buildPromoCard(promo, promoService),
+      child: _buildPromoCard(promo),
     );
   }
 
-  Widget _buildPromoCard(Promocion promo, PromoService promoService) {
+  Widget _buildPromoCard(Promocion promo) {
     final supermercado = promoService.getSupermercado(promo.idSupermercado);
     final categoria = promoService.getCategoria(promo.idCategoria);
     final categoriaStyle = promoService.getCategoriaStyle(promo.idCategoria);
@@ -867,7 +858,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
 
   // ── Helper Methods ────────────────────────────────────────────────────────────
 
-  Widget _tabItem(int index, String label, PromoService promoService) {
+  Widget _tabItem(int index, String label) {
     final isActive = _selectedTab == index;
     
     // For demo, use first user as current user
@@ -983,7 +974,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
 
   Widget _buildPromoImage(Promocion promo, String? emoji, double height) {
     // Check if we have cached image bytes
-    final imageBytes = context.read<PromoService>().getImageBytes(promo.codigo);
+    final imageBytes = promoService.getImageBytes(promo.codigo);
     
     if (imageBytes != null) {
       return Image.memory(

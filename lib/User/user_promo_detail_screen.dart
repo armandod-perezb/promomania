@@ -1,12 +1,15 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import '../main.dart';
 import '../models/promocion.dart';
 import '../models/promocion_horario.dart';
 import '../models/reporte.dart';
 import '../models/comentario.dart';
 import '../models/valoracion.dart'; 
+import '../services/image_storage_service.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODELOS
@@ -195,21 +198,98 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
 
   // ── Hero image ──────────────────────────────────────────────────────────────
 
+  Future<Uint8List?> _getHeroImageBytes() async {
+    final promoImage = _promo?.foto?.trim();
+    if (promoImage == null || promoImage.isEmpty) return null;
+
+    try {
+      if (promoImage.startsWith('http')) {
+        final response = await http.get(Uri.parse(promoImage));
+        if (response.statusCode == 200) {
+          return response.bodyBytes;
+        }
+      } else {
+        final imageStorageService = ImageStorageService();
+        return await imageStorageService.readImageBytes(promoImage);
+      }
+    } catch (e) {
+      debugPrint('Error obteniendo imagen de promoción: $e');
+    }
+
+    return null;
+  }
+
+  Widget _buildHeroPlaceholder() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.grey[300]!, Colors.grey[400]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.image, size: 48, color: Colors.grey),
+            SizedBox(height: 8),
+            Text(
+              'Sin imagen',
+              style: TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildHeroImage() {
-    final promoImage = (_promo?.foto != null && _promo!.foto!.isNotEmpty)
-        ? _promo!.foto!
-        : _heroImageUrl;
+    final hasPromoImage = _promo?.foto?.trim().isNotEmpty ?? false;
 
     return SizedBox(
       height: 290,
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image.network(
-            promoImage,
-            fit: BoxFit.cover,
-            alignment: Alignment.center,
-          ),
+          if (!hasPromoImage)
+            Image.network(
+              _heroImageUrl,
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+            )
+          else
+            FutureBuilder<Uint8List?>(
+              future: _getHeroImageBytes(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.grey[300]!, Colors.grey[400]!],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: const Center(child: CircularProgressIndicator()),
+                  );
+                }
+
+                if (snapshot.hasData && snapshot.data != null) {
+                  return Image.memory(
+                    snapshot.data!,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    errorBuilder: (context, error, stackTrace) {
+                      return _buildHeroPlaceholder();
+                    },
+                  );
+                }
+
+                return _buildHeroPlaceholder();
+              },
+            ),
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(

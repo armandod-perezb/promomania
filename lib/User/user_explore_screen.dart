@@ -413,7 +413,7 @@ class _ExploreScreenState extends State<ExploreScreen>
 
                 // Descripción de la oferta
                 const Text(
-                  '30% OFF — 20 piezas por $42.000',
+                  '30% OFF — 20 piezas por \$42.000',
                   style: TextStyle(color: Colors.white70, fontSize: 13),
                 ),
 

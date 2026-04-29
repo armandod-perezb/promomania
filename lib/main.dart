@@ -89,7 +89,7 @@ class MyApp extends StatelessWidget {
 
       routes: {
         // 👇 NUEVA RUTA AGREGADA
-        AppRoutes.onboarding1: (context) => const Onboarding1Screen(),
+        AppRoutes.onboarding1: (context) => const SplashScreen(),
 
         AppRoutes.login: (context) => const LoginScreen(),
         AppRoutes.register: (context) => const RegisterScreen(),

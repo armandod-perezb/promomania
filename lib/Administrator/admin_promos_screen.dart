@@ -1,10 +1,25 @@
+// ============================================================================
+// ARCHIVO: manage_promotions_screen.dart
+// PROPÓSITO: Pantalla de gestión CRUD completa de promociones del panel admin.
+//            Permite crear, editar, aprobar/rechazar y eliminar promociones.
+//            Incluye el modal CrearPromoModal como widget independiente en el
+//            mismo archivo.
+// PATRÓN: StatefulWidget con AnimatedBuilder sobre ChangeNotifier global.
+//         Lógica de negocio delegada a promoService (servicio global).
+// ============================================================================
+
 import 'package:flutter/material.dart';
-import '../Core/Routes/app_routes.dart';
-import '../main.dart';
-import '../models/promocion.dart';
+import '../Core/Routes/app_routes.dart'; // Rutas nombradas de la app
+import '../main.dart';                   // Expone promoService y sessionManager
+import '../models/promocion.dart';       // Modelo de datos Promocion con copyWith
 
-/// Pantalla de gestion de promociones: crear, editar, aprobar y eliminar.
+// ── Paleta de colores como static const (dentro de la clase de estado) ───────
+// Se definen como static const para que sean accesibles sin instancia y el
+// compilador las trate como constantes de compilación.
 
+// ============================================================================
+// WIDGET PRINCIPAL: ManagePromotionsScreen
+// ============================================================================
 class ManagePromotionsScreen extends StatefulWidget {
   const ManagePromotionsScreen({super.key});
 
@@ -13,20 +28,32 @@ class ManagePromotionsScreen extends StatefulWidget {
 }
 
 class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
-  // Mantiene el item activo en la barra de navegacion inferior.
+
+  // ── Estado local ────────────────────────────────────────────────────────────
+  // Índice del ítem activo en el BottomNav. Valor 2 = "Promos".
   int _selectedIndex = 2;
 
-  static const Color primaryOrange = Color(0xFFFF5733);
-  static const Color textDark = Color(0xFF1A1A2E);
-  static const Color textGray = Color(0xFF8A8A9A);
-  static const Color greenAccent = Color(0xFF2ECC71);
-  static const Color bgColor = Color(0xFFF5F5F8);
+  // Constantes de color declaradas como static const dentro de la clase de
+  // estado. Esto las hace accesibles en todos los métodos sin necesidad de
+  // pasarlas como parámetros.
+  static const Color primaryOrange = Color(0xFFFF5733); // Naranja principal
+  static const Color textDark      = Color(0xFF1A1A2E); // Texto oscuro principal
+  static const Color textGray      = Color(0xFF8A8A9A); // Texto secundario
+  static const Color greenAccent   = Color(0xFF2ECC71); // Verde para estados activos
+  static const Color bgColor       = Color(0xFFF5F5F8); // Fondo general
 
-  /// Obtiene promociones del servicio
+  // Getter que delega al servicio global para obtener la lista reactiva
+  // de promociones. Al ser un getter, siempre retorna el estado más reciente.
   List<Promocion> get _promos => promoService.promociones;
 
+  // ============================================================================
+  // BUILD PRINCIPAL
+  // ============================================================================
   @override
   Widget build(BuildContext context) {
+    // AnimatedBuilder se suscribe a promoService (ChangeNotifier).
+    // Cada vez que promoService llama notifyListeners(), esta pantalla
+    // se reconstruye, actualizando la lista de promociones automáticamente.
     return AnimatedBuilder(
       animation: promoService,
       builder: (context, _) {
@@ -35,6 +62,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
           body: SafeArea(
             child: Column(
               children: [
+                // Barra superior con logo, nombre de la app y avatar.
                 _buildTopBar(),
                 Expanded(
                   child: SingleChildScrollView(
@@ -42,10 +70,12 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Encabezado con CTA principal para crear promociones.
+                        // Título "Promociones" + botón "Nueva Promo".
                         _buildTitleRow(),
                         const SizedBox(height: 20),
-                        // Renderizado dinamico de todas las promociones actuales.
+                        // Spread operator (...) para insertar todas las tarjetas
+                        // de promoción como widgets hijos directos del Column.
+                        // Cada Promocion del getter _promos genera un _buildPromoCard.
                         ..._promos.map((p) => _buildPromoCard(p)),
                       ],
                     ),
@@ -60,13 +90,19 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
-  // ─── TOP BAR ────────────────────────────────────────────────────────────────
+  // ============================================================================
+  // TOP BAR
+  // Logo rectangular "AP" (Admin Panel), nombre de la app y avatar navegable.
+  // A diferencia de las pantallas de avisos, usa BorderRadius en lugar de
+  // BoxShape.circle para el logo.
+  // ============================================================================
   Widget _buildTopBar() {
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
+          // Logo "AP" con esquinas redondeadas (no circular)
           Container(
             width: 36,
             height: 36,
@@ -110,6 +146,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
               ],
             ),
           ),
+          // Avatar del admin → navega al perfil
           GestureDetector(
             onTap: () => Navigator.pushNamed(context, AppRoutes.userProfile),
             child: Container(
@@ -136,7 +173,11 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
-  // ─── TITLE ROW ──────────────────────────────────────────────────────────────
+  // ============================================================================
+  // TITLE ROW
+  // Fila con el título de sección y el botón CTA "Nueva Promo".
+  // Al tocar el botón, se abre un BottomSheet con CrearPromoModal.
+  // ============================================================================
   Widget _buildTitleRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -150,6 +191,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        // Botón naranja que abre el modal de creación
         GestureDetector(
           onTap: () => _showCrearPromoModal(),
           child: Container(
@@ -179,8 +221,10 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
+  // Abre el BottomSheet de creación de promociones.
+  // isScrollControlled: true permite que el modal ocupe más del 50% de pantalla.
+  // backgroundColor: transparent para que el Container interior maneje el fondo.
   void _showCrearPromoModal() {
-    // Formulario modal para alta rapida de promociones desde el admin.
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -189,11 +233,18 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
-  // ─── PROMO CARD ─────────────────────────────────────────────────────────────
+  // ============================================================================
+  // PROMO CARD
+  // Tarjeta completa de una promoción con secciones:
+  //   1. Header: badge de descuento, título, supermercado, fechas y estado.
+  //   2. Código promocional: fondo oscuro con QR decorativo.
+  //   3. Stats: canjes (fijo en 0), vistas (dinámico), conversión (fija en 0%).
+  //   4. Acciones: Editar, Aprobar/Aprobada, Eliminar.
+  // ============================================================================
   Widget _buildPromoCard(Promocion promo) {
-    // Una promo se considera activa cuando ya fue aprobada.
+    // Una promo es activa solo cuando su estado es exactamente 'aprobada'.
     final bool isActive = promo.estado == 'aprobada';
-    // Badge visual de descuento; usa 0% cuando no hay dato.
+    // Muestra 0% si el campo descuento es null (campo opcional en el modelo).
     final badge = '${promo.descuento ?? 0}%';
 
     return Container(
@@ -211,13 +262,13 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
       ),
       child: Column(
         children: [
-          // ── Top section ──────────────────────────────────────
+          // ── Sección 1: Header de la tarjeta ──────────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Badge
+                // Badge cuadrado con el porcentaje de descuento
                 Container(
                   width: 56,
                   height: 56,
@@ -249,7 +300,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Info
+                // Columna de información: título, supermercado, fechas
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,7 +311,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                             child: Text(
                               promo.titulo,
                               maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                              overflow: TextOverflow.ellipsis, // Trunca si es muy largo
                               style: const TextStyle(
                                 color: textDark,
                                 fontSize: 15,
@@ -269,42 +320,31 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                             ),
                           ),
                           const SizedBox(width: 8),
+                          // Badge de estado: verde=Activa, rojo=Expirada
                           _statusBadge(isActive),
                         ],
                       ),
                       const SizedBox(height: 5),
+                      // Identificador del supermercado asociado
                       Row(
                         children: [
-                          const Icon(
-                            Icons.storefront_outlined,
-                            size: 13,
-                            color: textGray,
-                          ),
+                          const Icon(Icons.storefront_outlined, size: 13, color: textGray),
                           const SizedBox(width: 4),
                           Text(
                             'Supermercado #${promo.idSupermercado}',
-                            style: const TextStyle(
-                              color: textGray,
-                              fontSize: 12,
-                            ),
+                            style: const TextStyle(color: textGray, fontSize: 12),
                           ),
                         ],
                       ),
                       const SizedBox(height: 4),
+                      // Rango de vigencia de la promoción
                       Row(
                         children: [
-                          const Icon(
-                            Icons.calendar_today_outlined,
-                            size: 12,
-                            color: textGray,
-                          ),
+                          const Icon(Icons.calendar_today_outlined, size: 12, color: textGray),
                           const SizedBox(width: 4),
                           Text(
                             '${promo.fechaInicio} → ${promo.fechaFin}',
-                            style: const TextStyle(
-                              color: textGray,
-                              fontSize: 12,
-                            ),
+                            style: const TextStyle(color: textGray, fontSize: 12),
                           ),
                         ],
                       ),
@@ -315,28 +355,30 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
             ),
           ),
 
-          // ── Promo code section ───────────────────────────────
+          // ── Sección 2: Código promocional ─────────────────────────────────
+          // Fondo oscuro con el código en letras grandes y un ícono de QR decorativo.
           _buildCodeSection(promo.codigo),
 
-          // ── Stats row ────────────────────────────────────────
+          // ── Sección 3: Estadísticas de la promo ──────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
             child: Row(
               children: [
-                _statItem('0', 'Canjes'),
+                _statItem('0', 'Canjes'),         // Hardcoded: aún sin implementar
                 _verticalDivider(),
-                _statItem(promo.vistas.toString(), 'Vistas'),
+                _statItem(promo.vistas.toString(), 'Vistas'), // Dinámico desde el modelo
                 _verticalDivider(),
-                _conversionStat(0),
+                _conversionStat(0),               // Hardcoded: cálculo pendiente
               ],
             ),
           ),
 
-          // ── Action buttons ───────────────────────────────────
+          // ── Sección 4: Botones de acción ──────────────────────────────────
           Padding(
             padding: const EdgeInsets.all(14),
             child: Row(
               children: [
+                // Botón outline para editar: abre AlertDialog con campos de edición
                 Expanded(
                   child: _outlineBtn(
                     icon: Icons.edit_outlined,
@@ -345,22 +387,24 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                   ),
                 ),
                 const SizedBox(width: 10),
+                // Botón sólido que actúa como toggle de aprobación:
+                // Si está aprobada → muestra "Aprobada" y permite revertir a 'rechazada'
+                // Si no está aprobada → muestra "Aprobar" y permite cambiar a 'aprobada'
                 Expanded(
                   child: isActive
                       ? _solidBtn(
                           icon: Icons.check_circle_outline,
                           label: 'Aprobada',
-                          // Permite revertir una aprobada a rechazada desde el card.
                           onTap: () => _changeStatus(promo, 'rechazada'),
                         )
                       : _solidBtn(
                           icon: Icons.check_circle_outline,
                           label: 'Aprobar',
-                          // Aprueba en un toque cuando esta pendiente/rechazada.
                           onTap: () => _changeStatus(promo, 'aprobada'),
                         ),
                 ),
                 const SizedBox(width: 10),
+                // Botón de eliminar con fondo rojo translúcido
                 _deleteBtn(onTap: () => _confirmDelete(promo)),
               ],
             ),
@@ -370,20 +414,33 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
-  /// Cambia el estado de la promoción
+  // ============================================================================
+  // CHANGE STATUS
+  // Actualiza el estado de una promoción en el servicio global.
+  // Usa el patrón copyWith para crear un objeto nuevo con el campo modificado,
+  // preservando inmutabilidad. Llama setState() para forzar reconstrucción local
+  // además de la que hace AnimatedBuilder.
+  // ============================================================================
   void _changeStatus(Promocion promo, String nuevoEstado) {
     final updated = promo.copyWith(estado: nuevoEstado);
-    promoService.updatePromocion(updated);
-    setState(() {});
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Promoción: $nuevoEstado')));
+    promoService.updatePromocion(updated); // Persiste en el servicio y notifica
+    setState(() {}); // Reconstrucción adicional por seguridad
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Promoción: $nuevoEstado')),
+    );
   }
 
-  /// Abre diálogo para editar promoción
+  // ============================================================================
+  // EDIT PROMO
+  // Abre un AlertDialog con dos TextField para editar título y descripción.
+  // Usa TextEditingController inicializados con los valores actuales de la promo.
+  // Al guardar, actualiza via promoService.updatePromocion() con copyWith.
+  // NOTA: Los controladores no tienen dispose() aquí porque el dialog
+  // gestiona su propio ciclo de vida al cerrarse.
+  // ============================================================================
   void _editPromo(Promocion promo) {
-    final tituloCtrl = TextEditingController(text: promo.titulo);
-    final descCtrl = TextEditingController(text: promo.descripcion ?? '');
+    final tituloCtrl  = TextEditingController(text: promo.titulo);
+    final descCtrl    = TextEditingController(text: promo.descripcion ?? '');
 
     showDialog(
       context: context,
@@ -414,7 +471,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
           ElevatedButton(
             onPressed: () {
               final updated = promo.copyWith(
-                titulo: tituloCtrl.text,
+                titulo:      tituloCtrl.text,
                 descripcion: descCtrl.text,
               );
               promoService.updatePromocion(updated);
@@ -430,7 +487,12 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
-  /// Confirma eliminación de promoción
+  // ============================================================================
+  // CONFIRM DELETE
+  // Muestra un AlertDialog de confirmación antes de eliminar.
+  // Usa promoService.deletePromocion(promo.codigo) — el código es el
+  // identificador primario de la promoción en el modelo de datos.
+  // ============================================================================
   void _confirmDelete(Promocion promo) {
     showDialog(
       context: context,
@@ -444,7 +506,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              promoService.deletePromocion(promo.codigo);
+              promoService.deletePromocion(promo.codigo); // Elimina por código
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Promoción eliminada')),
@@ -458,6 +520,10 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
+  // ── WIDGETS AUXILIARES DE LA TARJETA ─────────────────────────────────────────
+
+  // Badge de estado: verde con "Activa" o rojo con "Expirada".
+  // Incluye un punto de color como indicador visual adicional.
   Widget _statusBadge(bool isActive) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -470,6 +536,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Punto de color como indicador de estado
           Container(
             width: 5,
             height: 5,
@@ -492,6 +559,8 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
+  // Sección del código promocional con fondo oscuro (textDark).
+  // El ícono de QR es decorativo: no genera ni lee códigos reales.
   Widget _buildCodeSection(String code) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 14),
@@ -515,6 +584,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                 ),
               ),
               const SizedBox(height: 3),
+              // Código en mayúsculas con letterSpacing para legibilidad
               Text(
                 code,
                 style: const TextStyle(
@@ -527,6 +597,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
             ],
           ),
           const Spacer(),
+          // Ícono QR decorativo — sin funcionalidad de generación de QR real
           Container(
             width: 42,
             height: 42,
@@ -534,17 +605,15 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
               color: Colors.white10,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(
-              Icons.qr_code_2_rounded,
-              color: Colors.white,
-              size: 26,
-            ),
+            child: const Icon(Icons.qr_code_2_rounded, color: Colors.white, size: 26),
           ),
         ],
       ),
     );
   }
 
+  // Columna de estadística individual (Canjes / Vistas).
+  // Expanded para que cada columna ocupe el mismo espacio horizontal.
   Widget _statItem(String value, String label) {
     return Expanded(
       child: Column(
@@ -564,10 +633,13 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
+  // Separador vertical entre columnas de estadísticas.
   Widget _verticalDivider() {
     return Container(width: 1, height: 36, color: const Color(0xFFEEEEF2));
   }
 
+  // Columna de conversión en porcentaje con color verde.
+  // El valor `pct` es fijo en 0 — pendiente de implementar cálculo real.
   Widget _conversionStat(int pct) {
     return Expanded(
       child: Column(
@@ -581,15 +653,14 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
             ),
           ),
           const SizedBox(height: 2),
-          const Text(
-            'Conversión',
-            style: TextStyle(color: textGray, fontSize: 12),
-          ),
+          const Text('Conversión', style: TextStyle(color: textGray, fontSize: 12)),
         ],
       ),
     );
   }
 
+  // Botón con borde (outline) para acciones secundarias como "Editar".
+  // Recibe ícono, texto y callback como parámetros requeridos.
   Widget _outlineBtn({
     required IconData icon,
     required String label,
@@ -623,6 +694,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
+  // Botón sólido (fondo oscuro) para acciones primarias como "Aprobar".
   Widget _solidBtn({
     required IconData icon,
     required String label,
@@ -655,6 +727,8 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
+  // Botón de eliminar: cuadrado fijo de 42×42px con fondo rojo translúcido.
+  // No es Expanded, por eso tiene dimensiones fijas y no ocupa espacio flexible.
   Widget _deleteBtn({required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
@@ -670,18 +744,17 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     );
   }
 
+  // ============================================================================
+  // NAVEGACIÓN — BOTTOM NAV
+  // Mapea índice a ruta y navega usando pushReplacementNamed.
+  // ============================================================================
   String _routeForIndex(int index) {
     switch (index) {
-      case 0:
-        return AppRoutes.adminDashboard;
-      case 1:
-        return AppRoutes.manageUsers;
-      case 2:
-        return AppRoutes.managePromotions;
-      case 3:
-        return AppRoutes.manageStores;
-      default:
-        return AppRoutes.manageNotifications;
+      case 0: return AppRoutes.adminDashboard;
+      case 1: return AppRoutes.manageUsers;
+      case 2: return AppRoutes.managePromotions; // Esta pantalla
+      case 3: return AppRoutes.manageStores;
+      default: return AppRoutes.manageNotifications;
     }
   }
 
@@ -690,25 +763,26 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
     Navigator.pushReplacementNamed(context, _routeForIndex(index));
   }
 
-  // ─── BOTTOM NAV ─────────────────────────────────────────────────────────────
+  // ============================================================================
+  // BOTTOM NAV
+  // A diferencia de las pantallas de avisos, este BottomNav usa AnimatedContainer
+  // con una duración de 200ms para animar el fondo del ítem seleccionado.
+  // El ítem activo tiene un fondo naranja con 12% de opacidad.
+  // ============================================================================
   Widget _buildBottomNav() {
     final items = [
-      {'icon': Icons.dashboard_outlined, 'label': 'Panel'},
-      {'icon': Icons.people_outline, 'label': 'Usuarios'},
-      {'icon': Icons.local_offer_outlined, 'label': 'Promos'},
-      {'icon': Icons.storefront_outlined, 'label': 'Comercios'},
-      {'icon': Icons.notifications_outlined, 'label': 'Avisos'},
+      {'icon': Icons.dashboard_outlined,    'label': 'Panel'},
+      {'icon': Icons.people_outline,        'label': 'Usuarios'},
+      {'icon': Icons.local_offer_outlined,  'label': 'Promos'},
+      {'icon': Icons.storefront_outlined,   'label': 'Comercios'},
+      {'icon': Icons.notifications_outlined,'label': 'Avisos'},
     ];
 
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: [
-          BoxShadow(
-            color: Color(0x10000000),
-            blurRadius: 12,
-            offset: Offset(0, -2),
-          ),
+          BoxShadow(color: Color(0x10000000), blurRadius: 12, offset: Offset(0, -2)),
         ],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
@@ -719,12 +793,12 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
           return GestureDetector(
             onTap: () => _onBottomNavTap(i),
             child: AnimatedContainer(
+              // Animación de 200ms al cambiar el estado del ítem
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
-                color: selected
-                    ? primaryOrange.withOpacity(0.12)
-                    : Colors.transparent,
+                // Fondo naranja translúcido en el ítem activo
+                color: selected ? primaryOrange.withOpacity(0.12) : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -741,9 +815,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                     style: TextStyle(
                       color: selected ? primaryOrange : textGray,
                       fontSize: 10,
-                      fontWeight: selected
-                          ? FontWeight.w700
-                          : FontWeight.normal,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
                     ),
                   ),
                 ],
@@ -756,6 +828,23 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
   }
 }
 
+// ============================================================================
+// WIDGET SECUNDARIO: CrearPromoModal
+// BottomSheet modal para crear nuevas promociones.
+// Es un StatefulWidget independiente dentro del mismo archivo para mantener
+// cohesión con la pantalla que lo invoca.
+//
+// CAMPOS DEL FORMULARIO:
+//   - codigo (String, obligatorio): identificador único de la promo
+//   - titulo (String, obligatorio): nombre de la promoción
+//   - descripcion (String, opcional): detalles adicionales
+//   - precio (double, obligatorio): precio base del producto
+//   - descuento (int, opcional): porcentaje de descuento
+//   - estado: siempre inicia en 'pendiente'
+//
+// VALIDACIÓN: Se verifica que código, título y precio no estén vacíos antes
+// de crear el objeto Promocion.
+// ============================================================================
 class CrearPromoModal extends StatefulWidget {
   const CrearPromoModal({super.key});
 
@@ -764,16 +853,24 @@ class CrearPromoModal extends StatefulWidget {
 }
 
 class _CrearPromoModalState extends State<CrearPromoModal> {
-  final _titulo = TextEditingController();
-  final _descripcion = TextEditingController();
-  final _precio = TextEditingController();
-  final _descuento = TextEditingController();
-  final _codigo = TextEditingController();
 
+  // ── Controladores de texto ──────────────────────────────────────────────────
+  // Cada campo del formulario tiene su propio TextEditingController.
+  // Se liberan en dispose() para evitar memory leaks.
+  final _titulo      = TextEditingController();
+  final _descripcion = TextEditingController();
+  final _precio      = TextEditingController();
+  final _descuento   = TextEditingController();
+  final _codigo      = TextEditingController();
+
+  // Estado inicial de la promoción al crear: siempre 'pendiente'.
+  // El admin debe aprobarla manualmente desde la pantalla principal.
   String _estado = 'pendiente';
 
   @override
   void dispose() {
+    // Libera todos los controladores al destruir el widget.
+    // IMPORTANTE: Omitir esto causaría memory leaks en apps de larga duración.
     _titulo.dispose();
     _descripcion.dispose();
     _precio.dispose();
@@ -782,62 +879,87 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
     super.dispose();
   }
 
+  // ============================================================================
+  // CREAR PROMOCIÓN — Lógica de validación y persistencia
+  //
+  // Flujo:
+  //   1. Valida campos obligatorios (título, código, precio). Muestra SnackBar si falla.
+  //   2. Construye objeto Promocion con valores del formulario.
+  //   3. Llama promoService.addPromocion() para persistir y notificar.
+  //   4. Cierra el modal con Navigator.pop().
+  //
+  // Conversión de tipos:
+  //   - precio: String → double con double.tryParse() || 0.0 (fallback seguro)
+  //   - descuento: String → int con int.tryParse() → puede ser null (campo opcional)
+  //   - idUsuario: se obtiene de sessionManager.usuarioActual?.id ?? 1 (fallback)
+  // ============================================================================
   void _crearPromocion() {
+    // Validación secuencial de campos obligatorios
     if (_titulo.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('El título es obligatorio')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('El título es obligatorio')),
+      );
       return;
     }
     if (_codigo.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('El código es obligatorio')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('El código es obligatorio')),
+      );
       return;
     }
     if (_precio.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('El precio es obligatorio')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('El precio es obligatorio')),
+      );
       return;
     }
 
+    // Construcción del objeto Promocion con valores del formulario
     final nuevaPromo = Promocion(
-      codigo: _codigo.text,
-      titulo: _titulo.text,
-      descripcion: _descripcion.text,
-      precio: double.tryParse(_precio.text) ?? 0.0,
-      descuento: int.tryParse(_descuento.text),
-      condicionProducto: 'nuevo',
-      tipoVigencia: 'por_fecha',
-      estado: _estado,
-      vistas: 0,
-      idUsuario: sessionManager.usuarioActual?.id ?? 1,
-      idSupermercado: 1,
-      idCategoria: 1,
-      idTipoPromocion: 1,
+      codigo:            _codigo.text,
+      titulo:            _titulo.text,
+      descripcion:       _descripcion.text,
+      precio:            double.tryParse(_precio.text) ?? 0.0, // Conversión segura
+      descuento:         int.tryParse(_descuento.text),         // null si está vacío
+      condicionProducto: 'nuevo',      // Valor por defecto hardcoded
+      tipoVigencia:      'por_fecha',  // Valor por defecto hardcoded
+      estado:            _estado,      // Siempre 'pendiente' al crear
+      vistas:            0,            // Inicia sin vistas
+      idUsuario:         sessionManager.usuarioActual?.id ?? 1, // ID del admin actual
+      idSupermercado:    1,            // Hardcoded: debería ser seleccionable
+      idCategoria:       1,            // Hardcoded: debería ser seleccionable
+      idTipoPromocion:   1,            // Hardcoded: debería ser seleccionable
     );
 
-    promoService.addPromocion(nuevaPromo);
+    promoService.addPromocion(nuevaPromo); // Persiste y dispara notifyListeners()
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Promoción creada exitosamente')),
     );
 
-    Navigator.pop(context);
+    Navigator.pop(context); // Cierra el BottomSheet
   }
 
+  // ============================================================================
+  // BUILD DEL MODAL
+  // Ocupa el 75% de la altura de la pantalla.
+  // Usa BorderRadius.vertical para redondear solo la parte superior.
+  // El indicador de arrastre (línea gris) sigue la convención de Material Design.
+  // ============================================================================
   @override
   Widget build(BuildContext context) {
     return Container(
+      // 75% de la altura total de la pantalla
       height: MediaQuery.of(context).size.height * 0.75,
       decoration: const BoxDecoration(
         color: Colors.white,
+        // Solo esquinas superiores redondeadas (patrón estándar de BottomSheet)
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
       ),
       child: Column(
         children: [
           const SizedBox(height: 10),
+          // Indicador de arrastre (drag handle): convención visual de BottomSheet
           Container(
             width: 40,
             height: 4,
@@ -847,6 +969,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
             ),
           ),
           const SizedBox(height: 16),
+          // ListView para scroll interno del formulario
           Expanded(
             child: ListView(
               padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
@@ -860,6 +983,8 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                // ── Campo: Código (obligatorio) ──────────────────────────────
                 const Text(
                   'CÓDIGO *',
                   style: TextStyle(
@@ -874,21 +999,17 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                   controller: _codigo,
                   decoration: InputDecoration(
                     hintText: 'PROMO2024',
-                    hintStyle: TextStyle(
-                      color: Colors.grey.withOpacity(0.5),
-                      fontSize: 13,
-                    ),
+                    hintStyle: TextStyle(color: Colors.grey.withOpacity(0.5), fontSize: 13),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide: const BorderSide(color: Color(0xFFEEEEF2)),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 13,
-                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
                   ),
                 ),
                 const SizedBox(height: 12),
+
+                // ── Campo: Título (obligatorio) ──────────────────────────────
                 const Text(
                   'TÍTULO *',
                   style: TextStyle(
@@ -903,21 +1024,17 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                   controller: _titulo,
                   decoration: InputDecoration(
                     hintText: 'Descuento especial en frutas',
-                    hintStyle: TextStyle(
-                      color: Colors.grey.withOpacity(0.5),
-                      fontSize: 13,
-                    ),
+                    hintStyle: TextStyle(color: Colors.grey.withOpacity(0.5), fontSize: 13),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide: const BorderSide(color: Color(0xFFEEEEF2)),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 13,
-                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
                   ),
                 ),
                 const SizedBox(height: 12),
+
+                // ── Campo: Descripción (opcional, 3 líneas) ──────────────────
                 const Text(
                   'DESCRIPCIÓN',
                   style: TextStyle(
@@ -933,23 +1050,21 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                   maxLines: 3,
                   decoration: InputDecoration(
                     hintText: 'Detalles de la promoción...',
-                    hintStyle: TextStyle(
-                      color: Colors.grey.withOpacity(0.5),
-                      fontSize: 13,
-                    ),
+                    hintStyle: TextStyle(color: Colors.grey.withOpacity(0.5), fontSize: 13),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide: const BorderSide(color: Color(0xFFEEEEF2)),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 13,
-                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
                   ),
                 ),
                 const SizedBox(height: 12),
+
+                // ── Fila: Precio y Descuento (lado a lado) ───────────────────
+                // Usa Row con dos Expanded para dividir el espacio equitativamente.
                 Row(
                   children: [
+                    // Campo precio: teclado numérico, obligatorio
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -966,29 +1081,22 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                           const SizedBox(height: 6),
                           TextField(
                             controller: _precio,
-                            keyboardType: TextInputType.number,
+                            keyboardType: TextInputType.number, // Teclado numérico
                             decoration: InputDecoration(
                               hintText: '19.99',
-                              hintStyle: TextStyle(
-                                color: Colors.grey.withOpacity(0.5),
-                                fontSize: 13,
-                              ),
+                              hintStyle: TextStyle(color: Colors.grey.withOpacity(0.5), fontSize: 13),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFEEEEF2),
-                                ),
+                                borderSide: const BorderSide(color: Color(0xFFEEEEF2)),
                               ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 13,
-                              ),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
                             ),
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(width: 12),
+                    // Campo descuento: opcional, int
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1008,20 +1116,12 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               hintText: '20',
-                              hintStyle: TextStyle(
-                                color: Colors.grey.withOpacity(0.5),
-                                fontSize: 13,
-                              ),
+                              hintStyle: TextStyle(color: Colors.grey.withOpacity(0.5), fontSize: 13),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFEEEEF2),
-                                ),
+                                borderSide: const BorderSide(color: Color(0xFFEEEEF2)),
                               ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 13,
-                              ),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
                             ),
                           ),
                         ],
@@ -1030,8 +1130,11 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                   ],
                 ),
                 const SizedBox(height: 20),
+
+                // ── Botones de acción del formulario ─────────────────────────
                 Row(
                   children: [
+                    // Cancelar: 1/3 del espacio (flex:1)
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(context),
@@ -1045,14 +1148,12 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                         ),
                         child: const Text(
                           'Cancelar',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
+                    // Crear: 2/3 del espacio (flex:2) — mayor prominencia visual
                     Expanded(
                       flex: 2,
                       child: ElevatedButton.icon(
@@ -1060,10 +1161,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                         icon: const Icon(Icons.add_outlined, size: 18),
                         label: const Text(
                           'Crear Promoción',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFFF5733),
@@ -1072,7 +1170,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          elevation: 0,
+                          elevation: 0, // Sin sombra: look flat
                         ),
                       ),
                     ),

@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
 
       // 👇 CAMBIO PRINCIPAL AQUÍ
-      initialRoute: AppRoutes.onboarding1,
+      initialRoute: AppRoutes.login,
 
       onGenerateRoute: (settings) {
         if (settings.name == AppRoutes.verifyCode) {

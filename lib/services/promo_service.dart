@@ -14,6 +14,7 @@ import '../models/comentario.dart';
 import '../models/valoracion.dart';
 import '../models/favorito.dart';
 import '../models/reporte.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class PromoService extends ChangeNotifier {
   // "Base de datos" en memoria
@@ -30,18 +31,18 @@ class PromoService extends ChangeNotifier {
 
   bool loaded = false;
   String? loadError;
-  
+
   // Cache de imágenes en memoria para web
   final Map<String, Uint8List> _imageCache = {};
-  
+
   // Getters para acceso a imágenes
   Uint8List? getImageBytes(String codigo) => _imageCache[codigo];
-  
+
   void setImageBytes(String codigo, Uint8List bytes) {
     _imageCache[codigo] = bytes;
     notifyListeners();
   }
-  
+
   void clearImageCache() {
     _imageCache.clear();
     notifyListeners();
@@ -83,8 +84,8 @@ class PromoService extends ChangeNotifier {
           .map((p) => Promocion.fromJson(p as Map<String, dynamic>))
           .toList();
 
-        // Cargar horarios de promociones
-        promocionesHorarios = (data['promociones_horarios'] as List)
+      // Cargar horarios de promociones
+      promocionesHorarios = (data['promociones_horarios'] as List)
           .map((h) => PromocionHorario.fromJson(h as Map<String, dynamic>))
           .toList();
 
@@ -103,8 +104,8 @@ class PromoService extends ChangeNotifier {
           .map((f) => Favorito.fromJson(f as Map<String, dynamic>))
           .toList();
 
-        // Cargar reportes
-        reportes = (data['reportes'] as List)
+      // Cargar reportes
+      reportes = (data['reportes'] as List)
           .map((r) => Reporte.fromJson(r as Map<String, dynamic>))
           .toList();
 
@@ -120,15 +121,21 @@ class PromoService extends ChangeNotifier {
 
   /// Obtiene la ruta del archivo de datos persistentes
   Future<File> _getDataFile() async {
-    final directory = await getApplicationDocumentsDirectory();
-    return File('${directory.path}/promomania_data.json');
+    if (!kIsWeb) {
+      final directory = await getApplicationDocumentsDirectory();
+
+      return File('${directory.path}/promomania_data.json');
+    } else {
+      // Para web, usar un archivo virtual en memoria (no persistente)
+      return File('promomania_data.json');
+    }
   }
 
   /// Carga promociones guardadas localmente (persistencia)
   Future<void> loadLocalPromociones() async {
     try {
       final file = await _getDataFile();
-      
+
       if (!await file.exists()) {
         print('No hay datos persistentes locales');
         return;
@@ -164,7 +171,9 @@ class PromoService extends ChangeNotifier {
 
       final data = {
         'promociones': promociones.map((p) => p.toJson()).toList(),
-        'promociones_horarios': promocionesHorarios.map((h) => h.toJson()).toList(),
+        'promociones_horarios': promocionesHorarios
+            .map((h) => h.toJson())
+            .toList(),
       };
 
       await file.writeAsString(json.encode(data), flush: true);
@@ -260,10 +269,9 @@ class PromoService extends ChangeNotifier {
 
   List<PromocionHorario> getPromocionesHorariosByCodigo(
     String codigoPromocion,
-  ) =>
-      promocionesHorarios
-          .where((h) => h.codigoPromocion == codigoPromocion)
-          .toList();
+  ) => promocionesHorarios
+      .where((h) => h.codigoPromocion == codigoPromocion)
+      .toList();
 
   void addPromocionHorario(PromocionHorario promocionHorario) {
     promocionesHorarios.add(promocionHorario);
@@ -458,7 +466,7 @@ class PromoService extends ChangeNotifier {
   }
 
   // ========== HELPER METHODS FOR UI ==========
-  
+
   /// Obtiene flash deals - top N promociones por descuento (o vistas si descuento es null)
   List<Promocion> getFlashDeals({int limit = 5}) {
     final aprobadas = getPromocionesAprobadas();
@@ -475,11 +483,11 @@ class PromoService extends ChangeNotifier {
     });
     return aprobadas.take(limit).toList();
   }
-  
+
   /// Obtiene nearby stores - simula distancia/tiempo por id hasta tener GPS
   List<Map<String, dynamic>> getNearbyStores({int limit = 5}) {
     final supermercadosConPromos = <int, List<Promocion>>{};
-    
+
     // Agrupar promociones por supermercado
     for (final promo in getPromocionesAprobadas()) {
       if (!supermercadosConPromos.containsKey(promo.idSupermercado)) {
@@ -487,16 +495,16 @@ class PromoService extends ChangeNotifier {
       }
       supermercadosConPromos[promo.idSupermercado]!.add(promo);
     }
-    
+
     final nearbyStores = <Map<String, dynamic>>[];
-    
+
     for (final entry in supermercadosConPromos.entries) {
       final supermercado = getSupermercado(entry.key);
       if (supermercado != null) {
         // Simular distancia/tiempo por id (más pequeño = más cercano)
         final simulatedDistance = (entry.key * 0.5 + 1.0).toStringAsFixed(1);
         final simulatedTime = '${entry.key * 2 + 5} min';
-        
+
         nearbyStores.add({
           'supermercado': supermercado,
           'promociones': entry.value,
@@ -505,24 +513,26 @@ class PromoService extends ChangeNotifier {
         });
       }
     }
-    
+
     // Ordenar por distancia (simulada por id)
-    nearbyStores.sort((a, b) => a['supermercado'].id.compareTo(b['supermercado'].id));
-    
+    nearbyStores.sort(
+      (a, b) => a['supermercado'].id.compareTo(b['supermercado'].id),
+    );
+
     return nearbyStores.take(limit).toList();
   }
-  
+
   /// Calcula urgencia de una promoción
   String getPromocionUrgency(Promocion promo) {
     if (promo.tipoVigencia == 'permanente' || promo.fechaFin == null) {
       return 'noRush';
     }
-    
+
     try {
       final fechaFin = DateTime.parse(promo.fechaFin!);
       final ahora = DateTime.now();
       final diferencia = fechaFin.difference(ahora);
-      
+
       if (diferencia.isNegative) {
         return 'expired';
       } else if (diferencia.inDays <= 1) {
@@ -536,7 +546,7 @@ class PromoService extends ChangeNotifier {
       return 'noRush';
     }
   }
-  
+
   /// Obtiene promociones por urgencia para un usuario
   Map<String, List<Promocion>> getPromocionesByUrgency(int idUsuario) {
     final favoritos = getFavoritosByUsuario(idUsuario);
@@ -545,39 +555,39 @@ class PromoService extends ChangeNotifier {
         .where((p) => p != null)
         .cast<Promocion>()
         .toList();
-    
+
     final result = <String, List<Promocion>>{
       'today': [],
       'thisWeek': [],
       'noRush': [],
     };
-    
+
     for (final promo in promocionesFavoritas) {
       final urgency = getPromocionUrgency(promo);
       if (urgency != 'expired') {
         result[urgency]!.add(promo);
       }
     }
-    
+
     return result;
   }
-  
+
   /// Obtiene emoji y color por categoría
   Map<String, String> getCategoriaStyle(int idCategoria) {
     final categoria = getCategoria(idCategoria);
     if (categoria == null) {
       return {'emoji': '📦', 'color': '#808080'};
     }
-    
+
     final styles = <String, Map<String, String>>{
       'Electrónica': {'emoji': '📱', 'color': '#2196F3'},
       'Alimentos': {'emoji': '🍎', 'color': '#4CAF50'},
       'Ropa': {'emoji': '👕', 'color': '#FF9800'},
     };
-    
+
     return styles[categoria.nombre] ?? {'emoji': '📦', 'color': '#808080'};
   }
-  
+
   /// Calcula precio con descuento
   double getPrecioConDescuento(Promocion promo) {
     if (promo.descuento == null || promo.descuento == 0) {
@@ -585,16 +595,16 @@ class PromoService extends ChangeNotifier {
     }
     return promo.precio * (1 - promo.descuento! / 100);
   }
-  
+
   /// Obtiene rating promedio de una promoción
   double getPromocionRating(String codigoPromocion) {
     final valoraciones = getValoracionesByPromocion(codigoPromocion);
     if (valoraciones.isEmpty) return 0.0;
-    
+
     final positivas = valoraciones.where((v) => v.tipo == 'positiva').length;
     return (positivas / valoraciones.length) * 5.0; // Escala de 0 a 5
   }
-  
+
   /// Obtiene número de reseñas de una promoción
   int getPromocionReviewsCount(String codigoPromocion) {
     return getComentariosByPromocion(codigoPromocion).length;

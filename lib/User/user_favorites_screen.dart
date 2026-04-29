@@ -82,39 +82,45 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Obtener usuario actual (para demo: primer usuario de la lista)
-    final currentUser = promoService.getUsuarios().isNotEmpty 
-        ? promoService.getUsuarios().first.id 
-        : 1;
-    // Obtener promociones favoritas del usuario actual
-    final favoritePromos = promoService.getFavoritosByUsuario(currentUser);
-    
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,  // Establecer estilo de sistema (status bar oscuro)
-      child: Scaffold(
-        backgroundColor: _lightBg,  // Fondo gris claro principal
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header con título y contador de favoritos
-              _buildTopHeader(),
-              // Card de estadísticas de ahorros
-              _buildSavingsCard(),
-              // Banner informativo con instrucciones (solo si está visible)
-              if (_showBanner) _buildInfoBanner(),
-              // Barra de tabs para filtrar favoritos
-              _buildTabBar(),
-              // Grupos de promociones según tab seleccionado
-              _buildPromoGroups(),
-              // Espacio al final del scroll
-              const SizedBox(height: 24),
-            ],
+    // Usar AnimatedBuilder para reconstruir UI cuando cambia el promoService
+    return AnimatedBuilder(
+      animation: promoService,
+      builder: (context, _) {
+        // Obtener usuario actual (para demo: primer usuario de la lista)
+        final currentUser = promoService.getUsuarios().isNotEmpty 
+            ? promoService.getUsuarios().first.id 
+            : 1;
+        // Obtener promociones favoritas del usuario actual
+        final favoritePromos = promoService.getFavoritosByUsuario(currentUser);
+        
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.dark,  // Establecer estilo de sistema (status bar oscuro)
+          child: Scaffold(
+            backgroundColor: _lightBg,  // Fondo gris claro principal
+            body: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header con título y contador de favoritos
+                  _buildTopHeader(),
+                  // Card de estadísticas de ahorros
+                  _buildSavingsCard(),
+                  // Banner informativo con instrucciones (solo si está visible)
+                  if (_showBanner) _buildInfoBanner(),
+                  // Barra de tabs para filtrar favoritos
+                  _buildTabBar(),
+                  // Grupos de promociones según tab seleccionado
+                  _buildPromoGroups(),
+                  // Espacio al final del scroll
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
+            // Navegación inferior
+            bottomNavigationBar: _buildBottomNav(),
           ),
-        ),
-        // Navegación inferior
-        bottomNavigationBar: _buildBottomNav(),
-      ),
+        );
+      },
     );
   }
 

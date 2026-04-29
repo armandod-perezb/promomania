@@ -290,7 +290,7 @@
   "comentarios": [
     {
       "id": 1,
-      "contenido": "Excelente promoción, muy recomendada",
+      "contenido": "Excelente promoción, muy recomendada. El producto es de buena calidad y el descuento es real.",
       "fecha": "2026-04-05T10:30:00",
       "id_usuario": 2,
       "codigo_promocion": "PROMO001",
@@ -298,10 +298,42 @@
     },
     {
       "id": 2,
-      "contenido": "Buena oferta, aprovechable",
+      "contenido": "Buena oferta, aprovechable. Compré dos unidades y quedé muy satisfecho.",
       "fecha": "2026-04-06T14:15:00",
       "id_usuario": 3,
       "codigo_promocion": "PROMO002",
+      "id_comment_reply": null
+    },
+    {
+      "id": 3,
+      "contenido": "Las prendas de lino son hermosas. Calidad real, no parecen de oferta para nada. El descuento es un regalo.",
+      "fecha": "2026-04-07T09:20:00",
+      "id_usuario": 2,
+      "codigo_promocion": "PROMO003",
+      "id_comment_reply": null
+    },
+    {
+      "id": 4,
+      "contenido": "Muy buena atención en el supermercado y la promoción es excelente. Los productos están frescos.",
+      "fecha": "2026-04-08T16:45:00",
+      "id_usuario": 3,
+      "codigo_promocion": "PROMO001",
+      "id_comment_reply": null
+    },
+    {
+      "id": 5,
+      "contenido": "Ahorre mucho con esta promoción. Definitivamente volveré a comprar.",
+      "fecha": "2026-04-09T11:30:00",
+      "id_usuario": 2,
+      "codigo_promocion": "PROMO004",
+      "id_comment_reply": null
+    },
+    {
+      "id": 6,
+      "contenido": "La tecnología de este producto es increíble y con el descuento es una oportunidad única.",
+      "fecha": "2026-04-10T13:15:00",
+      "id_usuario": 3,
+      "codigo_promocion": "PROMO005",
       "id_comment_reply": null
     }
   ],

@@ -5,30 +5,12 @@ import '../main.dart';
 import '../models/promocion.dart';
 import '../models/promocion_horario.dart';
 import '../models/reporte.dart';
+import '../models/comentario.dart'; 
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODELOS
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _Review {
-  final String name;
-  final String initials;
-  final Color avatarColor;
-  final double rating;
-  final String time;
-  final String comment;
-  final int useful;
-
-  const _Review({
-    required this.name,
-    required this.initials,
-    required this.avatarColor,
-    required this.rating,
-    required this.time,
-    required this.comment,
-    required this.useful,
-  });
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PANTALLA DE DETALLE
@@ -66,29 +48,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   // Rating bars data [1★..5★]
   final List<int> _ratingCounts = [2, 3, 9, 21, 32]; // index 0=1★
 
-  final List<_Review> _reviews = const [
-    _Review(
-      name: 'Paula Jiménez',
-      initials: 'PJ',
-      avatarColor: Color(0xFF8B5CF6),
-      rating: 5,
-      time: 'Hace 3 días',
-      comment:
-          'Las prendas de lino son hermosas. Calidad real, no parecen de oferta para nada. El descuento es un regalo.',
-      useful: 22,
-    ),
-    _Review(
-      name: 'Mariana Ospina',
-      initials: 'MO',
-      avatarColor: Color(0xFFEC4899),
-      rating: 4,
-      time: 'Hace 6 días',
-      comment:
-          'Buen diseño, buena calidad. Pedí en línea con el código y funcionó perfecto. Llegó en 2 días.',
-      useful: 14,
-    ),
-  ];
-
+  
   @override
   void initState() {
     super.initState();
@@ -1174,7 +1134,10 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   // ── Reseñas ─────────────────────────────────────────────────────────────────
 
   Widget _buildReviewsSection() {
-    final total = _totalReviews;
+    if (_promo == null) return const SizedBox.shrink();
+    
+    final comentarios = promoService.getComentariosByPromocion(_promo!.codigo);
+    final total = comentarios.length;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
@@ -1182,125 +1145,96 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Reseñas',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF1A1F2E),
-                ),
-              ),
+              const Icon(Icons.reviews_outlined, color: _primary, size: 20),
+              const SizedBox(width: 8),
               Text(
-                '67 reseñas',
-                style: const TextStyle(fontSize: 13, color: Color(0xFF8A8FA8)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          // Rating summary
-          Row(
-            children: [
-              // Score grande
-              Column(
-                children: [
-                  const Text(
-                    '4.4',
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.w900,
-                      color: Color(0xFF1A1F2E),
-                      height: 1,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: List.generate(
-                      5,
-                      (i) => Icon(
-                        i < 4 ? Icons.star_rounded : Icons.star_half_rounded,
-                        color: const Color(0xFFFBBF24),
-                        size: 16,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'de 5',
-                    style: TextStyle(fontSize: 12, color: Color(0xFF8A8FA8)),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 24),
-              // Barras
-              Expanded(
-                child: Column(
-                  children: List.generate(5, (i) {
-                    final star = 5 - i; // 5, 4, 3, 2, 1
-                    final count = _ratingCounts[star - 1];
-                    final pct = total > 0 ? count / total : 0.0;
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 5),
-                      child: Row(
-                        children: [
-                          Text(
-                            '$star',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF8A8FA8),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          const Icon(
-                            Icons.star_rounded,
-                            color: Color(0xFFFBBF24),
-                            size: 11,
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: LinearProgressIndicator(
-                                value: pct,
-                                minHeight: 6,
-                                backgroundColor: const Color(0xFFE8EAF0),
-                                valueColor: const AlwaysStoppedAnimation<Color>(
-                                  Color(0xFFFBBF24),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          SizedBox(
-                            width: 20,
-                            child: Text(
-                              '$count',
-                              textAlign: TextAlign.right,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: Color(0xFF8A8FA8),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
+                'Reseñas ($total)',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1A1F2E),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          // Lista de reseñas
-          ..._reviews.map((r) => _buildReviewCard(r)).toList(),
+          // Add comment button
+          _buildAddCommentButton(),
+          const SizedBox(height: 16),
+          // Lista de reseñas reales
+          if (comentarios.isEmpty)
+            const Text(
+              'No hay reseñas aún. ¡Sé el primero en comentar!',
+              style: TextStyle(
+                fontSize: 14,
+                color: Color(0xFFAA8880),
+                fontStyle: FontStyle.italic,
+              ),
+            )
+          else
+            ...comentarios.map((c) => _buildCommentCard(c)).toList(),
         ],
       ),
     );
   }
 
-  Widget _buildReviewCard(_Review r) {
+  Widget _buildAddCommentButton() {
+    return GestureDetector(
+      onTap: _showAddCommentDialog,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: _primary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: _primary.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.add_comment_outlined, color: _primary, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              'Agregar un comentario',
+              style: TextStyle(
+                color: _primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCommentCard(Comentario comentario) {
+    final usuario = promoService.getUsuario(comentario.idUsuario);
+    final userName = usuario?.nombre ?? 'Usuario Anónimo';
+    final userInitials = userName.split(' ').map((e) => e[0]).take(2).join('').toUpperCase();
+    final userColor = _getUserAvatarColor(comentario.idUsuario);
+    
+    // Format date
+    DateTime fecha;
+    try {
+      fecha = DateTime.parse(comentario.fecha);
+    } catch (e) {
+      fecha = DateTime.now();
+    }
+    
+    final now = DateTime.now();
+    final difference = now.difference(fecha);
+    String timeAgo;
+    
+    if (difference.inDays > 0) {
+      timeAgo = 'Hace ${difference.inDays} día${difference.inDays > 1 ? 's' : ''}';
+    } else if (difference.inHours > 0) {
+      timeAgo = 'Hace ${difference.inHours} hora${difference.inHours > 1 ? 's' : ''}';
+    } else if (difference.inMinutes > 0) {
+      timeAgo = 'Hace ${difference.inMinutes} minuto${difference.inMinutes > 1 ? 's' : ''}';
+    } else {
+      timeAgo = 'Ahora';
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Column(
@@ -1308,114 +1242,136 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
         children: [
           Row(
             children: [
-              // Avatar
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: r.avatarColor,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    r.initials,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                    ),
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: userColor.withValues(alpha: 0.1),
+                child: Text(
+                  userInitials,
+                  style: TextStyle(
+                    color: userColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      r.name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A1F2E),
-                      ),
-                    ),
                     Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: List.generate(
-                        5,
-                        (i) => Icon(
-                          i < r.rating.toInt()
-                              ? Icons.star_rounded
-                              : Icons.star_outline_rounded,
-                          color: const Color(0xFFFBBF24),
-                          size: 12,
+                      children: [
+                        Text(
+                          userName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                            color: Color(0xFF1A1F2E),
+                          ),
                         ),
+                        const SizedBox(width: 8),
+                        if (usuario?.rol == 'admin')
+                          const Icon(
+                            Icons.verified_rounded,
+                            size: 14,
+                            color: Color(0xFF10B981),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      timeAgo,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFFAA8880),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
-              SizedBox(
-                width: 64,
-                child: Text(
-                  r.time,
-                  textAlign: TextAlign.right,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 10.5,
-                    color: Color(0xFF8A8FA8),
-                  ),
-                ),
-              ),
             ],
           ),
-          const SizedBox(height: 10),
-          Text(
-            r.comment,
-            style: const TextStyle(
-              fontSize: 13.5,
-              color: Color(0xFF5A5F72),
-              height: 1.55,
-            ),
-          ),
-          const SizedBox(height: 10),
-          GestureDetector(
-            onTap: () => HapticFeedback.lightImpact(),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5F6FA),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFE8EAF0), width: 1),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.thumb_up_outlined,
-                    size: 14,
-                    color: Color(0xFF5A5F72),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Útil (${r.useful})',
-                    style: const TextStyle(
-                      fontSize: 12.5,
-                      color: Color(0xFF5A5F72),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
           const SizedBox(height: 12),
-          const Divider(color: Color(0xFFF0F1F5), thickness: 1),
+          Text(
+            comentario.contenido,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Color(0xFF5A5F72),
+              height: 1.4,
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  void _showAddCommentDialog() {
+    final TextEditingController commentController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Agregar Comentario'),
+        content: TextField(
+          controller: commentController,
+          maxLines: 3,
+          decoration: const InputDecoration(
+            hintText: 'Escribe tu comentario aquí...',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (commentController.text.trim().isNotEmpty && _promo != null) {
+                _addComment(commentController.text.trim());
+                Navigator.pop(context);
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: _primary),
+            child: const Text('Publicar', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _addComment(String contenido) {
+    if (_promo == null) return;
+    
+    final newComment = Comentario(
+      id: promoService.getComentarios().isNotEmpty 
+          ? promoService.getComentarios().last.id + 1 
+          : 1,
+      contenido: contenido,
+      fecha: DateTime.now().toIso8601String(),
+      idUsuario: _activeUserId,
+      codigoPromocion: _promo!.codigo,
+      idCommentReply: null,
+    );
+    
+    promoService.addComentario(newComment);
+    HapticFeedback.lightImpact();
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Comentario agregado exitosamente')),
+    );
+  }
+
+  Color _getUserAvatarColor(int userId) {
+    final colors = [
+      const Color(0xFF8B5CF6), // Purple
+      const Color(0xFFEC4899), // Pink
+      const Color(0xFF3B82F6), // Blue
+      const Color(0xFF10B981), // Green
+      const Color(0xFFF59E0B), // Amber
+      const Color(0xFFEF4444), // Red
+    ];
+    return colors[userId % colors.length];
   }
 
   Widget _buildViewAllReviews() {
@@ -1525,16 +1481,20 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                     ),
                     elevation: 0,
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.bolt_rounded, size: 20),
-                      SizedBox(width: 6),
-                      Text(
-                        'Activar Promoción',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
+                      const Icon(Icons.bolt_rounded, size: 20),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'Activar Promoción',
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ],

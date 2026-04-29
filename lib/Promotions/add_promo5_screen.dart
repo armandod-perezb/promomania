@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:typed_data';
 import '../main.dart';
 import '../models/promocion.dart';
 import '../models/promocion_horario.dart';
 import '../models/supermercado.dart';
 import '../services/image_storage_service.dart';
+import '../widgets/promocion_card.dart';
 
 class AddPromotion5Screen extends StatefulWidget {
   // Datos opcionales que vienen de los pasos anteriores
@@ -292,8 +295,35 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
 
     setState(() => _isPublishing = true);
 
+    // Generar código de promoción primero
+    final promoCode = _buildPromoCode(draft['code'] as String?);
+
+    // Guardar la imagen si existe
+    String? finalImageName = _previewImage;
+    bool isLocalImage = false;
+    
+    if (_previewImage != null && !_previewImage!.startsWith('http')) {
+      // Es una imagen local (guardada previamente), procesarla con el servicio
+      try {
+        // Leer los bytes de la imagen guardada
+        final imageStorageService = ImageStorageService();
+        final imageBytes = await imageStorageService.readImageBytes(_previewImage!);
+        
+        if (imageBytes != null) {
+          final savedName = await promoService.savePromotionImage(promoCode, imageBytes);
+          if (savedName != null) {
+            finalImageName = savedName;
+            isLocalImage = true;
+            print('✅ Imagen procesada para promoción $promoCode: $savedName');
+          }
+        }
+      } catch (e) {
+        print('❌ Error procesando imagen para promoción: $e');
+      }
+    }
+
     final promo = Promocion(
-      codigo: _buildPromoCode(draft['code'] as String?),
+      codigo: promoCode,
       titulo: title,
       descripcion: (draft['description'] as String?)?.trim(),
       precio: (draft['price'] as num?)?.toDouble() ?? 0,
@@ -301,7 +331,8 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
       condicionProducto: _normalizeCondition(draft['condition'] as String?),
       ubicacion: (draft['location'] as String?)?.trim(),
       url: (draft['website'] as String?)?.trim(),
-      foto: _previewImage,
+      foto: finalImageName,
+      fotoEsLocal: isLocalImage,
       tipoVigencia: (draft['vigenciaType'] == 'permanente')
           ? 'permanente'
           : 'por_fecha',
@@ -582,6 +613,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
   // ── Preview card ─────────────────────────────────────────────────────────────
 
   Widget _buildPreviewCard() {
+    // Crear un widget de vista previa personalizado que no depende del servicio
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -598,93 +630,161 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Imagen o placeholder
-          Stack(
-            children: [
-              _previewImage != null
-                  ? Image.network(
-                      _previewImage!,
-                      width: double.infinity,
-                      height: 180,
-                      fit: BoxFit.cover,
-                    )
-                  : Container(
-                      width: double.infinity,
-                      height: 180,
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Color(0xFFE8EAF0), Color(0xFFCDD0DB)],
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.image_outlined,
-                        color: Color(0xFFB0B5CC),
-                        size: 48,
-                      ),
-                    ),
-              // Overlay degradado inferior
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  height: 80,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [Colors.black54, Colors.transparent],
-                    ),
-                  ),
-                ),
-              ),
-              // Título sobre imagen
-              Positioned(
-                bottom: 14,
-                left: 14,
-                right: 14,
-                child: Text(
-                  _previewTitle,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black26,
-                        blurRadius: 4,
-                        offset: Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          // Ubicación
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            child: Row(
+          // Imagen con manejo directo
+          AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Stack(
               children: [
-                const Icon(
-                  Icons.location_on_outlined,
-                  color: Color(0xFFB0B5CC),
-                  size: 16,
+                // Imagen de fondo
+                FutureBuilder<Uint8List?>(
+                  future: _getPreviewImageBytes(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.grey[300]!, Colors.grey[400]!],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+
+                    if (snapshot.hasData && snapshot.data != null) {
+                      return Image.memory(
+                        snapshot.data!,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        errorBuilder: (context, error, stackTrace) {
+                          return _buildPlaceholder();
+                        },
+                      );
+                    }
+
+                    return _buildPlaceholder();
+                  },
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  _previewLocation,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFF8A8FA8),
+                
+                // Overlay con gradiente para el texto
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.7),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _previewTitle,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (_previewLocation != 'Ubicación') ...[
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.location_on,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    _previewLocation,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<Uint8List?> _getPreviewImageBytes() async {
+    if (_previewImage == null) return null;
+    
+    try {
+      if (_previewImage!.startsWith('http')) {
+        // Es URL, descargarla
+        final response = await http.get(Uri.parse(_previewImage!));
+        if (response.statusCode == 200) {
+          return response.bodyBytes;
+        }
+      } else {
+        // Es archivo local, leerlo directamente
+        final imageStorageService = ImageStorageService();
+        return await imageStorageService.readImageBytes(_previewImage!);
+      }
+    } catch (e) {
+      print('❌ Error obteniendo imagen de vista previa: $e');
+    }
+    
+    return null;
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.grey[300]!, Colors.grey[400]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.image,
+              size: 48,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Sin imagen',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

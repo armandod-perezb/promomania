@@ -8,6 +8,7 @@ class Promocion {
   final String? ubicacion;
   final String? url;
   final String? foto;
+  final bool fotoEsLocal;
   final String tipoVigencia; // 'por_fecha' o 'permanente'
   final String? fechaInicio;
   final String? fechaFin;
@@ -30,6 +31,7 @@ class Promocion {
     this.ubicacion,
     this.url,
     this.foto,
+    this.fotoEsLocal = false,
     required this.tipoVigencia,
     this.fechaInicio,
     this.fechaFin,
@@ -54,6 +56,7 @@ class Promocion {
       ubicacion: json['ubicacion'] as String?,
       url: json['url'] as String?,
       foto: json['foto'] as String?,
+      fotoEsLocal: json['foto_es_local'] as bool? ?? false,
       tipoVigencia: json['tipo_vigencia'] as String? ?? 'por_fecha',
       fechaInicio: json['fecha_inicio'] as String?,
       fechaFin: json['fecha_fin'] as String?,
@@ -79,6 +82,7 @@ class Promocion {
       'ubicacion': ubicacion,
       'url': url,
       'foto': foto,
+      'foto_es_local': fotoEsLocal,
       'tipo_vigencia': tipoVigencia,
       'fecha_inicio': fechaInicio,
       'fecha_fin': fechaFin,
@@ -103,6 +107,7 @@ class Promocion {
     String? ubicacion,
     String? url,
     String? foto,
+    bool? fotoEsLocal,
     String? tipoVigencia,
     String? fechaInicio,
     String? fechaFin,
@@ -125,6 +130,7 @@ class Promocion {
       ubicacion: ubicacion ?? this.ubicacion,
       url: url ?? this.url,
       foto: foto ?? this.foto,
+      fotoEsLocal: fotoEsLocal ?? this.fotoEsLocal,
       tipoVigencia: tipoVigencia ?? this.tipoVigencia,
       fechaInicio: fechaInicio ?? this.fechaInicio,
       fechaFin: fechaFin ?? this.fechaFin,

@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/usuario.dart';
 import '../models/supermercado.dart';
 import '../models/categoria.dart';
@@ -15,6 +17,7 @@ import '../models/valoracion.dart';
 import '../models/favorito.dart';
 import '../models/reporte.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'image_storage_service.dart';
 
 class PromoService extends ChangeNotifier {
   // "Base de datos" en memoria
@@ -34,6 +37,9 @@ class PromoService extends ChangeNotifier {
 
   // Cache de imágenes en memoria para web
   final Map<String, Uint8List> _imageCache = {};
+
+  // Instancia del servicio de almacenamiento de imágenes
+  final ImageStorageService _imageStorage = ImageStorageService();
 
   // Getters para acceso a imágenes
   Uint8List? getImageBytes(String codigo) => _imageCache[codigo];
@@ -134,28 +140,56 @@ class PromoService extends ChangeNotifier {
   /// Carga promociones guardadas localmente (persistencia)
   Future<void> loadLocalPromociones() async {
     try {
-      final file = await _getDataFile();
+      if (!kIsWeb) {
+        // NATIVO: Usar archivo
+        final file = await _getDataFile();
 
-      if (!await file.exists()) {
-        print('No hay datos persistentes locales');
-        return;
-      }
+        if (!await file.exists()) {
+          print('No hay datos persistentes locales');
+          return;
+        }
 
-      final content = await file.readAsString();
-      final data = json.decode(content) as Map<String, dynamic>;
+        final content = await file.readAsString();
+        final data = json.decode(content) as Map<String, dynamic>;
 
-      // Cargar promociones locales
-      if (data['promociones'] != null) {
-        promociones = (data['promociones'] as List)
-            .map((p) => Promocion.fromJson(p as Map<String, dynamic>))
-            .toList();
-      }
+        // Cargar promociones locales
+        if (data['promociones'] != null) {
+          promociones = (data['promociones'] as List)
+              .map((p) => Promocion.fromJson(p as Map<String, dynamic>))
+              .toList();
+        }
 
-      // Cargar horarios locales
-      if (data['promociones_horarios'] != null) {
-        promocionesHorarios = (data['promociones_horarios'] as List)
-            .map((h) => PromocionHorario.fromJson(h as Map<String, dynamic>))
-            .toList();
+        // Cargar horarios locales
+        if (data['promociones_horarios'] != null) {
+          promocionesHorarios = (data['promociones_horarios'] as List)
+              .map((h) => PromocionHorario.fromJson(h as Map<String, dynamic>))
+              .toList();
+        }
+      } else {
+        // WEB: Usar SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        final dataString = prefs.getString('promomania_data');
+        
+        if (dataString != null) {
+          final data = json.decode(dataString) as Map<String, dynamic>;
+
+          // Cargar promociones locales
+          if (data['promociones'] != null) {
+            promociones = (data['promociones'] as List)
+                .map((p) => Promocion.fromJson(p as Map<String, dynamic>))
+                .toList();
+          }
+
+          // Cargar horarios locales
+          if (data['promociones_horarios'] != null) {
+            promocionesHorarios = (data['promociones_horarios'] as List)
+                .map((h) => PromocionHorario.fromJson(h as Map<String, dynamic>))
+                .toList();
+          }
+        } else {
+          print('No hay datos persistentes en web');
+          return;
+        }
       }
 
       print('Datos persistentes cargados correctamente');
@@ -167,8 +201,6 @@ class PromoService extends ChangeNotifier {
   /// Guarda los datos en almacenamiento persistente
   Future<void> _saveLocalData() async {
     try {
-      final file = await _getDataFile();
-
       final data = {
         'promociones': promociones.map((p) => p.toJson()).toList(),
         'promociones_horarios': promocionesHorarios
@@ -176,7 +208,16 @@ class PromoService extends ChangeNotifier {
             .toList(),
       };
 
-      await file.writeAsString(json.encode(data), flush: true);
+      if (!kIsWeb) {
+        // NATIVO: Usar archivo
+        final file = await _getDataFile();
+        await file.writeAsString(json.encode(data), flush: true);
+      } else {
+        // WEB: Usar SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('promomania_data', json.encode(data));
+      }
+      
       print('Datos guardados correctamente');
     } catch (e) {
       print('Error guardando datos: $e');
@@ -608,5 +649,145 @@ class PromoService extends ChangeNotifier {
   /// Obtiene número de reseñas de una promoción
   int getPromocionReviewsCount(String codigoPromocion) {
     return getComentariosByPromocion(codigoPromocion).length;
+  }
+
+  // ========== MÉTODOS DE GESTIÓN DE IMÁGENES ==========
+
+  /// Guarda una imagen para una promoción
+  Future<String?> savePromotionImage(String codigoPromocion, Uint8List bytes) async {
+    try {
+      if (!_isValidImageBytes(bytes)) {
+        print('❌ Bytes de imagen inválidos');
+        return null;
+      }
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final fileName = 'promo_${codigoPromocion}_$timestamp.jpg';
+
+      final savedFileName = await _imageStorage.saveImageFromBytes(bytes, fileName: fileName);
+
+      final promocionIndex = promociones.indexWhere((p) => p.codigo == codigoPromocion);
+      if (promocionIndex != -1) {
+        final updatedPromocion = promociones[promocionIndex].copyWith(
+          foto: savedFileName,
+          fotoEsLocal: true,
+        );
+        promociones[promocionIndex] = updatedPromocion;
+        notifyListeners();
+        await _saveLocalData();
+      }
+
+      _imageCache[codigoPromocion] = bytes;
+
+      print('✅ Imagen guardada para promoción $codigoPromocion: $savedFileName');
+      return savedFileName;
+    } catch (e) {
+      print('❌ Error guardando imagen para promoción $codigoPromocion: $e');
+      return null;
+    }
+  }
+
+  /// Obtiene los bytes de una imagen de promoción
+  Future<Uint8List?> getPromotionImageBytes(String codigoPromocion) async {
+    try {
+      print('🔍 getPromotionImageBytes: Buscando promoción con código $codigoPromocion');
+      final promocion = getPromocionByCodigo(codigoPromocion);
+      
+      if (promocion == null) {
+        print('❌ getPromotionImageBytes: Promoción no encontrada');
+        return null;
+      }
+      
+      if (promocion.foto == null) {
+        print('❌ getPromotionImageBytes: Promoción sin foto');
+        return null;
+      }
+
+      print('🔍 getPromotionImageBytes: Foto=${promocion.foto}, EsLocal=${promocion.fotoEsLocal}');
+      
+      if (promocion.fotoEsLocal || !_isUrl(promocion.foto!)) {
+        print('🔍 getPromotionImageBytes: Leyendo imagen local');
+        final bytes = await _imageStorage.readImageBytes(promocion.foto!);
+        print('🔍 getPromotionImageBytes: Bytes leídos=${bytes != null ? bytes.length : 'null'}');
+        return bytes;
+      } else {
+        print('🔍 getPromotionImageBytes: Descargando imagen remota');
+        final bytes = await _downloadAndCacheImage(codigoPromocion, promocion.foto!);
+        print('🔍 getPromotionImageBytes: Bytes descargados=${bytes != null ? bytes.length : 'null'}');
+        return bytes;
+      }
+    } catch (e) {
+      print('❌ Error obteniendo imagen para promoción $codigoPromocion: $e');
+      return null;
+    }
+  }
+
+  /// Descarga y cachea una imagen desde URL
+  Future<Uint8List?> _downloadAndCacheImage(String codigoPromocion, String url) async {
+    try {
+      if (_imageCache.containsKey(codigoPromocion)) {
+        return _imageCache[codigoPromocion];
+      }
+
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final bytes = response.bodyBytes;
+        if (_isValidImageBytes(bytes)) {
+          _imageCache[codigoPromocion] = bytes;
+          return bytes;
+        }
+      }
+      return null;
+    } catch (e) {
+      print('❌ Error descargando imagen desde $url: $e');
+      return null;
+    }
+  }
+
+  /// Verifica si un string es una URL
+  bool _isUrl(String str) {
+    return str.startsWith('http://') || str.startsWith('https://');
+  }
+
+  /// Valida si los bytes corresponden a una imagen válida
+  bool _isValidImageBytes(Uint8List bytes) {
+    if (bytes.length < 4) return false;
+
+    final headers = bytes.take(4).toList();
+    
+    // JPEG: FF D8 FF
+    if (headers[0] == 0xFF && headers[1] == 0xD8 && headers[2] == 0xFF) {
+      return true;
+    }
+    
+    // PNG: 89 50 4E 47
+    if (headers[0] == 0x89 && headers[1] == 0x50 && headers[2] == 0x4E && headers[3] == 0x47) {
+      return true;
+    }
+    
+    // GIF: 47 49 46 38
+    if (headers[0] == 0x47 && headers[1] == 0x49 && headers[2] == 0x46 && headers[3] == 0x38) {
+      return true;
+    }
+    
+    // WebP: 52 49 46 46 ... 57 45 42 50
+    if (headers[0] == 0x52 && headers[1] == 0x49 && headers[2] == 0x46 && headers[3] == 0x46) {
+      return true;
+    }
+    
+    // BMP: 42 4D
+    if (headers[0] == 0x42 && headers[1] == 0x4D) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  /// Precarga imágenes de promociones para mejor rendimiento
+  Future<void> preloadPromotionImages(List<String> codigosPromocion) async {
+    for (final codigo in codigosPromocion) {
+      await getPromotionImageBytes(codigo);
+    }
+    print('✅ Imágenes precargadas para ${codigosPromocion.length} promociones');
   }
 }

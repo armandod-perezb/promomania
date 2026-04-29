@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 import '../main.dart';
 import '../models/promocion.dart';
 import '../models/promocion_horario.dart';
@@ -201,17 +200,11 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   Future<Uint8List?> _getHeroImageBytes() async {
     final promoImage = _promo?.foto?.trim();
     if (promoImage == null || promoImage.isEmpty) return null;
+    if (promoImage.startsWith('http')) return null;
 
     try {
-      if (promoImage.startsWith('http')) {
-        final response = await http.get(Uri.parse(promoImage));
-        if (response.statusCode == 200) {
-          return response.bodyBytes;
-        }
-      } else {
-        final imageStorageService = ImageStorageService();
-        return await imageStorageService.readImageBytes(promoImage);
-      }
+      final imageStorageService = ImageStorageService();
+      return await imageStorageService.readImageBytes(promoImage);
     } catch (e) {
       debugPrint('Error obteniendo imagen de promoción: $e');
     }
@@ -245,7 +238,9 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   }
 
   Widget _buildHeroImage() {
+    final promoImage = _promo?.foto?.trim() ?? '';
     final hasPromoImage = _promo?.foto?.trim().isNotEmpty ?? false;
+    final isRemoteImage = promoImage.startsWith('http');
 
     return SizedBox(
       height: 290,
@@ -257,6 +252,15 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
               _heroImageUrl,
               fit: BoxFit.cover,
               alignment: Alignment.center,
+            )
+          else if (isRemoteImage)
+            Image.network(
+              promoImage,
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+              errorBuilder: (context, error, stackTrace) {
+                return _buildHeroPlaceholder();
+              },
             )
           else
             FutureBuilder<Uint8List?>(

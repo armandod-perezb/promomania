@@ -38,11 +38,8 @@ final promoService = PromoService();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inicializar servicios
   await SessionManager.init();
   await promoService.init();
-  
-  // ✅ Cargar promociones guardadas localmente
   await promoService.loadLocalPromociones();
 
   runApp(const MyApp());

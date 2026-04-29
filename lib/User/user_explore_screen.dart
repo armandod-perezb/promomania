@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import '../Core/Routes/app_routes.dart';
 import '../main.dart';
 import '../services/promo_service.dart';
@@ -10,7 +9,6 @@ import '../models/supermercado.dart';
 // ─────────────────────────────────────────────────────────────────────────────
 // MODELOS
 // ─────────────────────────────────────────────────────────────────────────────
-
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PANTALLA PRINCIPAL
@@ -40,7 +38,6 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   final List<String> _sortOptions = ['Relevancia', 'Precio', 'Rating', 'Cerca'];
 
-
   @override
   void initState() {
     super.initState();
@@ -51,29 +48,22 @@ class _ExploreScreenState extends State<ExploreScreen>
     _bannerFade = CurvedAnimation(parent: _bannerCtrl, curve: Curves.easeOut);
     _bannerCtrl.forward();
 
-    // Initialize PromoService
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<PromoService>().init();
-    });
+    void _tickTimer() {
+      if (!mounted) return;
+      setState(() {
+        if (_seconds > 0) {
+          _seconds--;
+        } else if (_minutes > 0) {
+          _minutes--;
+          _seconds = 59;
+        } else if (_hours > 0) {
+          _hours--;
+          _minutes = 59;
+          _seconds = 59;
+        }
+      });
+    }
 
-    // Simular countdown
-    Future.delayed(const Duration(seconds: 1), _tickTimer);
-  }
-
-  void _tickTimer() {
-    if (!mounted) return;
-    setState(() {
-      if (_seconds > 0) {
-        _seconds--;
-      } else if (_minutes > 0) {
-        _minutes--;
-        _seconds = 59;
-      } else if (_hours > 0) {
-        _hours--;
-        _minutes = 59;
-        _seconds = 59;
-      }
-    });
     Future.delayed(const Duration(seconds: 1), _tickTimer);
   }
 
@@ -85,63 +75,63 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PromoService>(
-      builder: (context, promoService, child) {
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle.dark,
-          child: Scaffold(
-            backgroundColor: const Color(0xFFF5F6FA),
-            body: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(child: _buildHeader(promoService)),
-                SliverToBoxAdapter(child: _buildSearchBar()),
-                SliverToBoxAdapter(child: _buildHeroBanner()),
-                if (promoService.loaded && promoService.loadError == null)
-                  SliverToBoxAdapter(child: _buildFlashDealsSection(promoService)),
-                if (promoService.loaded && promoService.loadError == null)
-                  SliverToBoxAdapter(child: _buildNearbySection(promoService)),
-                if (promoService.loaded && promoService.loadError == null)
-                  SliverToBoxAdapter(child: _buildAllPromosHeader(promoService)),
-                if (promoService.loaded && promoService.loadError == null)
-                  _buildPromosGrid(promoService),
-                if (!promoService.loaded && promoService.loadError == null)
-                  const SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                if (promoService.loadError != null)
-                  SliverFillRemaining(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.error_outline, size: 64, color: Colors.grey),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Error al cargar datos',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            promoService.loadError!,
-                            style: TextStyle(fontSize: 14, color: Colors.grey),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: () => promoService.init(),
-                            child: const Text('Reintentar'),
-                          ),
-                        ],
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F6FA),
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(child: _buildHeader(promoService)),
+          SliverToBoxAdapter(child: _buildSearchBar()),
+          SliverToBoxAdapter(child: _buildHeroBanner()),
+          if (promoService.loaded && promoService.loadError == null)
+            SliverToBoxAdapter(child: _buildFlashDealsSection(promoService)),
+          if (promoService.loaded && promoService.loadError == null)
+            SliverToBoxAdapter(child: _buildNearbySection(promoService)),
+          if (promoService.loaded && promoService.loadError == null)
+            SliverToBoxAdapter(child: _buildAllPromosHeader(promoService)),
+          if (promoService.loaded && promoService.loadError == null)
+            _buildPromosGrid(promoService),
+          if (!promoService.loaded && promoService.loadError == null)
+            const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          if (promoService.loadError != null)
+            SliverFillRemaining(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Error al cargar datos',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),
-                const SliverToBoxAdapter(child: SizedBox(height: 24)),
-              ],
+                    const SizedBox(height: 8),
+                    Text(
+                      promoService.loadError!,
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => promoService.init(),
+                      child: const Text('Reintentar'),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            bottomNavigationBar: _buildBottomNav(),
-          ),
-        );
-      },
+          const SliverToBoxAdapter(child: SizedBox(height: 24)),
+        ],
+      ),
+      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
@@ -149,11 +139,11 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   Widget _buildHeader(PromoService promoService) {
     // Get current user (for demo, using first user)
-    final currentUser = promoService.getUsuarios().isNotEmpty 
-        ? promoService.getUsuarios().first 
+    final currentUser = promoService.getUsuarios().isNotEmpty
+        ? promoService.getUsuarios().first
         : null;
     final userCity = currentUser?.ciudad ?? 'Bogotá';
-    
+
     return Container(
       color: Colors.white,
       padding: EdgeInsets.only(
@@ -185,7 +175,10 @@ class _ExploreScreenState extends State<ExploreScreen>
                 const SizedBox(height: 4),
                 Text(
                   'Buenos días${currentUser != null ? ', ${currentUser.nombre.split(' ').first}' : ''}',
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ],
             ),
@@ -230,10 +223,18 @@ class _ExploreScreenState extends State<ExploreScreen>
             ),
             child: Center(
               child: Text(
-                currentUser != null 
-                    ? currentUser.nombre.split(' ').map((name) => name[0]).take(2).join().toUpperCase()
+                currentUser != null
+                    ? currentUser.nombre
+                          .split(' ')
+                          .map((name) => name[0])
+                          .take(2)
+                          .join()
+                          .toUpperCase()
                     : 'U',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -398,7 +399,7 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   Widget _buildFlashDealsSection(PromoService promoService) {
     final flashDeals = promoService.getFlashDeals(limit: 5);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -462,7 +463,8 @@ class _ExploreScreenState extends State<ExploreScreen>
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: flashDeals.length,
-            itemBuilder: (_, i) => _buildFlashDealCard(flashDeals[i], promoService),
+            itemBuilder: (_, i) =>
+                _buildFlashDealCard(flashDeals[i], promoService),
           ),
         ),
       ],
@@ -494,24 +496,29 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   void _openPromotionDetails(String promoCode) {
     HapticFeedback.lightImpact();
-    Navigator.pushNamed(context, AppRoutes.promotionDetails, arguments: promoCode);
+    Navigator.pushNamed(
+      context,
+      AppRoutes.promotionDetails,
+      arguments: promoCode,
+    );
   }
 
   // Helper method to build promo images with fallback
   Widget _buildPromoImage(Promocion promo, String? emoji, double height) {
     // Check if we have cached image bytes
-    final imageBytes = context.read<PromoService>().getImageBytes(promo.codigo);
-    
+    final imageBytes = promoService.getImageBytes(promo.codigo);
+
     if (imageBytes != null) {
       return Image.memory(
         imageBytes,
         height: height,
         width: double.infinity,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => _buildImageFallback(emoji, height),
+        errorBuilder: (context, error, stackTrace) =>
+            _buildImageFallback(emoji, height),
       );
     }
-    
+
     // Try network image if available
     if (promo.foto != null && promo.foto!.isNotEmpty) {
       return Image.network(
@@ -519,10 +526,11 @@ class _ExploreScreenState extends State<ExploreScreen>
         height: height,
         width: double.infinity,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => _buildImageFallback(emoji, height),
+        errorBuilder: (context, error, stackTrace) =>
+            _buildImageFallback(emoji, height),
       );
     }
-    
+
     // Fallback to emoji
     return _buildImageFallback(emoji, height);
   }
@@ -533,10 +541,7 @@ class _ExploreScreenState extends State<ExploreScreen>
       width: double.infinity,
       color: Colors.grey[200],
       child: Center(
-        child: Text(
-          emoji ?? '📦',
-          style: TextStyle(fontSize: height * 0.4),
-        ),
+        child: Text(emoji ?? '📦', style: TextStyle(fontSize: height * 0.4)),
       ),
     );
   }
@@ -550,7 +555,7 @@ class _ExploreScreenState extends State<ExploreScreen>
     final precioConDescuento = promoService.getPrecioConDescuento(promo);
     final rating = promoService.getPromocionRating(promo.codigo);
     final discount = promo.descuento != null ? '-${promo.descuento}%' : '';
-    
+
     return GestureDetector(
       onTap: () => _openPromotionDetails(promo.codigo),
       child: Container(
@@ -706,7 +711,7 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   Widget _buildNearbySection(PromoService promoService) {
     final nearbyStores = promoService.getNearbyStores(limit: 5);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -746,7 +751,8 @@ class _ExploreScreenState extends State<ExploreScreen>
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: nearbyStores.length,
-            itemBuilder: (_, i) => _buildNearbyCard(nearbyStores[i], promoService),
+            itemBuilder: (_, i) =>
+                _buildNearbyCard(nearbyStores[i], promoService),
           ),
         ),
       ],
@@ -755,12 +761,15 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   // ── Card moderna con imagen ───────────────────────────────────────────────
 
-  Widget _buildNearbyCard(Map<String, dynamic> storeData, PromoService promoService) {
+  Widget _buildNearbyCard(
+    Map<String, dynamic> storeData,
+    PromoService promoService,
+  ) {
     final supermercado = storeData['supermercado'] as Supermercado;
     final promociones = storeData['promociones'] as List<Promocion>;
     final distancia = storeData['distancia'] as String;
     final tiempo = storeData['tiempo'] as String;
-    
+
     // Calculate average rating from promotions
     double avgRating = 0;
     if (promociones.isNotEmpty) {
@@ -769,7 +778,7 @@ class _ExploreScreenState extends State<ExploreScreen>
           .reduce((a, b) => a + b);
       avgRating = totalRating / promociones.length;
     }
-    
+
     return Container(
       width: 180,
       margin: const EdgeInsets.only(right: 14),
@@ -798,7 +807,13 @@ class _ExploreScreenState extends State<ExploreScreen>
                   color: Colors.grey[200],
                   child: promociones.isNotEmpty
                       ? _buildPromoImage(promociones.first, '🏪', 110)
-                      : const Center(child: Icon(Icons.store, size: 40, color: Colors.grey)),
+                      : const Center(
+                          child: Icon(
+                            Icons.store,
+                            size: 40,
+                            color: Colors.grey,
+                          ),
+                        ),
                 ),
 
                 // 📍 DISTANCIA (overlay)
@@ -841,7 +856,11 @@ class _ExploreScreenState extends State<ExploreScreen>
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.star, size: 10, color: Colors.yellow),
+                          const Icon(
+                            Icons.star,
+                            size: 10,
+                            color: Colors.yellow,
+                          ),
                           const SizedBox(width: 3),
                           Text(
                             avgRating.toStringAsFixed(1),
@@ -909,7 +928,6 @@ class _ExploreScreenState extends State<ExploreScreen>
     );
   }
 
-  
   Widget _buildPromoGridCard(Promocion promo, PromoService promoService) {
     final supermercado = promoService.getSupermercado(promo.idSupermercado);
     final categoria = promoService.getCategoria(promo.idCategoria);
@@ -918,13 +936,13 @@ class _ExploreScreenState extends State<ExploreScreen>
     final rating = promoService.getPromocionRating(promo.codigo);
     final reviewsCount = promoService.getPromocionReviewsCount(promo.codigo);
     final urgency = promoService.getPromocionUrgency(promo);
-    
+
     // For demo, use first user as current user
-    final currentUser = promoService.getUsuarios().isNotEmpty 
-        ? promoService.getUsuarios().first.id 
+    final currentUser = promoService.getUsuarios().isNotEmpty
+        ? promoService.getUsuarios().first.id
         : 1;
     final isFavorite = promoService.isFavorito(currentUser, promo.codigo);
-    
+
     // Format time display
     String timeDisplay = 'permanente';
     if (promo.fechaFin != null) {
@@ -932,7 +950,7 @@ class _ExploreScreenState extends State<ExploreScreen>
         final fechaFin = DateTime.parse(promo.fechaFin!);
         final ahora = DateTime.now();
         final diferencia = fechaFin.difference(ahora);
-        
+
         if (diferencia.inDays > 0) {
           timeDisplay = '${diferencia.inDays} días';
         } else if (diferencia.inHours > 0) {
@@ -944,10 +962,12 @@ class _ExploreScreenState extends State<ExploreScreen>
         timeDisplay = 'permanente';
       }
     }
-    
+
     final discount = promo.descuento != null ? '-${promo.descuento}%' : '';
-    final categoryColor = Color(int.parse(categoriaStyle['color']!.replaceFirst('#', '0xFF')));
-    
+    final categoryColor = Color(
+      int.parse(categoriaStyle['color']!.replaceFirst('#', '0xFF')),
+    );
+
     return GestureDetector(
       onTap: () => _openPromotionDetails(promo.codigo),
       child: Container(
@@ -1024,7 +1044,10 @@ class _ExploreScreenState extends State<ExploreScreen>
                       right: 10,
                       child: GestureDetector(
                         onTap: () {
-                          promoService.toggleFavorito(currentUser, promo.codigo);
+                          promoService.toggleFavorito(
+                            currentUser,
+                            promo.codigo,
+                          );
                         },
                         child: Container(
                           width: 34,
@@ -1263,14 +1286,14 @@ class _ExploreScreenState extends State<ExploreScreen>
           childAspectRatio: childAspectRatio,
         ),
         delegate: SliverChildBuilderDelegate(
-          (context, index) => _buildPromoGridCard(promociones[index], promoService),
+          (context, index) =>
+              _buildPromoGridCard(promociones[index], promoService),
           childCount: promociones.length,
         ),
       ),
     );
   }
 
-  
   // ── Bottom Nav ────────────────────────────────────────────────────────────
 
   Widget _buildBottomNav() {

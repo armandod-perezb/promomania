@@ -1,9 +1,22 @@
+/// Modelo que representa una valoración (like/dislike) asociada a una promoción.
+///
+/// Cada `Valoracion` indica si un usuario marcó la promoción como positiva
+/// o negativa. Se guarda como parte de los datos de la app y se usa para
+/// calcular métricas y el rating de una promoción.
 class Valoracion {
+  /// Identificador único de la valoración.
   final int id;
-  final String tipo; // 'positiva' o 'negativa'
+
+  /// Tipo de valoración: 'positiva' o 'negativa'.
+  final String tipo;
+
+  /// ID del usuario que hizo la valoración (referencia a `Usuario`).
   final int idUsuario;
+
+  /// Código de la promoción valorada (referencia a `Promocion.codigo`).
   final String codigoPromocion;
 
+  /// Constructor principal.
   Valoracion({
     required this.id,
     required this.tipo,
@@ -11,6 +24,7 @@ class Valoracion {
     required this.codigoPromocion,
   });
 
+  /// Construye una instancia a partir de un `Map` (JSON).
   factory Valoracion.fromJson(Map<String, dynamic> json) {
     return Valoracion(
       id: json['id'] as int,
@@ -20,6 +34,7 @@ class Valoracion {
     );
   }
 
+  /// Serializa la valoración a `Map<String, dynamic>` para persistencia.
   Map<String, dynamic> toJson() {
     return {
       'id': id,

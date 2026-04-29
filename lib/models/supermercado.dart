@@ -1,10 +1,23 @@
+/// Modelo que representa un supermercado o comercio dentro de la app.
+///
+/// Se utiliza para relacionar promociones con una tienda física u online.
 class Supermercado {
+  /// Identificador único del supermercado.
   final int id;
-  final String nombre;
-  final String? direccion;
-  final String? ciudad;
-  final String estado; // 'activo' o 'inactivo'
 
+  /// Nombre comercial del supermercado.
+  final String nombre;
+
+  /// Dirección física (opcional).
+  final String? direccion;
+
+  /// Ciudad donde se ubica el supermercado (opcional).
+  final String? ciudad;
+
+  /// Estado operacional: 'activo' o 'inactivo'.
+  final String estado;
+
+  /// Constructor principal.
   Supermercado({
     required this.id,
     required this.nombre,
@@ -13,6 +26,9 @@ class Supermercado {
     required this.estado,
   });
 
+  /// Construye una instancia a partir de un `Map` (parseado desde JSON).
+  ///
+  /// Si `estado` no está presente se asume 'activo' por defecto.
   factory Supermercado.fromJson(Map<String, dynamic> json) {
     return Supermercado(
       id: json['id'] as int,
@@ -23,6 +39,7 @@ class Supermercado {
     );
   }
 
+  /// Serializa la entidad a `Map<String, dynamic>` para convertirla a JSON.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -33,6 +50,8 @@ class Supermercado {
     };
   }
 
+  /// Devuelve una copia inmutable del supermercado, permitiendo actualizar
+  /// solo los campos que se pasen como parámetros.
   Supermercado copyWith({
     int? id,
     String? nombre,

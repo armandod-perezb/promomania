@@ -1,11 +1,28 @@
+/// Modelo que representa un reporte creado por un usuario sobre una promoción.
+///
+/// Los reportes se usan para notificar problemas, contenido inapropiado
+/// o inconsistencia en una promoción. Se almacenan junto a los demás
+/// datos en el `PromoService` y pueden persistirse en el JSON local.
 class Reporte {
+  /// Identificador único del reporte.
   final int id;
+
+  /// Motivo textual del reporte (por ejemplo: 'Producto vencido').
   final String motivo;
+
+  /// Fecha del reporte en formato ISO o legible (se usa como string).
   final String fecha;
-  final String estado; // 'pendiente', 'revisado', 'descartado'
+
+  /// Estado del procesamiento del reporte: 'pendiente', 'revisado', 'descartado'.
+  final String estado;
+
+  /// ID del usuario que originó el reporte (referencia a `Usuario`).
   final int idUsuario;
+
+  /// Código de la promoción reportada (referencia a `Promocion.codigo`).
   final String codigoPromocion;
 
+  /// Constructor principal con todos los campos obligatorios.
   Reporte({
     required this.id,
     required this.motivo,
@@ -15,6 +32,9 @@ class Reporte {
     required this.codigoPromocion,
   });
 
+  /// Construye una instancia desde un `Map` parseado desde JSON.
+  ///
+  /// Aplica valor por defecto 'pendiente' si `estado` no está presente.
   factory Reporte.fromJson(Map<String, dynamic> json) {
     return Reporte(
       id: json['id'] as int,
@@ -26,6 +46,7 @@ class Reporte {
     );
   }
 
+  /// Serializa el reporte a `Map` para convertirlo a JSON.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -37,6 +58,8 @@ class Reporte {
     };
   }
 
+  /// Devuelve una copia inmutable del `Reporte`, permitiendo actualizar
+  /// solo los campos necesarios (patrón `copyWith`).
   Reporte copyWith({
     int? id,
     String? motivo,

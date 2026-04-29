@@ -1,12 +1,31 @@
+/// Modelo que representa un usuario de la aplicación.
+///
+/// Contiene los datos básicos necesarios para autenticación, autorización
+/// y personalización (por ejemplo la ciudad). Se usa en `PromoService`
+/// para identificar al creador de promociones y en las pantallas de admin.
 class Usuario {
+  /// Identificador único del usuario.
   final int id;
+
+  /// Nombre completo del usuario.
   final String nombre;
+
+  /// Correo electrónico (también usado como identificador para login).
   final String correo;
+
+  /// Contraseña en texto plano en este modelo (en producción debería ser hash).
   final String password;
-  final String rol; // 'usuario' o 'admin'
-  final String estado; // 'activo' o 'inactivo'
+
+  /// Rol del usuario: 'usuario' o 'admin'. Controla accesos en la app.
+  final String rol;
+
+  /// Estado de la cuenta: 'activo' o 'inactivo'.
+  final String estado;
+
+  /// Ciudad del usuario (opcional), usada para segmentación y filtros.
   final String? ciudad;
 
+  /// Constructor principal.
   Usuario({
     required this.id,
     required this.nombre,
@@ -17,7 +36,10 @@ class Usuario {
     this.ciudad,
   });
 
-  // Convertir JSON a Objeto
+  /// Crea una instancia de `Usuario` a partir de un `Map` parseado desde JSON.
+  ///
+  /// Proporciona valores por defecto para `rol` y `estado` cuando no están
+  /// presentes en el JSON empaquetado.
   factory Usuario.fromJson(Map<String, dynamic> json) {
     return Usuario(
       id: json['id'] as int,
@@ -30,7 +52,7 @@ class Usuario {
     );
   }
 
-  // Convertir Objeto a JSON
+  /// Serializa el `Usuario` a `Map<String, dynamic>` para convertirlo a JSON.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -43,7 +65,8 @@ class Usuario {
     };
   }
 
-  // Copiar con cambios
+  /// Devuelve una copia inmutable del usuario, permitiendo sobrescribir
+  /// únicamente los campos que se pasen (patrón `copyWith`).
   Usuario copyWith({
     int? id,
     String? nombre,

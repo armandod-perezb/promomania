@@ -1,23 +1,30 @@
-import 'dart:async';
-import 'dart:typed_data';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import '../main.dart';
-import '../models/promocion.dart';
-import '../models/promocion_horario.dart';
-import '../models/reporte.dart';
-import '../models/comentario.dart';
-import '../models/valoracion.dart'; 
-import '../services/image_storage_service.dart';
+// Importaciones necesarias para la pantalla de detalles de promoción
+import 'dart:async';           // Para manejo de operaciones asíncronas y timers
+import 'dart:typed_data';      // Para manejo de datos binarios (imágenes)
+import 'package:flutter/material.dart';  // UI framework principal
+import 'package:flutter/services.dart';  // Para feedback háptico y servicios del sistema
+import '../main.dart';         // Para acceso a servicios globales (promoService, sessionManager)
+import '../models/promocion.dart';       // Modelo de datos para promociones
+import '../models/promocion_horario.dart'; // Modelo para horarios de promociones
+import '../models/reporte.dart';          // Modelo para reportes de usuarios
+import '../models/comentario.dart';       // Modelo para comentarios de usuarios
+import '../models/valoracion.dart';       // Modelo para valoraciones (like/dislike)
+import '../services/image_storage_service.dart'; // Servicio para manejo de imágenes locales
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MODELOS
+// MODELOS (Importados arriba)
 // ─────────────────────────────────────────────────────────────────────────────
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PANTALLA DE DETALLE
+// PANTALLA DE DETALLE DE PROMOCIÓN
 // ─────────────────────────────────────────────────────────────────────────────
+// Muestra información completa de una promoción incluyendo:
+// - Imágenes y descripción
+// - Precios y descuentos
+// - Información de la tienda
+// - Sistema de valoraciones y comentarios
+// - Funcionalidades de favoritos y reportes
 
 class PromoDetailScreen extends StatefulWidget {
   const PromoDetailScreen({super.key});
@@ -28,50 +35,59 @@ class PromoDetailScreen extends StatefulWidget {
 
 class _PromoDetailScreenState extends State<PromoDetailScreen>
     with TickerProviderStateMixin {
-  static const Color _primary = Color(0xFFFF4D2E);
-  static const Color _darkBg = Color(0xFF1A1F2E);
-  static const Color _green = Color(0xFF10B981);
-  static const Color _lightBg = Color(0xFFF5F6FA);
+  // Colores constantes de la aplicación
+  static const Color _primary = Color(0xFFFF4D2E);      // Color primario rojo/naranja
+  static const Color _darkBg = Color(0xFF1A1F2E);       // Fondo oscuro para countdown
+  static const Color _green = Color(0xFF10B981);        // Verde para indicadores de ahorro
+  static const Color _lightBg = Color(0xFFF5F6FA);      // Fondo claro principal
+  
+  // URLs de imágenes placeholder cuando no hay imágenes disponibles
   static const String _heroImageUrl =
-      'https://images.unsplash.com/photo-1496747611176-843222e1e57c';
+      'https://images.unsplash.com/photo-1496747611176-843222e1e57c';  // Imagen hero placeholder
   static const String _storeImageUrl =
-      'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85';
+      'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85';  // Logo de tienda placeholder
 
-  Promocion? _promo;
-  List<PromocionHorario> _horarios = [];
-  bool _routeDataResolved = false;
+  // Variables de estado principales
+  Promocion? _promo;                    // Promoción actual que se está mostrando
+  List<PromocionHorario> _horarios = []; // Lista de horarios de disponibilidad
+  bool _routeDataResolved = false;       // Control para evitar reprocesar datos de ruta
 
-  bool _isFavorite = false;
-  bool _descExpanded = false;
+  // Estados de UI interactiva
+  bool _isFavorite = false;              // Estado de favorito del usuario actual
+  bool _descExpanded = false;            // Control para expandir/colapsar descripción
 
-  // Countdown: termina 8 mar 2026 → días, horas, minutos, segundos
+  // Variables para countdown (cuenta regresiva)
+  // Inicializado con valores de ejemplo: termina 8 mar 2026 → días, horas, minutos, segundos
   int _days = 0, _hours = 23, _minutes = 57, _seconds = 6;
-  Timer? _timer;
+  Timer? _timer;                         // Timer para actualizar countdown cada segundo
 
-  // Rating bars data [1★..5★]
-  final List<int> _ratingCounts = [2, 3, 9, 21, 32]; // index 0=1★
+  // Datos de calificación (estáticos por ahora)
+  // Índice 0 = 1 estrella, índice 4 = 5 estrellas
+  final List<int> _ratingCounts = [2, 3, 9, 21, 32];
 
   
   @override
   void initState() {
     super.initState();
+    // Inicializar timer para countdown que se actualiza cada segundo
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted) return;
+      if (!mounted) return;  // Verificar que el widget todavía está montado
       setState(() {
+        // Lógica de decremento de tiempo para countdown
         if (_seconds > 0) {
-          _seconds--;
+          _seconds--;  // Decrementar segundos
         } else if (_minutes > 0) {
-          _minutes--;
-          _seconds = 59;
+          _minutes--;  // Decrementar minutos
+          _seconds = 59;  // Reiniciar segundos
         } else if (_hours > 0) {
-          _hours--;
-          _minutes = 59;
-          _seconds = 59;
+          _hours--;  // Decrementar horas
+          _minutes = 59;  // Reiniciar minutos
+          _seconds = 59;  // Reiniciar segundos
         } else if (_days > 0) {
-          _days--;
-          _hours = 23;
-          _minutes = 59;
-          _seconds = 59;
+          _days--;  // Decrementar días
+          _hours = 23;  // Reiniciar horas
+          _minutes = 59;  // Reiniciar minutos
+          _seconds = 59;  // Reiniciar segundos
         }
       });
     });
@@ -80,12 +96,15 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // Evitar reprocesar datos si ya se han resuelto
     if (_routeDataResolved) return;
     _routeDataResolved = true;
 
+    // Obtener código de promoción de los argumentos de la ruta
     final args = ModalRoute.of(context)?.settings.arguments;
     final codigo = args is String ? args : null;
 
+    // Intentar obtener promoción por código, si no hay fallback a primera aprobada
     final promoByCode = codigo != null
         ? promoService.getPromocionByCodigo(codigo)
         : null;
@@ -95,27 +114,32 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
               ? promoService.getPromociones().first
               : null);
 
+    // Asignar promoción encontrada
     _promo = promoByCode ?? fallbackPromo;
     if (_promo != null) {
-      _horarios = promoService.getPromocionesHorariosByCodigo(_promo!.codigo);
-      _isFavorite = promoService.isFavorito(_activeUserId, _promo!.codigo);
+      // Cargar datos relacionados con la promoción
+      _horarios = promoService.getPromocionesHorariosByCodigo(_promo!.codigo);  // Horarios de disponibilidad
+      _isFavorite = promoService.isFavorito(_activeUserId, _promo!.codigo);     // Estado de favorito del usuario
     }
   }
 
   @override
   void dispose() {
+    // Cancelar timer para evitar memory leaks
     _timer?.cancel();
     super.dispose();
   }
 
-  int get _totalReviews => _ratingCounts.fold(0, (a, b) => a + b);
-  int get _activeUserId => sessionManager.usuarioActual?.id ?? 1;
+  // Getters para cálculos y datos auxiliares
+  int get _totalReviews => _ratingCounts.fold(0, (a, b) => a + b);  // Total de reseñas sumando todos los ratings
+  int get _activeUserId => sessionManager.usuarioActual?.id ?? 1;   // ID del usuario activo (fallback a 1)
   int get _nextReporteId =>
       (promoService.getReportes().isNotEmpty
-          ? promoService.getReportes().last.id
-          : 0) +
-      1;
+          ? promoService.getReportes().last.id  // Último ID de reporte
+          : 0) + 1;  // Siguiente ID disponible
 
+  /// Formatea la lista de horarios como texto legible
+  /// Returns: String con formato "Lunes: 9:00 - 18:00 · Martes: 9:00 - 18:00"
   String _horarioTexto() {
     if (_horarios.isEmpty) return 'Horario no especificado';
     return _horarios
@@ -123,20 +147,24 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
         .join(' · ');
   }
 
+  /// Reporta la promoción actual al sistema
+  /// Crea un reporte con estado 'pendiente' para revisión administrativa
   Future<void> _reportarPromocion() async {
     if (_promo == null) return;
 
+    // Crear y agregar reporte al servicio
     promoService.addReporte(
       Reporte(
         id: _nextReporteId,
         motivo: 'Reporte enviado desde detalle de promoción',
-        fecha: DateTime.now().toIso8601String(),
-        estado: 'pendiente',
-        idUsuario: _activeUserId,
-        codigoPromocion: _promo!.codigo,
+        fecha: DateTime.now().toIso8601String(),  // Timestamp actual
+        estado: 'pendiente',                     // Estado inicial para revisión
+        idUsuario: _activeUserId,                // Usuario que reporta
+        codigoPromocion: _promo!.codigo,        // Promoción reportada
       ),
     );
 
+    // Verificar que el widget todavía está montado antes de mostrar SnackBar
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Reporte enviado. Será revisado por el admin.')),
@@ -145,47 +173,50 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Usar AnimatedBuilder para reconstruir UI cuando cambia el promoService
     return AnimatedBuilder(
       animation: promoService,
       builder: (context, _) {
+        // Manejo de caso cuando no hay promoción disponible
         if (_promo == null) {
           return const Scaffold(
             body: Center(child: Text('No se encontró información de la promoción')),
           );
         }
 
+        // Configurar estilo de barra de estado para tema claro
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle.light,
           child: Scaffold(
             backgroundColor: _lightBg,
             body: Stack(
               children: [
-                // Contenido scrollable
+                // Contenido principal scrollable
                 SingleChildScrollView(
-                  padding: const EdgeInsets.only(bottom: 100),
+                  padding: const EdgeInsets.only(bottom: 100),  // Espacio para bottom bar
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildHeroImage(),
-                      _buildMainInfo(),
+                      _buildHeroImage(),        // Imagen principal con overlay
+                      _buildMainInfo(),         // Información principal (título, precio, rating)
+                      _buildDivider(),         // Separador visual
+                      _buildCountdown(),       // Cuenta regresiva de la promoción
                       _buildDivider(),
-                      _buildCountdown(),
+                      _buildStats(),           // Estadísticas (vistas, likes, etc.)
                       _buildDivider(),
-                      _buildStats(),
+                      _buildDescription(),     // Descripción expandible con tags
                       _buildDivider(),
-                      _buildDescription(),
+                      _buildStoreSection(),    // Información de la tienda
                       _buildDivider(),
-                      _buildStoreSection(),
+                      _buildLocationSection(), // Ubicación y mapa
                       _buildDivider(),
-                      _buildLocationSection(),
-                      _buildDivider(),
-                      _buildReviewsSection(),
-                      _buildViewAllReviews(),
+                      _buildReviewsSection(),  // Sistema de reseñas y comentarios
+                      _buildViewAllReviews(),  // Botón para ver todas las reseñas
                       const SizedBox(height: 24),
                     ],
                   ),
                 ),
-                // Bottom bar fijo
+                // Barra inferior fija con acciones principales
                 _buildBottomBar(),
               ],
             ),
@@ -195,12 +226,14 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     );
   }
 
-  // ── Hero image ──────────────────────────────────────────────────────────────
+  // ── SECCIÓN DE IMAGEN PRINCIPAL (HERO) ───────────────────────────────────────
 
+  /// Obtiene los bytes de una imagen local de la promoción
+  /// Returns: Uint8List con datos de imagen o null si hay error
   Future<Uint8List?> _getHeroImageBytes() async {
     final promoImage = _promo?.foto?.trim();
     if (promoImage == null || promoImage.isEmpty) return null;
-    if (promoImage.startsWith('http')) return null;
+    if (promoImage.startsWith('http')) return null;  // No procesar URLs remotas aquí
 
     try {
       final imageStorageService = ImageStorageService();
@@ -212,6 +245,8 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     return null;
   }
 
+  /// Construye el placeholder para cuando no hay imagen disponible
+  /// Muestra un gradiente gris con icono y texto "Sin imagen"
   Widget _buildHeroPlaceholder() {
     return Container(
       decoration: BoxDecoration(
@@ -237,6 +272,11 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     );
   }
 
+  /// Construye la imagen principal (hero) de la promoción
+  /// Soporta tres tipos de imágenes:
+  /// 1. Placeholder (sin imagen de promoción)
+  /// 2. Imagen remota (URL HTTP)
+  /// 3. Imagen local (almacenamiento interno)
   Widget _buildHeroImage() {
     final promoImage = _promo?.foto?.trim() ?? '';
     final hasPromoImage = _promo?.foto?.trim().isNotEmpty ?? false;
@@ -247,13 +287,16 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
       child: Stack(
         fit: StackFit.expand,
         children: [
+          // Lógica de carga de imagen según tipo
           if (!hasPromoImage)
+            // Caso 1: Sin imagen personalizada - usar placeholder
             Image.network(
               _heroImageUrl,
               fit: BoxFit.cover,
               alignment: Alignment.center,
             )
           else if (isRemoteImage)
+            // Caso 2: Imagen remota - cargar desde URL con manejo de errores
             Image.network(
               promoImage,
               fit: BoxFit.cover,
@@ -263,10 +306,12 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
               },
             )
           else
+            // Caso 3: Imagen local - cargar desde almacenamiento interno
             FutureBuilder<Uint8List?>(
               future: _getHeroImageBytes(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
+                  // Estado de carga
                   return Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -280,6 +325,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                 }
 
                 if (snapshot.hasData && snapshot.data != null) {
+                  // Imagen cargada exitosamente
                   return Image.memory(
                     snapshot.data!,
                     fit: BoxFit.cover,
@@ -291,45 +337,50 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                   );
                 }
 
+                // Error o sin datos - mostrar placeholder
                 return _buildHeroPlaceholder();
               },
             ),
+          // Overlay gradiente para mejorar legibilidad de botones
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withValues(alpha: 0.24),
-                  Colors.black.withValues(alpha: 0.10),
-                  Colors.black.withValues(alpha: 0.52),
+                  Colors.black.withValues(alpha: 0.24),  // Más oscuro arriba
+                  Colors.black.withValues(alpha: 0.10),  // Menos oscuro en medio
+                  Colors.black.withValues(alpha: 0.52),  // Más oscuro abajo
                 ],
               ),
             ),
           ),
-          // Botones overlay
+          // Botones de acción overlay sobre la imagen
           Positioned(
-            top: MediaQuery.of(context).padding.top + 10,
+            top: MediaQuery.of(context).padding.top + 10,  // Respetar área de status bar
             left: 16,
             right: 16,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Back
+                // Botón de regreso
                 _heroBtn(
                   icon: Icons.arrow_back_rounded,
-                  onTap: () => Navigator.pop(context),
+                  onTap: () => Navigator.pop(context),  // Navegar hacia atrás
                 ),
+                // Botones de acción derecha
                 Row(
                   children: [
-                    _heroBtn(icon: Icons.share_outlined, onTap: () {}),
+                    _heroBtn(icon: Icons.share_outlined, onTap: () {}),  // Compartir (sin implementar)
                     const SizedBox(width: 10),
+                    // Botón de favoritos con estado dinámico
                     _heroBtn(
                       icon: _isFavorite
-                          ? Icons.favorite_rounded
-                          : Icons.favorite_border_rounded,
-                      iconColor: _isFavorite ? _primary : Colors.white,
+                          ? Icons.favorite_rounded        // Favorito activo
+                          : Icons.favorite_border_rounded, // Favorito inactivo
+                      iconColor: _isFavorite ? _primary : Colors.white,  // Color según estado
                       onTap: () {
+                        // Toggle de estado de favorito
                         promoService.toggleFavorito(_activeUserId, _promo!.codigo);
                         setState(
                           () => _isFavorite = promoService.isFavorito(
@@ -337,7 +388,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                             _promo!.codigo,
                           ),
                         );
-                        HapticFeedback.lightImpact();
+                        HapticFeedback.lightImpact();  // Feedback háptico
                       },
                     ),
                   ],
@@ -345,20 +396,20 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
               ],
             ),
           ),
-          // Badge Moda
+          // Badge de categoría "Moda"
           Positioned(
             bottom: 14,
             left: 16,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.9),
+                color: Colors.white.withValues(alpha: 0.9),  // Fondo semitransparente
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Text(
                 'Moda',
                 style: TextStyle(
-                  color: Color(0xFF8B5CF6),
+                  color: Color(0xFF8B5CF6),  // Púrpura para categoría
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                 ),
@@ -370,6 +421,11 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     );
   }
 
+  /// Construye botón reutilizable para el overlay de la imagen hero
+  /// Parámetros:
+  /// - icon: Icono a mostrar
+  /// - iconColor: Color del icono (blanco por defecto)
+  /// - onTap: Acción al presionar
   Widget _heroBtn({
     required IconData icon,
     Color iconColor = Colors.white,
@@ -381,17 +437,19 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
         width: 38,
         height: 38,
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.35),
+          color: Colors.black.withOpacity(0.35),  // Fondo semitransparente oscuro
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withOpacity(0.15)),
+          border: Border.all(color: Colors.white.withOpacity(0.15)),  // Borde sutil
         ),
         child: Icon(icon, color: iconColor, size: 20),
       ),
     );
   }
 
-  // ── Info principal ──────────────────────────────────────────────────────────
+  // ── SECCIÓN DE INFORMACIÓN PRINCIPAL ────────────────────────────────────────
 
+  /// Construye la sección principal de información de la promoción
+  /// Incluye: breadcrumb, título, rating, distancia, tiempo y precio
   Widget _buildMainInfo() {
     final promo = _promo!;
 
@@ -400,7 +458,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Breadcrumb
+          // Breadcrumb de navegación y categorías
           Row(
             children: const [
               Text(
@@ -408,45 +466,47 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF8B5CF6),
+                  color: Color(0xFF8B5CF6),  // Púrpura para categoría principal
                 ),
               ),
               SizedBox(width: 8),
-              Text('•', style: TextStyle(color: Color(0xFFD1D5DB))),
+              Text('•', style: TextStyle(color: Color(0xFFD1D5DB))),  // Separador
               SizedBox(width: 8),
-              Icon(Icons.check_circle, size: 13, color: Color(0xFF3B82F6)),
+              Icon(Icons.check_circle, size: 13, color: Color(0xFF3B82F6)),  // Verificación
               SizedBox(width: 4),
               Text(
                 'Moda · Ropa casual',
-                style: TextStyle(fontSize: 12.5, color: Color(0xFF6B7280)),
+                style: TextStyle(fontSize: 12.5, color: Color(0xFF6B7280)),  // Subcategorías
               ),
             ],
           ),
           const SizedBox(height: 12),
-          // Título
+          // Título principal de la promoción
           Text(
             promo.titulo,
             style: TextStyle(
               fontSize: 21,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF111827),
-              height: 1.18,
+              color: Color(0xFF111827),  // Gris oscuro para texto
+              height: 1.18,  // Altura de línea compacta
             ),
           ),
           const SizedBox(height: 14),
-          // Rating + distancia + tiempo
+          // Fila de métricas: rating, distancia y tiempo
           Row(
             children: [
-              // Estrellas
+              // Sección de estrellas de rating
               Row(
                 children: List.generate(5, (i) {
                   if (i < 4) {
+                    // 4 estrellas completas
                     return const Icon(
                       Icons.star_rounded,
-                      color: Color(0xFFFBBF24),
+                      color: Color(0xFFFBBF24),  // Amarillo dorado
                       size: 16,
                     );
                   }
+                  // 1 estrella media (4.5 estrellas)
                   return const Icon(
                     Icons.star_half_rounded,
                     color: Color(0xFFFBBF24),
@@ -455,6 +515,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                 }),
               ),
               const SizedBox(width: 6),
+              // Valor numérico del rating
               const Text(
                 '4.4',
                 style: TextStyle(
@@ -463,13 +524,15 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                   color: Color(0xFF111827),
                 ),
               ),
+              // Número de reseñas
               const Text(
                 ' (67 reseñas)',
                 style: TextStyle(fontSize: 12.5, color: Color(0xFF8A8FA8)),
               ),
               const SizedBox(width: 8),
-              const Text('•', style: TextStyle(color: Color(0xFFB0B5CC))),
+              const Text('•', style: TextStyle(color: Color(0xFFB0B5CC))),  // Separador
               const SizedBox(width: 8),
+              // Icono y distancia
               const Icon(
                 Icons.location_on_outlined,
                 size: 13,
@@ -481,8 +544,9 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                 style: TextStyle(fontSize: 12.5, color: Color(0xFF8A8FA8)),
               ),
               const SizedBox(width: 8),
-              const Text('•', style: TextStyle(color: Color(0xFFB0B5CC))),
+              const Text('•', style: TextStyle(color: Color(0xFFB0B5CC))),  // Separador
               const SizedBox(width: 8),
+              // Icono y tiempo restante
               const Icon(
                 Icons.access_time_rounded,
                 size: 13,
@@ -496,34 +560,38 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
             ],
           ),
           const SizedBox(height: 18),
-          // Precio
+          // Sección de precio y descuento
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Columna principal de precio
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Fila con precio y descuento
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
+                        // Precio principal en grande
                         Text(
                           '\$${promo.precio.toStringAsFixed(2)}',
                           style: const TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.w900,
-                            color: _primary,
+                            color: _primary,  // Color primario rojo/naranja
                           ),
                         ),
+                        // Badge de descuento (si aplica)
                         if ((promo.descuento ?? 0) > 0) ...[
                           const SizedBox(width: 10),
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 4),
+                            padding: const EdgeInsets.only(bottom: 4),  // Alinear con precio
                             child: Text(
                               '${promo.descuento}% OFF',
                               style: const TextStyle(
                                 fontSize: 16,
-                                color: Color(0xFFB0B5CC),
+                                color: Color(0xFFB0B5CC),  // Gris claro
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -532,6 +600,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                       ],
                     ),
                     const SizedBox(height: 4),
+                    // Texto de moneda y descripción
                     const Text(
                       'COP · Precio con descuento',
                       style: TextStyle(fontSize: 12, color: Color(0xFF8A8FA8)),
@@ -539,17 +608,17 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                   ],
                 ),
               ),
-              // Badge de ahorro
+              // Badge de ahorro (lado derecho)
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 14,
                 ),
                 decoration: BoxDecoration(
-                  color: _green.withValues(alpha: 0.10),
+                  color: _green.withValues(alpha: 0.10),  // Fondo verde claro
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: _green.withValues(alpha: 0.18),
+                    color: _green.withValues(alpha: 0.18),  // Borde verde
                     width: 1.2,
                   ),
                 ),
@@ -584,22 +653,25 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     );
   }
 
-  // ── Countdown ───────────────────────────────────────────────────────────────
+  // ── SECCIÓN DE COUNTDOWN (CUENTA REGRESIVA) ───────────────────────────────
 
+  /// Construye la cuenta regresiva hasta que termina la promoción
+  /// Muestra días, horas, minutos y segundos restantes
   Widget _buildCountdown() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       decoration: BoxDecoration(
-        color: _darkBg,
+        color: _darkBg,  // Fondo oscuro para contraste
         borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
         children: [
+          // Badge con fecha de finalización
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: _primary,
+              color: _primary,  // Fondo primario rojo/naranja
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Row(
@@ -617,7 +689,8 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
               ],
             ),
           ),
-          const Spacer(),
+          const Spacer(),  // Empujar unidades hacia la derecha
+          // Unidades de tiempo: Días, Horas, Minutos, Segundos
           _countdownUnit(_days.toString().padLeft(2, '0'), 'D'),
           _countdownSep(),
           _countdownUnit(_hours.toString().padLeft(2, '0'), 'H'),
@@ -630,13 +703,18 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     );
   }
 
+  /// Construye una unidad individual del countdown (ej: "15 D")
+  /// Parámetros:
+  /// - val: Valor numérico (ej: "15")
+  /// - label: Etiqueta de tiempo (ej: "D" para días)
   Widget _countdownUnit(String val, String label) {
     return Column(
       children: [
+        // Contenedor del valor numérico
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.10),
+            color: Colors.white.withValues(alpha: 0.10),  // Fondo semitransparente
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
@@ -645,15 +723,16 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
               color: Colors.white,
               fontSize: 17,
               fontWeight: FontWeight.w900,
-              fontFeatures: [FontFeature.tabularFigures()],
+              fontFeatures: [FontFeature.tabularFigures()],  // Números monoespaciados
             ),
           ),
         ),
         const SizedBox(height: 3),
+        // Etiqueta debajo del valor
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.5),
+            color: Colors.white.withOpacity(0.5),  // Semitransparente
             fontSize: 9,
             fontWeight: FontWeight.w600,
           ),
@@ -662,13 +741,14 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     );
   }
 
+  /// Construye el separador dos puntos (:) entre unidades de tiempo
   Widget _countdownSep() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: Text(
         ':',
         style: TextStyle(
-          color: Colors.white.withOpacity(0.5),
+          color: Colors.white.withOpacity(0.5),  // Semitransparente como las etiquetas
           fontSize: 17,
           fontWeight: FontWeight.w800,
         ),
@@ -676,28 +756,33 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     );
   }
 
-  // ── Stats ───────────────────────────────────────────────────────────────────
+  // ── SECCIÓN DE ESTADÍSTICAS ────────────────────────────────────────────────
 
+  /// Construye la sección de estadísticas de la promoción
+  /// Muestra: vistas, útiles, guardados y reportes
   Widget _buildStats() {
     final promo = _promo!;
+    // Contar reportes para esta promoción
     final reportesCount = promoService.getReportesByPromocion(promo.codigo).length;
+    // Contar favoritos para esta promoción
     final favoritosCount = promoService.favoritos
         .where((f) => f.codigoPromocion == promo.codigo)
         .length;
 
+    // Definir estadísticas a mostrar
     final stats = [
       _Stat(
         icon: Icons.visibility_outlined,
-        value: '${promo.vistas}',
+        value: '${promo.vistas}',  // Vistas de la promoción
         label: 'Vistas',
       ),
-      _Stat(icon: Icons.thumb_up_outlined, value: '267', label: 'Útil'),
+      _Stat(icon: Icons.thumb_up_outlined, value: '267', label: 'Útil'),  // Valoraciones positivas (estático)
       _Stat(
         icon: Icons.favorite_border_rounded,
-        value: '$favoritosCount',
+        value: '$favoritosCount',  // Contador dinámico de favoritos
         label: 'Guardados',
       ),
-      _Stat(icon: Icons.report_outlined, value: '$reportesCount', label: 'Reportes'),
+      _Stat(icon: Icons.report_outlined, value: '$reportesCount', label: 'Reportes'),  // Contador dinámico
     ];
 
     return Padding(
@@ -711,10 +796,10 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: const Color(0xFFF0F1F5)),
+                border: Border.all(color: const Color(0xFFF0F1F5)),  // Borde gris claro
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
+                    color: Colors.black.withValues(alpha: 0.03),  // Sombra sutil
                     blurRadius: 10,
                     offset: const Offset(0, 3),
                   ),
@@ -722,22 +807,25 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
               ),
               child: Column(
                 children: [
+                  // Icono de la estadística
                   Icon(s.icon, color: const Color(0xFF9CA3AF), size: 20),
                   const SizedBox(height: 8),
+                  // Valor numérico
                   Text(
                     s.value,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF111827),
+                      color: Color(0xFF111827),  // Gris oscuro
                     ),
                   ),
                   const SizedBox(height: 2),
+                  // Etiqueta descriptiva
                   Text(
                     s.label,
                     style: const TextStyle(
                       fontSize: 10.5,
-                      color: Color(0xFF8A8FA8),
+                      color: Color(0xFF8A8FA8),  // Gris claro
                     ),
                   ),
                 ],
@@ -749,15 +837,19 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     );
   }
 
-  // ── Descripción ─────────────────────────────────────────────────────────────
+  // ── SECCIÓN DE DESCRIPCIÓN ───────────────────────────────────────────────────
 
+  /// Construye la sección de descripción expandible con tags
+  /// Incluye: texto completo/preview, botón expandir, tags y botones útil/no útil
   Widget _buildDescription() {
+    // Obtener texto de descripción o usar fallback
     final fullText =
       _promo?.descripcion?.trim().isNotEmpty == true
       ? _promo!.descripcion!.trim()
       : 'Esta promoción no tiene descripción ampliada.';
-    const preview = 150;
+    const preview = 150;  // Límite de caracteres para preview
 
+    // Tags relacionados con la promoción (estáticos por ahora)
     final tags = [
       '#Moda',
       '#Primavera 2026',
@@ -772,26 +864,29 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Título de la sección
           const Text(
             'Sobre esta promo',
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1A1F2E),
+              color: Color(0xFF1A1F2E),  // Gris oscuro
             ),
           ),
           const SizedBox(height: 10),
+          // Texto de descripción (completo o preview según estado)
           Text(
             _descExpanded || fullText.length <= preview
-                ? fullText
-                : '${fullText.substring(0, preview)}...',
+                ? fullText  // Texto completo si está expandido o es corto
+                : '${fullText.substring(0, preview)}...',  // Preview con puntos suspensivos
             style: const TextStyle(
               fontSize: 14,
-              color: Color(0xFF5A5F72),
-              height: 1.6,
+              color: Color(0xFF5A5F72),  // Gris medio
+              height: 1.6,  // Altura de línea para legibilidad
             ),
           ),
           const SizedBox(height: 6),
+          // Botón para expandir/colapsar descripción
           GestureDetector(
             onTap: () => setState(() => _descExpanded = !_descExpanded),
             child: Row(
@@ -799,15 +894,15 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                 Text(
                   _descExpanded ? 'Ver menos' : 'Ver más',
                   style: const TextStyle(
-                    color: _primary,
+                    color: _primary,  // Color primario para acción
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 Icon(
                   _descExpanded
-                      ? Icons.keyboard_arrow_up_rounded
-                      : Icons.keyboard_arrow_down_rounded,
+                      ? Icons.keyboard_arrow_up_rounded  // Flecha arriba si está expandido
+                      : Icons.keyboard_arrow_down_rounded, // Flecha abajo si está colapsado
                   color: _primary,
                   size: 18,
                 ),
@@ -815,10 +910,10 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
             ),
           ),
           const SizedBox(height: 14),
-          // Tags
+          // Tags de categorías y características
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: 8,      // Espacio horizontal entre tags
+            runSpacing: 8,   // Espacio vertical entre líneas de tags
             children: tags.map((t) {
               return Container(
                 padding: const EdgeInsets.symmetric(
@@ -826,15 +921,15 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF5F6FA),
+                  color: const Color(0xFFF5F6FA),  // Fondo gris claro
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFE8EAF0), width: 1),
+                  border: Border.all(color: const Color(0xFFE8EAF0), width: 1),  // Borde sutil
                 ),
                 child: Text(
                   t,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF5A5F72),
+                    color: Color(0xFF5A5F72),  // Gris medio
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -842,12 +937,12 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
             }).toList(),
           ),
           const SizedBox(height: 14),
-          // Útil / No útil
+          // Botones de útil/no útil para la descripción
           Row(
             children: [
-              _utilBtn(Icons.thumb_up_outlined, '¿Fue útil?'),
+              _utilBtn(Icons.thumb_up_outlined, '¿Fue útil?'),  // Botón positivo con texto
               const SizedBox(width: 10),
-              _utilBtn(Icons.thumb_down_outlined, null),
+              _utilBtn(Icons.thumb_down_outlined, null),        // Botón negativo sin texto
             ],
           ),
         ],
@@ -855,26 +950,30 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     );
   }
 
+  /// Construye botón reutilizable para acciones útil/no útil
+  /// Parámetros:
+  /// - icon: Icono a mostrar (pulgar arriba/abajo)
+  /// - label: Texto opcional (solo para botón positivo)
   Widget _utilBtn(IconData icon, String? label) {
     return GestureDetector(
-      onTap: () => HapticFeedback.lightImpact(),
+      onTap: () => HapticFeedback.lightImpact(),  // Feedback háptico al tocar
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: const Color(0xFFF5F6FA),
+          color: const Color(0xFFF5F6FA),  // Fondo gris claro
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFE8EAF0), width: 1.2),
+          border: Border.all(color: const Color(0xFFE8EAF0), width: 1.2),  // Borde sutil
         ),
         child: Row(
           children: [
-            Icon(icon, size: 18, color: const Color(0xFF5A5F72)),
+            Icon(icon, size: 18, color: const Color(0xFF5A5F72)),  // Icono gris medio
             if (label != null) ...[
               const SizedBox(width: 6),
               Text(
                 label,
                 style: const TextStyle(
                   fontSize: 12.5,
-                  color: Color(0xFF5A5F72),
+                  color: Color(0xFF5A5F72),  // Mismo color que el icono
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -885,8 +984,10 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     );
   }
 
-  // ── Tienda ──────────────────────────────────────────────────────────────────
+  // ── SECCIÓN DE INFORMACIÓN DE TIENDA ────────────────────────────────────────
 
+  /// Construye la sección con información del supermercado/tienda
+  /// Muestra: logo, nombre, rating, verificación y botón de acción
   Widget _buildStoreSection() {
     final promo = _promo!;
     final supermercado = promoService.getSupermercado(promo.idSupermercado);
@@ -896,15 +997,17 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Título de la sección
           const Text(
             'La tienda',
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1A1F2E),
+              color: Color(0xFF1A1F2E),  // Gris oscuro
             ),
           ),
           const SizedBox(height: 12),
+          // Card con información de la tienda
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -912,7 +1015,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
               borderRadius: BorderRadius.circular(18),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
+                  color: Colors.black.withValues(alpha: 0.04),  // Sombra muy sutil
                   blurRadius: 10,
                   offset: const Offset(0, 3),
                 ),
@@ -920,10 +1023,11 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
             ),
             child: Row(
               children: [
-                // Logo tienda
+                // Logo de la tienda con badge de verificación
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
+                    // Imagen del logo
                     ClipRRect(
                       borderRadius: BorderRadius.circular(14),
                       child: Image.network(
@@ -933,6 +1037,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                         fit: BoxFit.cover,
                       ),
                     ),
+                    // Badge verde de verificación (esquina inferior derecha)
                     Positioned(
                       right: -1,
                       bottom: -1,
@@ -940,9 +1045,9 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                         width: 18,
                         height: 18,
                         decoration: BoxDecoration(
-                          color: _green,
+                          color: _green,  // Fondo verde
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
+                          border: Border.all(color: Colors.white, width: 2),  // Borde blanco
                         ),
                         child: const Icon(
                           Icons.check,
@@ -954,11 +1059,12 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                   ],
                 ),
                 const SizedBox(width: 12),
-                // Info
+                // Información de la tienda (nombre, ciudad, rating)
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Nombre con badge de verificación
                       Row(
                         children: [
                           Text(
@@ -966,44 +1072,48 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
-                              color: Color(0xFF1A1F2E),
+                              color: Color(0xFF1A1F2E),  // Gris oscuro
                             ),
                           ),
                           const SizedBox(width: 5),
                           const Icon(
                             Icons.verified_rounded,
-                            color: Color(0xFF3B82F6),
+                            color: Color(0xFF3B82F6),  // Azul para verificación
                             size: 15,
                           ),
                         ],
                       ),
                       const SizedBox(height: 3),
+                      // Ciudad y tipo
                       Text(
                         '${supermercado?.ciudad ?? 'Ciudad no disponible'} · Promoción',
                         style: const TextStyle(
                           fontSize: 12.5,
-                          color: Color(0xFF8A8FA8),
+                          color: Color(0xFF8A8FA8),  // Gris claro
                         ),
                       ),
                       const SizedBox(height: 7),
+                      // Rating con estrellas
                       FittedBox(
                         alignment: Alignment.centerLeft,
-                        fit: BoxFit.scaleDown,
+                        fit: BoxFit.scaleDown,  // Escalar si no hay espacio
                         child: Row(
                           children: [
+                            // 5 estrellas (4.5 rating)
                             Row(
                               children: List.generate(
                                 5,
                                 (i) => Icon(
                                   i < 4
-                                      ? Icons.star_rounded
-                                      : Icons.star_half_rounded,
-                                  color: const Color(0xFFFBBF24),
+                                      ? Icons.star_rounded      // 4 estrellas completas
+                                      : Icons.star_half_rounded, // 1 estrella media
+                                  color: const Color(0xFFFBBF24),  // Amarillo dorado
                                   size: 12,
                                 ),
                               ),
                             ),
                             const SizedBox(width: 4),
+                            // Valor numérico del rating
                             const Text(
                               '4.4',
                               style: TextStyle(
@@ -1013,6 +1123,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                               ),
                             ),
                             const SizedBox(width: 4),
+                            // Número de reseñas
                             const Text(
                               '(380)',
                               style: TextStyle(
@@ -1026,14 +1137,14 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                     ],
                   ),
                 ),
-                // Botón Ver
+                // Botón de acción "Ver" tienda
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF4F5F8),
+                    color: const Color(0xFFF4F5F8),  // Fondo gris muy claro
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Row(
@@ -1044,14 +1155,14 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF1F2937),
+                          color: Color(0xFF1F2937),  // Gris oscuro
                         ),
                       ),
                       SizedBox(width: 1),
                       Icon(
                         Icons.chevron_right_rounded,
                         size: 17,
-                        color: Color(0xFF8A8FA8),
+                        color: Color(0xFF8A8FA8),  // Gris claro
                       ),
                     ],
                   ),
@@ -1064,8 +1175,10 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     );
   }
 
-  // ── Ubicación ───────────────────────────────────────────────────────────────
+  // ── SECCIÓN DE UBICACIÓN ─────────────────────────────────────────────────────
 
+  /// Construye la sección de ubicación con información de contacto y mapa
+  /// Muestra: dirección, horario, teléfono, mapa placeholder y navegación
   Widget _buildLocationSection() {
     final promo = _promo!;
     final supermercado = promoService.getSupermercado(promo.idSupermercado);
@@ -1075,51 +1188,53 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Info rows
+          // Fila de información de dirección
           _locationRow(
             icon: Icons.location_on_outlined,
             mainText:
                 supermercado?.direccion ??
                 promo.ubicacion ??
-                'Ubicación no especificada',
-            subText: supermercado?.ciudad,
+                'Ubicación no especificada',  // Fallback si no hay dirección
+            subText: supermercado?.ciudad,     // Ciudad como subtexto
           ),
           const SizedBox(height: 10),
+          // Fila de información de horario
           _locationRow(
             icon: Icons.access_time_rounded,
-            mainText: _horarioTexto(),
+            mainText: _horarioTexto(),  // Horarios formateados
           ),
           const SizedBox(height: 10),
+          // Fila de información de teléfono
           _locationRow(
             icon: Icons.phone_outlined,
-            mainText: '+57 (601) 789-0123',
+            mainText: '+57 (601) 789-0123',  // Teléfono estático (debería ser dinámico)
           ),
           const SizedBox(height: 14),
-          // Mapa placeholder
+          // Mapa placeholder con grid y pin
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Container(
               height: 130,
               width: double.infinity,
-              color: const Color(0xFFE8F0FE),
+              color: const Color(0xFFE8F0FE),  // Fondo azul claro
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Grid lines
+                  // Líneas de grid para efecto de mapa
                   CustomPaint(
                     size: const Size(double.infinity, 130),
                     painter: _GridPainter(),
                   ),
-                  // Pin
+                  // Pin de ubicación en el centro
                   Container(
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: _primary,
+                      color: _primary,  // Fondo primario
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: _primary.withOpacity(0.4),
+                          color: _primary.withOpacity(0.4),  // Sombra del mismo color
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
@@ -1136,15 +1251,15 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
             ),
           ),
           const SizedBox(height: 12),
-          // Cómo llegar
+          // Botón de navegación "Cómo llegar"
           GestureDetector(
-            onTap: () {},
+            onTap: () {},  // Sin implementar
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F6FA),
+                color: const Color(0xFFF5F6FA),  // Fondo gris claro
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE8EAF0), width: 1),
+                border: Border.all(color: const Color(0xFFE8EAF0), width: 1),  // Borde sutil
               ),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
@@ -1154,7 +1269,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                   Text(
                     'Cómo llegar — 0.9 km',
                     style: TextStyle(
-                      color: _primary,
+                      color: _primary,  // Color primario para acción
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
                     ),
@@ -1170,6 +1285,11 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     );
   }
 
+  /// Construye una fila de información de ubicación reutilizable
+  /// Parámetros:
+  /// - icon: Icono a mostrar (ubicación, tiempo, teléfono)
+  /// - mainText: Texto principal de la información
+  /// - subText: Texto secundario opcional (ciudad, etc.)
   Widget _locationRow({
     required IconData icon,
     required String mainText,
@@ -1178,13 +1298,13 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F6FA),
+        color: const Color(0xFFF5F6FA),  // Fondo gris claro
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: const Color(0xFF8A8FA8), size: 18),
+          Icon(icon, color: const Color(0xFF8A8FA8), size: 18),  // Icono gris medio
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -1194,8 +1314,8 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                   mainText,
                   style: const TextStyle(
                     fontSize: 13.5,
-                    color: Color(0xFF1A1F2E),
-                    height: 1.4,
+                    color: Color(0xFF1A1F2E),  // Gris oscuro
+                    height: 1.4,  // Altura de línea para legibilidad
                   ),
                 ),
                 if (subText != null) ...[
@@ -1204,7 +1324,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                     subText,
                     style: const TextStyle(
                       fontSize: 12,
-                      color: Color(0xFF8A8FA8),
+                      color: Color(0xFF8A8FA8),  // Gris claro
                     ),
                   ),
                 ],
@@ -1216,11 +1336,14 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     );
   }
 
-  // ── Reseñas ─────────────────────────────────────────────────────────────────
+  // ── SECCIÓN DE RESEÑAS Y COMENTARIOS ────────────────────────────────────────
 
+  /// Construye la sección completa de reseñas
+  /// Incluye: botones like/dislike, formulario de comentarios y lista de reseñas
   Widget _buildReviewsSection() {
     if (_promo == null) return const SizedBox.shrink();
     
+    // Obtener comentarios de esta promoción
     final comentarios = promoService.getComentariosByPromocion(_promo!.codigo);
     final total = comentarios.length;
 
@@ -1229,6 +1352,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Título de la sección con icono y contador
           Row(
             children: [
               const Icon(Icons.reviews_outlined, color: _primary, size: 20),
@@ -1238,29 +1362,31 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A1F2E),
+                  color: Color(0xFF1A1F2E),  // Gris oscuro
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          // Promotion like/dislike buttons
+          // Botones de like/dislike para la promoción
           _buildPromotionLikeDislikeButtons(),
           const SizedBox(height: 16),
-          // Add comment button
+          // Botón para agregar nuevo comentario
           _buildAddCommentButton(),
           const SizedBox(height: 16),
-          // Lista de reseñas reales
+          // Lista de comentarios existentes
           if (comentarios.isEmpty)
+            // Mensaje cuando no hay comentarios
             const Text(
               'No hay reseñas aún. ¡Sé el primero en comentar!',
               style: TextStyle(
                 fontSize: 14,
-                color: Color(0xFFAA8880),
+                color: Color(0xFFAA8880),  // Gris azulado
                 fontStyle: FontStyle.italic,
               ),
             )
           else
+            // Renderizar cada comentario como una card
             ...comentarios.map((c) => _buildCommentCard(c)).toList(),
         ],
       ),
@@ -1789,36 +1915,47 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
 
+  /// Construye un divisor visual entre secciones
   Widget _buildDivider() =>
       const Divider(color: Color(0xFFF0F1F5), thickness: 6, height: 6);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MODELOS AUXILIARES
+// CLASES AUXILIARES INTERNAS
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Modelo auxiliar para datos de estadísticas
+/// Usado para construir las cards de vistas, útiles, guardados, reportes
 class _Stat {
-  final IconData icon;
-  final String value;
-  final String label;
+  final IconData icon;    // Icono a mostrar
+  final String value;    // Valor numérico como texto
+  final String label;    // Etiqueta descriptiva
+  
   const _Stat({required this.icon, required this.value, required this.label});
 }
 
+/// Custom painter para dibujar grid de mapa placeholder
+/// Crea líneas horizontales y verticales para simular un mapa
 class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFD0DCF8)
-      ..strokeWidth = 0.8;
-    const spacing = 24.0;
+      ..color = const Color(0xFFD0DCF8)  // Color azul claro para líneas
+      ..strokeWidth = 0.8;              // Grosor de línea delgado
+    
+    const spacing = 24.0;  // Espaciado entre líneas
+    
+    // Dibujar líneas verticales
     for (double x = 0; x < size.width; x += spacing) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
     }
+    
+    // Dibujar líneas horizontales
     for (double y = 0; y < size.height; y += spacing) {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
   }
 
   @override
-  bool shouldRepaint(_GridPainter old) => false;
+  bool shouldRepaint(_GridPainter old) => false;  // No necesita repintado
 }

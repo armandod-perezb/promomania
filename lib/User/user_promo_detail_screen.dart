@@ -5,7 +5,8 @@ import '../main.dart';
 import '../models/promocion.dart';
 import '../models/promocion_horario.dart';
 import '../models/reporte.dart';
-import '../models/comentario.dart'; 
+import '../models/comentario.dart';
+import '../models/valoracion.dart'; 
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODELOS
@@ -1159,6 +1160,9 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
             ],
           ),
           const SizedBox(height: 20),
+          // Promotion like/dislike buttons
+          _buildPromotionLikeDislikeButtons(),
+          const SizedBox(height: 16),
           // Add comment button
           _buildAddCommentButton(),
           const SizedBox(height: 16),
@@ -1301,6 +1305,162 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPromotionLikeDislikeButtons() {
+    if (_promo == null) return const SizedBox.shrink();
+    
+    // Get current user's valoracion for this promotion (if any)
+    final userValoraciones = promoService.getValoracionesByPromocion(_promo!.codigo);
+    final userValoracion = userValoraciones.firstWhere(
+      (v) => v.idUsuario == _activeUserId,
+      orElse: () => Valoracion(id: -1, tipo: '', idUsuario: -1, codigoPromocion: ''),
+    );
+    
+    // Count likes and dislikes for this promotion
+    final likes = promoService.contarValoracionesPositivas(_promo!.codigo);
+    final dislikes = promoService.contarValoracionesNegativas(_promo!.codigo);
+    
+    // Check if current user has already rated
+    final hasRated = userValoracion.id != -1;
+    final isPositive = hasRated && userValoracion.tipo == 'positiva';
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F6FA),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE8EAF0), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '¿Te fue útil esta promoción?',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1A1F2E),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              // Like button
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _toggleValoracion('positiva'),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isPositive ? _primary.withValues(alpha: 0.1) : Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isPositive ? _primary : const Color(0xFFE8EAF0),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.thumb_up_outlined,
+                          size: 20,
+                          color: isPositive ? _primary : const Color(0xFF8A8FA8),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Útil ($likes)',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isPositive ? _primary : const Color(0xFF8A8FA8),
+                            fontWeight: isPositive ? FontWeight.w600 : FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Dislike button
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _toggleValoracion('negativa'),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: hasRated && !isPositive ? Colors.red.withValues(alpha: 0.1) : Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: hasRated && !isPositive ? Colors.red : const Color(0xFFE8EAF0),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.thumb_down_outlined,
+                          size: 20,
+                          color: hasRated && !isPositive ? Colors.red : const Color(0xFF8A8FA8),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'No útil ($dislikes)',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: hasRated && !isPositive ? Colors.red : const Color(0xFF8A8FA8),
+                            fontWeight: hasRated && !isPositive ? FontWeight.w600 : FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _toggleValoracion(String tipo) {
+    if (_promo == null) return;
+    
+    final userValoraciones = promoService.getValoracionesByPromocion(_promo!.codigo);
+    final existingValoracion = userValoraciones.firstWhere(
+      (v) => v.idUsuario == _activeUserId,
+      orElse: () => Valoracion(id: -1, tipo: '', idUsuario: -1, codigoPromocion: ''),
+    );
+    
+    if (existingValoracion.id != -1) {
+      // User has already rated, remove existing rating
+      promoService.deleteValoracion(existingValoracion.id);
+    }
+    
+    // Add new valoracion
+    final newValoracion = Valoracion(
+      id: promoService.getValoraciones().isNotEmpty 
+          ? promoService.getValoraciones().last.id + 1 
+          : 1,
+      tipo: tipo,
+      idUsuario: _activeUserId,
+      codigoPromocion: _promo!.codigo,
+    );
+    
+    promoService.addValoracion(newValoracion);
+    HapticFeedback.lightImpact();
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(tipo == 'positiva' 
+            ? 'Marcado como útil' 
+            : 'Marcado como no útil'),
+        duration: const Duration(seconds: 1),
       ),
     );
   }

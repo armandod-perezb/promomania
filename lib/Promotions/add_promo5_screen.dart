@@ -8,6 +8,20 @@ import '../models/supermercado.dart';
 import '../services/image_storage_service.dart';
 import '../widgets/promocion_card.dart';
 
+/// Pantalla paso 5 (final) del wizard de creación de promociones: Vista previa
+/// y publicación.
+///
+/// Responsabilidades:
+/// - Mostrar una vista previa de la promoción usando los `draftData`
+///   recibidos de los pasos anteriores.
+/// - Resolver IDs de categoría/tipo/tienda si es necesario y generar un
+///   código de promoción único.
+/// - Procesar la imagen seleccionada (leer bytes y delegar a
+///   `PromoService.savePromotionImage`).
+/// - Crear la instancia de `Promocion`, añadirla al servicio y crear los
+///   `PromocionHorario` asociados a partir del horario de la tienda.
+/// - Mostrar diálogo de éxito al finalizar.
+
 class AddPromotion5Screen extends StatefulWidget {
   // Datos opcionales que vienen de los pasos anteriores
   final String? promoTitle;
@@ -35,6 +49,9 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
   bool _isPublishing = false;
 
   String get _previewTitle {
+    // Devuelve el título que se mostrará en la vista previa. Prioriza
+    // los valores presentes en `draftData`, luego el parámetro `promoTitle`
+    // y finalmente un texto por defecto.
     final draftTitle = (widget.draftData['title'] as String?)?.trim();
     if (draftTitle != null && draftTitle.isNotEmpty) {
       return draftTitle;
@@ -45,6 +62,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
   }
 
   String get _previewLocation {
+    // Devuelve la ubicación que aparecerá en la vista previa.
     final draftLocation = (widget.draftData['location'] as String?)?.trim();
     if (draftLocation != null && draftLocation.isNotEmpty) {
       return draftLocation;
@@ -55,7 +73,10 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
   }
 
   String? get _previewImage {
-    // Buscar en draftData primero
+    // Determina el nombre de archivo de la imagen para la vista previa.
+    // - Primero busca en `draftData['imageFileName']` (resultado del paso 2).
+    // - Si no existe, usa `widget.imageFileName`.
+    // - Si ninguno existe, retorna null.
     final draftImage = (widget.draftData['imageFileName'] as String?)?.trim();
     if (draftImage != null && draftImage.isNotEmpty) {
       return draftImage;
@@ -120,6 +141,12 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
   }
 
   int _resolveSupermercadoId(Map<String, dynamic> draft) {
+    // Resuelve un `idSupermercado` para la promoción:
+    // - Si la promo es online o no se proporcionó nombre, devuelve el primer
+    //   supermercado conocido (fallback).
+    // - Si encuentra una tienda con el mismo nombre, devuelve su id.
+    // - Si no existe, crea un nuevo `Supermercado` en `promoService` y
+    //   devuelve el id recién generado.
     final allStores = promoService.getSupermercados();
     final onlineOnly = (draft['onlineOnly'] as bool?) ?? false;
     final storeName = (draft['storeName'] as String?)?.trim() ?? '';
@@ -149,6 +176,9 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
   }
 
   String _buildPromoCode(String? requestedCode) {
+    // Genera o valida un código único para la promoción.
+    // - Si el usuario pidió un código y no existe, lo usa.
+    // - En caso contrario, genera `PROMO###` buscando un candidato libre.
     final raw = requestedCode?.trim().toUpperCase() ?? '';
     if (raw.isNotEmpty && promoService.getPromocionByCodigo(raw) == null) {
       return raw;
@@ -258,6 +288,8 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
   }
 
   void _savePromocionHorarios(Promocion promo, Map<String, dynamic> draft) {
+    // Crea entradas `PromocionHorario` a partir del campo `schedule` del
+    // draft. Si la promo es solo online, no crea horarios.
     final onlineOnly = (draft['onlineOnly'] as bool?) ?? false;
     if (onlineOnly) return;
 

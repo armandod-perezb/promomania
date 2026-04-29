@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 import 'add_promo5_screen.dart';
 
+/// Pantalla paso 4 del wizard de creación de promociones: Tienda y ubicación.
+///
+/// Responsabilidades principales:
+/// - Recoger la información de la tienda donde se ofrece la promoción
+///   (nombre, teléfono, sitio web, dirección, ciudad, horario).
+/// - Permitir marcar la promo como "solo en línea" (oculta campos de ubicación).
+/// - Validar los campos mínimos necesarios antes de avanzar.
+/// - Construir y pasar el `draftData` al paso final (`AddPromotion5Screen`).
+
 class AddPromotion4Screen extends StatefulWidget {
   final Map<String, dynamic> draftData;
 

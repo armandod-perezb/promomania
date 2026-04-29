@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
 import 'add_promo2_screen.dart';
 
+/// Pantalla paso 1 del flujo de creación de una promoción.
+///
+/// Esta pantalla permite al usuario seleccionar el tipo de promoción
+/// (descuento, combo, envío gratis, etc.). Al pulsar "Siguiente"
+/// se envía un `draftData` con el `promoType` al siguiente paso
+/// (`AddPromotion2Screen`).
+///
+/// El flujo completo es un wizard en 5 pasos: Tipo → Producto → Precio → Tienda → Publicar.
+/// Los datos parciales se pasan mediante el mapa `draftData` en la navegación.
+
 // Modelo de tipo de promoción
+/// Representa una opción distinta de formato para la promoción.
+///
+/// Campos:
+/// - `id`: identificador lógico del tipo usado en el wizard (ej: 'descuento').
+/// - `title`, `subtitle`: textos mostrados al usuario.
+/// - `icon`, `iconColor`: presentación visual.
+/// - `imagePath`: ruta opcional a un asset.
 class PromoType {
   final String id;
   final String title;
@@ -81,6 +98,10 @@ class _AddPromotion1ScreenState extends State<AddPromotion1Screen> {
     _WizardStep(icon: Icons.send_outlined, label: 'Publicar'),
   ];
 
+  /// Navega al siguiente paso del wizard pasando los datos seleccionados.
+  ///
+  /// `draftData` contiene los campos ya completados; aquí solo se incluye
+  /// el `promoType` seleccionado en esta pantalla.
   void _onNext() {
     Navigator.push(
       context,
@@ -203,6 +224,10 @@ class _AddPromotion1ScreenState extends State<AddPromotion1Screen> {
     );
   }
 
+  /// Construye el stepper horizontal que muestra el progreso del wizard.
+  ///
+  /// Cada paso se renderiza mediante `_buildStep` indicando si está activo
+  /// o ya fue completado. En esta primera pantalla el paso activo es el 0.
   Widget _buildStepper() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -219,6 +244,11 @@ class _AddPromotion1ScreenState extends State<AddPromotion1Screen> {
     );
   }
 
+  /// Renderiza un único elemento del stepper.
+  ///
+  /// - `isActive`: paso actualmente seleccionado.
+  /// - `isPast`: paso completado (se muestra en estilo distinto).
+  /// - `isLast`: controla si se dibuja la línea separadora a la derecha.
   Widget _buildStep({
     required _WizardStep step,
     required bool isActive,
@@ -287,6 +317,7 @@ class _AddPromotion1ScreenState extends State<AddPromotion1Screen> {
 
   Widget _buildPromoCard(PromoType type) {
     final isSelected = _selectedId == type.id;
+    // Card interactiva que cambia la selección al tocarla.
     return GestureDetector(
       onTap: () => setState(() => _selectedId = type.id),
       child: AnimatedContainer(
@@ -397,6 +428,7 @@ class _AddPromotion1ScreenState extends State<AddPromotion1Screen> {
             width: double.infinity,
             height: 54,
             child: ElevatedButton(
+              // Pulsar "Siguiente" avanza al paso 2 y preserva el draft
               onPressed: _onNext,
               style: ElevatedButton.styleFrom(
                 backgroundColor: _darkBg,

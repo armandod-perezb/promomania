@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'add_promo4_screen.dart';
 
+/// Pantalla paso 3 del wizard de creación de promociones: Precio y Vigencia.
+///
+/// Responsabilidades principales:
+/// - Recoger el precio y el descuento de la promoción.
+/// - Permitir elegir si la promo es permanente o por fechas y seleccionar
+///   las fechas de inicio y fin cuando aplica.
+/// - Validar los campos necesarios antes de permitir avanzar al siguiente paso.
+/// - Pasar los datos recogidos al siguiente paso mediante `draftData`.
+
 class AddPromotion3Screen extends StatefulWidget {
   final Map<String, dynamic> draftData;
 

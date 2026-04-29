@@ -8,6 +8,17 @@ import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import '../services/image_storage_service.dart';
 
+/// Pantalla paso 2 del wizard de creación de promociones.
+///
+/// Responsabilidades principales:
+/// - Recoger datos del producto: título, descripción, código, fotos.
+/// - Permitir seleccionar hasta 5 imágenes (la primera es la principal).
+/// - Al avanzar, guarda temporalmente la primera imagen en disco y añade
+///   su nombre al `draftData` que se pasa al siguiente paso.
+///
+/// Nota: los datos parciales se transmiten entre pantallas mediante el
+/// mapa `draftData` para componer la promoción al final del wizard.
+
 class AddPromotion2Screen extends StatefulWidget {
   final String promoType;
   final Map<String, dynamic> draftData;
@@ -81,6 +92,15 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
       _photoPaths[index] = image.path;
     });
   }
+  
+  /// Abre el selector de imágenes y guarda los bytes en memoria temporal.
+  ///
+  /// - `index` indica la posición (0 = principal). Se almacenan los bytes
+  ///   en `_photos` y la ruta original en `_photoPaths` como referencia.
+  /// - La imagen todavía no se sube al servidor; se guarda localmente y
+  ///   más adelante se copiará a la ubicación gestionada por
+  ///   `ImageStorageService` cuando se confirme el siguiente paso.
+  
   @override
   void initState() {
     super.initState();
@@ -112,6 +132,13 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
       _category = draftCategory;
     }
   }
+  
+  /// Inicializa el estado de la pantalla usando los valores parciales
+  /// disponibles en `widget.draftData` (si el usuario viene del paso 1).
+  ///
+  /// Además, carga las categorías desde `promoService` y utiliza una lista
+  /// de respaldo si el servicio no tiene categorías registradas.
+  
 
   @override
   void dispose() {
@@ -802,6 +829,19 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
       }
     }
   }
+  
+  /// Acción al pulsar "Siguiente":
+  /// 1. Si hay una foto principal seleccionada, la guarda usando
+  ///    `ImageStorageService` y obtiene el nombre del archivo.
+  /// 2. Combina los datos recogidos en este paso con `widget.draftData`
+  ///    y crea `nextDraft` que se pasa al siguiente paso (`AddPromotion3Screen`).
+  ///
+  /// Observaciones:
+  /// - `imageFileName` contiene el nombre del archivo almacenado (metadato).
+  /// - `imagePath` guarda la ruta temporal del selector como respaldo.
+  /// - El guardado de la imagen es local; la promoción final podrá procesar
+  ///   la imagen (p. ej. renombrarla o subirla) cuando se publique.
+  
 }
 
 // ── Modelos auxiliares ────────────────────────────────────────────────────────

@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../Authentication/login_screen.dart';
 
 void main() {
   runApp(const PromoManiaApp());
@@ -208,159 +209,167 @@ class _SplashScreenState extends State<SplashScreen>
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF5F2),
-      body: AnimatedBuilder(
-        animation: Listenable.merge([
-          _bgController,
-          _logoController,
-          _textController,
-          _dotsController,
-          _pulseController,
-          _particleController,
-        ]),
-        builder: (context, _) {
-          return Stack(
-            children: [
-              // ── Animated background blobs ──
-              _buildBackground(size),
+      body: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
+        },
+        child: AnimatedBuilder(
+          animation: Listenable.merge([
+            _bgController,
+            _logoController,
+            _textController,
+            _dotsController,
+            _pulseController,
+            _particleController,
+          ]),
+          builder: (context, _) {
+            return Stack(
+              children: [
+                // ── Animated background blobs ──
+                _buildBackground(size),
 
-              // ── Floating particles ──
-              ..._buildParticles(size),
+                // ── Floating particles ──
+                ..._buildParticles(size),
 
-              // ── Content ──
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Spacer(flex: 3),
+                // ── Content ──
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Spacer(flex: 3),
 
-                    // ── Logo + pulse rings ──
-                    SizedBox(
-                      width: 160,
-                      height: 160,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // Outer pulse ring
-                          Opacity(
-                            opacity: _pulseOpacity.value,
-                            child: Transform.scale(
-                              scale: _pulseScale.value,
-                              child: Container(
-                                width: 88,
-                                height: 88,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: const Color(0xFFFF6B47),
-                                    width: 1.5,
+                      // ── Logo + pulse rings ──
+                      SizedBox(
+                        width: 160,
+                        height: 160,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Outer pulse ring
+                            Opacity(
+                              opacity: _pulseOpacity.value,
+                              child: Transform.scale(
+                                scale: _pulseScale.value,
+                                child: Container(
+                                  width: 88,
+                                  height: 88,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: const Color(0xFFFF6B47),
+                                      width: 1.5,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
 
-                          // Inner pulse ring (offset)
-                          Opacity(
-                            opacity: (_pulseOpacity.value * 0.6)
-                                .clamp(0.0, 1.0),
-                            child: Transform.scale(
-                              scale: (_pulseScale.value * 0.75)
-                                  .clamp(0.0, 3.0),
-                              child: Container(
-                                width: 88,
-                                height: 88,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: const Color(0xFFFF6B47)
-                                      .withOpacity(0.08),
+                            // Inner pulse ring (offset)
+                            Opacity(
+                              opacity: (_pulseOpacity.value * 0.6)
+                                  .clamp(0.0, 1.0),
+                              child: Transform.scale(
+                                scale: (_pulseScale.value * 0.75)
+                                    .clamp(0.0, 3.0),
+                                child: Container(
+                                  width: 88,
+                                  height: 88,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: const Color(0xFFFF6B47)
+                                        .withOpacity(0.08),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
 
-                          // Logo card
-                          Transform.translate(
-                            offset: Offset(0, _logoY.value),
-                            child: Opacity(
-                              opacity: _logoOpacity.value,
-                              child: Transform.scale(
-                                scale: _logoScale.value,
-                                child: _buildLogoCard(),
+                            // Logo card
+                            Transform.translate(
+                              offset: Offset(0, _logoY.value),
+                              child: Opacity(
+                                opacity: _logoOpacity.value,
+                                child: Transform.scale(
+                                  scale: _logoScale.value,
+                                  child: _buildLogoCard(),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
 
-                    const SizedBox(height: 36),
+                      const SizedBox(height: 36),
 
-                    // ── Wordmark ──
-                    Transform.translate(
-                      offset: Offset(0, _textY.value),
-                      child: Opacity(
-                        opacity: _textOpacity.value,
-                        child: Text(
-                          'Promomania',
-                          style: TextStyle(
-                            fontFamily: 'Georgia',
-                            fontSize: 30,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF1A1A1A),
-                            letterSpacing: _letterSpacing.value,
+                      // ── Wordmark ──
+                      Transform.translate(
+                        offset: Offset(0, _textY.value),
+                        child: Opacity(
+                          opacity: _textOpacity.value,
+                          child: Text(
+                            'Promomania',
+                            style: TextStyle(
+                              fontFamily: 'Georgia',
+                              fontSize: 30,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF1A1A1A),
+                              letterSpacing: _letterSpacing.value,
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
-                    const SizedBox(height: 6),
+                      const SizedBox(height: 6),
 
-                    // ── Tagline ──
-                    Transform.translate(
-                      offset: Offset(0, _textY.value * 1.4),
-                      child: Opacity(
-                        opacity: (_textOpacity.value - 0.3).clamp(0, 1),
+                      // ── Tagline ──
+                      Transform.translate(
+                        offset: Offset(0, _textY.value * 1.4),
+                        child: Opacity(
+                          opacity: (_textOpacity.value - 0.3).clamp(0, 1),
+                          child: const Text(
+                            'Discover the best deals near you',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFFAA8880),
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const Spacer(flex: 3),
+
+                      // ── Loading dots ──
+                      Opacity(
+                        opacity: _dotsOpacity.value,
+                        child: _AnimatedDots(),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // ── Version ──
+                      Opacity(
+                        opacity: _dotsOpacity.value * 0.5,
                         child: const Text(
-                          'Discover the best deals near you',
+                          'Version 1.0.0',
                           style: TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFFAA8880),
-                            letterSpacing: 0.3,
+                            fontSize: 11,
+                            color: Color(0xFFCCB0AA),
+                            letterSpacing: 1.2,
                           ),
                         ),
                       ),
-                    ),
 
-                    const Spacer(flex: 3),
-
-                    // ── Loading dots ──
-                    Opacity(
-                      opacity: _dotsOpacity.value,
-                      child: _AnimatedDots(),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // ── Version ──
-                    Opacity(
-                      opacity: _dotsOpacity.value * 0.5,
-                      child: const Text(
-                        'Version 1.0.0',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Color(0xFFCCB0AA),
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 40),
-                  ],
+                      const SizedBox(height: 40),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }

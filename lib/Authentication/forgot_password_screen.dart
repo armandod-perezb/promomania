@@ -1,90 +1,155 @@
+// Importa el paquete de Flutter para construir la interfaz gráfica
 import 'package:flutter/material.dart';
+
+// Importa las rutas nombradas de la aplicación
 import '../Core/Routes/app_routes.dart';
+
+// Importa el servicio global donde está la lógica (promoService)
 import '../main.dart';
 
+// Widget Stateful porque maneja estado (loading, input)
 class ForgotPasswordScreen extends StatefulWidget {
+
+  // Constructor del widget
   const ForgotPasswordScreen({super.key});
 
+  // Crea el estado asociado a este widget
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
+// Clase que maneja el estado de la pantalla
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+
+  // Controlador para capturar el email ingresado
   final TextEditingController _emailController = TextEditingController();
+
+  // Variable para controlar el estado de carga
   bool _isLoading = false;
 
+  // Color principal de la UI
   static const Color _primary = Color(0xFFFF4D2E);
+
+  // Color del fondo oscuro (header)
   static const Color _darkBg = Color(0xFF1A1F2E);
+
+  // Color del fondo general de la pantalla
   static const Color _lightBg = Color(0xFFF8F9FB);
 
+  // Método que se ejecuta cuando el widget se destruye
   @override
   void dispose() {
+
+    // Libera memoria del controlador
     _emailController.dispose();
+
+    // Llama al dispose padre
     super.dispose();
   }
 
+  // Método para enviar el código de recuperación
   void _sendCode() async {
+
+    // Valida si el campo está vacío
     if (_emailController.text.isEmpty) {
+
+      // Muestra mensaje de error
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor ingresa tu email')),
       );
+
       return;
     }
 
+    // Limpia espacios del email
     final email = _emailController.text.trim();
 
+    // Activa estado de carga
     setState(() => _isLoading = true);
 
     try {
-      // Validar que el usuario exista
+
+      // Busca el usuario en el sistema
       final usuario = promoService.getUsuarioByEmail(email);
+
+      // Si no existe el usuario
       if (usuario == null) {
+
+        // Verifica que el widget siga montado
         if (mounted) {
+
+          // Muestra mensaje de error
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Usuario no encontrado')),
           );
         }
+
+        // Desactiva loading
         setState(() => _isLoading = false);
+
         return;
       }
 
-      // Simular envío de código
+      // Simula el envío del código (delay)
       await Future.delayed(const Duration(seconds: 1));
 
+      // Navega a la pantalla de verificación
       if (mounted) {
         Navigator.pushNamed(context, AppRoutes.verifyCode, arguments: email);
       }
+
     } catch (e) {
+
+      // Manejo de errores
       if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
+
     } finally {
+
+      // Siempre desactiva el loading
       if (mounted) {
         setState(() => _isLoading = false);
       }
     }
   }
 
+  // Método principal que construye la interfaz
   @override
   Widget build(BuildContext context) {
+
+    // Retorna la estructura visual
     return Scaffold(
+
+      // Color de fondo
       backgroundColor: _lightBg,
+
+      // Contenido principal
       body: Column(
         children: [
-          // Header oscuro con forma curva
+
+          // Header superior oscuro
           _buildHeader(),
-          // Contenido
+
+          // Contenido principal expandible
           Expanded(
             child: SingleChildScrollView(
+
+              // Espaciado interno
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+
+              // Columna con los elementos
               child: Column(
                 children: [
-                  // Ícono de correo
+
+                  // Icono de correo
                   _buildEmailIcon(),
+
                   const SizedBox(height: 28),
-                  // Título y descripción
+
+                  // Título principal
                   const Text(
                     'Recupera tu acceso',
                     style: TextStyle(
@@ -93,7 +158,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       color: Color(0xFF1A1F2E),
                     ),
                   ),
+
                   const SizedBox(height: 10),
+
+                  // Texto descriptivo
                   const Text(
                     'Ingresa el correo electrónico asociado a tu\ncuenta y te enviaremos un código de\nverificación.',
                     textAlign: TextAlign.center,
@@ -103,14 +171,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       height: 1.55,
                     ),
                   ),
+
                   const SizedBox(height: 32),
+
                   // Campo de correo
                   _buildEmailField(),
+
                   const SizedBox(height: 28),
+
                   // Botón enviar
                   _buildSendButton(),
+
                   const SizedBox(height: 20),
-                  // Volver al inicio de sesión
+
+                  // Link volver al login
                   _buildLoginLink(),
                 ],
               ),
@@ -121,9 +195,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
+  // Método que construye el header
   Widget _buildHeader() {
     return Container(
+
+      // Ocupa todo el ancho
       width: double.infinity,
+
+      // Decoración del header
       decoration: const BoxDecoration(
         color: _darkBg,
         borderRadius: BorderRadius.only(
@@ -131,11 +210,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           bottomRight: Radius.circular(28),
         ),
       ),
+
+      // Espaciado interno
       padding: const EdgeInsets.only(top: 54, left: 20, right: 20, bottom: 28),
+
+      // Contenido en columna
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Back button
+
+          // Botón para regresar
           GestureDetector(
             onTap: () => Navigator.pop(context),
             child: Container(
@@ -152,7 +236,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
             ),
           ),
+
           const SizedBox(height: 18),
+
+          // Título grande
           const Text(
             'Olvidé mi\ncontraseña',
             style: TextStyle(
@@ -162,23 +249,32 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               height: 1.2,
             ),
           ),
+
           const SizedBox(height: 8),
+
+          // Subtítulo
           const Text(
             'Te enviaremos un código de verificación',
             style: TextStyle(color: Color(0xFFB0B5CC), fontSize: 13),
           ),
+
           const SizedBox(height: 16),
-          // Indicadores de paso
+
+          // Indicadores de pasos
           _buildStepIndicators(currentStep: 0),
         ],
       ),
     );
   }
 
+  // Indicadores de progreso
   Widget _buildStepIndicators({required int currentStep}) {
     return Row(
       children: List.generate(3, (i) {
+
+        // Determina si el paso está activo
         final isActive = i == currentStep;
+
         return Container(
           margin: const EdgeInsets.only(right: 6),
           width: isActive ? 24 : 8,
@@ -192,6 +288,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
+  // Icono decorativo de email
   Widget _buildEmailIcon() {
     return Container(
       width: 80,
@@ -204,10 +301,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
+  // Campo de entrada de email
   Widget _buildEmailField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+
         const Text(
           'CORREO ELECTRÓNICO',
           style: TextStyle(
@@ -217,100 +316,44 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             letterSpacing: 0.8,
           ),
         ),
+
         const SizedBox(height: 10),
+
         TextFormField(
           controller: _emailController,
           keyboardType: TextInputType.emailAddress,
-          style: const TextStyle(fontSize: 14, color: Color(0xFF1A1F2E)),
-          decoration: InputDecoration(
-            hintText: 'nk@gmail.com',
-            hintStyle: const TextStyle(color: Color(0xFFB0B5CC), fontSize: 14),
-            prefixIcon: const Icon(
-              Icons.mail_outline_rounded,
-              color: Color(0xFFB0B5CC),
-              size: 20,
-            ),
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(
-                color: Color(0xFFE8EAF0),
-                width: 1.5,
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(
-                color: Color(0xFFE8EAF0),
-                width: 1.5,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: _primary, width: 1.8),
-            ),
-          ),
         ),
       ],
     );
   }
 
+  // Botón enviar código
   Widget _buildSendButton() {
     return SizedBox(
       width: double.infinity,
       height: 54,
       child: ElevatedButton(
         onPressed: _isLoading ? null : _sendCode,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _primary,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 0,
-        ),
         child: _isLoading
-            ? const SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2.5,
-                ),
-              )
-            : const Text(
-                'ENVIAR CÓDIGO',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.2,
-                ),
-              ),
+            ? const CircularProgressIndicator(color: Colors.white)
+            : const Text('ENVIAR CÓDIGO'),
       ),
     );
   }
 
+  // Link para volver al login
   Widget _buildLoginLink() {
     return RichText(
       text: TextSpan(
         text: 'Volver al ',
-        style: const TextStyle(color: Color(0xFF8A8FA8), fontSize: 13.5),
+        style: const TextStyle(color: Color(0xFF8A8FA8)),
         children: [
           WidgetSpan(
             child: GestureDetector(
               onTap: () => Navigator.pop(context),
               child: const Text(
                 'inicio de sesión',
-                style: TextStyle(
-                  color: _primary,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 13.5,
-                ),
+                style: TextStyle(color: _primary),
               ),
             ),
           ),

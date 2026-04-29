@@ -7,6 +7,7 @@ import '../models/promocion_horario.dart';
 import '../models/supermercado.dart';
 import '../services/image_storage_service.dart';
 import '../widgets/promocion_card.dart';
+import '../Core/Routes/app_routes.dart';
 
 /// Pantalla paso 5 (final) del wizard de creación de promociones: Vista previa
 /// y publicación.
@@ -428,7 +429,10 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).popUntil((r) => r.isFirst);
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    AppRoutes.userHome,
+                    (route) => false,
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _primary,

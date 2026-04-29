@@ -431,26 +431,118 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
     final promosByUrgency = promoService.getPromocionesByUrgency(currentUser);
     
     // Filter based on selected tab
-    List<Promocion> filteredPromos = [];
     switch (_selectedTab) {
-      case 1: // Por vencer
-        filteredPromos = [...promosByUrgency['today']!, ...promosByUrgency['thisWeek']!];
-        break;
+      case 0: // Todas
+        return _buildAllCategories(promosByUrgency);
+      case 1: // Por vencer (3 días o menos)
+        return _buildExpiringSoon(currentUser);
+      case 2: // Categorías
+        return _buildByCategories(currentUser);
       case 3: // Usados (not implemented yet)
-        filteredPromos = [];
-        break;
-      default: // Todas
-        filteredPromos = [
-          ...promosByUrgency['today']!,
-          ...promosByUrgency['thisWeek']!,
-          ...promosByUrgency['noRush']!
-        ];
+        return _buildEmptyState();
+      default:
+        return _buildAllCategories(promosByUrgency);
+    }
+  }
+
+  // Helper method to get promotions expiring in 3 days or less
+  List<Promocion> _getPromotionsExpiringIn3Days(int userId) {
+    final favoritePromos = promoService.getFavoritosByUsuario(userId);
+    final promocionesFavoritas = favoritePromos
+        .map((f) => promoService.getPromocionByCodigo(f.codigoPromocion))
+        .where((p) => p != null)
+        .cast<Promocion>();
+
+    List<Promocion> expiringSoon = [];
+    final ahora = DateTime.now();
+
+    for (final promo in promocionesFavoritas) {
+      if (promo.tipoVigencia != 'permanente' && promo.fechaFin != null) {
+        try {
+          final fechaFin = DateTime.parse(promo.fechaFin!);
+          final diferencia = fechaFin.difference(ahora);
+          
+          // Include promotions expiring in 3 days or less
+          if (!diferencia.isNegative && diferencia.inDays <= 3) {
+            expiringSoon.add(promo);
+          }
+        } catch (e) {
+          // Skip invalid dates
+        }
+      }
     }
 
-    if (filteredPromos.isEmpty) {
+    return expiringSoon;
+  }
+
+  Widget _buildExpiringSoon(int userId) {
+    final expiringSoon = _getPromotionsExpiringIn3Days(userId);
+    
+    if (expiringSoon.isEmpty) {
       return _buildEmptyState();
     }
 
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildGroupHeader(
+          'Vencen en 3 días o menos',
+          const Color(0xFFFF4D2E),
+          '⏰',
+        ),
+        ...expiringSoon.map((p) => _buildSwipeCard(p)).toList(),
+      ],
+    );
+  }
+
+  Widget _buildByCategories(int userId) {
+    final favoritePromos = promoService.getFavoritosByUsuario(userId);
+    final promocionesFavoritas = favoritePromos
+        .map((f) => promoService.getPromocionByCodigo(f.codigoPromocion))
+        .where((p) => p != null)
+        .cast<Promocion>();
+
+    // Group by category
+    final Map<String, List<Promocion>> promosByCategory = {};
+    
+    for (final promo in promocionesFavoritas) {
+      final categoria = promoService.getCategoria(promo.idCategoria);
+      final categoryName = categoria?.nombre ?? 'Sin categoría';
+      
+      if (!promosByCategory.containsKey(categoryName)) {
+        promosByCategory[categoryName] = [];
+      }
+      promosByCategory[categoryName]!.add(promo);
+    }
+
+    if (promosByCategory.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ...promosByCategory.entries.map((entry) {
+          final categoryName = entry.key;
+          final promos = entry.value;
+          final categoryStyle = promoService.getCategoriaStyle(promos.first.idCategoria);
+          final emoji = categoryStyle['emoji'] ?? '📦';
+          final color = _getCategoryColor(categoryName);
+          
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildGroupHeader(categoryName, color, emoji),
+              ...promos.map((p) => _buildSwipeCard(p)).toList(),
+              const SizedBox(height: 16),
+            ],
+          );
+        }).toList(),
+      ],
+    );
+  }
+
+  Widget _buildAllCategories(Map<String, List<Promocion>> promosByUrgency) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -472,6 +564,33 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
         ],
       ],
     );
+  }
+
+  Color _getCategoryColor(String categoryName) {
+    switch (categoryName.toLowerCase()) {
+      case 'alimentos':
+        return const Color(0xFF10B981);
+      case 'tecnología':
+        return const Color(0xFF3B82F6);
+      case 'ropa':
+        return const Color(0xFF8B5CF6);
+      case 'hogar':
+        return const Color(0xFFF59E0B);
+      case 'salud':
+        return const Color(0xFFEF4444);
+      case 'deportes':
+        return const Color(0xFF06B6D4);
+      case 'belleza':
+        return const Color(0xFFEC4899);
+      case 'juguetes':
+        return const Color(0xFF84CC16);
+      case 'libros':
+        return const Color(0xFF6366F1);
+      case 'automotriz':
+        return const Color(0xFF6B7280);
+      default:
+        return const Color(0xFFFF4D2E);
+    }
   }
 
   Widget _buildGroupHeader(String title, Color color, String emoji) {

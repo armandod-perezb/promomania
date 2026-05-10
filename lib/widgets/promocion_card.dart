@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
-import '../models/promocion.dart';
-import '../services/promo_service.dart';
+import '../features/promotions/domain/entities/promocion.dart';
+import '../features/promotions/infrastructure/services/promo_service.dart';
 
 class PromocionCard extends StatelessWidget {
   final Promocion promocion;
@@ -32,12 +32,18 @@ class PromocionCard extends StatelessWidget {
                 children: [
                   // Imagen de fondo
                   FutureBuilder<Uint8List?>(
-                    future: promoService.getPromotionImageBytes(promocion.codigo),
+                    future: promoService.getPromotionImageBytes(
+                      promocion.codigo,
+                    ),
                     builder: (context, snapshot) {
                       // Debug logging
-                      print('🔍 PromocionCard: Código=${promocion.codigo}, Foto=${promocion.foto}, EsLocal=${promocion.fotoEsLocal}');
-                      print('🔍 FutureBuilder: ConnectionState=${snapshot.connectionState}, HasData=${snapshot.hasData}, Data=${snapshot.data != null ? 'bytes[${snapshot.data!.length}]' : 'null'}');
-                      
+                      print(
+                        '🔍 PromocionCard: Código=${promocion.codigo}, Foto=${promocion.foto}, EsLocal=${promocion.fotoEsLocal}',
+                      );
+                      print(
+                        '🔍 FutureBuilder: ConnectionState=${snapshot.connectionState}, HasData=${snapshot.hasData}, Data=${snapshot.data != null ? 'bytes[${snapshot.data!.length}]' : 'null'}',
+                      );
+
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Container(
                           decoration: BoxDecoration(
@@ -67,7 +73,7 @@ class PromocionCard extends StatelessWidget {
                       return _buildPlaceholder();
                     },
                   ),
-                  
+
                   // Overlay con gradiente para el texto
                   Positioned.fill(
                     child: Container(
@@ -148,18 +154,11 @@ class PromocionCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.image,
-              size: 48,
-              color: Colors.grey,
-            ),
+            Icon(Icons.image, size: 48, color: Colors.grey),
             SizedBox(height: 8),
             Text(
               'Sin imagen',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
           ],
         ),

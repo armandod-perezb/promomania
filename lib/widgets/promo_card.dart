@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/promocion.dart';
-import '../models/usuario.dart';
-import '../models/supermercado.dart';
+import '../features/promotions/domain/entities/promocion.dart';
+import '../features/users/domain/entities/usuario.dart';
+import '../features/promotions/domain/entities/supermercado.dart';
 
 class PromoCard extends StatelessWidget {
   final Promocion promocion;

@@ -1,0 +1,90 @@
+lib/
+│
+├── core/
+│   ├── config/
+│   │   ├── env.dart
+│   │   ├── routes.dart
+│   │   └── constants.dart
+│   │
+│   ├── network/
+│   │   ├── api_client.dart
+│   │   ├── interceptors/
+│   │   └── endpoints.dart
+│   │
+│   ├── storage/
+│   │   ├── secure_storage_service.dart
+│   │   └── local_storage_service.dart
+│   │
+│   ├── errors/
+│   │   ├── exceptions.dart
+│   │   ├── failures.dart
+│   │   └── error_mapper.dart
+│   │
+│   ├── utils/
+│   │   ├── validators.dart
+│   │   ├── formatters.dart
+│   │   ├── date_utils.dart
+│   │   └── helpers.dart
+│   │
+│   └── shared/
+│       ├── widgets/
+│       ├── theme/
+│       └── components/
+│
+├── features/
+│
+│   ├── auth/
+│   ├── users/
+│   ├── promotions/
+│   ├── comments/
+│   ├── interactions/
+│   ├── notifications/
+│   ├── moderation/
+│   └── catalog/
+│
+└── main.dart
+
+1) Auth
+
+(tabla Usuario + login)
+
+auth/
+│
+├── domain/
+│   ├── entities/
+│   │   ├── auth_user.dart
+│   │   └── auth_session.dart
+│   │
+│   ├── repositories/
+│   │   └── auth_repository.dart
+│   │
+│   ├── services/
+│   │   ├── password_hasher.dart
+│   │   └── auth_policy_service.dart
+│   │
+│   └── usecases/
+│       ├── login_usecase.dart
+│       ├── register_usecase.dart
+│       ├── logout_usecase.dart
+│       └── refresh_token_usecase.dart
+│
+├── application/
+│   └── dtos/
+│       ├── login_dto.dart
+│       └── register_dto.dart
+│
+├── infrastructure/
+│   ├── datasources/
+│   │   └── auth_api.dart
+│   │
+│   ├── models/
+│   │   ├── auth_user_model.dart
+│   │   └── auth_response_model.dart
+│   │
+│   └── repositories/
+│       └── auth_repository_impl.dart
+│
+└── presentation/
+    ├── pages/
+    ├── controllers/
+    └── widgets/

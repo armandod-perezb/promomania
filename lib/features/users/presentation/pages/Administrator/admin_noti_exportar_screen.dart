@@ -7,8 +7,8 @@
 // ============================================================================
 
 import 'package:flutter/material.dart';
-import '../Core/Routes/app_routes.dart'; // Constantes de rutas nombradas de la app
-import '../main.dart'; // Expone `promoService` (ChangeNotifier global)
+import '../../../../../Core/Routes/app_routes.dart'; // Constantes de rutas nombradas de la app
+import '../../../../../main.dart'; // Expone `promoService` (ChangeNotifier global)
 
 // ── Paleta de colores a nivel de archivo ─────────────────────────────────────
 // Se declaran como `const` fuera de la clase para que el compilador las trate

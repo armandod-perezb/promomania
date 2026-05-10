@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../Core/Routes/app_routes.dart';
-import '../main.dart';
+import '../../../../../Core/Routes/app_routes.dart';
+import '../../../../../main.dart';
 
 /// Pantalla de auditoria con actividad reciente, filtros y atajos de aviso.
 

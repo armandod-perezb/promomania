@@ -2,10 +2,10 @@
 import 'package:flutter/material.dart';
 
 // Importa las rutas nombradas de la aplicación
-import '../Core/Routes/app_routes.dart';
+import '../../../../../Core/Routes/app_routes.dart';
 
 // Importa el servicio global donde está la lógica (promoService)
-import '../main.dart';
+import '../../../../../main.dart';
 
 // Widget Stateful porque maneja estado (loading, input)
 class ForgotPasswordScreen extends StatefulWidget {

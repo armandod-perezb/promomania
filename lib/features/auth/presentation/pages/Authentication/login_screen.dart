@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart'; // UI framework principal
 import '../../../../../Core/Routes/app_routes.dart'; // Definición de rutas de navegación
 import '../../../../../main.dart'; // Para acceso a servicios globales (promoService, sessionManager)
-import '../../../../../Core/storage/session_manager.dart';
 
 /// Pantalla de inicio de sesión de usuarios
 /// Permite autenticar usuarios con email y contraseña

@@ -88,3 +88,171 @@ auth/
     ├── pages/
     ├── controllers/
     └── widgets/
+
+2) Users
+
+(tabla Usuario)
+
+users/
+
+Domain:
+
+User
+UpdateProfileUseCase
+ChangePasswordUseCase
+DeactivateUserUseCase
+3) Promotions (núcleo fuerte)
+
+Agrupa:
+
+Promocion
+PromocionHorario
+Supermercado
+promotions/
+│
+├── domain/
+│   ├── entities/
+│   │   ├── promotion.dart
+│   │   ├── promotion_schedule.dart
+│   │   └── supermarket.dart
+│   │
+│   ├── repositories/
+│   │   └── promotion_repository.dart
+│   │
+│   ├── services/
+│   │   ├── promotion_validator.dart
+│   │   ├── promotion_visibility_service.dart
+│   │   └── promotion_expiration_service.dart
+│   │
+│   └── usecases/
+│       ├── create_promotion.dart
+│       ├── update_promotion.dart
+│       ├── get_promotion.dart
+│       ├── list_promotions.dart
+│       ├── approve_promotion.dart
+│       └── reject_promotion.dart
+│
+├── application/
+│   └── dtos/
+│       ├── create_promotion_dto.dart
+│       ├── update_promotion_dto.dart
+│       └── promotion_filter_dto.dart
+│
+├── infrastructure/
+│   ├── datasources/
+│   │   └── promotions_api.dart
+│   │
+│   ├── models/
+│   │   ├── promotion_model.dart
+│   │   ├── supermarket_model.dart
+│   │   └── promotion_schedule_model.dart
+│   │
+│   └── repositories/
+│       └── promotion_repository_impl.dart
+│
+└── presentation/
+4) Comments
+
+Agrupa:
+
+Comentario
+comments/
+
+UseCases:
+
+add_comment
+reply_comment
+edit_comment
+delete_comment
+list_comments
+5) Interactions
+
+Agrupa:
+
+Favorito
+Valoracion
+
+porque ambas son interacción usuario-promoción.
+
+interactions/
+│
+├── domain/
+│   ├── entities/
+│   │   ├── favorite.dart
+│   │   └── rating.dart
+│   │
+│   └── usecases/
+│       ├── add_favorite.dart
+│       ├── remove_favorite.dart
+│       ├── like_promotion.dart
+│       └── dislike_promotion.dart
+6) Notifications
+
+Agrupa:
+
+Notificacion
+UsuarioNotificacion
+notifications/
+
+UseCases:
+
+send_notification
+mark_as_read
+list_notifications
+7) Moderation
+
+Agrupa:
+
+Reporte
+aprobar/rechazar promoción
+moderation/
+
+UseCases:
+
+report_promotion
+review_report
+dismiss_report
+8) Catalog
+
+Agrupa:
+
+Categoria
+TipoPromocion
+
+porque son catálogos maestros.
+
+catalog/
+Tus Entities raíz
+
+Así:
+
+User
+Promotion
+Comment
+Rating
+Favorite
+Notification
+Report
+Category
+PromotionType
+Supermarket
+Schedule
+Relaciones
+
+El aggregate root principal es:
+
+Promotion
+
+porque conecta con:
+
+User
+Category
+TypePromotion
+Supermarket
+Schedule
+Comments
+Ratings
+Favorites
+Reports
+
+Tu core de negocio gira alrededor de Promotion.

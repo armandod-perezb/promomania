@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import '../Authentication/login_screen.dart';
+import '../auth/presentation/pages/Authentication/login_screen.dart';
 
 void main() {
   runApp(const PromoManiaApp());

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import '../Core/Routes/app_routes.dart';
-import '../main.dart';
+import '../../../../../Core/Routes/app_routes.dart';
+import '../../../../../main.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

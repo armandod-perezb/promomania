@@ -9,7 +9,7 @@
 
 import 'package:flutter/material.dart';
 import '../../../../../Core/Routes/app_routes.dart'; // Rutas nombradas de la app
-import '../../../../../main.dart'; // Expone promoService (ChangeNotifier global)
+import '../../../../../Core/di/app_scope.dart'; // Expone promoService (ChangeNotifier global)
 import '../../../../../features/promotions/domain/entities/supermercado.dart'; // Entity Supermercado con copyWith
 
 // ============================================================================

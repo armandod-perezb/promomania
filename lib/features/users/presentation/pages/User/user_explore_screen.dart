@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart'; // UI framework principal
 import 'package:flutter/services.dart'; // Para feedback háptico y servicios del sistema
 import '../../../../../Core/Routes/app_routes.dart'; // Definición de rutas de navegación
-import '../../../../../main.dart'; // Para acceso a servicios globales (promoService)
+import '../../../../../Core/di/app_scope.dart'; // Para acceso a servicios globales (promoService)
 import '../../../../../features/promotions/infrastructure/services/promo_service.dart'; // Servicio principal de gestión de promociones
 import '../../../../../features/promotions/domain/entities/promocion.dart'; // Entity de promociones
 import '../../../../../features/promotions/domain/entities/supermercado.dart'; // Entity de supermercados

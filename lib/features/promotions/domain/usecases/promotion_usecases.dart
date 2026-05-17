@@ -86,3 +86,33 @@ class IncrementPromotionViewsUseCase {
     return repository.incrementViews(codigo);
   }
 }
+
+class GetPromotionsByUserUseCase {
+  final PromotionRepository repository;
+
+  GetPromotionsByUserUseCase(this.repository);
+
+  Future<List<Promocion>> execute(int userId) {
+    return repository.getPromotionsByUser(userId);
+  }
+}
+
+class ApprovePromotionUseCase {
+  final PromotionRepository repository;
+
+  ApprovePromotionUseCase(this.repository);
+
+  Future<void> execute(String codigo) {
+    return repository.approvePromotion(codigo);
+  }
+}
+
+class RejectPromotionUseCase {
+  final PromotionRepository repository;
+
+  RejectPromotionUseCase(this.repository);
+
+  Future<void> execute(String codigo) {
+    return repository.rejectPromotion(codigo);
+  }
+}

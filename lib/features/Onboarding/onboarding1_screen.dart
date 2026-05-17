@@ -1,22 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import '../auth/presentation/pages/Authentication/login_screen.dart';
-
-void main() {
-  runApp(const PromoManiaApp());
-}
-
-class PromoManiaApp extends StatelessWidget {
-  const PromoManiaApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
-    );
-  }
-}
+import '../../Core/Routes/app_routes.dart';
 
 // ─── Splash Screen ────────────────────────────────────────────────────────────
 
@@ -211,10 +195,7 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: const Color(0xFFFFF5F2),
       body: GestureDetector(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginScreen()),
-          );
+          Navigator.pushNamed(context, AppRoutes.login);
         },
         child: AnimatedBuilder(
           animation: Listenable.merge([

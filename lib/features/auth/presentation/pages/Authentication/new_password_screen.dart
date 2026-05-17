@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../../../Core/Routes/app_routes.dart';
-import '../../../../../main.dart';
+import '../../controllers/auth_controller.dart';
 
 class NewPasswordScreen extends StatefulWidget {
   final String? email;
+  final AuthController authController;
 
-  const NewPasswordScreen({super.key, this.email});
+  const NewPasswordScreen({super.key, this.email, required this.authController});
 
   @override
   State<NewPasswordScreen> createState() => _NewPasswordScreenState();
@@ -53,15 +54,11 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
     try {
       // Si tenemos el email, actualizar la contraseña del usuario
       if (widget.email != null && widget.email!.isNotEmpty) {
-        final usuario = promoService.getUsuarioByEmail(widget.email!);
-        if (usuario != null) {
-          final usuarioActualizado = usuario.copyWith(password: newPassword);
-          promoService.updateUsuario(usuarioActualizado);
-        }
+        await widget.authController.resetPassword(
+          correo: widget.email!,
+          newPassword: newPassword,
+        );
       }
-
-      // Simular envío al servidor
-      await Future.delayed(const Duration(seconds: 1));
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

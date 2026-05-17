@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:typed_data';
-import '../../../../../main.dart';
+import '../../../../../Core/di/app_scope.dart';
 import '../../../../../features/promotions/domain/entities/promocion.dart';
 import '../../../../../features/promotions/domain/entities/promocion_horario.dart';
 import '../../../../../features/promotions/domain/entities/supermercado.dart';

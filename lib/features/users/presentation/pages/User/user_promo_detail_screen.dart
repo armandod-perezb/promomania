@@ -3,7 +3,7 @@ import 'dart:async'; // Para manejo de operaciones asíncronas y timers
 import 'dart:typed_data'; // Para manejo de datos binarios (imágenes)
 import 'package:flutter/material.dart'; // UI framework principal
 import 'package:flutter/services.dart'; // Para feedback háptico y servicios del sistema
-import '../../../../../main.dart'; // Para acceso a servicios globales (promoService, sessionManager)
+import '../../../../../Core/di/app_scope.dart'; // Para acceso a servicios globales (promoService, sessionManager)
 import '../../../../../features/promotions/domain/entities/promocion.dart'; // Entity de promociones
 import '../../../../../features/promotions/domain/entities/promocion_horario.dart'; // Entity horarios
 import '../../../../../features/moderation/domain/entities/reporte.dart'; // Entity reportes

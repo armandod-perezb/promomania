@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import '../../../../../Core/Routes/app_routes.dart';
-import '../../../../../main.dart';
+import '../../../../../Core/di/app_scope.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -230,7 +230,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       title: 'Cerrar sesión',
                       titleColor: const Color(0xFFFF6B35),
                       onTap: () async {
-                        await sessionManager.logout();
+                        await settingsController.logout();
                         if (mounted) {
                           Navigator.pushNamedAndRemoveUntil(
                             context,

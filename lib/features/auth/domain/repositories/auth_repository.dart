@@ -31,4 +31,16 @@ abstract class AuthRepository {
 
   /// Refresca el token de la sesión actual.
   Future<void> refreshToken();
+
+  /// Solicita el envío de código de recuperación para el correo indicado.
+  Future<void> sendRecoveryCode({required String correo});
+
+  /// Verifica el código de recuperación asociado a un correo.
+  Future<bool> verifyRecoveryCode({required String correo, required String code});
+
+  /// Actualiza la contraseña del usuario asociado al correo.
+  Future<void> resetPassword({
+    required String correo,
+    required String newPassword,
+  });
 }

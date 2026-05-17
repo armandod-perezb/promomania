@@ -1,14 +1,15 @@
 // Importaciones necesarias para la pantalla de registro
 import 'package:flutter/material.dart'; // UI framework principal
 import '../../../../../Core/Routes/app_routes.dart'; // Definición de rutas de navegación
-import '../../../../../main.dart'; // Para acceso a servicios globales (promoService, sessionManager)
-import '../../../../../features/users/domain/entities/usuario.dart'; // Entity de usuarios
+import '../../controllers/auth_controller.dart';
 
 /// Pantalla de registro de nuevos usuarios
 /// Permite crear cuenta con nombre, email y contraseña
 /// Incluye validación de campos y términos y condiciones
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  final AuthController authController;
+
+  const RegisterScreen({super.key, required this.authController});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -80,44 +81,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Validar que el email no exista ya en el sistema
-      final usuarioExistente = promoService.getUsuarioByEmail(email);
-      if (usuarioExistente != null) {
-        if (mounted) {
-          // Verificar que el widget aún está montado
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('El email ya está registrado')),
-          );
-        }
-        setState(() => _isLoading = false); // Detener carga
-        return; // Salir del método
-      }
-
-      // Crear nuevo usuario con ID auto-incremental
-      final nuevoId =
-          (promoService.getUsuarios().isNotEmpty
-              ? promoService
-                    .getUsuarios()
-                    .last
-                    .id // Último ID existente
-              : 0) +
-          1; // Si no hay usuarios, empezar en 1
-
-      // Crear objeto Usuario con datos del formulario
-      final nuevoUsuario = Usuario(
-        id: nuevoId,
-        nombre: nombre,
-        correo: email,
-        password: password, // NOTA: En producción usar hashing (bcrypt)
-        rol: 'user', // Rol por defecto para usuarios normales
-        estado: 'activo', // Estado inicial del usuario
-      );
-
-      // Guardar nuevo usuario en la base de datos del servicio
-      promoService.addUsuario(nuevoUsuario);
-
-      // Guardar sesión del usuario para mantenerlo autenticado
-      await sessionManager.guardarSesion(nuevoUsuario);
+        await widget.authController.register(
+          nombre: nombre,
+          correo: email,
+          password: password,
+        );
 
       // Si el widget aún está montado, mostrar éxito y navegar
       if (mounted) {

@@ -2,11 +2,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../../Core/Routes/app_routes.dart';
+import '../../controllers/auth_controller.dart';
 
 class VerifyCodeScreen extends StatefulWidget {
   final String email;
+  final AuthController authController;
 
-  const VerifyCodeScreen({super.key, required this.email});
+  const VerifyCodeScreen({
+    super.key,
+    required this.email,
+    required this.authController,
+  });
 
   @override
   State<VerifyCodeScreen> createState() => _VerifyCodeScreenState();
@@ -32,6 +38,7 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
   int _secondsLeft = _resendSeconds;
   Timer? _timer;
   bool _isVerifying = false;
+  bool _isResending = false;
 
   @override
   void initState() {
@@ -86,9 +93,11 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
     setState(() => _isVerifying = true);
 
     try {
-      // Simular verificación de código
-      // En producción: validar contra un servidor
-      if (codigo == '123456') {
+      final isValid = await widget.authController.verifyRecoveryCode(
+        correo: widget.email,
+        code: codigo,
+      );
+      if (isValid) {
         // Código válido
         if (mounted) {
           Navigator.pushReplacementNamed(
@@ -113,6 +122,33 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
     } finally {
       if (mounted) {
         setState(() => _isVerifying = false);
+      }
+    }
+  }
+
+  Future<void> _resendCode() async {
+    if (_secondsLeft != 0 || _isResending) {
+      return;
+    }
+
+    setState(() => _isResending = true);
+    try {
+      await widget.authController.sendRecoveryCode(correo: widget.email);
+      if (mounted) {
+        _startTimer();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Codigo reenviado')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isResending = false);
       }
     }
   }
@@ -161,19 +197,9 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Text(
-                      'Código demo: 123456',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF8A8FA8)),
-                    ),
+                  const Text(
+                    'Revisa tu correo para ver el codigo enviado.',
+                    style: TextStyle(fontSize: 12, color: Color(0xFF8A8FA8)),
                   ),
                   const SizedBox(height: 32),
                   _buildCodeInputs(),
@@ -395,16 +421,24 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
   Widget _buildResendRow() {
     final canResend = _secondsLeft == 0;
     return GestureDetector(
-      onTap: canResend ? _startTimer : null,
+      onTap: canResend && !_isResending ? _resendCode : null,
       child: RichText(
         text: TextSpan(
-          text: 'Reenviar código en ',
+          text: canResend ? 'Reenviar código' : 'Reenviar código en ',
           style: TextStyle(
-            color: canResend ? _primary : const Color(0xFF8A8FA8),
+            color: canResend && !_isResending ? _primary : const Color(0xFF8A8FA8),
             fontSize: 13.5,
-            fontWeight: canResend ? FontWeight.w600 : FontWeight.w400,
+            fontWeight: canResend && !_isResending ? FontWeight.w600 : FontWeight.w400,
           ),
           children: [
+            if (_isResending)
+              const TextSpan(
+                text: '...',
+                style: TextStyle(
+                  color: _primary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             if (!canResend)
               TextSpan(
                 text: '${_secondsLeft}s',

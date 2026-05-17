@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../Core/Routes/app_routes.dart';
-import '../../../../../main.dart';
+import '../../../../../Core/di/app_scope.dart';
 import '../../../../../features/users/domain/entities/usuario.dart';
 
 /// Pantalla de gestion de usuarios con busqueda, filtros y acciones administrativas.

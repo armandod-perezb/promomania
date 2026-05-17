@@ -3,15 +3,14 @@ import 'package:flutter/material.dart';
 
 // Importa las rutas nombradas de la aplicación
 import '../../../../../Core/Routes/app_routes.dart';
-
-// Importa el servicio global donde está la lógica (promoService)
-import '../../../../../main.dart';
+import '../../controllers/auth_controller.dart';
 
 // Widget Stateful porque maneja estado (loading, input)
 class ForgotPasswordScreen extends StatefulWidget {
+  final AuthController authController;
 
   // Constructor del widget
-  const ForgotPasswordScreen({super.key});
+  const ForgotPasswordScreen({super.key, required this.authController});
 
   // Crea el estado asociado a este widget
   @override
@@ -69,29 +68,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     try {
 
-      // Busca el usuario en el sistema
-      final usuario = promoService.getUsuarioByEmail(email);
-
-      // Si no existe el usuario
-      if (usuario == null) {
-
-        // Verifica que el widget siga montado
-        if (mounted) {
-
-          // Muestra mensaje de error
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Usuario no encontrado')),
-          );
-        }
-
-        // Desactiva loading
-        setState(() => _isLoading = false);
-
-        return;
-      }
-
-      // Simula el envío del código (delay)
-      await Future.delayed(const Duration(seconds: 1));
+      await widget.authController.sendRecoveryCode(correo: email);
 
       // Navega a la pantalla de verificación
       if (mounted) {

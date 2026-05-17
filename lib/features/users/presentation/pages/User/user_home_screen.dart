@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';           // Para feedback háptico y es
 import 'package:flutter_map/flutter_map.dart';     // Biblioteca para mapas interactivos
 import 'package:latlong2/latlong.dart' show LatLng; // Para coordenadas geográficas
 import '../../../../../Core/Routes/app_routes.dart';         // Definición de rutas de navegación
-import '../../../../../main.dart';                            // Para acceso a servicios globales
+import '../../../../../Core/di/app_scope.dart';                            // Para acceso a servicios globales
 
 /// Pantalla principal de mapa con promociones geolocalizadas
 /// Muestra mapa interactivo con marcadores de promociones y controles de navegación

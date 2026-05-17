@@ -29,21 +29,14 @@ import 'features/users/presentation/pages/Administrator/admin_noti_activity_scre
 import 'features/users/presentation/pages/Administrator/admin_noti_report_screen.dart';
 import 'features/users/presentation/pages/Administrator/admin_noti_alert_screen.dart';
 import 'features/users/presentation/pages/Administrator/admin_noti_exportar_screen.dart';
-import 'features/promotions/infrastructure/services/promo_service.dart';
-import 'core/storage/session_manager.dart';
+import 'Core/di/app_scope.dart';
 
 // 👇 IMPORTA TU ONBOARDING (agregado)
 import 'features/Onboarding/onboarding1_screen.dart';
 
-final sessionManager = SessionManager();
-final promoService = PromoService();
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await SessionManager.init();
-  await promoService.init();
-  await promoService.loadLocalPromociones();
+  await AppScope.bootstrap();
 
   runApp(const MyApp());
 }
@@ -69,7 +62,11 @@ class MyApp extends StatelessWidget {
               ? settings.arguments as String
               : '';
           return MaterialPageRoute(
-            builder: (context) => VerifyCodeScreen(email: email),
+            builder: (context) =>
+                VerifyCodeScreen(
+                  email: email,
+                  authController: AppScope.authController,
+                ),
             settings: settings,
           );
         }
@@ -78,7 +75,10 @@ class MyApp extends StatelessWidget {
               ? settings.arguments as String
               : null;
           return MaterialPageRoute(
-            builder: (context) => NewPasswordScreen(email: email),
+            builder: (context) => NewPasswordScreen(
+              email: email,
+              authController: AppScope.authController,
+            ),
             settings: settings,
           );
         }
@@ -89,9 +89,12 @@ class MyApp extends StatelessWidget {
         // 👇 NUEVA RUTA AGREGADA
         AppRoutes.onboarding1: (context) => const SplashScreen(),
 
-        AppRoutes.login: (context) => const LoginScreen(),
-        AppRoutes.register: (context) => const RegisterScreen(),
-        AppRoutes.forgotPassword: (context) => const ForgotPasswordScreen(),
+        AppRoutes.login: (context) =>
+            LoginScreen(authController: AppScope.authController),
+        AppRoutes.register: (context) =>
+            RegisterScreen(authController: AppScope.authController),
+        AppRoutes.forgotPassword: (context) =>
+            ForgotPasswordScreen(authController: AppScope.authController),
         AppRoutes.userHome: (context) => const HomeMapScreen(),
         AppRoutes.userProfile: (context) => const UserProfileScreen(),
         AppRoutes.userFavorites: (context) => const MisFavoritosScreen(),

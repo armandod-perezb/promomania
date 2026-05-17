@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../Core/Routes/app_routes.dart';
-import '../../../../../main.dart';
+import '../../../../../Core/di/app_scope.dart';
 import '../../../../../features/promotions/domain/entities/promocion.dart';
 
 class ManagePromotionsScreen extends StatefulWidget {

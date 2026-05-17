@@ -1,13 +1,15 @@
 // Importaciones necesarias para la pantalla de inicio de sesión
 import 'package:flutter/material.dart'; // UI framework principal
 import '../../../../../Core/Routes/app_routes.dart'; // Definición de rutas de navegación
-import '../../../../../main.dart'; // Para acceso a servicios globales (promoService, sessionManager)
+import '../../controllers/auth_controller.dart';
 
 /// Pantalla de inicio de sesión de usuarios
 /// Permite autenticar usuarios con email y contraseña
 /// Incluye navegación basada en roles (admin/usuario) y opciones sociales
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final AuthController authController;
+
+  const LoginScreen({super.key, required this.authController});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -60,34 +62,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       // Buscar usuario en la base de datos por email
-      final usuario = promoService.getUsuarioByEmail(email);
-
-      // Verificar si el usuario existe
-      if (usuario == null) {
-        if (mounted) {
-          // Verificar que el widget aún está montado
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Usuario no encontrado')),
-          );
-        }
-        setState(() => _isLoading = false); // Detener carga
-        return; // Salir del método
-      }
-
-      // Validar contraseña (NOTA: En producción usar hashing bcrypt)
-      if (usuario.password != password) {
-        if (mounted) {
-          // Verificar que el widget aún está montado
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Contraseña incorrecta')),
-          );
-        }
-        setState(() => _isLoading = false); // Detener carga
-        return; // Salir del método
-      }
-
-      // Guardar sesión del usuario para mantenerlo autenticado
-      await sessionManager.guardarSesion(usuario);
+      final usuario = await widget.authController.login(
+        correo: email,
+        password: password,
+      );
 
       // Si el widget aún está montado, navegar según el rol del usuario
       if (mounted) {

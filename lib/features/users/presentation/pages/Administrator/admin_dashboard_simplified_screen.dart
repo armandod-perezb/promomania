@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../../main.dart';
+import '../../../../../Core/di/app_scope.dart';
 
 /// Vista resumida del dashboard para revisar KPIs generales rapidamente.
 class AdminDashboardSimplifiedScreen extends StatefulWidget {

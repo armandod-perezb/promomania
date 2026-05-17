@@ -1,6 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import '../../../../../Core/Routes/app_routes.dart';
-import '../../../../../main.dart';
+import '../../../../../Core/di/app_scope.dart';
 
 /// Pantalla de alertas administrativas y exportacion de datos desde avisos.
 

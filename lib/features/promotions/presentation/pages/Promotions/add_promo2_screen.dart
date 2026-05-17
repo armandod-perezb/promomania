@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../../../main.dart';
+import '../../../../../Core/di/app_scope.dart';
 import 'add_promo3_screen.dart';
 import 'dart:io';
 import 'dart:typed_data';

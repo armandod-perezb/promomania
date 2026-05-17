@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../Core/Routes/app_routes.dart';
-import '../../../../../main.dart';
+import '../../../../../Core/di/app_scope.dart';
 
 /// Pantalla principal del panel administrativo.
 /// Muestra métricas clave, actividad reciente y accesos rápidos a las

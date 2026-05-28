@@ -111,6 +111,21 @@ class PromoLocalDataSource {
     return text.isEmpty ? fallback : text;
   }
 
+  static String? _sanitizeImageUrl(dynamic value) {
+    if (value == null) return null;
+    final url = value.toString().trim();
+    if (url.isEmpty) return null;
+    final lowered = url.toLowerCase();
+
+    // Evita hosts de placeholder que suelen fallar en web y generan ruido.
+    if (lowered.contains('via.placeholder.com')) return null;
+
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    return null;
+  }
+
   static int _asInt(dynamic value, {int fallback = 0}) {
     if (value == null) return fallback;
     if (value is int) return value;
@@ -162,7 +177,7 @@ class PromoLocalDataSource {
       condicionProducto: _asString(json['condicion_producto'], fallback: 'nuevo'),
       ubicacion: json['ubicacion']?.toString(),
       url: json['url']?.toString(),
-      foto: json['foto']?.toString(),
+      foto: _sanitizeImageUrl(json['foto']),
       fotoEsLocal: false,
       tipoVigencia: _asString(json['tipo_vigencia'], fallback: 'por_fecha'),
       fechaInicio: json['fecha_inicio']?.toString(),

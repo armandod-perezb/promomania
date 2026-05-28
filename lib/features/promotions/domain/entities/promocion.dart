@@ -19,6 +19,15 @@ class Promocion {
     return double.tryParse(normalized) ?? fallback;
   }
 
+  static String? _sanitizeImageUrl(dynamic value) {
+    if (value == null) return null;
+    final url = value.toString().trim();
+    if (url.isEmpty) return null;
+    final lowered = url.toLowerCase();
+    if (lowered.contains('via.placeholder.com')) return null;
+    return url;
+  }
+
   /// Código único alfanumérico de la promoción (por ejemplo 'PROMO001').
   final String codigo;
 
@@ -120,7 +129,7 @@ class Promocion {
       condicionProducto: json['condicion_producto'] as String? ?? 'nuevo',
       ubicacion: json['ubicacion'] as String?,
       url: json['url'] as String?,
-      foto: json['foto'] as String?,
+      foto: _sanitizeImageUrl(json['foto']),
       fotoEsLocal: json['foto_es_local'] as bool? ?? false,
       tipoVigencia: json['tipo_vigencia'] as String? ?? 'por_fecha',
       fechaInicio: json['fecha_inicio'] as String?,

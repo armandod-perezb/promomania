@@ -624,7 +624,9 @@ class _ExploreScreenState extends State<ExploreScreen>
     }
 
     // 2. Intentar cargar imagen desde red si hay URL
-    if (promo.foto != null && promo.foto!.isNotEmpty) {
+    if (promo.foto != null &&
+        promo.foto!.isNotEmpty &&
+        !_shouldSkipRemoteImage(promo.foto!)) {
       return Image.network(
         promo.foto!,
         height: height,
@@ -637,6 +639,11 @@ class _ExploreScreenState extends State<ExploreScreen>
 
     // 3. Fallback final: emoji con fondo gris
     return _buildImageFallback(emoji, height);
+  }
+
+  bool _shouldSkipRemoteImage(String url) {
+    final lowered = url.toLowerCase();
+    return lowered.contains('via.placeholder.com');
   }
 
   /// Construye el fallback de imagen cuando no hay imagen disponible

@@ -21,6 +21,11 @@ class PromoCard extends StatelessWidget {
     this.isFavorite = false,
   });
 
+  bool _shouldUseRemoteImage(String? url) {
+    if (url == null || url.trim().isEmpty) return false;
+    return !url.toLowerCase().contains('via.placeholder.com');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -36,7 +41,7 @@ class PromoCard extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.grey[300],
-                image: promocion.foto != null
+                image: _shouldUseRemoteImage(promocion.foto)
                     ? DecorationImage(
                         image: NetworkImage(promocion.foto!),
                         fit: BoxFit.cover,

@@ -155,6 +155,8 @@ class AppScope {
     getPromotionsByUserUseCase: GetPromotionsByUserUseCase(promotionsRepository),
     approvePromotionUseCase: ApprovePromotionUseCase(promotionsRepository),
     rejectPromotionUseCase: RejectPromotionUseCase(promotionsRepository),
+    getPromotionsByCategoryUseCase: GetPromotionsByCategoryUseCase(promotionsRepository),
+    getPromotionsBySupermarketUseCase: GetPromotionsBySupermarketUseCase(promotionsRepository),
   );
 
   static final PromoUserDataSource usersDataSource = PromoUserDataSource(

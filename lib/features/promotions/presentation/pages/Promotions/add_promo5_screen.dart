@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import '../../../../../Core/di/app_scope.dart';
@@ -6,7 +6,6 @@ import '../../../../../features/promotions/domain/entities/promocion.dart';
 import '../../../../../features/promotions/domain/entities/promocion_horario.dart';
 import '../../../../../features/promotions/domain/entities/supermercado.dart';
 import '../../../../../core/storage/image_storage_service.dart';
-import '../../../../../widgets/promocion_card.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 
 /// Pantalla paso 5 (final) del wizard de creación de promociones: Vista previa

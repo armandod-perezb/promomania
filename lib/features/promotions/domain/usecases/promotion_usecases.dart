@@ -116,3 +116,23 @@ class RejectPromotionUseCase {
     return repository.rejectPromotion(codigo);
   }
 }
+
+class GetPromotionsByCategoryUseCase {
+  final PromotionRepository repository;
+
+  GetPromotionsByCategoryUseCase(this.repository);
+
+  Future<List<Promocion>> execute(int categoryId) {
+    return repository.getPromotionsByCategory(categoryId);
+  }
+}
+
+class GetPromotionsBySupermarketUseCase {
+  final PromotionRepository repository;
+
+  GetPromotionsBySupermarketUseCase(this.repository);
+
+  Future<List<Promocion>> execute(int supermarketId) {
+    return repository.getPromotionsBySupermarket(supermarketId);
+  }
+}

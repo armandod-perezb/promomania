@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import '../features/promotions/domain/entities/promocion.dart';
-import '../features/promotions/infrastructure/services/promo_service.dart';
 
 class PromocionCard extends StatelessWidget {
   final Promocion promocion;
-  final PromoService promoService;
+
+  /// Callback que recibe el código de la promoción y retorna los bytes de imagen.
+  /// Desacopla el widget de cualquier servicio concreto de infraestructura.
+  final Future<Uint8List?> Function(String codigo) getImageBytes;
   final VoidCallback? onTap;
 
   const PromocionCard({
     Key? key,
     required this.promocion,
-    required this.promoService,
+    required this.getImageBytes,
     this.onTap,
   }) : super(key: key);
 
@@ -32,9 +34,7 @@ class PromocionCard extends StatelessWidget {
                 children: [
                   // Imagen de fondo
                   FutureBuilder<Uint8List?>(
-                    future: promoService.getPromotionImageBytes(
-                      promocion.codigo,
-                    ),
+                    future: getImageBytes(promocion.codigo),
                     builder: (context, snapshot) {
                       // Debug logging
                       print(

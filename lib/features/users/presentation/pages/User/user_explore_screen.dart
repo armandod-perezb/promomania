@@ -1189,11 +1189,22 @@ class _ExploreScreenState extends State<ExploreScreen>
                       top: 10,
                       right: 10,
                       child: GestureDetector(
-                        onTap: () {
-                          interactionsController.toggleFavorito(
-                            currentUser,
-                            promo.codigo,
-                          );
+                        onTap: () async {
+                          try {
+                            await interactionsController.toggleFavorito(
+                              currentUser,
+                              promo.codigo,
+                            );
+                            if (mounted) {
+                              setState(() {});
+                            }
+                          } catch (e) {
+                            if (!mounted) return;
+                            final message = e.toString().replaceFirst('Exception: ', '');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(message)),
+                            );
+                          }
                         },
                         child: Container(
                           width: 34,

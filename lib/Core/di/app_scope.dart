@@ -17,6 +17,7 @@ import 'package:app/features/comments/infrastructure/repositories/comment_reposi
 import 'package:app/features/comments/presentation/controllers/comments_controller.dart';
 import 'package:app/features/interactions/domain/usecases/interaction_usecases.dart';
 import 'package:app/features/interactions/infrastructure/datasources/interaction_datasource.dart';
+import 'package:app/features/interactions/infrastructure/datasources/remote_favorite_datasource.dart';
 import 'package:app/features/interactions/infrastructure/repositories/interaction_repository_impl.dart';
 import 'package:app/features/interactions/presentation/controllers/interactions_controller.dart';
 import 'package:app/features/moderation/domain/usecases/moderation_usecases.dart';
@@ -101,8 +102,13 @@ class AppScope {
 
   static final PromoInteractionDataSource interactionsDataSource =
       PromoInteractionDataSource(promoService);
+  static final ApiRemoteFavoriteDataSource remoteFavoriteDataSource =
+      ApiRemoteFavoriteDataSource(ApiClient.instance);
   static final InteractionRepositoryImpl interactionsRepository =
-      InteractionRepositoryImpl(interactionsDataSource);
+      InteractionRepositoryImpl(
+        interactionsDataSource,
+        remoteFavoriteDataSource: remoteFavoriteDataSource,
+      );
   static final InteractionsController interactionsController =
       InteractionsController(
         getFavoritosByUsuarioSyncUseCase: GetFavoritosByUsuarioSyncUseCase(

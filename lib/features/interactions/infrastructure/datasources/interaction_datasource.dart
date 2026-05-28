@@ -4,7 +4,10 @@ import 'package:app/features/promotions/infrastructure/services/promo_service.da
 
 abstract class InteractionDataSource {
   List<Favorito> getFavoritosByUsuario(int userId);
+  Favorito? getFavorito(int userId, String promotionCode);
   bool isFavorito(int userId, String promotionCode);
+  void addFavorito(Favorito favorito);
+  void removeFavorito(int userId, String promotionCode);
   void toggleFavorito(int userId, String promotionCode);
   List<Valoracion> getValoracionesByPromocion(String promotionCode);
   List<Valoracion> getAllValoraciones();
@@ -23,7 +26,25 @@ class PromoInteractionDataSource implements InteractionDataSource {
   List<Favorito> getFavoritosByUsuario(int userId) => promoService.getFavoritosByUsuario(userId);
 
   @override
+  Favorito? getFavorito(int userId, String promotionCode) {
+    final favoritos = promoService.getFavoritosByUsuario(userId);
+    for (final favorito in favoritos) {
+      if (favorito.codigoPromocion == promotionCode) {
+        return favorito;
+      }
+    }
+    return null;
+  }
+
+  @override
   bool isFavorito(int userId, String promotionCode) => promoService.isFavorito(userId, promotionCode);
+
+  @override
+  void addFavorito(Favorito favorito) => promoService.addFavorito(favorito);
+
+  @override
+  void removeFavorito(int userId, String promotionCode) =>
+      promoService.removeFavorito(userId, promotionCode);
 
   @override
   void toggleFavorito(int userId, String promotionCode) => promoService.toggleFavorito(userId, promotionCode);

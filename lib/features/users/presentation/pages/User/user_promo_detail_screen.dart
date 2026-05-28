@@ -412,19 +412,27 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                       iconColor: _isFavorite
                           ? _primary
                           : Colors.white, // Color según estado
-                      onTap: () {
-                        // Toggle de estado de favorito
-                        interactionsController.toggleFavorito(
-                          _activeUserId,
-                          _promo!.codigo,
-                        );
-                        setState(
-                          () => _isFavorite = interactionsController.isFavoritoSync(
+                      onTap: () async {
+                        try {
+                          await interactionsController.toggleFavorito(
                             _activeUserId,
                             _promo!.codigo,
-                          ),
-                        );
-                        HapticFeedback.lightImpact(); // Feedback háptico
+                          );
+                          if (!mounted) return;
+                          setState(
+                            () => _isFavorite = interactionsController.isFavoritoSync(
+                              _activeUserId,
+                              _promo!.codigo,
+                            ),
+                          );
+                          HapticFeedback.lightImpact(); // Feedback háptico
+                        } catch (e) {
+                          if (!mounted) return;
+                          final message = e.toString().replaceFirst('Exception: ', '');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(message)),
+                          );
+                        }
                       },
                     ),
                   ],
@@ -1955,15 +1963,27 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
           children: [
             // Favorito
             GestureDetector(
-              onTap: () {
-                interactionsController.toggleFavorito(_activeUserId, _promo!.codigo);
-                setState(
-                  () => _isFavorite = interactionsController.isFavoritoSync(
+              onTap: () async {
+                try {
+                  await interactionsController.toggleFavorito(
                     _activeUserId,
                     _promo!.codigo,
-                  ),
-                );
-                HapticFeedback.lightImpact();
+                  );
+                  if (!mounted) return;
+                  setState(
+                    () => _isFavorite = interactionsController.isFavoritoSync(
+                      _activeUserId,
+                      _promo!.codigo,
+                    ),
+                  );
+                  HapticFeedback.lightImpact();
+                } catch (e) {
+                  if (!mounted) return;
+                  final message = e.toString().replaceFirst('Exception: ', '');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(message)),
+                  );
+                }
               },
               child: Container(
                 width: 50,

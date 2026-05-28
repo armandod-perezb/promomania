@@ -1,4 +1,4 @@
-// ============================================================================
+﻿// ============================================================================
 // ARCHIVO: admin_noti_report_screen.dart
 // PROPÓSITO: Pantalla de reportes del módulo de avisos.
 //            Muestra métricas de actividad por hora (gráfico de barras),
@@ -381,13 +381,13 @@ class _AdminNotiReportScreenState extends State<AdminNotiReportScreen> {
   // ============================================================================
   // TAB BAR
   // Barra de 4 tabs para navegar por las secciones del módulo de avisos.
-  // El badge de "Reportes" es DINÁMICO: depende de promoService.getReportes().
+  // El badge de "Reportes" es DINÁMICO: depende de moderationController.getReportesSync().
   // El de "Alertas" tiene valor fijo de 1 (hardcoded).
   // Usa pushReplacementNamed para evitar acumulación de rutas en el stack.
   // ============================================================================
   Widget _buildTabBar() {
     // Dato dinámico: número de reportes activos en el servicio global
-    final reportesBadge = promoService.getReportes().length;
+    final reportesBadge = moderationController.getReportesSync().length;
 
     final tabs = [
       {'icon': Icons.bar_chart_outlined,     'label': 'Actividad', 'badge': 0},
@@ -597,7 +597,7 @@ class _AdminNotiReportScreenState extends State<AdminNotiReportScreen> {
   // REPORTE GRID — Grid 2×2 con métricas dinámicas de reportes
   //
   // DATOS DINÁMICOS: Todos los valores se calculan en tiempo real desde
-  // promoService.getReportes(), que retorna la lista actual de reportes.
+  // moderationController.getReportesSync(), que retorna la lista actual de reportes.
   //
   // Métricas calculadas:
   //   - Total: reportes.length
@@ -606,7 +606,7 @@ class _AdminNotiReportScreenState extends State<AdminNotiReportScreen> {
   //   - Revisados/Descartados: filtrado por estado == 'revisado' y 'descartado'
   // ============================================================================
   Widget _buildReporteGrid() {
-    final reportes = promoService.getReportes(); // Lista completa de reportes
+    final reportes = moderationController.getReportesSync(); // Lista completa de reportes
 
     // Cálculos derivados de la lista de reportes
     final reportesPendientes  = reportes.where((r) => r.estado == 'pendiente').length;

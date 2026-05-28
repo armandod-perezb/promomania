@@ -1,6 +1,12 @@
 import '../entities/reporte.dart';
 import '../repositories/moderation_repository.dart';
 
+class GetReportesSyncUseCase {
+  final ModerationRepository repository;
+  GetReportesSyncUseCase(this.repository);
+  List<Reporte> execute() => repository.getReportesSync();
+}
+
 class GetAllReportesUseCase {
   final ModerationRepository repository;
 

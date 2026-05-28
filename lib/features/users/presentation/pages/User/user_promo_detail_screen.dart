@@ -1,4 +1,4 @@
-// Importaciones necesarias para la pantalla de detalles de promoción
+﻿// Importaciones necesarias para la pantalla de detalles de promoción
 import 'dart:async'; // Para manejo de operaciones asíncronas y timers
 import 'dart:typed_data'; // Para manejo de datos binarios (imágenes)
 import 'package:flutter/material.dart'; // UI framework principal
@@ -109,22 +109,22 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
 
     // Intentar obtener promoción por código, si no hay fallback a primera aprobada
     final promoByCode = codigo != null
-        ? promoService.getPromocionByCodigo(codigo)
+        ? promotionsController.getPromotionByCodeSync(codigo)
         : null;
-    final fallbackPromo = promoService.getPromocionesAprobadas().isNotEmpty
-        ? promoService.getPromocionesAprobadas().first
-        : (promoService.getPromociones().isNotEmpty
-              ? promoService.getPromociones().first
+    final fallbackPromo = promotionsController.getActivePromotionsSync().isNotEmpty
+        ? promotionsController.getActivePromotionsSync().first
+        : (promotionsController.getAllPromotionsSync().isNotEmpty
+              ? promotionsController.getAllPromotionsSync().first
               : null);
 
     // Asignar promoción encontrada
     _promo = promoByCode ?? fallbackPromo;
     if (_promo != null) {
       // Cargar datos relacionados con la promoción
-      _horarios = promoService.getPromocionesHorariosByCodigo(
+      _horarios = promotionsController.getPromocionesHorariosByCodigo(
         _promo!.codigo,
       ); // Horarios de disponibilidad
-      _isFavorite = promoService.isFavorito(
+      _isFavorite = interactionsController.isFavoritoSync(
         _activeUserId,
         _promo!.codigo,
       ); // Estado de favorito del usuario
@@ -147,7 +147,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
       sessionManager.usuarioActual?.id ??
       1; // ID del usuario activo (fallback a 1)
   int get _nextReporteId =>
-      (promoService.getReportes().isNotEmpty
+      (moderationController.getReportesSync().isNotEmpty
           ? promoService
                 .getReportes()
                 .last
@@ -170,7 +170,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     if (_promo == null) return;
 
     // Crear y agregar reporte al servicio
-    promoService.addReporte(
+    moderationController.addReporte(
       Reporte(
         id: _nextReporteId,
         motivo: 'Reporte enviado desde detalle de promoción',
@@ -413,12 +413,12 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                           : Colors.white, // Color según estado
                       onTap: () {
                         // Toggle de estado de favorito
-                        promoService.toggleFavorito(
+                        interactionsController.toggleFavorito(
                           _activeUserId,
                           _promo!.codigo,
                         );
                         setState(
-                          () => _isFavorite = promoService.isFavorito(
+                          () => _isFavorite = interactionsController.isFavoritoSync(
                             _activeUserId,
                             _promo!.codigo,
                           ),
@@ -1084,7 +1084,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   /// Muestra: logo, nombre, rating, verificación y botón de acción
   Widget _buildStoreSection() {
     final promo = _promo!;
-    final supermercado = promoService.getSupermercado(promo.idSupermercado);
+    final supermercado = promotionsController.getSupermercadoSync(promo.idSupermercado);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
@@ -1284,7 +1284,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   /// Muestra: dirección, horario, teléfono, mapa placeholder y navegación
   Widget _buildLocationSection() {
     final promo = _promo!;
-    final supermercado = promoService.getSupermercado(promo.idSupermercado);
+    final supermercado = promotionsController.getSupermercadoSync(promo.idSupermercado);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
@@ -1457,7 +1457,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     if (_promo == null) return const SizedBox.shrink();
 
     // Obtener comentarios de esta promoción
-    final comentarios = promoService.getComentariosByPromocion(_promo!.codigo);
+    final comentarios = commentsController.getComentariosByPromocionSync(_promo!.codigo);
     final total = comentarios.length;
 
     return Padding(
@@ -1535,7 +1535,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   }
 
   Widget _buildCommentCard(Comentario comentario) {
-    final usuario = promoService.getUsuario(comentario.idUsuario);
+    final usuario = usersController.getUserByIdSync(comentario.idUsuario);
     final userName = usuario?.nombre ?? 'Usuario Anónimo';
     final userInitials = userName
         .split(' ')
@@ -1644,7 +1644,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     if (_promo == null) return const SizedBox.shrink();
 
     // Get current user's valoracion for this promotion (if any)
-    final userValoraciones = promoService.getValoracionesByPromocion(
+    final userValoraciones = interactionsController.getValoracionesByPromocionSync(
       _promo!.codigo,
     );
     final userValoracion = userValoraciones.firstWhere(
@@ -1789,7 +1789,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   void _toggleValoracion(String tipo) {
     if (_promo == null) return;
 
-    final userValoraciones = promoService.getValoracionesByPromocion(
+    final userValoraciones = interactionsController.getValoracionesByPromocionSync(
       _promo!.codigo,
     );
     final existingValoracion = userValoraciones.firstWhere(
@@ -1800,20 +1800,20 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
 
     if (existingValoracion.id != -1) {
       // User has already rated, remove existing rating
-      promoService.deleteValoracion(existingValoracion.id);
+      interactionsController.deleteValoracion(existingValoracion.id);
     }
 
     // Add new valoracion
     final newValoracion = Valoracion(
-      id: promoService.getValoraciones().isNotEmpty
-          ? promoService.getValoraciones().last.id + 1
+      id: interactionsController.getAllValoracionesSync().isNotEmpty
+          ? interactionsController.getAllValoracionesSync().last.id + 1
           : 1,
       tipo: tipo,
       idUsuario: _activeUserId,
       codigoPromocion: _promo!.codigo,
     );
 
-    promoService.addValoracion(newValoracion);
+    interactionsController.addValoracion(newValoracion);
     HapticFeedback.lightImpact();
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -1868,8 +1868,8 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     if (_promo == null) return;
 
     final newComment = Comentario(
-      id: promoService.getComentarios().isNotEmpty
-          ? promoService.getComentarios().last.id + 1
+      id: commentsController.getComentariosSync().isNotEmpty
+          ? commentsController.getComentariosSync().last.id + 1
           : 1,
       contenido: contenido,
       fecha: DateTime.now().toIso8601String(),
@@ -1878,7 +1878,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
       idCommentReply: null,
     );
 
-    promoService.addComentario(newComment);
+    commentsController.addComment(newComment);
     HapticFeedback.lightImpact();
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -1955,9 +1955,9 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
             // Favorito
             GestureDetector(
               onTap: () {
-                promoService.toggleFavorito(_activeUserId, _promo!.codigo);
+                interactionsController.toggleFavorito(_activeUserId, _promo!.codigo);
                 setState(
-                  () => _isFavorite = promoService.isFavorito(
+                  () => _isFavorite = interactionsController.isFavoritoSync(
                     _activeUserId,
                     _promo!.codigo,
                   ),

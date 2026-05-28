@@ -1,18 +1,26 @@
-import 'package:app/features/interactions/domain/entities/favorito.dart';
+﻿import 'package:app/features/interactions/domain/entities/favorito.dart';
 import 'package:app/features/interactions/domain/entities/valoracion.dart';
 import 'package:app/features/interactions/domain/usecases/interaction_usecases.dart';
 
 class InteractionsController {
-  final GetFavoritosByUsuarioUseCase _getFavoritosByUsuarioUseCase;
-  final IsFavoritoUseCase _isFavoritoUseCase;
-  final ToggleFavoritoUseCase _toggleFavoritoUseCase;
-  final GetValoracionesByPromocionUseCase _getValoracionesByPromocionUseCase;
-  final CountPositiveRatingsUseCase _countPositiveRatingsUseCase;
-  final CountNegativeRatingsUseCase _countNegativeRatingsUseCase;
-  final AddValoracionUseCase _addValoracionUseCase;
-  final DeleteValoracionUseCase _deleteValoracionUseCase;
+  final GetFavoritosByUsuarioSyncUseCase _getFavoritosByUsuarioSync;
+  final IsFavoritoSyncUseCase _isFavoritoSync;
+  final GetValoracionesByPromocionSyncUseCase _getValoracionesByPromocionSync;
+  final GetAllValoracionesSyncUseCase _getAllValoracionesSync;
+  final GetFavoritosByUsuarioUseCase _getFavoritosByUsuario;
+  final IsFavoritoUseCase _isFavorito;
+  final ToggleFavoritoUseCase _toggleFavorito;
+  final GetValoracionesByPromocionUseCase _getValoracionesByPromocion;
+  final CountPositiveRatingsUseCase _countPositiveRatings;
+  final CountNegativeRatingsUseCase _countNegativeRatings;
+  final AddValoracionUseCase _addValoracion;
+  final DeleteValoracionUseCase _deleteValoracion;
 
   InteractionsController({
+    required GetFavoritosByUsuarioSyncUseCase getFavoritosByUsuarioSyncUseCase,
+    required IsFavoritoSyncUseCase isFavoritoSyncUseCase,
+    required GetValoracionesByPromocionSyncUseCase getValoracionesByPromocionSyncUseCase,
+    required GetAllValoracionesSyncUseCase getAllValoracionesSyncUseCase,
     required GetFavoritosByUsuarioUseCase getFavoritosByUsuarioUseCase,
     required IsFavoritoUseCase isFavoritoUseCase,
     required ToggleFavoritoUseCase toggleFavoritoUseCase,
@@ -21,44 +29,32 @@ class InteractionsController {
     required CountNegativeRatingsUseCase countNegativeRatingsUseCase,
     required AddValoracionUseCase addValoracionUseCase,
     required DeleteValoracionUseCase deleteValoracionUseCase,
-  }) : _getFavoritosByUsuarioUseCase = getFavoritosByUsuarioUseCase,
-       _isFavoritoUseCase = isFavoritoUseCase,
-       _toggleFavoritoUseCase = toggleFavoritoUseCase,
-       _getValoracionesByPromocionUseCase = getValoracionesByPromocionUseCase,
-       _countPositiveRatingsUseCase = countPositiveRatingsUseCase,
-       _countNegativeRatingsUseCase = countNegativeRatingsUseCase,
-       _addValoracionUseCase = addValoracionUseCase,
-       _deleteValoracionUseCase = deleteValoracionUseCase;
+  })  : _getFavoritosByUsuarioSync = getFavoritosByUsuarioSyncUseCase,
+        _isFavoritoSync = isFavoritoSyncUseCase,
+        _getValoracionesByPromocionSync = getValoracionesByPromocionSyncUseCase,
+        _getAllValoracionesSync = getAllValoracionesSyncUseCase,
+        _getFavoritosByUsuario = getFavoritosByUsuarioUseCase,
+        _isFavorito = isFavoritoUseCase,
+        _toggleFavorito = toggleFavoritoUseCase,
+        _getValoracionesByPromocion = getValoracionesByPromocionUseCase,
+        _countPositiveRatings = countPositiveRatingsUseCase,
+        _countNegativeRatings = countNegativeRatingsUseCase,
+        _addValoracion = addValoracionUseCase,
+        _deleteValoracion = deleteValoracionUseCase;
 
-  Future<List<Favorito>> getFavoritosByUsuario(int userId) {
-    return _getFavoritosByUsuarioUseCase.execute(userId);
-  }
+  // ── Sync queries ──────────────────────────────────────────────────────────
+  List<Favorito> getFavoritosByUsuarioSync(int userId) => _getFavoritosByUsuarioSync.execute(userId);
+  bool isFavoritoSync(int userId, String promotionCode) => _isFavoritoSync.execute(userId, promotionCode);
+  List<Valoracion> getValoracionesByPromocionSync(String promotionCode) => _getValoracionesByPromocionSync.execute(promotionCode);
+  List<Valoracion> getAllValoracionesSync() => _getAllValoracionesSync.execute();
 
-  Future<bool> isFavorito(int userId, String promotionCode) {
-    return _isFavoritoUseCase.execute(userId, promotionCode);
-  }
-
-  Future<void> toggleFavorito(int userId, String promotionCode) {
-    return _toggleFavoritoUseCase.execute(userId, promotionCode);
-  }
-
-  Future<List<Valoracion>> getValoracionesByPromocion(String promotionCode) {
-    return _getValoracionesByPromocionUseCase.execute(promotionCode);
-  }
-
-  Future<int> countPositiveRatings(String promotionCode) {
-    return _countPositiveRatingsUseCase.execute(promotionCode);
-  }
-
-  Future<int> countNegativeRatings(String promotionCode) {
-    return _countNegativeRatingsUseCase.execute(promotionCode);
-  }
-
-  Future<void> addValoracion(Valoracion valoracion) {
-    return _addValoracionUseCase.execute(valoracion);
-  }
-
-  Future<void> deleteValoracion(int id) {
-    return _deleteValoracionUseCase.execute(id);
-  }
+  // ── Async commands ────────────────────────────────────────────────────────
+  Future<List<Favorito>> getFavoritosByUsuario(int userId) => _getFavoritosByUsuario.execute(userId);
+  Future<bool> isFavorito(int userId, String promotionCode) => _isFavorito.execute(userId, promotionCode);
+  Future<void> toggleFavorito(int userId, String promotionCode) => _toggleFavorito.execute(userId, promotionCode);
+  Future<List<Valoracion>> getValoracionesByPromocion(String promotionCode) => _getValoracionesByPromocion.execute(promotionCode);
+  Future<int> countPositiveRatings(String promotionCode) => _countPositiveRatings.execute(promotionCode);
+  Future<int> countNegativeRatings(String promotionCode) => _countNegativeRatings.execute(promotionCode);
+  Future<void> addValoracion(Valoracion valoracion) => _addValoracion.execute(valoracion);
+  Future<void> deleteValoracion(int id) => _deleteValoracion.execute(id);
 }

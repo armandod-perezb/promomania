@@ -1,6 +1,12 @@
 import '../entities/comentario.dart';
 import '../repositories/comment_repository.dart';
 
+class GetComentariosSyncUseCase {
+  final CommentRepository repository;
+  GetComentariosSyncUseCase(this.repository);
+  List<Comentario> execute() => repository.getComentariosSync();
+}
+
 class GetAllCommentsUseCase {
   final CommentRepository repository;
 

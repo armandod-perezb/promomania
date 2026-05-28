@@ -98,8 +98,8 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
     return 'nuevo';
   }
 
-  int _resolveCategoriaId(String? categoryName) {
-    final categorias = promoService.getCategorias();
+  Future<int> _resolveCategoriaId(String? categoryName) async {
+    final categorias = await catalogController.getCategorias();
     if (categorias.isEmpty) return 1;
 
     final normalized = categoryName?.toLowerCase().trim();
@@ -115,8 +115,8 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
     return categorias.first.id;
   }
 
-  int _resolveTipoPromocionId(String? wizardType) {
-    final tipos = promoService.getTiposPromocion();
+  Future<int> _resolveTipoPromocionId(String? wizardType) async {
+    final tipos = await catalogController.getTiposPromocion();
     if (tipos.isEmpty) return 1;
 
     String expectedName;
@@ -140,14 +140,14 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
     return tipos.first.id;
   }
 
-  int _resolveSupermercadoId(Map<String, dynamic> draft) {
+  Future<int> _resolveSupermercadoId(Map<String, dynamic> draft) async {
     // Resuelve un `idSupermercado` para la promoción:
     // - Si la promo es online o no se proporcionó nombre, devuelve el primer
     //   supermercado conocido (fallback).
     // - Si encuentra una tienda con el mismo nombre, devuelve su id.
     // - Si no existe, crea un nuevo `Supermercado` en `promoService` y
     //   devuelve el id recién generado.
-    final allStores = promoService.getSupermercados();
+    final allStores = promotionsController.getSupermercadosSync();
     final onlineOnly = (draft['onlineOnly'] as bool?) ?? false;
     final storeName = (draft['storeName'] as String?)?.trim() ?? '';
     final address = (draft['address'] as String?)?.trim();
@@ -171,7 +171,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
       ciudad: city,
       estado: 'activo',
     );
-    promoService.addSupermercado(nuevoSupermercado);
+    await promotionsController.addSupermercado(nuevoSupermercado);
     return newId;
   }
 
@@ -180,14 +180,14 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
     // - Si el usuario pidió un código y no existe, lo usa.
     // - En caso contrario, genera `PROMO###` buscando un candidato libre.
     final raw = requestedCode?.trim().toUpperCase() ?? '';
-    if (raw.isNotEmpty && promoService.getPromocionByCodigo(raw) == null) {
+    if (raw.isNotEmpty && promotionsController.getPromotionByCodeSync(raw) == null) {
       return raw;
     }
 
-    var next = promoService.getPromociones().length + 1;
+    var next = promotionsController.getAllPromotionsSync().length + 1;
     while (true) {
       final candidate = 'PROMO${next.toString().padLeft(3, '0')}';
-      if (promoService.getPromocionByCodigo(candidate) == null) {
+      if (promotionsController.getPromotionByCodeSync(candidate) == null) {
         return candidate;
       }
       next++;
@@ -195,8 +195,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
   }
 
   int _nextHorarioId() {
-    final horarios = promoService.getPromocionesHorarios();
-    return (horarios.isEmpty ? 0 : horarios.last.id) + 1;
+    return promotionsController.getNextHorarioId();
   }
 
   String _normalizeHourTo24h(String rawHour, String? period) {
@@ -288,7 +287,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
     return [start, end];
   }
 
-  void _savePromocionHorarios(Promocion promo, Map<String, dynamic> draft) {
+  Future<void> _savePromocionHorarios(Promocion promo, Map<String, dynamic> draft) async {
     // Crea entradas `PromocionHorario` a partir del campo `schedule` del
     // draft. Si la promo es solo online, no crea horarios.
     final onlineOnly = (draft['onlineOnly'] as bool?) ?? false;
@@ -300,7 +299,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
     var nextId = _nextHorarioId();
 
     for (final day in days) {
-      promoService.addPromocionHorario(
+      await promotionsController.addPromocionHorario(
         PromocionHorario(
           id: nextId,
           diaSemana: day,
@@ -345,7 +344,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
         );
 
         if (imageBytes != null) {
-          final savedName = await promoService.savePromotionImage(
+          final savedName = await promotionsController.savePromotionImage(
             promoCode,
             imageBytes,
           );
@@ -379,12 +378,12 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
       estado: 'pendiente',
       vistas: 0,
       idUsuario: sessionManager.usuarioActual?.id ?? 1,
-      idSupermercado: _resolveSupermercadoId(draft),
-      idCategoria: _resolveCategoriaId(draft['category'] as String?),
-      idTipoPromocion: _resolveTipoPromocionId(draft['promoType'] as String?),
+      idSupermercado: await _resolveSupermercadoId(draft),
+      idCategoria: await _resolveCategoriaId(draft['category'] as String?),
+      idTipoPromocion: await _resolveTipoPromocionId(draft['promoType'] as String?),
     );
 
-    promoService.addPromocion(promo);
+    await promotionsController.createPromotion(promo);
     _savePromocionHorarios(promo, draft);
 
     await Future.delayed(const Duration(milliseconds: 600));

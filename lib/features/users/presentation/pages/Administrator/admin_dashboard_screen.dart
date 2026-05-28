@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 import '../../../../../Core/di/app_scope.dart';
 
@@ -157,14 +157,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             children: [
               _headerStat(
                 Icons.people_outline,
-                promoService.usuarios.length.toString(),     // Cantidad real de usuarios
+                usersController.getUsersSync().length.toString(),     // Cantidad real de usuarios
                 'Usuarios',
                 '+50%',
               ),
               const SizedBox(width: 12),
               _headerStat(
                 Icons.confirmation_number_outlined,
-                promoService.promociones.length.toString(),  // Cantidad real de tickets
+                promotionsController.getAllPromotionsSync().length.toString(),  // Cantidad real de tickets
                 'Tickets',
                 '+32%',
               ),
@@ -320,7 +320,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   icon: Icons.storefront,
                   iconColor: greenAccent,
                   iconBg: greenLight,
-                  value: promoService.supermercados.length.toString(), // Dato en tiempo real
+                  value: promotionsController.getSupermercadosSync().length.toString(), // Dato en tiempo real
                   label: 'Comercios',
                   sublabel: 'Activos ahora',
                   badge: '+2',

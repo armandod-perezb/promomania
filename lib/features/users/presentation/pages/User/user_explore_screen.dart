@@ -1,9 +1,8 @@
-// Importaciones necesarias para la pantalla de exploración de promociones
+﻿// Importaciones necesarias para la pantalla de exploración de promociones
 import 'package:flutter/material.dart'; // UI framework principal
 import 'package:flutter/services.dart'; // Para feedback háptico y servicios del sistema
 import '../../../../../Core/Routes/app_routes.dart'; // Definición de rutas de navegación
-import '../../../../../Core/di/app_scope.dart'; // Para acceso a servicios globales (promoService)
-import '../../../../../features/promotions/infrastructure/services/promo_service.dart'; // Servicio principal de gestión de promociones
+import '../../../../../Core/di/app_scope.dart'; // Para acceso a servicios globales ()
 import '../../../../../features/promotions/domain/entities/promocion.dart'; // Entity de promociones
 import '../../../../../features/promotions/domain/entities/supermercado.dart'; // Entity de supermercados
 
@@ -112,32 +111,32 @@ class _ExploreScreenState extends State<ExploreScreen>
             // Slivers para mejor performance en listas largas
             slivers: [
               // Header con saludo y ubicación del usuario
-              SliverToBoxAdapter(child: _buildHeader(promoService)),
+              SliverToBoxAdapter(child: _buildHeader()),
               // Barra de búsqueda y filtros
               SliverToBoxAdapter(child: _buildSearchBar()),
               // Banner hero con animación
               SliverToBoxAdapter(child: _buildHeroBanner()),
               // Sección de flash deals (solo si hay datos y no hay errores)
-              if (promoService.loaded && promoService.loadError == null)
+              if (promotionsController.isLoaded && promotionsController.loadError == null)
                 SliverToBoxAdapter(
-                  child: _buildFlashDealsSection(promoService),
+                  child: _buildFlashDealsSection(),
                 ),
               // Sección de tiendas cercanas (solo si hay datos y no hay errores)
-              if (promoService.loaded && promoService.loadError == null)
-                SliverToBoxAdapter(child: _buildNearbySection(promoService)),
+              if (promotionsController.isLoaded && promotionsController.loadError == null)
+                SliverToBoxAdapter(child: _buildNearbySection()),
               // Header de todas las promociones con filtros (solo si hay datos y no hay errores)
-              if (promoService.loaded && promoService.loadError == null)
-                SliverToBoxAdapter(child: _buildAllPromosHeader(promoService)),
+              if (promotionsController.isLoaded && promotionsController.loadError == null)
+                SliverToBoxAdapter(child: _buildAllPromosHeader()),
               // Grid de todas las promociones (solo si hay datos y no hay errores)
-              if (promoService.loaded && promoService.loadError == null)
-                _buildPromosGrid(promoService),
+              if (promotionsController.isLoaded && promotionsController.loadError == null)
+                _buildPromosGrid(),
               // Estado de carga (solo si está cargando y no hay errores)
-              if (!promoService.loaded && promoService.loadError == null)
+              if (!promotionsController.isLoaded && promotionsController.loadError == null)
                 const SliverFillRemaining(
                   child: Center(child: CircularProgressIndicator()),
                 ),
               // Estado de error (solo si hay error de carga)
-              if (promoService.loadError != null)
+              if (promotionsController.loadError != null)
                 SliverFillRemaining(
                   child: Center(
                     child: Column(
@@ -161,7 +160,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                         const SizedBox(height: 8),
                         // Detalle del error
                         Text(
-                          promoService.loadError!,
+                          promotionsController.loadError!,
                           style: TextStyle(fontSize: 14, color: Colors.grey),
                           textAlign: TextAlign.center,
                         ),
@@ -169,7 +168,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                         // Botón para reintentar carga
                         ElevatedButton(
                           onPressed: () =>
-                              promoService.init(), // Reintentar inicialización
+                              promotionsController.reinitialize(), // Reintentar inicialización
                           child: const Text('Reintentar'),
                         ),
                       ],
@@ -191,10 +190,10 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   /// Construye el header superior con saludo personalizado y ubicación
   /// Muestra: ciudad, saludo personalizado, notificaciones y avatar del usuario
-  Widget _buildHeader(PromoService promoService) {
+  Widget _buildHeader() {
     // Obtener usuario actual (para demo: primer usuario de la lista)
-    final currentUser = promoService.getUsuarios().isNotEmpty
-        ? promoService.getUsuarios().first
+    final currentUser = usersController.getUsersSync().isNotEmpty
+        ? usersController.getUsersSync().first
         : null;
     final userCity =
         currentUser?.ciudad ?? 'Bogotá'; // Ciudad del usuario o fallback
@@ -478,9 +477,9 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   /// Construye la sección de ofertas flash con countdown
   /// Muestra: header con countdown y lista horizontal de promociones
-  Widget _buildFlashDealsSection(PromoService promoService) {
+  Widget _buildFlashDealsSection() {
     // Obtener flash deals del service (limitado a 5 para performance)
-    final flashDeals = promoService.getFlashDeals(limit: 5);
+    final flashDeals = promotionsController.getFlashDealsSync(limit: 5);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -557,7 +556,6 @@ class _ExploreScreenState extends State<ExploreScreen>
             itemCount: flashDeals.length,
             itemBuilder: (_, i) => _buildFlashDealCard(
               flashDeals[i],
-              promoService,
             ), // Construir cada card
           ),
         ),
@@ -611,7 +609,7 @@ class _ExploreScreenState extends State<ExploreScreen>
   /// - height: altura de la imagen
   Widget _buildPromoImage(Promocion promo, String? emoji, double height) {
     // 1. Intentar usar imagen cacheada en memoria
-    final imageBytes = promoService.getImageBytes(promo.codigo);
+    final imageBytes = promotionsController.getCachedImageBytes(promo.codigo);
 
     if (imageBytes != null) {
       return Image.memory(
@@ -665,13 +663,13 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   /// Construye una card individual para flash deal
   /// Muestra: imagen con badge de descuento, título, tienda, precio y rating
-  Widget _buildFlashDealCard(Promocion promo, PromoService promoService) {
+  Widget _buildFlashDealCard(Promocion promo) {
     // Obtener datos relacionados del service
-    final supermercado = promoService.getSupermercado(promo.idSupermercado);
-    final categoria = promoService.getCategoria(promo.idCategoria);
-    final categoriaStyle = promoService.getCategoriaStyle(promo.idCategoria);
-    final precioConDescuento = promoService.getPrecioConDescuento(promo);
-    final rating = promoService.getPromocionRating(promo.codigo);
+    final supermercado = promotionsController.getSupermercadoSync(promo.idSupermercado);
+    final categoria = catalogController.getCategoriaByIdSync(promo.idCategoria);
+    final categoriaStyle = catalogController.getCategoriaStyleSync(promo.idCategoria);
+    final precioConDescuento = promotionsController.getPrecioConDescuento(promo);
+    final rating = promotionsController.getPromocionRatingSync(promo.codigo);
     final discount = promo.descuento != null ? '-${promo.descuento}%' : '';
 
     return GestureDetector(
@@ -840,9 +838,9 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   /// Construye la sección de tiendas cercanas con cards horizontales
   /// Muestra: header con enlace a mapa y lista de tiendas con promociones
-  Widget _buildNearbySection(PromoService promoService) {
+  Widget _buildNearbySection() {
     // Obtener tiendas cercanas del service (limitado a 5 para performance)
-    final nearbyStores = promoService.getNearbyStores(limit: 5);
+    final nearbyStores = promotionsController.getNearbyStoresSync(limit: 5);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -887,7 +885,6 @@ class _ExploreScreenState extends State<ExploreScreen>
             itemCount: nearbyStores.length,
             itemBuilder: (_, i) => _buildNearbyCard(
               nearbyStores[i],
-              promoService,
             ), // Construir cada card
           ),
         ),
@@ -903,8 +900,7 @@ class _ExploreScreenState extends State<ExploreScreen>
   /// - storeData: mapa con datos de tienda, promociones, distancia y tiempo
   /// - promoService: servicio para obtener datos adicionales
   Widget _buildNearbyCard(
-    Map<String, dynamic> storeData,
-    PromoService promoService,
+    Map<String, dynamic> storeData
   ) {
     final supermercado =
         storeData['supermercado'] as Supermercado; // Datos de la tienda
@@ -917,7 +913,7 @@ class _ExploreScreenState extends State<ExploreScreen>
     double avgRating = 0;
     if (promociones.isNotEmpty) {
       final totalRating = promociones
-          .map((p) => promoService.getPromocionRating(p.codigo))
+          .map((p) => promotionsController.getPromocionRatingSync(p.codigo))
           .reduce((a, b) => a + b); // Sumar todos los ratings
       avgRating = totalRating / promociones.length; // Calcular promedio
     }
@@ -1071,18 +1067,18 @@ class _ExploreScreenState extends State<ExploreScreen>
     );
   }
 
-  Widget _buildPromoGridCard(Promocion promo, PromoService promoService) {
-    final supermercado = promoService.getSupermercado(promo.idSupermercado);
-    final categoria = promoService.getCategoria(promo.idCategoria);
-    final categoriaStyle = promoService.getCategoriaStyle(promo.idCategoria);
-    final precioConDescuento = promoService.getPrecioConDescuento(promo);
-    final rating = promoService.getPromocionRating(promo.codigo);
-    final reviewsCount = promoService.getPromocionReviewsCount(promo.codigo);
-    final urgency = promoService.getPromocionUrgency(promo);
+  Widget _buildPromoGridCard(Promocion promo) {
+    final supermercado = promotionsController.getSupermercadoSync(promo.idSupermercado);
+    final categoria = catalogController.getCategoriaByIdSync(promo.idCategoria);
+    final categoriaStyle = catalogController.getCategoriaStyleSync(promo.idCategoria);
+    final precioConDescuento = promotionsController.getPrecioConDescuento(promo);
+    final rating = promotionsController.getPromocionRatingSync(promo.codigo);
+    final reviewsCount = commentsController.getComentariosByPromocionSync(promo.codigo).length;
+    final urgency = promotionsController.getPromocionUrgency(promo);
 
     // For demo, use first user as current user
-    final currentUser = promoService.getUsuarios().isNotEmpty
-        ? promoService.getUsuarios().first.id
+    final currentUser = usersController.getUsersSync().isNotEmpty
+        ? usersController.getUsersSync().first.id
         : 1;
 
     // Format time display
@@ -1186,7 +1182,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                       right: 10,
                       child: GestureDetector(
                         onTap: () {
-                          promoService.toggleFavorito(
+                          interactionsController.toggleFavorito(
                             currentUser,
                             promo.codigo,
                           );
@@ -1205,11 +1201,11 @@ class _ExploreScreenState extends State<ExploreScreen>
                             ],
                           ),
                           child: Icon(
-                            promoService.isFavorito(currentUser, promo.codigo)
+                            interactionsController.isFavoritoSync(currentUser, promo.codigo)
                                 ? Icons.favorite
                                 : Icons.favorite_border,
                             color:
-                                promoService.isFavorito(
+                                interactionsController.isFavoritoSync(
                                   currentUser,
                                   promo.codigo,
                                 )
@@ -1358,7 +1354,7 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   /// Construye el header de la sección de todas las promociones
   /// Incluye: título, dropdown de ordenamiento y toggle de vista
-  Widget _buildAllPromosHeader(PromoService promoService) {
+  Widget _buildAllPromosHeader() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 12),
       child: Row(
@@ -1431,9 +1427,9 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   /// Construye el grid de todas las promociones aprobadas
   /// Adapta layout según: tamaño de pantalla y modo de vista
-  SliverPadding _buildPromosGrid(PromoService promoService) {
+  SliverPadding _buildPromosGrid() {
     // Obtener promociones aprobadas del service
-    final promociones = promoService.getPromocionesAprobadas();
+    final promociones = promotionsController.getActivePromotionsSync();
     // Medir ancho de pantalla para layouts responsivos
     final screenWidth = MediaQuery.of(context).size.width;
     final isNarrow = screenWidth < 400; // Pantallas estrechas
@@ -1458,7 +1454,6 @@ class _ExploreScreenState extends State<ExploreScreen>
         delegate: SliverChildBuilderDelegate(
           (context, index) => _buildPromoGridCard(
             promociones[index],
-            promoService,
           ), // Construir cada card
           childCount: promociones.length,
         ),

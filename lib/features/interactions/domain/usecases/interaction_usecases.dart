@@ -2,6 +2,30 @@ import '../entities/favorito.dart';
 import '../entities/valoracion.dart';
 import '../repositories/interaction_repository.dart';
 
+class GetFavoritosByUsuarioSyncUseCase {
+  final InteractionRepository repository;
+  GetFavoritosByUsuarioSyncUseCase(this.repository);
+  List<Favorito> execute(int userId) => repository.getFavoritosByUsuarioSync(userId);
+}
+
+class IsFavoritoSyncUseCase {
+  final InteractionRepository repository;
+  IsFavoritoSyncUseCase(this.repository);
+  bool execute(int userId, String promotionCode) => repository.isFavoritoSync(userId, promotionCode);
+}
+
+class GetValoracionesByPromocionSyncUseCase {
+  final InteractionRepository repository;
+  GetValoracionesByPromocionSyncUseCase(this.repository);
+  List<Valoracion> execute(String promotionCode) => repository.getValoracionesByPromocionSync(promotionCode);
+}
+
+class GetAllValoracionesSyncUseCase {
+  final InteractionRepository repository;
+  GetAllValoracionesSyncUseCase(this.repository);
+  List<Valoracion> execute() => repository.getAllValoracionesSync();
+}
+
 class GetFavoritosByUsuarioUseCase {
   final InteractionRepository repository;
 

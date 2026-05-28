@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 import '../../../../../Core/di/app_scope.dart';
@@ -100,7 +100,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           correo: _emailCtrl.text,
         );
         await sessionManager.actualizarUsuario(usuarioActualizado);
-        promoService.updateUsuario(usuarioActualizado);
+        usersController.updateUserProfile(usuarioActualizado);
       }
 
       if (mounted) {

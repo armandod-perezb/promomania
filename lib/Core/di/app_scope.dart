@@ -1,4 +1,4 @@
-import 'package:app/core/storage/session_manager.dart';
+﻿import 'package:app/core/storage/session_manager.dart';
 import 'package:app/features/auth/domain/usecases/auth_usecases.dart';
 import 'package:app/features/auth/infrastructure/datasources/auth_session_datasource.dart';
 import 'package:app/features/auth/infrastructure/datasources/auth_user_datasource.dart';
@@ -56,32 +56,25 @@ class AppScope {
     resetPasswordUseCase: ResetPasswordUseCase(authRepository),
     logoutUseCase: LogoutUseCase(authRepository),
   );
-  static final SettingsController settingsController = SettingsController(
-    authController,
-  );
+  static final SettingsController settingsController = SettingsController(authController);
 
-  static final PromoCatalogDataSource catalogDataSource =
-      PromoCatalogDataSource(promoService);
-  static final CatalogRepositoryImpl catalogRepository = CatalogRepositoryImpl(
-    catalogDataSource,
-  );
+  static final PromoCatalogDataSource catalogDataSource = PromoCatalogDataSource(promoService);
+  static final CatalogRepositoryImpl catalogRepository = CatalogRepositoryImpl(catalogDataSource);
   static final CatalogController catalogController = CatalogController(
     getCategoriasUseCase: GetCategoriasUseCase(catalogRepository),
     getTiposPromocionUseCase: GetTiposPromocionUseCase(catalogRepository),
     getCategoriaByIdUseCase: GetCategoriaByIdUseCase(catalogRepository),
     getTipoPromocionByIdUseCase: GetTipoPromocionByIdUseCase(catalogRepository),
+    getCategoriaByIdSyncUseCase: GetCategoriaByIdSyncUseCase(catalogRepository),
+    getCategoriaStyleUseCase: GetCategoriaStyleUseCase(catalogRepository),
   );
 
-  static final PromoCommentDataSource commentsDataSource =
-      PromoCommentDataSource(promoService);
-  static final CommentRepositoryImpl commentsRepository = CommentRepositoryImpl(
-    commentsDataSource,
-  );
+  static final PromoCommentDataSource commentsDataSource = PromoCommentDataSource(promoService);
+  static final CommentRepositoryImpl commentsRepository = CommentRepositoryImpl(commentsDataSource);
   static final CommentsController commentsController = CommentsController(
+    getComentariosSyncUseCase: GetComentariosSyncUseCase(commentsRepository),
     getAllCommentsUseCase: GetAllCommentsUseCase(commentsRepository),
-    getCommentsByPromotionUseCase: GetCommentsByPromotionUseCase(
-      commentsRepository,
-    ),
+    getCommentsByPromotionUseCase: GetCommentsByPromotionUseCase(commentsRepository),
     addCommentUseCase: AddCommentUseCase(commentsRepository),
     deleteCommentUseCase: DeleteCommentUseCase(commentsRepository),
   );
@@ -90,38 +83,30 @@ class AppScope {
       PromoInteractionDataSource(promoService);
   static final InteractionRepositoryImpl interactionsRepository =
       InteractionRepositoryImpl(interactionsDataSource);
-  static final InteractionsController interactionsController =
-      InteractionsController(
-        getFavoritosByUsuarioUseCase: GetFavoritosByUsuarioUseCase(
-          interactionsRepository,
-        ),
-        isFavoritoUseCase: IsFavoritoUseCase(interactionsRepository),
-        toggleFavoritoUseCase: ToggleFavoritoUseCase(interactionsRepository),
-        getValoracionesByPromocionUseCase: GetValoracionesByPromocionUseCase(
-          interactionsRepository,
-        ),
-        countPositiveRatingsUseCase: CountPositiveRatingsUseCase(
-          interactionsRepository,
-        ),
-        countNegativeRatingsUseCase: CountNegativeRatingsUseCase(
-          interactionsRepository,
-        ),
-        addValoracionUseCase: AddValoracionUseCase(interactionsRepository),
-        deleteValoracionUseCase: DeleteValoracionUseCase(interactionsRepository),
-      );
+  static final InteractionsController interactionsController = InteractionsController(
+    getFavoritosByUsuarioSyncUseCase: GetFavoritosByUsuarioSyncUseCase(interactionsRepository),
+    isFavoritoSyncUseCase: IsFavoritoSyncUseCase(interactionsRepository),
+    getValoracionesByPromocionSyncUseCase: GetValoracionesByPromocionSyncUseCase(interactionsRepository),
+    getAllValoracionesSyncUseCase: GetAllValoracionesSyncUseCase(interactionsRepository),
+    getFavoritosByUsuarioUseCase: GetFavoritosByUsuarioUseCase(interactionsRepository),
+    isFavoritoUseCase: IsFavoritoUseCase(interactionsRepository),
+    toggleFavoritoUseCase: ToggleFavoritoUseCase(interactionsRepository),
+    getValoracionesByPromocionUseCase: GetValoracionesByPromocionUseCase(interactionsRepository),
+    countPositiveRatingsUseCase: CountPositiveRatingsUseCase(interactionsRepository),
+    countNegativeRatingsUseCase: CountNegativeRatingsUseCase(interactionsRepository),
+    addValoracionUseCase: AddValoracionUseCase(interactionsRepository),
+    deleteValoracionUseCase: DeleteValoracionUseCase(interactionsRepository),
+  );
 
   static final PromoModerationDataSource moderationDataSource =
       PromoModerationDataSource(promoService);
   static final ModerationRepositoryImpl moderationRepository =
       ModerationRepositoryImpl(moderationDataSource);
   static final ModerationController moderationController = ModerationController(
+    getReportesSyncUseCase: GetReportesSyncUseCase(moderationRepository),
     getAllReportesUseCase: GetAllReportesUseCase(moderationRepository),
-    getReportesByUsuarioUseCase: GetReportesByUsuarioUseCase(
-      moderationRepository,
-    ),
-    getReportesByPromocionUseCase: GetReportesByPromocionUseCase(
-      moderationRepository,
-    ),
+    getReportesByUsuarioUseCase: GetReportesByUsuarioUseCase(moderationRepository),
+    getReportesByPromocionUseCase: GetReportesByPromocionUseCase(moderationRepository),
     addReporteUseCase: AddReporteUseCase(moderationRepository),
     updateReporteUseCase: UpdateReporteUseCase(moderationRepository),
     deleteReporteUseCase: DeleteReporteUseCase(moderationRepository),
@@ -131,15 +116,10 @@ class AppScope {
       PromoNotificationDataSource(promoService);
   static final NotificationRepositoryImpl notificationsRepository =
       NotificationRepositoryImpl(notificationsDataSource);
-  static final NotificationsController notificationsController =
-      NotificationsController(
-        getAdminSummaryUseCase: GetAdminNotificationSummaryUseCase(
-          notificationsRepository,
-        ),
-        getReportesBadgeCountUseCase: GetReportesBadgeCountUseCase(
-          notificationsRepository,
-        ),
-      );
+  static final NotificationsController notificationsController = NotificationsController(
+    getAdminSummaryUseCase: GetAdminNotificationSummaryUseCase(notificationsRepository),
+    getReportesBadgeCountUseCase: GetReportesBadgeCountUseCase(notificationsRepository),
+  );
 
   static final PromotionServiceRepositoryAdapter promotionsRepository =
       PromotionServiceRepositoryAdapter(promoService);
@@ -149,19 +129,38 @@ class AppScope {
     createPromotionUseCase: CreatePromotionUseCase(promotionsRepository),
     updatePromotionUseCase: UpdatePromotionUseCase(promotionsRepository),
     deletePromotionUseCase: DeletePromotionUseCase(promotionsRepository),
-    incrementPromotionViewsUseCase: IncrementPromotionViewsUseCase(
-      promotionsRepository,
-    ),
+    incrementPromotionViewsUseCase: IncrementPromotionViewsUseCase(promotionsRepository),
     getPromotionsByUserUseCase: GetPromotionsByUserUseCase(promotionsRepository),
     approvePromotionUseCase: ApprovePromotionUseCase(promotionsRepository),
     rejectPromotionUseCase: RejectPromotionUseCase(promotionsRepository),
     getPromotionsByCategoryUseCase: GetPromotionsByCategoryUseCase(promotionsRepository),
     getPromotionsBySupermarketUseCase: GetPromotionsBySupermarketUseCase(promotionsRepository),
+    addPromocionHorarioUseCase: AddPromocionHorarioUseCase(promotionsRepository),
+    savePromotionImageUseCase: SavePromotionImageUseCase(promotionsRepository),
+    getPromotionImageBytesUseCase: GetPromotionImageBytesUseCase(promotionsRepository),
+    addSupermercadoUseCase: AddSupermercadoUseCase(promotionsRepository),
+    updateSupermercadoUseCase: UpdateSupermercadoUseCase(promotionsRepository),
+    deleteSupermercadoUseCase: DeleteSupermercadoUseCase(promotionsRepository),
+    reinitializeUseCase: ReinitializePromotionsUseCase(promotionsRepository),
+    isLoadedUseCase: IsLoadedUseCase(promotionsRepository),
+    getLoadErrorUseCase: GetLoadErrorUseCase(promotionsRepository),
+    getActivePromotionsSyncUseCase: GetActivePromotionsSyncUseCase(promotionsRepository),
+    getAllPromotionsSyncUseCase: GetAllPromotionsSyncUseCase(promotionsRepository),
+    getPromotionByCodeSyncUseCase: GetPromotionByCodeSyncUseCase(promotionsRepository),
+    getFlashDealsSyncUseCase: GetFlashDealsSyncUseCase(promotionsRepository),
+    getNearbyStoresSyncUseCase: GetNearbyStoresSyncUseCase(promotionsRepository),
+    getPromocionUrgencyUseCase: GetPromocionUrgencyUseCase(promotionsRepository),
+    getPromocionesByUrgencySyncUseCase: GetPromocionesByUrgencySyncUseCase(promotionsRepository),
+    getPromocionRatingSyncUseCase: GetPromocionRatingSyncUseCase(promotionsRepository),
+    getPrecioConDescuentoUseCase: GetPrecioConDescuentoUseCase(promotionsRepository),
+    getHorariosByCodigoUseCase: GetPromocionesHorariosByCodigoUseCase(promotionsRepository),
+    getNextHorarioIdUseCase: GetNextHorarioIdUseCase(promotionsRepository),
+    getSupermercadoSyncUseCase: GetSupermercadoSyncUseCase(promotionsRepository),
+    getSupermercadosSyncUseCase: GetSupermercadosSyncUseCase(promotionsRepository),
+    getCachedImageBytesUseCase: GetCachedImageBytesUseCase(promotionsRepository),
   );
 
-  static final PromoUserDataSource usersDataSource = PromoUserDataSource(
-    promoService,
-  );
+  static final PromoUserDataSource usersDataSource = PromoUserDataSource(promoService);
   static final UserRepositoryImpl usersRepository = UserRepositoryImpl(
     dataSource: usersDataSource,
     sessionManager: sessionManager,
@@ -173,6 +172,10 @@ class AppScope {
     changePasswordUseCase: ChangePasswordUseCase(usersRepository),
     deactivateUserUseCase: DeactivateUserUseCase(usersRepository),
     getUsersByCityUseCase: GetUsersByCityUseCase(usersRepository),
+    getUsersSyncUseCase: GetUsersSyncUseCase(usersRepository),
+    getUserByIdSyncUseCase: GetUserByIdSyncUseCase(usersRepository),
+    addUserUseCase: AddUserUseCase(usersRepository),
+    deleteUserUseCase: DeleteUserUseCase(usersRepository),
   );
 
   static Future<void> bootstrap() async {
@@ -182,7 +185,7 @@ class AppScope {
   }
 }
 
-// Compatibilidad temporal para pantallas que aún consumen referencias globales.
+// Compatibilidad temporal: acceso global a controllers sin importar clases de infraestructura.
 final sessionManager = AppScope.sessionManager;
 final promoService = AppScope.promoService;
 final authController = AppScope.authController;

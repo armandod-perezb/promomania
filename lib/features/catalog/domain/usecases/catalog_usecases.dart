@@ -41,3 +41,19 @@ class GetTipoPromocionByIdUseCase {
     return repository.getTipoPromocionById(id);
   }
 }
+
+class GetCategoriaByIdSyncUseCase {
+  final CatalogRepository repository;
+  GetCategoriaByIdSyncUseCase(this.repository);
+  Categoria? execute(int id) => repository.getCategoriaByIdSync(id);
+}
+
+class GetCategoriaStyleUseCase {
+  final CatalogRepository repository;
+
+  GetCategoriaStyleUseCase(this.repository);
+
+  Map<String, String> execute(int idCategoria) {
+    return repository.getCategoriaStyleSync(idCategoria);
+  }
+}

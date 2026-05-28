@@ -1,45 +1,65 @@
+import 'dart:typed_data';
 import 'package:app/features/promotions/domain/entities/promocion.dart';
+import 'package:app/features/promotions/domain/entities/promocion_horario.dart';
+import 'package:app/features/promotions/domain/entities/supermercado.dart';
 
 /// Interfaz de repositorio para gestión de promociones.
 ///
-/// Define los contratos para operaciones CRUD y consultas avanzadas de promociones.
-/// Promotion es el aggregate root principal del dominio.
+/// Define contratos CQRS:
+///  - Queries síncronas (datos en memoria, ideales para builds reactivos de UI)
+///  - Commands asíncronos (operaciones con persistencia)
 abstract class PromotionRepository {
-  /// Crea una nueva promoción.
+  // ── Estado ────────────────────────────────────────────────────────────────
+
+  bool get isLoaded;
+  String? get loadError;
+  Future<void> reinitialize();
+
+  // ── Queries síncronas ─────────────────────────────────────────────────────
+
+  List<Promocion> getActivePromotionsSync({int? categoryId, int? supermarketId});
+  List<Promocion> getAllPromotionsSync();
+  Promocion? getPromotionByCodeSync(String codigo);
+  List<Promocion> getPromotionsByUserSync(int userId);
+  List<Promocion> getFlashDealsSync({int limit = 5});
+  List<Map<String, dynamic>> getNearbyStoresSync({int limit = 5});
+  String getPromocionUrgency(Promocion promo);
+  Map<String, List<Promocion>> getPromocionesByUrgencySync(int userId);
+  double getPromocionRatingSync(String codigo);
+  double getPrecioConDescuento(Promocion promo);
+
+  List<PromocionHorario> getPromocionesHorariosByCodigoSync(String codigo);
+  int getNextHorarioIdSync();
+
+  Supermercado? getSupermercadoSync(int id);
+  List<Supermercado> getSupermercadosSync();
+
+  Uint8List? getCachedImageBytes(String codigo);
+
+  // ── Commands asíncronos ───────────────────────────────────────────────────
+
   Future<Promocion> createPromotion(Promocion promocion);
-
-  /// Obtiene una promoción por su código.
   Future<Promocion?> getPromotionByCode(String codigo);
-
-  /// Obtiene todas las promociones activas (con filtros opcionales).
   Future<List<Promocion>> getActivePromotions({
     int? categoryId,
     int? supermarketId,
     int? page,
     int? pageSize,
   });
-
-  /// Obtiene promociones por categoría.
   Future<List<Promocion>> getPromotionsByCategory(int categoryId);
-
-  /// Obtiene promociones por supermercado.
   Future<List<Promocion>> getPromotionsBySupermarket(int supermarketId);
-
-  /// Actualiza una promoción existente.
   Future<Promocion> updatePromotion(Promocion promocion);
-
-  /// Aprueba una promoción (cambía estado a 'aprobada').
   Future<void> approvePromotion(String codigo);
-
-  /// Rechaza una promoción (cambía estado a 'rechazada').
   Future<void> rejectPromotion(String codigo);
-
-  /// Elimina una promoción.
   Future<void> deletePromotion(String codigo);
-
-  /// Incrementa el contador de vistas de una promoción.
   Future<void> incrementViews(String codigo);
-
-  /// Obtiene promociones por usuario (creador).
   Future<List<Promocion>> getPromotionsByUser(int userId);
+
+  Future<void> addPromocionHorario(PromocionHorario horario);
+  Future<String?> savePromotionImage(String codigo, Uint8List bytes);
+  Future<Uint8List?> getPromotionImageBytes(String codigo);
+
+  Future<void> addSupermercado(Supermercado supermercado);
+  Future<void> updateSupermercado(Supermercado supermercado);
+  Future<void> deleteSupermercado(int id);
 }

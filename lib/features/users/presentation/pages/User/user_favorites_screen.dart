@@ -61,11 +61,11 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   /// Parámetro: promoCode - código único de la promoción a eliminar
   void _dismiss(String promoCode) {
     // Obtener usuario actual (para demo: primer usuario de la lista)
-    final currentUser = promoService.getUsuarios().isNotEmpty
-        ? promoService.getUsuarios().first.id
+    final currentUser = usersController.getUsersSync().isNotEmpty
+        ? usersController.getUsersSync().first.id
         : 1;
     // Toggle del estado de favorito (elimina si estaba activo)
-    promoService.toggleFavorito(currentUser, promoCode);
+    interactionsController.toggleFavorito(currentUser, promoCode);
     // Feedback háptico medio para confirmar acción
     HapticFeedback.mediumImpact();
   }
@@ -92,11 +92,11 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
       animation: promoService,
       builder: (context, _) {
         // Obtener usuario actual (para demo: primer usuario de la lista)
-        final currentUser = promoService.getUsuarios().isNotEmpty
-            ? promoService.getUsuarios().first.id
+        final currentUser = usersController.getUsersSync().isNotEmpty
+            ? usersController.getUsersSync().first.id
             : 1;
         // Obtener promociones favoritas del usuario actual
-        final favoritePromos = promoService.getFavoritosByUsuario(currentUser);
+        final favoritePromos = interactionsController.getFavoritosByUsuarioSync(currentUser);
 
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle
@@ -136,11 +136,11 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   /// Muestra: título "Mis Favoritos" y badge con cantidad de promos guardadas
   Widget _buildTopHeader() {
     // Obtener usuario actual (para demo: primer usuario de la lista)
-    final currentUser = promoService.getUsuarios().isNotEmpty
-        ? promoService.getUsuarios().first.id
+    final currentUser = usersController.getUsersSync().isNotEmpty
+        ? usersController.getUsersSync().first.id
         : 1;
     // Obtener promociones favoritas del usuario
-    final favoritePromos = promoService.getFavoritosByUsuario(currentUser);
+    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(currentUser);
 
     return Container(
       color: Colors.white,
@@ -202,16 +202,16 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   /// Muestra: total ahorrado, porcentaje usado, gráfico circular y estadísticas
   Widget _buildSavingsCard() {
     // Obtener usuario actual (para demo: primer usuario de la lista)
-    final currentUser = promoService.getUsuarios().isNotEmpty
-        ? promoService.getUsuarios().first.id
+    final currentUser = usersController.getUsersSync().isNotEmpty
+        ? usersController.getUsersSync().first.id
         : 1;
     // Obtener promociones favoritas del usuario
-    final favoritePromos = promoService.getFavoritosByUsuario(currentUser);
+    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(currentUser);
 
     // Calcular total de ahorros potenciales
     double totalSavings = 0;
     for (final favorito in favoritePromos) {
-      final promo = promoService.getPromocionByCodigo(favorito.codigoPromocion);
+      final promo = promotionsController.getPromotionByCodeSync(favorito.codigoPromocion);
       if (promo != null && promo.descuento != null) {
         // Calcular monto de descuento: precio * (descuento / 100)
         final discountAmount = promo.precio * (promo.descuento! / 100);
@@ -225,9 +225,9 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
     // Calcular promociones urgentes (que vencen hoy)
     int urgent = 0;
     for (final favorito in favoritePromos) {
-      final promo = promoService.getPromocionByCodigo(favorito.codigoPromocion);
+      final promo = promotionsController.getPromotionByCodeSync(favorito.codigoPromocion);
       if (promo != null) {
-        final urgency = promoService.getPromocionUrgency(promo);
+        final urgency = promotionsController.getPromocionUrgency(promo);
         if (urgency == 'today') urgent++; // Contar solo las que vencen hoy
       }
     }
@@ -540,14 +540,14 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   /// Filtra y organiza las promociones favoritas del usuario
   Widget _buildPromoGroups() {
     // Obtener usuario actual (para demo: primer usuario de la lista)
-    final currentUser = promoService.getUsuarios().isNotEmpty
-        ? promoService.getUsuarios().first.id
+    final currentUser = usersController.getUsersSync().isNotEmpty
+        ? usersController.getUsersSync().first.id
         : 1;
     // Obtener promociones favoritas del usuario
-    final favoritePromos = promoService.getFavoritosByUsuario(currentUser);
+    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(currentUser);
 
     // Obtener promociones agrupadas por urgencia
-    final promosByUrgency = promoService.getPromocionesByUrgency(currentUser);
+    final promosByUrgency = promotionsController.getPromocionesByUrgencySync(currentUser);
 
     // Filtrar y mostrar según tab seleccionado
     switch (_selectedTab) {
@@ -569,10 +569,10 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   /// Parámetro: userId - ID del usuario actual
   List<Promocion> _getPromotionsExpiringIn3Days(int userId) {
     // Obtener promociones favoritas del usuario
-    final favoritePromos = promoService.getFavoritosByUsuario(userId);
+    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(userId);
     // Convertir favoritos a objetos Promocion completos
     final promocionesFavoritas = favoritePromos
-        .map((f) => promoService.getPromocionByCodigo(f.codigoPromocion))
+        .map((f) => promotionsController.getPromotionByCodeSync(f.codigoPromocion))
         .where((p) => p != null) // Filtrar nulos
         .cast<Promocion>();
 
@@ -633,10 +633,10 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   /// Parámetro: userId - ID del usuario actual
   Widget _buildByCategories(int userId) {
     // Obtener promociones favoritas del usuario
-    final favoritePromos = promoService.getFavoritosByUsuario(userId);
+    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(userId);
     // Convertir a objetos Promocion completos
     final promocionesFavoritas = favoritePromos
-        .map((f) => promoService.getPromocionByCodigo(f.codigoPromocion))
+        .map((f) => promotionsController.getPromotionByCodeSync(f.codigoPromocion))
         .where((p) => p != null)
         .cast<Promocion>();
 
@@ -645,7 +645,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
 
     for (final promo in promocionesFavoritas) {
       // Obtener información de la categoría
-      final categoria = promoService.getCategoria(promo.idCategoria);
+      final categoria = catalogController.getCategoriaByIdSync(promo.idCategoria);
       final categoryName = categoria?.nombre ?? 'Sin categoría';
 
       // Inicializar lista para la categoría si no existe
@@ -669,7 +669,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
           final categoryName = entry.key;
           final promos = entry.value;
           // Obtener estilo y emoji de la categoría
-          final categoryStyle = promoService.getCategoriaStyle(
+          final categoryStyle = catalogController.getCategoriaStyleSync(
             promos.first.idCategoria,
           );
           final emoji = categoryStyle['emoji'] ?? '📦';
@@ -847,12 +847,12 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   /// Parámetro: promo - objeto promoción a mostrar
   Widget _buildPromoCard(Promocion promo) {
     // Obtener datos relacionados del service
-    final supermercado = promoService.getSupermercado(promo.idSupermercado);
-    final categoria = promoService.getCategoria(promo.idCategoria);
-    final categoriaStyle = promoService.getCategoriaStyle(promo.idCategoria);
-    final precioConDescuento = promoService.getPrecioConDescuento(promo);
-    final rating = promoService.getPromocionRating(promo.codigo);
-    final urgency = promoService.getPromocionUrgency(promo);
+    final supermercado = promotionsController.getSupermercadoSync(promo.idSupermercado);
+    final categoria = catalogController.getCategoriaByIdSync(promo.idCategoria);
+    final categoriaStyle = catalogController.getCategoriaStyleSync(promo.idCategoria);
+    final precioConDescuento = promotionsController.getPrecioConDescuento(promo);
+    final rating = promotionsController.getPromocionRatingSync(promo.codigo);
+    final urgency = promotionsController.getPromocionUrgency(promo);
 
     // Determinar color y etiqueta de urgencia
     Color urgencyColor;
@@ -1195,11 +1195,11 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
     final isActive = _selectedTab == index;
 
     // For demo, use first user as current user
-    final currentUser = promoService.getUsuarios().isNotEmpty
-        ? promoService.getUsuarios().first.id
+    final currentUser = usersController.getUsersSync().isNotEmpty
+        ? usersController.getUsersSync().first.id
         : 1;
-    final favoritePromos = promoService.getFavoritosByUsuario(currentUser);
-    final promosByUrgency = promoService.getPromocionesByUrgency(currentUser);
+    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(currentUser);
+    final promosByUrgency = promotionsController.getPromocionesByUrgencySync(currentUser);
 
     // Calculate badge counts
     String? badge;
@@ -1304,7 +1304,7 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   /// Utilizado en la sección de imagen de la promoción
   Widget _buildPromoImage(Promocion promo, String? emoji, double height) {
     // Check if we have cached image bytes
-    final imageBytes = promoService.getImageBytes(promo.codigo);
+    final imageBytes = promotionsController.getCachedImageBytes(promo.codigo);
 
     if (imageBytes != null) {
       return Image.memory(

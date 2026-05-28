@@ -339,7 +339,7 @@ class _AdminNotiAlertScreenState extends State<AdminNotiAlertScreen> {
   /// El badge de Reportes se toma en tiempo real del promoService.
   Widget _tabBar() {
     // Cantidad de reportes activos (dato en vivo del servicio global)
-    final reportesBadge = promoService.getReportes().length;
+    final reportesBadge = moderationController.getReportesSync().length;
 
     // Lista de mapas con la definición de cada tab.
     // Se usa Map<String, dynamic> porque los valores tienen tipos distintos.

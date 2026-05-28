@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../../../Core/di/app_scope.dart';
 
 /// Vista resumida del dashboard para revisar KPIs generales rapidamente.
@@ -23,10 +23,10 @@ class _AdminDashboardSimplifiedScreenState
       builder: (context, _) {
         // Se obtienen copias de las listas actuales del servicio global.
         // Estas llamadas devuelven los datos en tiempo real almacenados en memoria.
-        final usuarios = promoService.getUsuarios();
-        final promociones = promoService.getPromociones();
-        final supermercados = promoService.getSupermercados();
-        final comentarios = promoService.getComentarios();
+        final usuarios = usersController.getUsersSync();
+        final promociones = promotionsController.getAllPromotionsSync();
+        final supermercados = promotionsController.getSupermercadosSync();
+        final comentarios = commentsController.getComentariosSync();
 
         // ── Cálculo de estadísticas derivadas ──
         // .where() filtra la lista por condición y .length cuenta los resultados.

@@ -8,6 +8,9 @@ class ModerationRepositoryImpl implements ModerationRepository {
   ModerationRepositoryImpl(this.dataSource);
 
   @override
+  List<Reporte> getReportesSync() => dataSource.getAllReportes();
+
+  @override
   Future<List<Reporte>> getAllReportes() async {
     return dataSource.getAllReportes();
   }

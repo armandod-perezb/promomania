@@ -1,10 +1,12 @@
-import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
+﻿import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 import 'package:app/features/users/domain/entities/usuario.dart';
 
 abstract class UserDataSource {
-  Usuario? getUserById(int id);
   List<Usuario> getAllUsers();
+  Usuario? getUserById(int id);
   void updateUser(Usuario usuario);
+  void addUser(Usuario usuario);
+  void deleteUser(int userId);
 }
 
 class PromoUserDataSource implements UserDataSource {
@@ -13,17 +15,17 @@ class PromoUserDataSource implements UserDataSource {
   PromoUserDataSource(this.promoService);
 
   @override
-  Usuario? getUserById(int id) {
-    return promoService.getUsuario(id);
-  }
+  List<Usuario> getAllUsers() => promoService.getUsuarios();
 
   @override
-  List<Usuario> getAllUsers() {
-    return promoService.getUsuarios();
-  }
+  Usuario? getUserById(int id) => promoService.getUsuario(id);
 
   @override
-  void updateUser(Usuario usuario) {
-    promoService.updateUsuario(usuario);
-  }
+  void updateUser(Usuario usuario) => promoService.updateUsuario(usuario);
+
+  @override
+  void addUser(Usuario usuario) => promoService.addUsuario(usuario);
+
+  @override
+  void deleteUser(int userId) => promoService.deleteUsuario(userId);
 }

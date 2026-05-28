@@ -8,6 +8,9 @@ class CommentRepositoryImpl implements CommentRepository {
   CommentRepositoryImpl(this.dataSource);
 
   @override
+  List<Comentario> getComentariosSync() => dataSource.getAllComments();
+
+  @override
   Future<List<Comentario>> getAllComments() async {
     return dataSource.getAllComments();
   }

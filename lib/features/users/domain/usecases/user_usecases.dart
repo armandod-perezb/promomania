@@ -68,3 +68,27 @@ class GetUsersByCityUseCase {
     return repository.getUsersByCity(city);
   }
 }
+
+class GetUsersSyncUseCase {
+  final UserRepository repository;
+  GetUsersSyncUseCase(this.repository);
+  List<Usuario> execute() => repository.getUsersSync();
+}
+
+class GetUserByIdSyncUseCase {
+  final UserRepository repository;
+  GetUserByIdSyncUseCase(this.repository);
+  Usuario? execute(int id) => repository.getUserByIdSync(id);
+}
+
+class AddUserUseCase {
+  final UserRepository repository;
+  AddUserUseCase(this.repository);
+  Future<void> execute(Usuario usuario) => repository.addUser(usuario);
+}
+
+class DeleteUserUseCase {
+  final UserRepository repository;
+  DeleteUserUseCase(this.repository);
+  Future<void> execute(int userId) => repository.deleteUser(userId);
+}

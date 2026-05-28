@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 import '../../../../../Core/di/app_scope.dart';
 import '../../../../../features/promotions/domain/entities/promocion.dart';
@@ -20,7 +20,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
   static const Color bgColor = Color(0xFFF5F5F8);
   static const Color yellowAccent = Color(0xFFF39C12); // Para 'pendiente'
 
-  List<Promocion> get _promos => promoService.promociones;
+  List<Promocion> get _promos => promotionsController.getAllPromotionsSync();
 
   @override
   Widget build(BuildContext context) {
@@ -539,7 +539,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
   // ============================================================================
   void _changeStatus(Promocion promo, String nuevoEstado) {
     final updated = promo.copyWith(estado: nuevoEstado);
-    promoService.updatePromocion(updated);
+    promotionsController.updatePromotion(updated);
     setState(() {});
     final msg = nuevoEstado == 'aprobada'
         ? '✓ Promoción aprobada'
@@ -586,7 +586,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
                 titulo: tituloCtrl.text,
                 descripcion: descCtrl.text,
               );
-              promoService.updatePromocion(updated);
+              promotionsController.updatePromotion(updated);
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Promoción actualizada')),
@@ -615,7 +615,7 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              promoService.deletePromocion(promo.codigo);
+              promotionsController.deletePromotion(promo.codigo);
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Promoción eliminada')),
@@ -976,7 +976,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
       idTipoPromocion: int.tryParse(_idTipoPromocion.text) ?? 1,
     );
 
-    promoService.addPromocion(nuevaPromo);
+    promotionsController.createPromotion(nuevaPromo);
     _snack('Promoción creada exitosamente');
     Navigator.pop(context);
   }

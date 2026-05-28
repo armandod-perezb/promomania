@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 import '../../../../../Core/di/app_scope.dart';
 import '../../../../../features/users/domain/entities/usuario.dart';
@@ -27,7 +27,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
   static const Color bgColor = Color(0xFFF5F5F8);
 
   /// Obtiene usuarios del servicio
-  List<Usuario> get _users => promoService.usuarios;
+  List<Usuario> get _users => usersController.getUsersSync();
 
   /// Filtra usuarios según búsqueda
   List<Usuario> get _filteredUsers {
@@ -531,7 +531,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     final updatedUser = user.copyWith(
       estado: user.estado == 'activo' ? 'inactivo' : 'activo',
     );
-    promoService.updateUsuario(updatedUser);
+    usersController.updateUserProfile(updatedUser);
     setState(() {});
     ScaffoldMessenger.of(
       context,
@@ -574,7 +574,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                 nombre: nombreCtrl.text,
                 correo: emailCtrl.text,
               );
-              promoService.updateUsuario(updatedUser);
+              usersController.updateUserProfile(updatedUser);
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Usuario actualizado')),
@@ -601,7 +601,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              promoService.deleteUsuario(user.id);
+              usersController.deleteUser(user.id);
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Usuario eliminado')),
@@ -1001,9 +1001,9 @@ class _CrearUsuarioModalState extends State<CrearUsuarioModal> {
 
     // Crear nuevo usuario
     final newId =
-        (promoService.usuarios.isEmpty
+        (usersController.getUsersSync().isEmpty
             ? 0
-            : promoService.usuarios
+            : usersController.getUsersSync()
                   .map((u) => u.id)
                   .reduce((a, b) => a > b ? a : b)) +
         1;
@@ -1018,7 +1018,7 @@ class _CrearUsuarioModalState extends State<CrearUsuarioModal> {
     );
 
     // Guardar en el servicio
-    promoService.addUsuario(nuevoUsuario);
+    usersController.addUser(nuevoUsuario);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Usuario creado exitosamente')),

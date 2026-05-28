@@ -1,4 +1,4 @@
-// ============================================================================
+﻿// ============================================================================
 // ARCHIVO: manage_stores_screen.dart
 // PROPÓSITO: Pantalla de gestión CRUD de comercios (supermercados) del panel admin.
 //            Permite crear comercios, alternar su estado activo/pausado y eliminarlos.
@@ -37,8 +37,8 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
 
   // Getter reactivo: siempre retorna la lista actualizada de supermercados.
   // Al ser un getter (no una variable), siempre apunta al estado más reciente
-  // de promoService.supermercados sin necesidad de setState().
-  List<Supermercado> get _stores => promoService.supermercados;
+  // de promotionsController.getSupermercadosSync() sin necesidad de setState().
+  List<Supermercado> get _stores => promotionsController.getSupermercadosSync();
 
   // ============================================================================
   // BUILD PRINCIPAL
@@ -379,13 +379,13 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
   // Alterna el estado del comercio entre 'activo' e 'inactivo'.
   // Usa copyWith para inmutabilidad: crea un nuevo objeto Supermercado
   // con solo el campo `estado` modificado.
-  // promoService.updateSupermercado() persiste el cambio y llama notifyListeners().
+  // promotionsController.updateSupermercado() persiste el cambio y llama notifyListeners().
   // ============================================================================
   void _toggleStatus(Supermercado store) {
     final updated = store.copyWith(
       estado: store.estado == 'activo' ? 'inactivo' : 'activo',
     );
-    promoService.updateSupermercado(updated);
+    promotionsController.updateSupermercado(updated);
     setState(() {}); // Reconstrucción adicional de seguridad
   }
 
@@ -408,7 +408,7 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              promoService.deleteSupermercado(
+              promotionsController.deleteSupermercado(
                 store.id,
               ); // Elimina por ID entero
               Navigator.pop(ctx);
@@ -700,9 +700,9 @@ class _CrearComercioModalState extends State<CrearComercioModal> {
 
     // Genera un ID incremental basado en el máximo existente
     final newId =
-        (promoService.supermercados.isEmpty
+        (promotionsController.getSupermercadosSync().isEmpty
             ? 0
-            : promoService.supermercados
+            : promotionsController.getSupermercadosSync()
                   .map((s) => s.id)
                   .reduce((a, b) => a > b ? a : b)) +
         1;
@@ -716,7 +716,7 @@ class _CrearComercioModalState extends State<CrearComercioModal> {
       estado: 'activo', // Todo comercio nuevo inicia como activo
     );
 
-    promoService.addSupermercado(nuevoComercio);
+    promotionsController.addSupermercado(nuevoComercio);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Comercio creado exitosamente')),

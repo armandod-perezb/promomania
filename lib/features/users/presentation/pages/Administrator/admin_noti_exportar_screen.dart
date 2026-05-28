@@ -1,4 +1,4 @@
-// ============================================================================
+﻿// ============================================================================
 // ARCHIVO: admin_noti_export_screen.dart
 // PROPÓSITO: Pantalla de exportación de datos del módulo de avisos.
 //            Permite al administrador descargar datos en CSV, JSON o PDF,
@@ -467,13 +467,13 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
   // ============================================================================
   // TAB BAR
   // Barra de navegación interna del módulo de avisos con 4 tabs.
-  // El badge de "Reportes" es dinámico: lee promoService.getReportes().length.
+  // El badge de "Reportes" es dinámico: lee moderationController.getReportesSync().length.
   // Al tocar un tab diferente al activo, hace pushReplacementNamed()
   // para evitar acumulación en el stack de navegación.
   // ============================================================================
   Widget _buildTabBar() {
     // Badge dinámico: cantidad actual de reportes registrados
-    final reportesBadge = promoService.getReportes().length;
+    final reportesBadge = moderationController.getReportesSync().length;
 
     // Lista de tabs con su ícono, etiqueta y badge numérico
     final tabs = [

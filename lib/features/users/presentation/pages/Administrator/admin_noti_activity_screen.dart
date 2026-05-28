@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 import '../../../../../Core/di/app_scope.dart';
@@ -586,7 +586,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
   /// El badge de Reportes se obtiene en tiempo real del promoService.
   Widget _buildTabBar() {
     // Cantidad de reportes activos (dato en vivo del servicio global)
-    final reportesBadge = promoService.getReportes().length;
+    final reportesBadge = moderationController.getReportesSync().length;
 
     // Lista de definiciones de tabs (modelo auxiliar _TabDef al final del archivo)
     final tabs = [

@@ -41,9 +41,15 @@ class PromoLocalDataSource {
     try {
       await _initFromApi();
     } catch (e) {
-      loadError = e.toString();
+      loadError = 'No se pudieron convertir correctamente los datos de la API. Detalle: $e';
       loaded = false;
     }
+  }
+
+  Future<void> reinitializeFromApi() async {
+    loaded = false;
+    loadError = null;
+    await init();
   }
 
   /// Carga todos los datos desde los endpoints de la API REST.
@@ -66,19 +72,19 @@ class PromoLocalDataSource {
         .map((u) => _usuarioFromApi(u as Map<String, dynamic>))
         .toList();
     supermercados = (results[1])
-        .map((s) => Supermercado.fromJson(s as Map<String, dynamic>))
+        .map((s) => _supermercadoFromApi(s as Map<String, dynamic>))
         .toList();
     categorias = (results[2])
-        .map((c) => Categoria.fromJson(c as Map<String, dynamic>))
+        .map((c) => _categoriaFromApi(c as Map<String, dynamic>))
         .toList();
     tiposPromocion = (results[3])
-        .map((t) => TipoPromocion.fromJson(t as Map<String, dynamic>))
+        .map((t) => _tipoPromocionFromApi(t as Map<String, dynamic>))
         .toList();
     promociones = (results[4])
         .map((p) => _promocionFromApi(p as Map<String, dynamic>))
         .toList();
     promocionesHorarios = (results[5])
-        .map((h) => PromocionHorario.fromJson(h as Map<String, dynamic>))
+        .map((h) => _promocionHorarioFromApi(h as Map<String, dynamic>))
         .toList();
     comentarios = (results[6])
         .map((c) => _comentarioFromApi(c as Map<String, dynamic>))
@@ -90,7 +96,7 @@ class PromoLocalDataSource {
         .map((f) => _favoritoFromApi(f as Map<String, dynamic>))
         .toList();
     reportes = (results[9])
-        .map((r) => Reporte.fromJson(r as Map<String, dynamic>))
+        .map((r) => _reporteFromApi(r as Map<String, dynamic>))
         .toList();
 
     loadError = null;
@@ -99,68 +105,155 @@ class PromoLocalDataSource {
 
   // ─── Parsers específicos para la API (manejan FKs nullables) ────────────
 
+  static String _asString(dynamic value, {String fallback = ''}) {
+    if (value == null) return fallback;
+    final text = value.toString().trim();
+    return text.isEmpty ? fallback : text;
+  }
+
+  static int _asInt(dynamic value, {int fallback = 0}) {
+    if (value == null) return fallback;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString()) ?? fallback;
+  }
+
+  static double _asDouble(dynamic value, {double fallback = 0.0}) {
+    if (value == null) return fallback;
+    if (value is double) return value;
+    if (value is num) return value.toDouble();
+    final normalized = value.toString().replaceAll(',', '.').trim();
+    return double.tryParse(normalized) ?? fallback;
+  }
+
+  static String _normalizePromotionStatus(dynamic value) {
+    final raw = _asString(value, fallback: 'pendiente').toLowerCase();
+    if (raw == 'approved' || raw == 'aprobado' || raw == 'aprobada') {
+      return 'aprobada';
+    }
+    if (raw == 'rejected' || raw == 'rechazado' || raw == 'rechazada') {
+      return 'rechazada';
+    }
+    if (raw == 'pending') {
+      return 'pendiente';
+    }
+    return raw;
+  }
+
   static Usuario _usuarioFromApi(Map<String, dynamic> json) {
     return Usuario(
-      id: json['id'] as int,
-      nombre: json['nombre'] as String,
-      correo: json['correo'] as String,
+      id: _asInt(json['id']),
+      nombre: _asString(json['nombre'], fallback: 'Usuario'),
+      correo: _asString(json['correo']),
       password: '',
-      rol: json['rol'] as String? ?? 'usuario',
-      estado: json['estado'] as String? ?? 'activo',
-      ciudad: json['ciudad'] as String?,
+      rol: _asString(json['rol'], fallback: 'usuario'),
+      estado: _asString(json['estado'], fallback: 'activo'),
+      ciudad: json['ciudad']?.toString(),
     );
   }
 
   static Promocion _promocionFromApi(Map<String, dynamic> json) {
     return Promocion(
-      codigo: json['codigo'] as String,
-      titulo: json['titulo'] as String,
-      descripcion: json['descripcion'] as String?,
-      precio: (json['precio'] as num).toDouble(),
-      descuento: json['descuento'] as int?,
-      condicionProducto: json['condicion_producto'] as String? ?? 'nuevo',
-      ubicacion: json['ubicacion'] as String?,
-      url: json['url'] as String?,
-      foto: json['foto'] as String?,
+      codigo: _asString(json['codigo']),
+      titulo: _asString(json['titulo'], fallback: 'Promoción'),
+      descripcion: json['descripcion']?.toString(),
+      precio: _asDouble(json['precio']),
+      descuento: json['descuento'] == null ? null : _asInt(json['descuento']),
+      condicionProducto: _asString(json['condicion_producto'], fallback: 'nuevo'),
+      ubicacion: json['ubicacion']?.toString(),
+      url: json['url']?.toString(),
+      foto: json['foto']?.toString(),
       fotoEsLocal: false,
-      tipoVigencia: json['tipo_vigencia'] as String? ?? 'por_fecha',
-      fechaInicio: json['fecha_inicio'] as String?,
-      fechaFin: json['fecha_fin'] as String?,
-      estado: json['estado'] as String? ?? 'pendiente',
-      vistas: json['vistas'] as int? ?? 0,
-      idUsuario: json['id_usuario'] as int? ?? 0,
-      idSupermercado: json['id_supermercado'] as int? ?? 0,
-      idCategoria: json['id_categoria'] as int? ?? 0,
-      idTipoPromocion: json['id_tipo_promocion'] as int? ?? 0,
+      tipoVigencia: _asString(json['tipo_vigencia'], fallback: 'por_fecha'),
+      fechaInicio: json['fecha_inicio']?.toString(),
+      fechaFin: json['fecha_fin']?.toString(),
+      estado: _normalizePromotionStatus(json['estado']),
+      vistas: _asInt(json['vistas']),
+      idUsuario: _asInt(json['id_usuario']),
+      idSupermercado: _asInt(json['id_supermercado']),
+      idCategoria: _asInt(json['id_categoria']),
+      idTipoPromocion: _asInt(json['id_tipo_promocion']),
+      lat: json['lat'] == null ? null : _asDouble(json['lat']),
+      lng: json['lng'] == null ? null : _asDouble(json['lng']),
     );
   }
 
   static Comentario _comentarioFromApi(Map<String, dynamic> json) {
     return Comentario(
-      id: json['id'] as int,
-      contenido: json['contenido'] as String,
-      fecha: json['fecha'] as String,
-      idUsuario: json['id_usuario'] as int? ?? 0,
-      codigoPromocion: json['codigo_promocion'] as String? ?? '',
-      idCommentReply: json['id_comment_reply'] as int?,
+      id: _asInt(json['id']),
+      contenido: _asString(json['contenido']),
+      fecha: _asString(json['fecha']),
+      idUsuario: _asInt(json['id_usuario']),
+      codigoPromocion: _asString(json['codigo_promocion']),
+      idCommentReply: json['id_comment_reply'] == null
+          ? null
+          : _asInt(json['id_comment_reply']),
     );
   }
 
   static Valoracion _valoracionFromApi(Map<String, dynamic> json) {
     return Valoracion(
-      id: json['id'] as int,
-      tipo: json['tipo'] as String,
-      idUsuario: json['id_usuario'] as int? ?? 0,
-      codigoPromocion: json['codigo_promocion'] as String? ?? '',
+      id: _asInt(json['id']),
+      tipo: _asString(json['tipo']),
+      idUsuario: _asInt(json['id_usuario']),
+      codigoPromocion: _asString(json['codigo_promocion']),
     );
   }
 
   static Favorito _favoritoFromApi(Map<String, dynamic> json) {
     return Favorito(
-      id: json['id'] as int,
-      idUsuario: json['id_usuario'] as int,
-      codigoPromocion: json['codigo_promocion'] as String,
-      fecha: json['fecha'] as String,
+      id: _asInt(json['id']),
+      idUsuario: _asInt(json['id_usuario']),
+      codigoPromocion: _asString(json['codigo_promocion']),
+      fecha: _asString(json['fecha']),
+    );
+  }
+
+  static Supermercado _supermercadoFromApi(Map<String, dynamic> json) {
+    return Supermercado(
+      id: _asInt(json['id']),
+      nombre: _asString(json['nombre'], fallback: 'Sin nombre'),
+      direccion: json['direccion']?.toString(),
+      ciudad: json['ciudad']?.toString(),
+      estado: _asString(json['estado'], fallback: 'activo'),
+    );
+  }
+
+  static Categoria _categoriaFromApi(Map<String, dynamic> json) {
+    return Categoria(
+      id: _asInt(json['id']),
+      nombre: _asString(json['nombre'], fallback: 'Sin categoría'),
+      descripcion: json['descripcion']?.toString(),
+    );
+  }
+
+  static TipoPromocion _tipoPromocionFromApi(Map<String, dynamic> json) {
+    return TipoPromocion(
+      id: _asInt(json['id']),
+      nombre: _asString(json['nombre'], fallback: 'Sin tipo'),
+      descripcion: json['descripcion']?.toString(),
+      estado: _asString(json['estado'], fallback: 'activo'),
+    );
+  }
+
+  static PromocionHorario _promocionHorarioFromApi(Map<String, dynamic> json) {
+    return PromocionHorario(
+      id: _asInt(json['id']),
+      diaSemana: _asString(json['dia_semana']),
+      horaInicio: _asString(json['hora_inicio']),
+      horaFin: _asString(json['hora_fin']),
+      codigoPromocion: _asString(json['codigo_promocion']),
+    );
+  }
+
+  static Reporte _reporteFromApi(Map<String, dynamic> json) {
+    return Reporte(
+      id: _asInt(json['id']),
+      motivo: _asString(json['motivo']),
+      fecha: _asString(json['fecha']),
+      estado: _asString(json['estado'], fallback: 'pendiente'),
+      idUsuario: _asInt(json['id_usuario']),
+      codigoPromocion: _asString(json['codigo_promocion']),
     );
   }
 
@@ -574,8 +667,9 @@ class PromoLocalDataSource {
 
     final headers = bytes.take(4).toList();
 
-    if (headers[0] == 0xFF && headers[1] == 0xD8 && headers[2] == 0xFF)
+    if (headers[0] == 0xFF && headers[1] == 0xD8 && headers[2] == 0xFF) {
       return true;
+    }
     if (headers[0] == 0x89 &&
         headers[1] == 0x50 &&
         headers[2] == 0x4E &&
@@ -594,7 +688,9 @@ class PromoLocalDataSource {
         headers[3] == 0x46) {
       return true;
     }
-    if (headers[0] == 0x42 && headers[1] == 0x4D) return true;
+    if (headers[0] == 0x42 && headers[1] == 0x4D) {
+      return true;
+    }
 
     return false;
   }

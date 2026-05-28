@@ -19,7 +19,7 @@ class PromotionRepositoryImpl implements PromotionRepository {
   String? get loadError => dataSource.loadError;
 
   @override
-  Future<void> reinitialize() => dataSource.init();
+  Future<void> reinitialize() => dataSource.reinitializeFromApi();
 
   // ── Sync queries ──────────────────────────────────────────────────────────
 

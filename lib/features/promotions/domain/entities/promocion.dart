@@ -4,6 +4,21 @@
 /// una promoción en listados y en su detalle, así como la
 /// información necesaria para la persistencia en JSON.
 class Promocion {
+  static int _asInt(dynamic value, {int fallback = 0}) {
+    if (value == null) return fallback;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString()) ?? fallback;
+  }
+
+  static double _asDouble(dynamic value, {double fallback = 0.0}) {
+    if (value == null) return fallback;
+    if (value is double) return value;
+    if (value is num) return value.toDouble();
+    final normalized = value.toString().replaceAll(',', '.').trim();
+    return double.tryParse(normalized) ?? fallback;
+  }
+
   /// Código único alfanumérico de la promoción (por ejemplo 'PROMO001').
   final String codigo;
 
@@ -100,8 +115,8 @@ class Promocion {
       codigo: json['codigo'] as String,
       titulo: json['titulo'] as String,
       descripcion: json['descripcion'] as String?,
-      precio: (json['precio'] as num).toDouble(),
-      descuento: json['descuento'] as int?,
+      precio: _asDouble(json['precio']),
+      descuento: json['descuento'] == null ? null : _asInt(json['descuento']),
       condicionProducto: json['condicion_producto'] as String? ?? 'nuevo',
       ubicacion: json['ubicacion'] as String?,
       url: json['url'] as String?,
@@ -111,13 +126,13 @@ class Promocion {
       fechaInicio: json['fecha_inicio'] as String?,
       fechaFin: json['fecha_fin'] as String?,
       estado: json['estado'] as String? ?? 'pendiente',
-      vistas: json['vistas'] as int? ?? 0,
-      idUsuario: json['id_usuario'] as int,
-      idSupermercado: json['id_supermercado'] as int,
-      idCategoria: json['id_categoria'] as int,
-      idTipoPromocion: json['id_tipo_promocion'] as int,
-      lat: json['lat'] as double?,
-      lng: json['lng'] as double?,
+      vistas: _asInt(json['vistas']),
+      idUsuario: _asInt(json['id_usuario']),
+      idSupermercado: _asInt(json['id_supermercado']),
+      idCategoria: _asInt(json['id_categoria']),
+      idTipoPromocion: _asInt(json['id_tipo_promocion']),
+      lat: json['lat'] == null ? null : _asDouble(json['lat']),
+      lng: json['lng'] == null ? null : _asDouble(json['lng']),
     );
   }
 

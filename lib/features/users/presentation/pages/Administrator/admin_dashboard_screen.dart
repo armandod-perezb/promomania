@@ -1,4 +1,6 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 import '../../../../../Core/di/app_scope.dart';
 
@@ -31,9 +33,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     // AnimatedBuilder escucha los cambios del promoService (ChangeNotifier).
     // Cada vez que promoService notifica (se agrega/edita un dato),
     // Flutter reconstruye automáticamente todo el dashboard con los datos actualizados.
-    return AnimatedBuilder(
-      animation: promoService,
-      builder: (context, _) {
+    return Consumer<PromoService>(
+      builder: (context, promoService, child) {
         return Scaffold(
           backgroundColor: const Color(0xFFF5F5F8), // Fondo gris muy suave de la pantalla
           body: SafeArea(

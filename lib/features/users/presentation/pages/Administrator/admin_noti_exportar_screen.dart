@@ -7,6 +7,8 @@
 // ============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 import '../../../../../Core/Routes/app_routes.dart'; // Constantes de rutas nombradas de la app
 import '../../../../../Core/di/app_scope.dart'; // Expone `promoService` (ChangeNotifier global)
 
@@ -66,9 +68,8 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
     // Cada vez que promoService llama a notifyListeners(), este widget
     // se reconstruye automáticamente. Esto permite que el badge de
     // "Reportes" en el TabBar sea siempre dinámico y actualizado.
-    return AnimatedBuilder(
-      animation: promoService,
-      builder: (context, _) {
+    return Consumer<PromoService>(
+      builder: (context, promoService, child) {
         return Scaffold(
           backgroundColor: kBgGray, // Fondo gris claro general
           body: SafeArea(

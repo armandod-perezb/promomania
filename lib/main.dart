@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'Core/Routes/app_routes.dart';
 import 'features/auth/presentation/pages/Authentication/login_screen.dart';
 import 'features/auth/presentation/pages/Authentication/register_screen.dart';
@@ -38,7 +39,14 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppScope.bootstrap();
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: AppScope.promoService),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

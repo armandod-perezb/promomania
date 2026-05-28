@@ -8,6 +8,8 @@
 // ============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 import '../../../../../Core/Routes/app_routes.dart'; // Rutas nombradas de la app
 import '../../../../../Core/di/app_scope.dart'; // Expone promoService (ChangeNotifier global)
 import '../../../../../features/promotions/domain/entities/supermercado.dart'; // Entity Supermercado con copyWith
@@ -48,9 +50,8 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
     // AnimatedBuilder se suscribe a promoService (ChangeNotifier).
     // Cuando promoService llama notifyListeners(), toda la pantalla se reconstruye,
     // reflejando cambios en la lista de comercios (crear, editar, eliminar).
-    return AnimatedBuilder(
-      animation: promoService,
-      builder: (context, _) {
+    return Consumer<PromoService>(
+      builder: (context, promoService, child) {
         return Scaffold(
           backgroundColor: bgColor,
           body: SafeArea(

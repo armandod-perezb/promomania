@@ -1,7 +1,9 @@
 ﻿// Importaciones necesarias para la pantalla de detalles de promoción
 import 'dart:async'; // Para manejo de operaciones asíncronas y timers
 import 'dart:typed_data'; // Para manejo de datos binarios (imágenes)
-import 'package:flutter/material.dart'; // UI framework principal
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:app/features/promotions/infrastructure/services/promo_service.dart'; // UI framework principal
 import 'package:flutter/services.dart'; // Para feedback háptico y servicios del sistema
 import '../../../../../Core/di/app_scope.dart'; // Para acceso a servicios globales (promoService, sessionManager)
 import '../../../../../features/promotions/domain/entities/promocion.dart'; // Entity de promociones
@@ -193,9 +195,8 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   @override
   Widget build(BuildContext context) {
     // Usar AnimatedBuilder para reconstruir UI cuando cambia el promoService
-    return AnimatedBuilder(
-      animation: promoService,
-      builder: (context, _) {
+    return Consumer<PromoService>(
+      builder: (context, promoService, child) {
         // Manejo de caso cuando no hay promoción disponible
         if (_promo == null) {
           return const Scaffold(

@@ -1,5 +1,7 @@
 ﻿// Importaciones necesarias para la pantalla de exploración de promociones
-import 'package:flutter/material.dart'; // UI framework principal
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:app/features/promotions/infrastructure/services/promo_service.dart'; // UI framework principal
 import 'package:flutter/services.dart'; // Para feedback háptico y servicios del sistema
 import '../../../../../Core/Routes/app_routes.dart'; // Definición de rutas de navegación
 import '../../../../../Core/di/app_scope.dart'; // Para acceso a servicios globales ()
@@ -102,9 +104,8 @@ class _ExploreScreenState extends State<ExploreScreen>
   @override
   Widget build(BuildContext context) {
     // Usar AnimatedBuilder para reconstruir UI cuando cambia el promoService
-    return AnimatedBuilder(
-      animation: promoService,
-      builder: (context, _) {
+    return Consumer<PromoService>(
+      builder: (context, promoService, child) {
         return Scaffold(
           backgroundColor: const Color(0xFFF5F6FA), // Fondo gris claro
           body: CustomScrollView(

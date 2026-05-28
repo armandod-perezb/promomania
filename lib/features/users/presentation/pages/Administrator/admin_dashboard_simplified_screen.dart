@@ -1,4 +1,6 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 import '../../../../../Core/di/app_scope.dart';
 
 /// Vista resumida del dashboard para revisar KPIs generales rapidamente.
@@ -18,9 +20,8 @@ class _AdminDashboardSimplifiedScreenState
     // AnimatedBuilder escucha a promoService (ChangeNotifier).
     // Cada vez que los datos cambian, Flutter reconstruye solo este widget
     // sin necesidad de llamar setState() manualmente.
-    return AnimatedBuilder(
-      animation: promoService,
-      builder: (context, _) {
+    return Consumer<PromoService>(
+      builder: (context, promoService, child) {
         // Se obtienen copias de las listas actuales del servicio global.
         // Estas llamadas devuelven los datos en tiempo real almacenados en memoria.
         final usuarios = usersController.getUsersSync();

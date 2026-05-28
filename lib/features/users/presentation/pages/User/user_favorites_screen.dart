@@ -1,5 +1,7 @@
 ﻿// Importaciones necesarias para la pantalla de favoritos de usuarios
-import 'package:flutter/material.dart'; // UI framework principal
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:app/features/promotions/infrastructure/services/promo_service.dart'; // UI framework principal
 import 'package:flutter/services.dart'; // Para feedback háptico y estilo de sistema
 import '../../../../../Core/Routes/app_routes.dart'; // Definición de rutas de navegación
 import '../../../../../Core/di/app_scope.dart'; // Para acceso a servicios globales (promoService)
@@ -88,9 +90,8 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   @override
   Widget build(BuildContext context) {
     // Usar AnimatedBuilder para reconstruir UI cuando cambia el promoService
-    return AnimatedBuilder(
-      animation: promoService,
-      builder: (context, _) {
+    return Consumer<PromoService>(
+      builder: (context, promoService, child) {
         // Obtener usuario actual (para demo: primer usuario de la lista)
         final currentUser = usersController.getUsersSync().isNotEmpty
             ? usersController.getUsersSync().first.id

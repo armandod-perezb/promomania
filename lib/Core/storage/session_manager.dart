@@ -16,6 +16,12 @@ class SessionManager {
   static const String _keyUsuarioEstado = 'usuario_estado';
   static const String _keyLoginTime = 'login_time';
   static const String _keySessionExpiry = 'session_expiry';
+  static const String _keyBearerToken = 'bearer_token';
+
+  String? _token;
+
+  /// Token Bearer activo para llamadas a la API REST.
+  String? get token => _token;
 
   SessionManager._();
 
@@ -43,6 +49,7 @@ class SessionManager {
         estado: _prefs?.getString(_keyUsuarioEstado) ?? 'activo',
       );
     }
+    _token = _prefs?.getString(_keyBearerToken);
   }
 
   /// Obtiene el usuario actualmente logueado
@@ -54,8 +61,9 @@ class SessionManager {
   /// Verifica si el usuario actual es admin
   bool get isAdmin => _usuarioActual?.rol == 'admin';
 
-  /// Guarda la sesión de un usuario después de login exitoso
-  Future<bool> guardarSesion(Usuario usuario) async {
+  /// Guarda la sesión de un usuario después de login exitoso.
+  /// Si se provee [token], también lo persiste para llamadas a la API.
+  Future<bool> guardarSesion(Usuario usuario, {String? token}) async {
     try {
       _usuarioActual = usuario;
       await _prefs?.setInt(_keyUsuarioId, usuario.id);
@@ -64,6 +72,10 @@ class SessionManager {
       await _prefs?.setString(_keyUsuarioRol, usuario.rol);
       await _prefs?.setString(_keyUsuarioEstado, usuario.estado);
       await _prefs?.setString(_keyLoginTime, DateTime.now().toIso8601String());
+      if (token != null) {
+        _token = token;
+        await _prefs?.setString(_keyBearerToken, token);
+      }
       return true;
     } catch (e) {
       print('Error guardando sesión: $e');
@@ -90,12 +102,14 @@ class SessionManager {
   Future<bool> logout() async {
     try {
       _usuarioActual = null;
+      _token = null;
       await _prefs?.remove(_keyUsuarioId);
       await _prefs?.remove(_keyUsuarioNombre);
       await _prefs?.remove(_keyUsuarioCorreo);
       await _prefs?.remove(_keyUsuarioRol);
       await _prefs?.remove(_keyUsuarioEstado);
       await _prefs?.remove(_keyLoginTime);
+      await _prefs?.remove(_keyBearerToken);
       return true;
     } catch (e) {
       print('Error en logout: $e');

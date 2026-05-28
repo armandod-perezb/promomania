@@ -2,16 +2,19 @@ import 'package:app/core/errors/exceptions.dart';
 import 'package:app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:app/features/auth/infrastructure/datasources/auth_session_datasource.dart';
 import 'package:app/features/auth/infrastructure/datasources/auth_user_datasource.dart';
+import 'package:app/features/auth/infrastructure/datasources/remote_login_datasource.dart';
 import 'package:app/features/users/domain/entities/usuario.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthUserDataSource userDataSource;
   final AuthSessionDataSource sessionDataSource;
+  final RemoteLoginDataSource? remoteLoginDataSource;
   final Map<String, _RecoveryCodeEntry> _recoveryCodes = {};
 
   AuthRepositoryImpl({
     required this.userDataSource,
     required this.sessionDataSource,
+    this.remoteLoginDataSource,
   });
 
   static const Duration _recoveryCodeTtl = Duration(minutes: 10);
@@ -28,14 +31,28 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Usuario> login({required String correo, required String password}) async {
-    final usuario = userDataSource.findByEmail(_normalizeEmail(correo));
+    final normalizedEmail = _normalizeEmail(correo);
+
+    if (remoteLoginDataSource != null) {
+      try {
+        final result = await remoteLoginDataSource!.login(
+          correo: normalizedEmail,
+          password: password,
+        );
+        await sessionDataSource.saveSession(result.usuario, token: result.token);
+        return result.usuario;
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+
+    final usuario = userDataSource.findByEmail(normalizedEmail);
     if (usuario == null) {
       throw UserNotFoundException('Usuario no encontrado');
     }
     if (usuario.password != password) {
       throw AuthenticationException('Contrasena incorrecta');
     }
-
     await sessionDataSource.saveSession(usuario);
     return usuario;
   }
@@ -47,6 +64,21 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     final normalizedEmail = _normalizeEmail(correo);
+
+    if (remoteLoginDataSource != null) {
+      try {
+        final result = await remoteLoginDataSource!.register(
+          nombre: nombre.trim(),
+          correo: normalizedEmail,
+          password: password,
+        );
+        await sessionDataSource.saveSession(result.usuario, token: result.token);
+        return result.usuario;
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+
     final usuarioExistente = userDataSource.findByEmail(normalizedEmail);
     if (usuarioExistente != null) {
       throw ValidationException('El email ya esta registrado');
@@ -124,6 +156,10 @@ class AuthRepositoryImpl implements AuthRepository {
 
     userDataSource.updateUser(usuario.copyWith(password: newPassword));
     _recoveryCodes.remove(normalizedEmail);
+  }
+
+  bool _shouldFallbackToLocal(Object error) {
+    return error is NetworkException;
   }
 }
 

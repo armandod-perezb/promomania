@@ -1,6 +1,7 @@
 // Importaciones necesarias para la pantalla de inicio de sesión
 import 'package:flutter/material.dart'; // UI framework principal
 import '../../../../../Core/Routes/app_routes.dart'; // Definición de rutas de navegación
+import '../../../../../Core/utils/validators.dart';
 import '../../controllers/auth_controller.dart';
 
 /// Pantalla de inicio de sesión de usuarios
@@ -45,19 +46,24 @@ class _LoginScreenState extends State<LoginScreen> {
   /// Método principal para iniciar sesión de usuario
   /// Valida campos, busca usuario, verifica contraseña y navega según rol
   void _login() async {
-    // Validar que los campos no estén vacíos
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor completa todos los campos')),
       );
       return;
     }
 
-    // Obtener y limpiar datos del formulario
-    final email = _emailController.text.trim(); // Email sin espacios
-    final password = _passwordController.text; // Contraseña (no se limpia)
+    final emailError = Validators.validateEmail(email);
+    if (emailError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(emailError)),
+      );
+      return;
+    }
 
-    // Activar estado de carga
     setState(() => _isLoading = true);
 
     try {
@@ -78,11 +84,11 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } catch (e) {
-      // Manejar errores durante el proceso de login
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        final message = e.toString().replaceFirst('Exception: ', '');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
       }
     } finally {
       // Siempre detener el estado de carga al finalizar

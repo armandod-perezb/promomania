@@ -1,6 +1,8 @@
 // Importaciones necesarias para la pantalla de registro
 import 'package:flutter/material.dart'; // UI framework principal
 import '../../../../../Core/Routes/app_routes.dart'; // Definición de rutas de navegación
+import 'package:flutter/gestures.dart';
+import '../../../../../Core/utils/validators.dart';
 import '../../controllers/auth_controller.dart';
 
 /// Pantalla de registro de nuevos usuarios
@@ -31,6 +33,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscureConfirm = true; // Ocultar/mostrar confirmación
   bool _acceptTerms = false; // Aceptación de términos y condiciones
   bool _isLoading = false; // Estado de carga durante registro
+  late final TapGestureRecognizer _termsRecognizer;
 
   // Colores constantes de la aplicación
   static const Color _primary = Color(
@@ -40,8 +43,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   static const Color _lightBg = Color(0xFFF8F9FB); // Fondo claro principal
 
   @override
+  void initState() {
+    super.initState();
+    _termsRecognizer = TapGestureRecognizer()
+      ..onTap = () => Navigator.pushNamed(context, AppRoutes.termsService);
+    _nameController.addListener(() => setState(() {}));
+    _emailController.addListener(() => setState(() {}));
+    _passwordController.addListener(() => setState(() {}));
+    _confirmController.addListener(() => setState(() {}));
+  }
+
+  @override
   void dispose() {
-    // Liberar recursos de los controladores para evitar memory leaks
+    _termsRecognizer.dispose();
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -52,12 +66,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
   /// Getter que determina si el formulario es válido para registro
   /// Verifica: campos no vacíos, contraseña de 8+ caracteres, coincidencia de contraseñas y términos aceptados
   bool get _canRegister =>
-      _nameController.text.isNotEmpty && // Nombre no vacío
-      _emailController.text.isNotEmpty && // Email no vacío
-      _passwordController.text.length >= 8 && // Contraseña mínimo 8 caracteres
-      _passwordController.text ==
-          _confirmController.text && // Contraseñas coinciden
-      _acceptTerms; // Términos aceptados
+      _nameController.text.isNotEmpty &&
+      Validators.validateEmail(_emailController.text.trim()) == null &&
+      _passwordController.text.length >= 8 &&
+      _passwordController.text == _confirmController.text &&
+      _acceptTerms;
+
+  String? get _validationMessage {
+    if (_nameController.text.isEmpty) return 'Ingresa tu nombre';
+    final emailError = Validators.validateEmail(_emailController.text.trim());
+    if (emailError != null) {
+      return emailError;
+    }
+    if (_passwordController.text.length < 8) {
+      return 'La contraseña debe tener al menos 8 caracteres';
+    }
+    if (_passwordController.text != _confirmController.text) {
+      return 'Las contraseñas no coinciden';
+    }
+    if (!_acceptTerms) return 'Acepta los términos y condiciones';
+    return null;
+  }
 
   /// Método principal para registrar un nuevo usuario
   /// Valida formulario, verifica email duplicado, crea usuario y guarda sesión
@@ -65,8 +94,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // Validar que el formulario esté completo antes de continuar
     if (!_canRegister) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor completa todos los campos correctamente'),
+        SnackBar(
+          content: Text(_validationMessage ?? 'Completa todos los campos'),
         ),
       );
       return;
@@ -81,11 +110,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _isLoading = true);
 
     try {
-        await widget.authController.register(
-          nombre: nombre,
-          correo: email,
-          password: password,
-        );
+      await widget.authController.register(
+        nombre: nombre,
+        correo: email,
+        password: password,
+      );
 
       // Si el widget aún está montado, mostrar éxito y navegar
       if (mounted) {
@@ -96,11 +125,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Navigator.pushReplacementNamed(context, AppRoutes.userHome);
       }
     } catch (e) {
-      // Manejar errores durante el proceso de registro
       if (mounted) {
+        final message = e.toString().replaceFirst('Exception: ', '');
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     } finally {
       // Siempre detener el estado de carga al finalizar
@@ -161,6 +190,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 20),
                   // Checkbox de términos y condiciones
                   _buildTermsRow(),
+                  if (_validationMessage != null) ...[
+                    const SizedBox(height: 10),
+                    Text(
+                      _validationMessage!,
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        color: Color(0xFFB45309),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 28),
                   // Botón principal de registro
                   _buildRegisterButton(),
@@ -339,30 +378,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         const SizedBox(width: 10),
         // Texto con enlaces destacados
-        RichText(
-          text: const TextSpan(
-            text: 'Acepto los ',
-            style: TextStyle(
-              color: Color(0xFF8A8FA8),
-              fontSize: 13.5,
-            ), // Gris claro
-            children: [
-              TextSpan(
-                text: 'Términos',
-                style: TextStyle(
-                  color: _primary,
-                  fontWeight: FontWeight.w700,
-                ), // Rojo primario
-              ),
-              TextSpan(text: ' y '),
-              TextSpan(
-                text: 'Condiciones',
-                style: TextStyle(
-                  color: _primary,
-                  fontWeight: FontWeight.w700,
-                ), // Rojo primario
-              ),
-            ],
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              text: 'Acepto los ',
+              style: TextStyle(
+                color: Color(0xFF8A8FA8),
+                fontSize: 13.5,
+              ), // Gris claro
+              children: [
+                TextSpan(
+                  text: 'Términos y Condiciones',
+                  style: TextStyle(
+                    color: _primary,
+                    fontWeight: FontWeight.w700,
+                  ), // Rojo primario
+                  recognizer: _termsRecognizer,
+                ),
+              ],
+            ),
           ),
         ),
       ],

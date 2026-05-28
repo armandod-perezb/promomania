@@ -2,6 +2,7 @@
 import 'package:flutter/services.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 import '../../../../../Core/di/app_scope.dart';
+import '../../../../../Core/utils/validators.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PANTALLA EDITAR PERFIL
@@ -90,17 +91,34 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   void _save() async {
+    final nombre = _nameCtrl.text.trim();
+    final correo = _emailCtrl.text.trim();
+    final emailError = Validators.validateEmail(correo);
+
+    if (nombre.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('El nombre no puede estar vacío')),
+      );
+      return;
+    }
+
+    if (emailError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(emailError)),
+      );
+      return;
+    }
+
     setState(() => _isSaving = true);
 
     try {
       final usuario = sessionManager.usuarioActual;
       if (usuario != null) {
         final usuarioActualizado = usuario.copyWith(
-          nombre: _nameCtrl.text,
-          correo: _emailCtrl.text,
+          nombre: nombre,
+          correo: correo,
         );
-        await sessionManager.actualizarUsuario(usuarioActualizado);
-        usersController.updateUserProfile(usuarioActualizado);
+        await usersController.updateUserProfile(usuarioActualizado);
       }
 
       if (mounted) {
@@ -111,9 +129,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        final message = e.toString().replaceFirst('Exception: ', '');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
       }
     } finally {
       if (mounted) {

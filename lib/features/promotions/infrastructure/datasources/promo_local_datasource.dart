@@ -1,7 +1,6 @@
-import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:app/core/network/api_client.dart';
 import 'package:app/core/storage/image_storage_service.dart';
 import 'package:app/features/catalog/domain/entities/categoria.dart';
 import 'package:app/features/comments/domain/entities/comentario.dart';
@@ -13,11 +12,7 @@ import 'package:app/features/promotions/domain/entities/supermercado.dart';
 import 'package:app/features/catalog/domain/entities/tipo_promocion.dart';
 import 'package:app/features/users/domain/entities/usuario.dart';
 import 'package:app/features/interactions/domain/entities/valoracion.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class PromoLocalDataSource {
   List<Usuario> usuarios = [];
@@ -36,130 +31,142 @@ class PromoLocalDataSource {
 
   final Map<String, Uint8List> imageCache = {};
   final ImageStorageService imageStorage;
+  final ApiClient? apiClient;
 
-  PromoLocalDataSource({ImageStorageService? imageStorage})
+  PromoLocalDataSource({this.apiClient, ImageStorageService? imageStorage})
     : imageStorage = imageStorage ?? ImageStorageService();
 
   Future<void> init() async {
     if (loaded) return;
-
     try {
-      loadError = null;
-      final response = await rootBundle.loadString(
-        'assets/data/promomania_data.json',
-      );
-      final data = json.decode(response);
-
-      usuarios = (data['usuarios'] as List)
-          .map((u) => Usuario.fromJson(u as Map<String, dynamic>))
-          .toList();
-      supermercados = (data['supermercados'] as List)
-          .map((s) => Supermercado.fromJson(s as Map<String, dynamic>))
-          .toList();
-      categorias = (data['categorias'] as List)
-          .map((c) => Categoria.fromJson(c as Map<String, dynamic>))
-          .toList();
-      tiposPromocion = (data['tipos_promocion'] as List)
-          .map((t) => TipoPromocion.fromJson(t as Map<String, dynamic>))
-          .toList();
-      promociones = (data['promociones'] as List)
-          .map((p) => Promocion.fromJson(p as Map<String, dynamic>))
-          .toList();
-      promocionesHorarios = (data['promociones_horarios'] as List)
-          .map((h) => PromocionHorario.fromJson(h as Map<String, dynamic>))
-          .toList();
-      comentarios = (data['comentarios'] as List)
-          .map((c) => Comentario.fromJson(c as Map<String, dynamic>))
-          .toList();
-      valoraciones = (data['valoraciones'] as List)
-          .map((v) => Valoracion.fromJson(v as Map<String, dynamic>))
-          .toList();
-      favoritos = (data['favoritos'] as List)
-          .map((f) => Favorito.fromJson(f as Map<String, dynamic>))
-          .toList();
-      reportes = (data['reportes'] as List)
-          .map((r) => Reporte.fromJson(r as Map<String, dynamic>))
-          .toList();
-
-      loaded = true;
+      await _initFromApi();
     } catch (e) {
       loadError = e.toString();
       loaded = false;
     }
   }
 
-  Future<File> _getDataFile() async {
-    if (!kIsWeb) {
-      final directory = await getApplicationDocumentsDirectory();
-      return File('${directory.path}/promomania_data.json');
-    }
-    return File('promomania_data.json');
+  /// Carga todos los datos desde los endpoints de la API REST.
+  Future<void> _initFromApi() async {
+    final client = apiClient!;
+    final results = await Future.wait([
+      client.getAllPages('/usuarios/'),
+      client.getAllPages('/supermercados/'),
+      client.getAllPages('/categorias/'),
+      client.getAllPages('/tipos-promocion/'),
+      client.getAllPages('/promociones/'),
+      client.getAllPages('/promociones-horarios/'),
+      client.getAllPages('/comentarios/'),
+      client.getAllPages('/valoraciones/'),
+      client.getAllPages('/favoritos/'),
+      client.getAllPages('/reportes/'),
+    ]);
+
+    usuarios = (results[0])
+        .map((u) => _usuarioFromApi(u as Map<String, dynamic>))
+        .toList();
+    supermercados = (results[1])
+        .map((s) => Supermercado.fromJson(s as Map<String, dynamic>))
+        .toList();
+    categorias = (results[2])
+        .map((c) => Categoria.fromJson(c as Map<String, dynamic>))
+        .toList();
+    tiposPromocion = (results[3])
+        .map((t) => TipoPromocion.fromJson(t as Map<String, dynamic>))
+        .toList();
+    promociones = (results[4])
+        .map((p) => _promocionFromApi(p as Map<String, dynamic>))
+        .toList();
+    promocionesHorarios = (results[5])
+        .map((h) => PromocionHorario.fromJson(h as Map<String, dynamic>))
+        .toList();
+    comentarios = (results[6])
+        .map((c) => _comentarioFromApi(c as Map<String, dynamic>))
+        .toList();
+    valoraciones = (results[7])
+        .map((v) => _valoracionFromApi(v as Map<String, dynamic>))
+        .toList();
+    favoritos = (results[8])
+        .map((f) => _favoritoFromApi(f as Map<String, dynamic>))
+        .toList();
+    reportes = (results[9])
+        .map((r) => Reporte.fromJson(r as Map<String, dynamic>))
+        .toList();
+
+    loadError = null;
+    loaded = true;
   }
 
-  Future<void> loadLocalPromociones() async {
-    try {
-      if (!kIsWeb) {
-        final file = await _getDataFile();
-        if (!await file.exists()) return;
+  // ─── Parsers específicos para la API (manejan FKs nullables) ────────────
 
-        final content = await file.readAsString();
-        final data = json.decode(content) as Map<String, dynamic>;
-
-        if (data['promociones'] != null) {
-          promociones = (data['promociones'] as List)
-              .map((p) => Promocion.fromJson(p as Map<String, dynamic>))
-              .toList();
-        }
-
-        if (data['promociones_horarios'] != null) {
-          promocionesHorarios = (data['promociones_horarios'] as List)
-              .map((h) => PromocionHorario.fromJson(h as Map<String, dynamic>))
-              .toList();
-        }
-      } else {
-        final prefs = await SharedPreferences.getInstance();
-        final dataString = prefs.getString('promomania_data');
-        if (dataString == null) return;
-
-        final data = json.decode(dataString) as Map<String, dynamic>;
-
-        if (data['promociones'] != null) {
-          promociones = (data['promociones'] as List)
-              .map((p) => Promocion.fromJson(p as Map<String, dynamic>))
-              .toList();
-        }
-
-        if (data['promociones_horarios'] != null) {
-          promocionesHorarios = (data['promociones_horarios'] as List)
-              .map((h) => PromocionHorario.fromJson(h as Map<String, dynamic>))
-              .toList();
-        }
-      }
-    } catch (_) {
-      // Mantener comportamiento resiliente de la implementación original.
-    }
+  static Usuario _usuarioFromApi(Map<String, dynamic> json) {
+    return Usuario(
+      id: json['id'] as int,
+      nombre: json['nombre'] as String,
+      correo: json['correo'] as String,
+      password: '',
+      rol: json['rol'] as String? ?? 'usuario',
+      estado: json['estado'] as String? ?? 'activo',
+      ciudad: json['ciudad'] as String?,
+    );
   }
 
-  Future<void> saveLocalData() async {
-    try {
-      final data = {
-        'promociones': promociones.map((p) => p.toJson()).toList(),
-        'promociones_horarios': promocionesHorarios
-            .map((h) => h.toJson())
-            .toList(),
-      };
-
-      if (!kIsWeb) {
-        final file = await _getDataFile();
-        await file.writeAsString(json.encode(data), flush: true);
-      } else {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('promomania_data', json.encode(data));
-      }
-    } catch (_) {
-      // Mantener comportamiento resiliente de la implementación original.
-    }
+  static Promocion _promocionFromApi(Map<String, dynamic> json) {
+    return Promocion(
+      codigo: json['codigo'] as String,
+      titulo: json['titulo'] as String,
+      descripcion: json['descripcion'] as String?,
+      precio: (json['precio'] as num).toDouble(),
+      descuento: json['descuento'] as int?,
+      condicionProducto: json['condicion_producto'] as String? ?? 'nuevo',
+      ubicacion: json['ubicacion'] as String?,
+      url: json['url'] as String?,
+      foto: json['foto'] as String?,
+      fotoEsLocal: false,
+      tipoVigencia: json['tipo_vigencia'] as String? ?? 'por_fecha',
+      fechaInicio: json['fecha_inicio'] as String?,
+      fechaFin: json['fecha_fin'] as String?,
+      estado: json['estado'] as String? ?? 'pendiente',
+      vistas: json['vistas'] as int? ?? 0,
+      idUsuario: json['id_usuario'] as int? ?? 0,
+      idSupermercado: json['id_supermercado'] as int? ?? 0,
+      idCategoria: json['id_categoria'] as int? ?? 0,
+      idTipoPromocion: json['id_tipo_promocion'] as int? ?? 0,
+    );
   }
+
+  static Comentario _comentarioFromApi(Map<String, dynamic> json) {
+    return Comentario(
+      id: json['id'] as int,
+      contenido: json['contenido'] as String,
+      fecha: json['fecha'] as String,
+      idUsuario: json['id_usuario'] as int? ?? 0,
+      codigoPromocion: json['codigo_promocion'] as String? ?? '',
+      idCommentReply: json['id_comment_reply'] as int?,
+    );
+  }
+
+  static Valoracion _valoracionFromApi(Map<String, dynamic> json) {
+    return Valoracion(
+      id: json['id'] as int,
+      tipo: json['tipo'] as String,
+      idUsuario: json['id_usuario'] as int? ?? 0,
+      codigoPromocion: json['codigo_promocion'] as String? ?? '',
+    );
+  }
+
+  static Favorito _favoritoFromApi(Map<String, dynamic> json) {
+    return Favorito(
+      id: json['id'] as int,
+      idUsuario: json['id_usuario'] as int,
+      codigoPromocion: json['codigo_promocion'] as String,
+      fecha: json['fecha'] as String,
+    );
+  }
+
+  Future<void> loadLocalPromociones() async {}
+
+  Future<void> saveLocalData() async {}
 
   Usuario? getUsuario(int id) {
     try {

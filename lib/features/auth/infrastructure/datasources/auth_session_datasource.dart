@@ -2,9 +2,10 @@ import 'package:app/core/storage/session_manager.dart';
 import 'package:app/features/users/domain/entities/usuario.dart';
 
 abstract class AuthSessionDataSource {
-  Future<void> saveSession(Usuario usuario);
+  Future<void> saveSession(Usuario usuario, {String? token});
   Future<void> clearSession();
   Usuario? getCurrentUser();
+  String? getToken();
 }
 
 class LocalAuthSessionDataSource implements AuthSessionDataSource {
@@ -13,8 +14,8 @@ class LocalAuthSessionDataSource implements AuthSessionDataSource {
   LocalAuthSessionDataSource(this.sessionManager);
 
   @override
-  Future<void> saveSession(Usuario usuario) async {
-    await sessionManager.guardarSesion(usuario);
+  Future<void> saveSession(Usuario usuario, {String? token}) async {
+    await sessionManager.guardarSesion(usuario, token: token);
   }
 
   @override
@@ -26,4 +27,7 @@ class LocalAuthSessionDataSource implements AuthSessionDataSource {
   Usuario? getCurrentUser() {
     return sessionManager.usuarioActual;
   }
+
+  @override
+  String? getToken() => sessionManager.token;
 }

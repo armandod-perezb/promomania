@@ -1,17 +1,23 @@
-﻿import 'dart:typed_data';
+import 'dart:typed_data';
+
+import 'package:app/core/errors/exceptions.dart';
 import 'package:app/features/promotions/domain/entities/promocion.dart';
 import 'package:app/features/promotions/domain/entities/promocion_horario.dart';
 import 'package:app/features/promotions/domain/entities/supermercado.dart';
 import 'package:app/features/promotions/domain/repositories/promotion_repository.dart';
+import 'package:app/features/promotions/infrastructure/datasources/remote_admin_promotion_datasource.dart';
 import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 
 /// Adapter que implementa PromotionRepository delegando en PromoService.
-/// Permite que PromotionsController use PromoService como fuente de datos
-/// sin que la capa de presentacion conozca PromoService directamente.
+/// Permite integrar una capa remota (Django API) sin romper la UI actual.
 class PromotionServiceRepositoryAdapter implements PromotionRepository {
   final PromoService promoService;
+  final RemoteAdminPromotionDataSource? remoteDataSource;
 
-  PromotionServiceRepositoryAdapter(this.promoService);
+  PromotionServiceRepositoryAdapter(
+    this.promoService, {
+    this.remoteDataSource,
+  });
 
   // ── Estado ────────────────────────────────────────────────────────────────
 
@@ -29,8 +35,12 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
   @override
   List<Promocion> getActivePromotionsSync({int? categoryId, int? supermarketId}) {
     Iterable<Promocion> result = promoService.getPromocionesAprobadas();
-    if (categoryId != null) result = result.where((p) => p.idCategoria == categoryId);
-    if (supermarketId != null) result = result.where((p) => p.idSupermercado == supermarketId);
+    if (categoryId != null) {
+      result = result.where((p) => p.idCategoria == categoryId);
+    }
+    if (supermarketId != null) {
+      result = result.where((p) => p.idSupermercado == supermarketId);
+    }
     return result.toList();
   }
 
@@ -38,33 +48,43 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
   List<Promocion> getAllPromotionsSync() => promoService.getPromociones();
 
   @override
-  Promocion? getPromotionByCodeSync(String codigo) => promoService.getPromocionByCodigo(codigo);
+  Promocion? getPromotionByCodeSync(String codigo) =>
+      promoService.getPromocionByCodigo(codigo);
 
   @override
-  List<Promocion> getPromotionsByUserSync(int userId) => promoService.getPromocionesById(userId);
+  List<Promocion> getPromotionsByUserSync(int userId) =>
+      promoService.getPromocionesById(userId);
 
   @override
-  List<Promocion> getFlashDealsSync({int limit = 5}) => promoService.getFlashDeals(limit: limit);
+  List<Promocion> getFlashDealsSync({int limit = 5}) =>
+      promoService.getFlashDeals(limit: limit);
 
   @override
-  List<Map<String, dynamic>> getNearbyStoresSync({int limit = 5}) => promoService.getNearbyStores(limit: limit);
+  List<Map<String, dynamic>> getNearbyStoresSync({int limit = 5}) =>
+      promoService.getNearbyStores(limit: limit);
 
   @override
-  String getPromocionUrgency(Promocion promo) => promoService.getPromocionUrgency(promo);
+  String getPromocionUrgency(Promocion promo) =>
+      promoService.getPromocionUrgency(promo);
 
   @override
   Map<String, List<Promocion>> getPromocionesByUrgencySync(int userId) =>
       promoService.getPromocionesByUrgency(userId);
 
   @override
-  double getPromocionRatingSync(String codigo) => promoService.getPromocionRating(codigo);
+  double getPromocionRatingSync(String codigo) =>
+      promoService.getPromocionRating(codigo);
 
   @override
-  double getPrecioConDescuento(Promocion promo) => promoService.getPrecioConDescuento(promo);
+  double getPrecioConDescuento(Promocion promo) =>
+      promoService.getPrecioConDescuento(promo);
 
   @override
   List<PromocionHorario> getPromocionesHorariosByCodigoSync(String codigo) =>
-      promoService.getPromocionesHorarios().where((h) => h.codigoPromocion == codigo).toList();
+      promoService
+          .getPromocionesHorarios()
+          .where((h) => h.codigoPromocion == codigo)
+          .toList();
 
   @override
   int getNextHorarioIdSync() {
@@ -85,13 +105,33 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
 
   @override
   Future<Promocion> createPromotion(Promocion promocion) async {
+    if (remoteDataSource != null) {
+      try {
+        final created = await remoteDataSource!.createPromotion(promocion);
+        _upsertLocalPromotion(created);
+        return created;
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+
     promoService.addPromocion(promocion);
     return promocion;
   }
 
   @override
-  Future<Promocion?> getPromotionByCode(String codigo) async =>
-      promoService.getPromocionByCodigo(codigo);
+  Future<Promocion?> getPromotionByCode(String codigo) async {
+    if (remoteDataSource != null) {
+      try {
+        final remote = await remoteDataSource!.getPromotionByCode(codigo);
+        if (remote != null) _upsertLocalPromotion(remote);
+        return remote ?? promoService.getPromocionByCodigo(codigo);
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    return promoService.getPromocionByCodigo(codigo);
+  }
 
   @override
   Future<List<Promocion>> getActivePromotions({
@@ -100,7 +140,29 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
     int? page,
     int? pageSize,
   }) async {
-    var list = getActivePromotionsSync(categoryId: categoryId, supermarketId: supermarketId);
+    var list = getActivePromotionsSync(
+      categoryId: categoryId,
+      supermarketId: supermarketId,
+    );
+
+    if (remoteDataSource != null) {
+      try {
+        final remoteAll = await remoteDataSource!.getAllPromotions();
+        for (final promo in remoteAll) {
+          _upsertLocalPromotion(promo);
+        }
+        list = remoteAll.where((p) => p.estado == 'aprobada').toList();
+        if (categoryId != null) {
+          list = list.where((p) => p.idCategoria == categoryId).toList();
+        }
+        if (supermarketId != null) {
+          list = list.where((p) => p.idSupermercado == supermarketId).toList();
+        }
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+
     if (page == null || pageSize == null || pageSize <= 0) return list;
     final start = (page - 1) * pageSize;
     if (start < 0 || start >= list.length) return [];
@@ -108,40 +170,121 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
   }
 
   @override
-  Future<List<Promocion>> getPromotionsByCategory(int categoryId) async =>
-      promoService.getPromocionesByCategoria(categoryId);
+  Future<List<Promocion>> getPromotionsByCategory(int categoryId) async {
+    if (remoteDataSource != null) {
+      try {
+        final remoteAll = await remoteDataSource!.getAllPromotions();
+        for (final promo in remoteAll) {
+          _upsertLocalPromotion(promo);
+        }
+        return remoteAll.where((p) => p.idCategoria == categoryId).toList();
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    return promoService.getPromocionesByCategoria(categoryId);
+  }
 
   @override
-  Future<List<Promocion>> getPromotionsBySupermarket(int supermarketId) async =>
-      promoService.getPromocionesBySupermercado(supermarketId);
+  Future<List<Promocion>> getPromotionsBySupermarket(int supermarketId) async {
+    if (remoteDataSource != null) {
+      try {
+        final remoteAll = await remoteDataSource!.getAllPromotions();
+        for (final promo in remoteAll) {
+          _upsertLocalPromotion(promo);
+        }
+        return remoteAll.where((p) => p.idSupermercado == supermarketId).toList();
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    return promoService.getPromocionesBySupermercado(supermarketId);
+  }
 
   @override
-  Future<List<Promocion>> getPromotionsByUser(int userId) async =>
-      promoService.getPromocionesById(userId);
+  Future<List<Promocion>> getPromotionsByUser(int userId) async {
+    if (remoteDataSource != null) {
+      try {
+        final remoteAll = await remoteDataSource!.getAllPromotions();
+        for (final promo in remoteAll) {
+          _upsertLocalPromotion(promo);
+        }
+        return remoteAll.where((p) => p.idUsuario == userId).toList();
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    return promoService.getPromocionesById(userId);
+  }
 
   @override
   Future<Promocion> updatePromotion(Promocion promocion) async {
+    if (remoteDataSource != null) {
+      try {
+        final updated = await remoteDataSource!.updatePromotion(promocion);
+        _upsertLocalPromotion(updated);
+        return updated;
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
     promoService.updatePromocion(promocion);
     return promocion;
   }
 
   @override
   Future<void> approvePromotion(String codigo) async {
-    final promo = promoService.getPromocionByCodigo(codigo);
-    if (promo != null) promoService.updatePromocion(promo.copyWith(estado: 'aprobada'));
+    if (remoteDataSource != null) {
+      try {
+        await remoteDataSource!.approvePromotion(codigo);
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    final local = promoService.getPromocionByCodigo(codigo);
+    if (local != null) {
+      _upsertLocalPromotion(local.copyWith(estado: 'aprobada'));
+    }
   }
 
   @override
   Future<void> rejectPromotion(String codigo) async {
-    final promo = promoService.getPromocionByCodigo(codigo);
-    if (promo != null) promoService.updatePromocion(promo.copyWith(estado: 'rechazada'));
+    if (remoteDataSource != null) {
+      try {
+        await remoteDataSource!.rejectPromotion(codigo);
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    final local = promoService.getPromocionByCodigo(codigo);
+    if (local != null) {
+      _upsertLocalPromotion(local.copyWith(estado: 'rechazada'));
+    }
   }
 
   @override
-  Future<void> deletePromotion(String codigo) async => promoService.deletePromocion(codigo);
+  Future<void> deletePromotion(String codigo) async {
+    if (remoteDataSource != null) {
+      try {
+        await remoteDataSource!.deletePromotion(codigo);
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    promoService.deletePromocion(codigo);
+  }
 
   @override
-  Future<void> incrementViews(String codigo) async => promoService.incrementarVistas(codigo);
+  Future<void> incrementViews(String codigo) async {
+    if (remoteDataSource != null) {
+      try {
+        await remoteDataSource!.incrementViews(codigo);
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    promoService.incrementarVistas(codigo);
+  }
 
   @override
   Future<void> addPromocionHorario(PromocionHorario horario) async =>
@@ -156,13 +299,62 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
       promoService.getPromotionImageBytes(codigo);
 
   @override
-  Future<void> addSupermercado(Supermercado supermercado) async =>
+  Future<void> addSupermercado(Supermercado supermercado) async {
+    if (remoteDataSource != null) {
+      try {
+        final created = await remoteDataSource!.createSupermercado(supermercado);
+        _upsertLocalSupermercado(created);
+        return;
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    promoService.addSupermercado(supermercado);
+  }
+
+  @override
+  Future<void> updateSupermercado(Supermercado supermercado) async {
+    if (remoteDataSource != null) {
+      try {
+        final updated = await remoteDataSource!.updateSupermercado(supermercado);
+        _upsertLocalSupermercado(updated);
+        return;
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    promoService.updateSupermercado(supermercado);
+  }
+
+  @override
+  Future<void> deleteSupermercado(int id) async {
+    if (remoteDataSource != null) {
+      try {
+        await remoteDataSource!.deleteSupermercado(id);
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    promoService.deleteSupermercado(id);
+  }
+
+  void _upsertLocalPromotion(Promocion promocion) {
+    if (promoService.getPromocionByCodigo(promocion.codigo) == null) {
+      promoService.addPromocion(promocion);
+      return;
+    }
+    promoService.updatePromocion(promocion);
+  }
+
+  void _upsertLocalSupermercado(Supermercado supermercado) {
+    if (promoService.getSupermercado(supermercado.id) == null) {
       promoService.addSupermercado(supermercado);
+      return;
+    }
+    promoService.updateSupermercado(supermercado);
+  }
 
-  @override
-  Future<void> updateSupermercado(Supermercado supermercado) async =>
-      promoService.updateSupermercado(supermercado);
-
-  @override
-  Future<void> deleteSupermercado(int id) async => promoService.deleteSupermercado(id);
+  bool _shouldFallbackToLocal(Object error) {
+    return error is NetworkException;
+  }
 }

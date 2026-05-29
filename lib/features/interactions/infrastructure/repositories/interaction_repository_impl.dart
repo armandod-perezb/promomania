@@ -97,19 +97,54 @@ class InteractionRepositoryImpl implements InteractionRepository {
 
   @override
   Future<List<Valoracion>> getValoracionesByPromocion(String promotionCode) async =>
-      dataSource.getValoracionesByPromocion(promotionCode);
+      remoteFavoriteDataSource != null
+      ? await (() async {
+          try {
+            return await remoteFavoriteDataSource!.getValoracionesByPromocion(promotionCode);
+          } catch (e) {
+            if (!_shouldFallbackToLocal(e)) rethrow;
+            return dataSource.getValoracionesByPromocion(promotionCode);
+          }
+        })()
+      : dataSource.getValoracionesByPromocion(promotionCode);
 
   @override
-  Future<int> countPositiveRatings(String promotionCode) async => dataSource.countPositiveRatings(promotionCode);
+  Future<int> countPositiveRatings(String promotionCode) async {
+    final valores = await getValoracionesByPromocion(promotionCode);
+    return valores.where((v) => v.tipo == 'positiva').length;
+  }
 
   @override
-  Future<int> countNegativeRatings(String promotionCode) async => dataSource.countNegativeRatings(promotionCode);
+  Future<int> countNegativeRatings(String promotionCode) async {
+    final valores = await getValoracionesByPromocion(promotionCode);
+    return valores.where((v) => v.tipo == 'negativa').length;
+  }
 
   @override
-  Future<void> addValoracion(Valoracion valoracion) async => dataSource.addValoracion(valoracion);
+  Future<void> addValoracion(Valoracion valoracion) async {
+    if (remoteFavoriteDataSource != null) {
+      try {
+        final created = await remoteFavoriteDataSource!.addValoracion(valoracion);
+        dataSource.addValoracion(created);
+        return;
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    dataSource.addValoracion(valoracion);
+  }
 
   @override
-  Future<void> deleteValoracion(int id) async => dataSource.deleteValoracion(id);
+  Future<void> deleteValoracion(int id) async {
+    if (remoteFavoriteDataSource != null) {
+      try {
+        await remoteFavoriteDataSource!.deleteValoracion(id);
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    dataSource.deleteValoracion(id);
+  }
 
   bool _shouldFallbackToLocal(Object error) {
     return error is NetworkException;

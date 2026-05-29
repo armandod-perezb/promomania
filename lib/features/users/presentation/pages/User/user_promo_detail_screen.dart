@@ -1694,7 +1694,17 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
               // Like button
               Expanded(
                 child: GestureDetector(
-                  onTap: () => _toggleValoracion('positiva'),
+                  onTap: () async {
+                    try {
+                      await _toggleValoracion('positiva');
+                      if (mounted) setState(() {});
+                    } catch (e) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+                      );
+                    }
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -1742,7 +1752,17 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
               // Dislike button
               Expanded(
                 child: GestureDetector(
-                  onTap: () => _toggleValoracion('negativa'),
+                  onTap: () async {
+                    try {
+                      await _toggleValoracion('negativa');
+                      if (mounted) setState(() {});
+                    } catch (e) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+                      );
+                    }
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -1795,7 +1815,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     );
   }
 
-  void _toggleValoracion(String tipo) {
+  Future<void> _toggleValoracion(String tipo) async {
     if (_promo == null) return;
 
     final userValoraciones = interactionsController.getValoracionesByPromocionSync(
@@ -1809,7 +1829,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
 
     if (existingValoracion.id != -1) {
       // User has already rated, remove existing rating
-      interactionsController.deleteValoracion(existingValoracion.id);
+      await interactionsController.deleteValoracion(existingValoracion.id);
     }
 
     // Add new valoracion
@@ -1822,7 +1842,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
       codigoPromocion: _promo!.codigo,
     );
 
-    interactionsController.addValoracion(newValoracion);
+    await interactionsController.addValoracion(newValoracion);
     HapticFeedback.lightImpact();
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -1856,9 +1876,17 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (commentController.text.trim().isNotEmpty && _promo != null) {
-                _addComment(commentController.text.trim());
+                try {
+                  await _addComment(commentController.text.trim());
+                  if (mounted) setState(() {});
+                } catch (e) {
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+                  );
+                }
                 Navigator.pop(context);
               }
             },
@@ -1873,7 +1901,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     );
   }
 
-  void _addComment(String contenido) {
+  Future<void> _addComment(String contenido) async {
     if (_promo == null) return;
 
     final newComment = Comentario(
@@ -1887,7 +1915,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
       idCommentReply: null,
     );
 
-    commentsController.addComment(newComment);
+    await commentsController.addComment(newComment);
     HapticFeedback.lightImpact();
 
     ScaffoldMessenger.of(context).showSnackBar(

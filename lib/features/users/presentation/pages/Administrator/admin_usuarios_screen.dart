@@ -528,15 +528,23 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
   }
 
   /// Alterna el estado del usuario (activo/inactivo)
-  void _toggleStatus(Usuario user) {
+  Future<void> _toggleStatus(Usuario user) async {
     final updatedUser = user.copyWith(
       estado: user.estado == 'activo' ? 'inactivo' : 'activo',
     );
-    usersController.updateUserProfile(updatedUser);
-    setState(() {});
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Usuario ${updatedUser.estado}')));
+    try {
+      await usersController.updateUserProfile(updatedUser);
+      setState(() {});
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Usuario ${updatedUser.estado}')));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se pudo actualizar estado: $e')),
+      );
+    }
   }
 
   /// Abre diálogo para editar usuario
@@ -570,12 +578,21 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               final updatedUser = user.copyWith(
                 nombre: nombreCtrl.text,
                 correo: emailCtrl.text,
               );
-              usersController.updateUserProfile(updatedUser);
+              try {
+                await usersController.updateUserProfile(updatedUser);
+              } catch (e) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('No se pudo actualizar: $e')),
+                );
+                return;
+              }
+              if (!mounted || !ctx.mounted) return;
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Usuario actualizado')),
@@ -601,8 +618,17 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () {
-              usersController.deleteUser(user.id);
+            onPressed: () async {
+              try {
+                await usersController.deleteUser(user.id);
+              } catch (e) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('No se pudo eliminar: $e')),
+                );
+                return;
+              }
+              if (!mounted || !ctx.mounted) return;
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Usuario eliminado')),
@@ -973,7 +999,7 @@ class _CrearUsuarioModalState extends State<CrearUsuarioModal> {
     super.dispose();
   }
 
-  void _crearUsuario() {
+  Future<void> _crearUsuario() async {
     // Validar campos obligatorios
     if (_nombre.text.isEmpty) {
       ScaffoldMessenger.of(
@@ -1019,8 +1045,17 @@ class _CrearUsuarioModalState extends State<CrearUsuarioModal> {
     );
 
     // Guardar en el servicio
-    usersController.addUser(nuevoUsuario);
+    try {
+      await usersController.addUser(nuevoUsuario);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se pudo crear usuario: $e')),
+      );
+      return;
+    }
 
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Usuario creado exitosamente')),
     );

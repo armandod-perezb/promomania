@@ -123,6 +123,18 @@ class UserRepositoryImpl implements UserRepository {
     final usuario = dataSource.getUserById(userId);
     if (usuario == null) throw UserNotFoundException('Usuario no encontrado');
     final updated = usuario.copyWith(estado: 'inactivo');
+    if (remoteDataSource != null) {
+      try {
+        final remoteUser = await remoteDataSource!.updateUserProfile(updated);
+        dataSource.updateUser(remoteUser);
+        if (sessionManager.usuarioActual?.id == userId) {
+          await sessionManager.actualizarUsuario(remoteUser);
+        }
+        return;
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
     dataSource.updateUser(updated);
     if (sessionManager.usuarioActual?.id == userId) {
       await sessionManager.actualizarUsuario(updated);
@@ -139,10 +151,30 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<void> addUser(Usuario usuario) async => dataSource.addUser(usuario);
+  Future<void> addUser(Usuario usuario) async {
+    if (remoteDataSource != null) {
+      try {
+        final created = await remoteDataSource!.createUser(usuario);
+        dataSource.addUser(created);
+        return;
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    dataSource.addUser(usuario);
+  }
 
   @override
-  Future<void> deleteUser(int userId) async => dataSource.deleteUser(userId);
+  Future<void> deleteUser(int userId) async {
+    if (remoteDataSource != null) {
+      try {
+        await remoteDataSource!.deleteUser(userId);
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    dataSource.deleteUser(userId);
+  }
 
   bool _shouldFallbackToLocal(Object error) {
     return error is NetworkException;

@@ -538,14 +538,22 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
   // ============================================================================
   // CHANGE STATUS
   // ============================================================================
-  void _changeStatus(Promocion promo, String nuevoEstado) {
+  Future<void> _changeStatus(Promocion promo, String nuevoEstado) async {
     final updated = promo.copyWith(estado: nuevoEstado);
-    promotionsController.updatePromotion(updated);
-    setState(() {});
-    final msg = nuevoEstado == 'aprobada'
-        ? '✓ Promoción aprobada'
-        : '✗ Promoción rechazada';
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    try {
+      await promotionsController.updatePromotion(updated);
+      setState(() {});
+      if (!mounted) return;
+      final msg = nuevoEstado == 'aprobada'
+          ? '✓ Promoción aprobada'
+          : '✗ Promoción rechazada';
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se pudo actualizar estado: $e')),
+      );
+    }
   }
 
   // ============================================================================
@@ -582,12 +590,21 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               final updated = promo.copyWith(
                 titulo: tituloCtrl.text,
                 descripcion: descCtrl.text,
               );
-              promotionsController.updatePromotion(updated);
+              try {
+                await promotionsController.updatePromotion(updated);
+              } catch (e) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('No se pudo actualizar: $e')),
+                );
+                return;
+              }
+              if (!mounted || !ctx.mounted) return;
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Promoción actualizada')),
@@ -615,8 +632,17 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () {
-              promotionsController.deletePromotion(promo.codigo);
+            onPressed: () async {
+              try {
+                await promotionsController.deletePromotion(promo.codigo);
+              } catch (e) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('No se pudo eliminar: $e')),
+                );
+                return;
+              }
+              if (!mounted || !ctx.mounted) return;
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Promoción eliminada')),
@@ -935,7 +961,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
   void _snack(String msg) =>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
 
-  void _crearPromocion() {
+  Future<void> _crearPromocion() async {
     if (_codigo.text.isEmpty) {
       _snack('El código es obligatorio');
       return;
@@ -977,7 +1003,13 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
       idTipoPromocion: int.tryParse(_idTipoPromocion.text) ?? 1,
     );
 
-    promotionsController.createPromotion(nuevaPromo);
+    try {
+      await promotionsController.createPromotion(nuevaPromo);
+    } catch (e) {
+      _snack('No se pudo crear promoción: $e');
+      return;
+    }
+    if (!mounted) return;
     _snack('Promoción creada exitosamente');
     Navigator.pop(context);
   }

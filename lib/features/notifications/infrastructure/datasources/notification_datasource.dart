@@ -1,13 +1,25 @@
+import 'package:app/features/notifications/domain/entities/notification_item.dart';
+import 'package:app/features/notifications/domain/entities/push_campaign.dart';
 import 'package:app/features/notifications/domain/entities/notification_summary.dart';
 import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 
 abstract class NotificationDataSource {
   NotificationSummary getAdminSummary();
   int getReportesBadgeCount();
+  List<NotificationItem> getAllNotifications();
+  NotificationItem createNotification(NotificationItem item);
+  NotificationItem updateNotification(NotificationItem item);
+  void deleteNotification(int id);
+  List<PushCampaign> getAllPushCampaigns();
+  PushCampaign createPushCampaign(PushCampaign campaign);
+  PushCampaign updatePushCampaign(PushCampaign campaign);
+  void deletePushCampaign(int id);
 }
 
 class PromoNotificationDataSource implements NotificationDataSource {
   final PromoService promoService;
+  final List<NotificationItem> _notifications = [];
+  final List<PushCampaign> _pushCampaigns = [];
 
   PromoNotificationDataSource(this.promoService);
 
@@ -33,5 +45,55 @@ class PromoNotificationDataSource implements NotificationDataSource {
   @override
   int getReportesBadgeCount() {
     return promoService.getReportes().length;
+  }
+
+  @override
+  List<NotificationItem> getAllNotifications() => List.unmodifiable(_notifications);
+
+  @override
+  NotificationItem createNotification(NotificationItem item) {
+    _notifications.add(item);
+    return item;
+  }
+
+  @override
+  NotificationItem updateNotification(NotificationItem item) {
+    final index = _notifications.indexWhere((n) => n.id == item.id);
+    if (index == -1) {
+      _notifications.add(item);
+      return item;
+    }
+    _notifications[index] = item;
+    return item;
+  }
+
+  @override
+  void deleteNotification(int id) {
+    _notifications.removeWhere((n) => n.id == id);
+  }
+
+  @override
+  List<PushCampaign> getAllPushCampaigns() => List.unmodifiable(_pushCampaigns);
+
+  @override
+  PushCampaign createPushCampaign(PushCampaign campaign) {
+    _pushCampaigns.add(campaign);
+    return campaign;
+  }
+
+  @override
+  PushCampaign updatePushCampaign(PushCampaign campaign) {
+    final index = _pushCampaigns.indexWhere((c) => c.id == campaign.id);
+    if (index == -1) {
+      _pushCampaigns.add(campaign);
+      return campaign;
+    }
+    _pushCampaigns[index] = campaign;
+    return campaign;
+  }
+
+  @override
+  void deletePushCampaign(int id) {
+    _pushCampaigns.removeWhere((c) => c.id == id);
   }
 }

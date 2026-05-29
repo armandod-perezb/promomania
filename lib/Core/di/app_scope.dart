@@ -13,6 +13,7 @@ import 'package:app/features/catalog/infrastructure/repositories/catalog_reposit
 import 'package:app/features/catalog/presentation/controllers/catalog_controller.dart';
 import 'package:app/features/comments/domain/usecases/comment_usecases.dart';
 import 'package:app/features/comments/infrastructure/datasources/comment_datasource.dart';
+import 'package:app/features/comments/infrastructure/datasources/remote_comment_datasource.dart';
 import 'package:app/features/comments/infrastructure/repositories/comment_repository_impl.dart';
 import 'package:app/features/comments/presentation/controllers/comments_controller.dart';
 import 'package:app/features/interactions/domain/usecases/interaction_usecases.dart';
@@ -22,14 +23,17 @@ import 'package:app/features/interactions/infrastructure/repositories/interactio
 import 'package:app/features/interactions/presentation/controllers/interactions_controller.dart';
 import 'package:app/features/moderation/domain/usecases/moderation_usecases.dart';
 import 'package:app/features/moderation/infrastructure/datasources/moderation_datasource.dart';
+import 'package:app/features/moderation/infrastructure/datasources/remote_moderation_datasource.dart';
 import 'package:app/features/moderation/infrastructure/repositories/moderation_repository_impl.dart';
 import 'package:app/features/moderation/presentation/controllers/moderation_controller.dart';
 import 'package:app/features/notifications/domain/usecases/notification_usecases.dart';
 import 'package:app/features/notifications/infrastructure/datasources/notification_datasource.dart';
+import 'package:app/features/notifications/infrastructure/datasources/remote_notification_datasource.dart';
 import 'package:app/features/notifications/infrastructure/repositories/notification_repository_impl.dart';
 import 'package:app/features/notifications/presentation/controllers/notifications_controller.dart';
 import 'package:app/features/promotions/domain/usecases/promotion_usecases.dart';
 import 'package:app/features/promotions/infrastructure/datasources/promo_local_datasource.dart';
+import 'package:app/features/promotions/infrastructure/datasources/remote_admin_promotion_datasource.dart';
 import 'package:app/features/promotions/infrastructure/repositories/promotion_service_repository_adapter.dart';
 import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 import 'package:app/features/promotions/presentation/controllers/promotions_controller.dart';
@@ -87,8 +91,11 @@ class AppScope {
 
   static final PromoCommentDataSource commentsDataSource =
       PromoCommentDataSource(promoService);
+  static final ApiRemoteCommentDataSource remoteCommentDataSource =
+      ApiRemoteCommentDataSource(ApiClient.instance);
   static final CommentRepositoryImpl commentsRepository = CommentRepositoryImpl(
     commentsDataSource,
+    remoteDataSource: remoteCommentDataSource,
   );
   static final CommentsController commentsController = CommentsController(
     getComentariosSyncUseCase: GetComentariosSyncUseCase(commentsRepository),
@@ -142,8 +149,13 @@ class AppScope {
 
   static final PromoModerationDataSource moderationDataSource =
       PromoModerationDataSource(promoService);
+  static final ApiRemoteModerationDataSource remoteModerationDataSource =
+      ApiRemoteModerationDataSource(ApiClient.instance);
   static final ModerationRepositoryImpl moderationRepository =
-      ModerationRepositoryImpl(moderationDataSource);
+      ModerationRepositoryImpl(
+        moderationDataSource,
+        remoteDataSource: remoteModerationDataSource,
+      );
   static final ModerationController moderationController = ModerationController(
     getReportesSyncUseCase: GetReportesSyncUseCase(moderationRepository),
     getAllReportesUseCase: GetAllReportesUseCase(moderationRepository),
@@ -160,8 +172,13 @@ class AppScope {
 
   static final PromoNotificationDataSource notificationsDataSource =
       PromoNotificationDataSource(promoService);
+  static final ApiRemoteNotificationDataSource remoteNotificationDataSource =
+      ApiRemoteNotificationDataSource(ApiClient.instance);
   static final NotificationRepositoryImpl notificationsRepository =
-      NotificationRepositoryImpl(notificationsDataSource);
+      NotificationRepositoryImpl(
+        notificationsDataSource,
+        remoteDataSource: remoteNotificationDataSource,
+      );
   static final NotificationsController notificationsController =
       NotificationsController(
         getAdminSummaryUseCase: GetAdminNotificationSummaryUseCase(
@@ -170,10 +187,37 @@ class AppScope {
         getReportesBadgeCountUseCase: GetReportesBadgeCountUseCase(
           notificationsRepository,
         ),
+        getAllNotificationsUseCase: GetAllNotificationsUseCase(
+          notificationsRepository,
+        ),
+        createNotificationUseCase: CreateNotificationUseCase(
+          notificationsRepository,
+        ),
+        updateNotificationUseCase: UpdateNotificationUseCase(
+          notificationsRepository,
+        ),
+        deleteNotificationUseCase: DeleteNotificationUseCase(
+          notificationsRepository,
+        ),
+        getAllPushCampaignsUseCase: GetAllPushCampaignsUseCase(
+          notificationsRepository,
+        ),
+        createPushCampaignUseCase: CreatePushCampaignUseCase(
+          notificationsRepository,
+        ),
+        updatePushCampaignUseCase: UpdatePushCampaignUseCase(
+          notificationsRepository,
+        ),
+        deletePushCampaignUseCase: DeletePushCampaignUseCase(
+          notificationsRepository,
+        ),
       );
 
   static final PromotionServiceRepositoryAdapter promotionsRepository =
-      PromotionServiceRepositoryAdapter(promoService);
+      PromotionServiceRepositoryAdapter(
+        promoService,
+        remoteDataSource: ApiRemoteAdminPromotionDataSource(ApiClient.instance),
+      );
   static final PromotionsController promotionsController = PromotionsController(
     getActivePromotionsUseCase: GetActivePromotionsUseCase(
       promotionsRepository,

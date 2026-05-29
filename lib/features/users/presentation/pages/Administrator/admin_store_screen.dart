@@ -382,12 +382,19 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
   // con solo el campo `estado` modificado.
   // promotionsController.updateSupermercado() persiste el cambio y llama notifyListeners().
   // ============================================================================
-  void _toggleStatus(Supermercado store) {
+  Future<void> _toggleStatus(Supermercado store) async {
     final updated = store.copyWith(
       estado: store.estado == 'activo' ? 'inactivo' : 'activo',
     );
-    promotionsController.updateSupermercado(updated);
-    setState(() {}); // Reconstrucción adicional de seguridad
+    try {
+      await promotionsController.updateSupermercado(updated);
+      setState(() {});
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se pudo actualizar comercio: $e')),
+      );
+    }
   }
 
   // ============================================================================
@@ -408,10 +415,17 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () {
-              promotionsController.deleteSupermercado(
-                store.id,
-              ); // Elimina por ID entero
+            onPressed: () async {
+              try {
+                await promotionsController.deleteSupermercado(store.id);
+              } catch (e) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('No se pudo eliminar: $e')),
+                );
+                return;
+              }
+              if (!mounted || !ctx.mounted) return;
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Supermercado eliminado')),
@@ -691,7 +705,7 @@ class _CrearComercioModalState extends State<CrearComercioModal> {
   //   Si hay supermercados → newId = max(s.id para todo s en lista) + 1
   //   .reduce((a, b) => a > b ? a : b) es equivalente a max() sobre la colección.
   // ============================================================================
-  void _crearComercio() {
+  Future<void> _crearComercio() async {
     if (_nombre.text.isEmpty) {
       ScaffoldMessenger.of(
         context,
@@ -717,8 +731,17 @@ class _CrearComercioModalState extends State<CrearComercioModal> {
       estado: 'activo', // Todo comercio nuevo inicia como activo
     );
 
-    promotionsController.addSupermercado(nuevoComercio);
+    try {
+      await promotionsController.addSupermercado(nuevoComercio);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se pudo crear comercio: $e')),
+      );
+      return;
+    }
 
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Comercio creado exitosamente')),
     );

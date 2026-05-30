@@ -1,0 +1,345 @@
+Necesito que revises y mejores completamente el módulo de **Promociones** del proyecto, tanto en la sección administrativa como en la sección donde un usuario normal registra promociones.
+
+Antes de modificar código, analiza la estructura actual del proyecto, los modelos, servicios, rutas, componentes, formularios y endpoints existentes. No elimines funcionalidades que ya sirven; refactoriza solo lo necesario para que el módulo quede coherente, funcional, escalable y conectado correctamente con la base de datos.
+
+## Objetivo principal
+
+Actualmente el formulario de promoción solicita IDs manuales para campos como categoría, supermercado y tipo de promoción. Esto no debe funcionar así. El usuario no debe escribir IDs. Debe seleccionar información entendible desde la interfaz, usando nombres reales traídos desde la base de datos mediante combobox, selectores con búsqueda o componentes equivalentes.
+
+El módulo debe permitir crear y editar promociones considerando diferentes tipos de promoción, ubicación física o virtual, validaciones y relaciones con categorías y supermercados.
+
+---
+
+## 1. Tipos de promoción
+
+En el formulario de crear promoción debe existir al inicio un campo para seleccionar el tipo de promoción.
+
+Los tipos principales serán:
+
+* Descuento
+* 2x1
+* Envío Gratis
+* Otro
+
+Este campo debe guiar dinámicamente los campos que aparecen en el formulario.
+
+Ejemplo:
+
+* Si el usuario selecciona **Descuento**, debe mostrarse el campo de porcentaje o valor de descuento.
+* Si selecciona **Envío Gratis**, no debe mostrarse el campo de descuento porque no aplica.
+* Si selecciona **2x1**, deben mostrarse solo los campos necesarios para ese tipo.
+* Si selecciona **Otro**, debe permitirse describir el tipo de promoción.
+
+Si ya existe una tabla o modelo para tipos de promoción, úsala correctamente. Si no existe y es necesario crearla o ajustarla, hazlo de forma limpia y coherente con el proyecto.
+
+---
+
+## 2. Categoría de la promoción
+
+El formulario no debe pedir el ID de la categoría.
+
+Debe mostrar un combobox, select con búsqueda o componente similar que cargue las categorías existentes desde la base de datos.
+
+Ejemplo de visualización:
+
+* Hogar
+* Electrónica
+* Alimentos
+* Ropa
+* Tecnología
+* Otro
+
+El valor que se guarde internamente puede ser el ID correspondiente, pero el usuario siempre debe ver y seleccionar el nombre de la categoría.
+
+Si la categoría “Otro” existe en la base de datos, debe aparecer como una opción normal. No hardcodees datos si ya existen endpoints o tablas para consultarlos.
+
+---
+
+## 3. Supermercado o tienda
+
+El formulario tampoco debe pedir el ID del supermercado.
+
+Debe mostrarse un selector con búsqueda que cargue los supermercados o tiendas existentes desde la base de datos.
+
+Cada opción debería mostrar información útil, por ejemplo:
+
+`Nombre del supermercado - Dirección - Ciudad`
+
+Ejemplo:
+
+`Olímpica - Cra 43 #72-15 - Barranquilla`
+
+Además, si el supermercado o tienda no está registrado, debe existir un botón visible llamado **Nuevo** o **Registrar nuevo supermercado**.
+
+Al presionar ese botón, debe abrirse un formulario, modal o sección para registrar un nuevo supermercado con mínimo estos campos:
+
+* Nombre del supermercado
+* Dirección
+* Ciudad
+
+Después de registrar el nuevo supermercado, debe quedar disponible automáticamente en el selector para poder asociarlo a la promoción.
+
+---
+
+## 4. Local físico, local virtual o ambos
+
+En el formulario de promoción debe preguntarse si la promoción aplica para:
+
+* Local físico
+* Local virtual
+* Ambos
+
+El usuario debe poder seleccionar una o ambas opciones.
+
+### Si selecciona Local físico
+
+Deben mostrarse los siguientes campos:
+
+1. Un campo de texto para describir la ubicación de forma manual.
+
+Texto sugerido del label:
+
+`Describe con tus palabras dónde está ubicado el local`
+
+Ejemplo:
+
+`Frente al centro comercial, al lado de la farmacia.`
+
+2. Un botón llamado:
+
+`Elegir ubicación`
+
+Al presionarlo, debe abrirse una interfaz de mapa similar a Google Maps o el sistema de mapas que sea más viable para el proyecto.
+
+La funcionalidad del mapa debe permitir:
+
+* Usar la ubicación actual del usuario.
+* Buscar una ubicación escribiendo una dirección.
+* Seleccionar manualmente un punto en el mapa.
+* Confirmar la ubicación seleccionada.
+
+Al confirmar la ubicación, se deben extraer y guardar:
+
+* Latitud
+* Longitud
+
+Estos campos deben guardarse en la base de datos junto con la promoción.
+
+Si el proyecto aún no tiene soporte para mapas, implementa una solución viable y mantenible. Puede ser con Google Maps, Leaflet, OpenStreetMap u otra librería adecuada según las dependencias actuales del proyecto. Evita soluciones innecesariamente complejas.
+
+### Si selecciona Local virtual
+
+Debe mostrarse un campo para ingresar la URL del sitio web.
+
+Este campo debe validar que la URL comience con `https://`.
+
+Si no cumple con esa condición, debe mostrarse un mensaje de error claro y no permitir guardar la promoción.
+
+### Si selecciona ambos
+
+Deben mostrarse tanto los campos de local físico como los campos de local virtual.
+
+---
+
+## 5. Crear promoción
+
+Al crear una promoción, el formulario debe enviar correctamente todos los datos necesarios al backend.
+
+Debe incluir, según corresponda:
+
+* Nombre o título de la promoción.
+* Descripción.
+* Categoría seleccionada.
+* Supermercado seleccionado.
+* Tipo de promoción seleccionado.
+* Datos específicos del tipo de promoción.
+* Información de local físico, si aplica.
+* Descripción textual de ubicación física, si aplica.
+* Latitud, si aplica.
+* Longitud, si aplica.
+* URL del local virtual, si aplica.
+* Fechas de vigencia, si ya existen en el modelo.
+* Imágenes u otros campos que ya existan en el módulo actual.
+
+No elimines campos importantes que ya existan en el formulario original. Integra los nuevos cambios sin romper lo anterior.
+
+---
+
+## 6. Editar promoción
+
+El formulario de edición debe respetar exactamente la misma lógica del formulario de creación.
+
+Cuando se edite una promoción:
+
+* Deben cargarse los datos actuales.
+* Debe mostrarse el nombre de la categoría, no solo su ID.
+* Debe mostrarse el supermercado con nombre, dirección y ciudad.
+* Debe mostrarse el tipo de promoción seleccionado.
+* Deben aparecer dinámicamente los campos correspondientes al tipo de promoción.
+* Si la promoción tiene local físico, deben cargarse la descripción, latitud y longitud.
+* Si la promoción tiene local virtual, debe cargarse la URL.
+* Si tiene ambas opciones, deben cargarse ambas secciones.
+
+Al guardar los cambios, la promoción debe actualizarse correctamente en la base de datos.
+
+---
+
+## 7. Sección administrativa y sección de usuario
+
+Estos cambios deben aplicarse tanto en:
+
+1. La sección administrativa de promociones.
+2. La sección donde un usuario normal registra promociones.
+
+Ambas secciones deben compartir la misma lógica de negocio y validaciones, aunque puedan tener diferencias visuales según el diseño actual.
+
+Evita duplicar código innecesariamente. Si es posible, crea componentes reutilizables para el formulario de promoción, selector de categoría, selector de supermercado, selector de tipo de promoción y selector de ubicación.
+
+---
+
+## 8. Backend y base de datos
+
+Revisa si el backend y los modelos actuales soportan todos estos campos.
+
+Si no los soportan, realiza los ajustes necesarios:
+
+* Modelos.
+* Migraciones.
+* Serializers o DTOs.
+* Controladores, views o endpoints.
+* Servicios.
+* Validaciones.
+* Rutas.
+* Relaciones entre entidades.
+
+La base de datos debe poder almacenar correctamente:
+
+* Tipo de promoción.
+* Categoría asociada.
+* Supermercado asociado.
+* Indicación de local físico.
+* Indicación de local virtual.
+* Descripción textual de ubicación física.
+* Latitud.
+* Longitud.
+* URL del local virtual.
+
+Usa nombres de campos claros y coherentes con las convenciones actuales del proyecto.
+
+---
+
+## 9. Validaciones necesarias
+
+Implementa validaciones tanto en frontend como en backend.
+
+Validaciones mínimas:
+
+* No permitir crear promoción sin categoría.
+* No permitir crear promoción sin supermercado.
+* No permitir crear promoción sin tipo de promoción.
+* Si el tipo es Descuento, validar que exista un valor de descuento válido.
+* Si se selecciona local físico, validar descripción de ubicación física o coordenadas según corresponda.
+* Si se selecciona local virtual, validar que exista URL y que empiece con `https://`.
+* Si se selecciona “Otro” como tipo de promoción, validar que se escriba una descripción del tipo.
+* No permitir guardar una promoción sin local físico ni local virtual.
+
+Los mensajes de error deben ser claros para el usuario.
+
+---
+
+## 10. Diseño e interfaz
+
+Si es necesario cambiar el diseño original, puedes hacerlo.
+
+La interfaz debe quedar:
+
+* Limpia.
+* Intuitiva.
+* Ordenada.
+* Fácil de usar.
+* Responsive.
+* Coherente con el estilo visual actual del proyecto.
+
+Evita formularios largos y confusos. Si es necesario, organiza el formulario por secciones:
+
+1. Información básica.
+2. Tipo de promoción.
+3. Categoría y supermercado.
+4. Ubicación física o virtual.
+5. Vigencia y detalles adicionales.
+
+---
+
+## 11. Requisitos técnicos
+
+Haz la implementación siguiendo la arquitectura actual del proyecto.
+
+Si el proyecto usa separación por:
+
+* pages
+* components
+* hooks
+* services
+* routes
+* models
+* serializers
+* views
+* controllers
+
+respeta esa estructura.
+
+En frontend:
+
+* Los componentes de UI deben quedar en la carpeta correspondiente.
+* Las llamadas HTTP deben ir en services.
+* La lógica reutilizable debe ir en hooks si aplica.
+* Las páginas deben consumir los hooks y componentes, no contener toda la lógica directamente.
+
+En backend:
+
+* Mantén el código ordenado.
+* No dupliques lógica.
+* Agrega o ajusta endpoints necesarios.
+* Agrega migraciones si se modifican modelos.
+* Asegúrate de que los datos se guarden correctamente.
+
+---
+
+## 12. Resultado esperado
+
+Al finalizar, el módulo debe permitir:
+
+1. Crear promociones desde administración sin escribir IDs manualmente.
+2. Crear promociones desde la sección de usuario sin escribir IDs manualmente.
+3. Seleccionar categoría desde la base de datos.
+4. Seleccionar supermercado desde la base de datos.
+5. Registrar un nuevo supermercado si no existe.
+6. Seleccionar tipo de promoción.
+7. Mostrar campos dinámicos según el tipo de promoción.
+8. Elegir si la promoción es de local físico, virtual o ambos.
+9. Seleccionar ubicación física desde un mapa y guardar latitud/longitud.
+10. Ingresar URL para local virtual validando que sea `https://`.
+11. Editar promociones conservando toda esta lógica.
+12. Guardar todo correctamente en la base de datos.
+13. Mantener una interfaz clara y funcional.
+
+---
+
+## 13. Antes de finalizar
+
+Después de implementar, revisa que no haya errores de compilación, errores de importación, rutas rotas ni problemas con las migraciones.
+
+También verifica:
+
+* Crear promoción.
+* Editar promoción.
+* Registrar nuevo supermercado.
+* Seleccionar categoría.
+* Seleccionar tipo de promoción.
+* Seleccionar ubicación física.
+* Guardar URL virtual.
+* Crear promoción con local físico.
+* Crear promoción con local virtual.
+* Crear promoción con ambas opciones.
+
+Si encuentras inconsistencias en el modelo actual o en la estructura del proyecto, corrígelas de la forma más limpia posible y explícame brevemente qué cambios hiciste.

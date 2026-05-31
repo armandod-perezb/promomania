@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
 /// Tipos de ubicación soportados
@@ -488,11 +491,15 @@ class _LocationSelectorState extends State<LocationSelector> {
   }
 
   void _showMapPicker(BuildContext context) async {
+    // Si no hay coordenadas previas, usar ubicación actual por defecto
+    final bool useCurrentLocation = widget.latitud == null || widget.longitud == null;
+    
     final result = await showDialog<LatLng>(
       context: context,
       builder: (context) => MapPickerDialog(
         initialLat: widget.latitud,
         initialLng: widget.longitud,
+        useCurrentLocationAsDefault: useCurrentLocation,
       ),
     );
 
@@ -503,14 +510,17 @@ class _LocationSelectorState extends State<LocationSelector> {
 }
 
 /// Diálogo para seleccionar ubicación en mapa usando flutter_map (OpenStreetMap)
+/// Incluye buscador de direcciones y botón para ubicación actual.
 class MapPickerDialog extends StatefulWidget {
   final double? initialLat;
   final double? initialLng;
+  final bool useCurrentLocationAsDefault;
 
   const MapPickerDialog({
     super.key,
     this.initialLat,
     this.initialLng,
+    this.useCurrentLocationAsDefault = false,
   });
 
   @override
@@ -520,15 +530,161 @@ class MapPickerDialog extends StatefulWidget {
 class _MapPickerDialogState extends State<MapPickerDialog> {
   late LatLng _selectedLocation;
   final MapController _mapController = MapController();
+  final TextEditingController _searchController = TextEditingController();
+  
+  // Estado de búsqueda
+  bool _isSearching = false;
+  bool _isLoadingLocation = false;
+  List<Map<String, dynamic>> _searchResults = [];
+  
+  // Coordenadas por defecto (Bogotá, Colombia)
+  static const LatLng _defaultLocation = LatLng(4.7110, -74.0721);
 
   @override
   void initState() {
     super.initState();
-    // Ubicación por defecto: Bogotá, Colombia
-    _selectedLocation = LatLng(
-      widget.initialLat ?? 4.7110,
-      widget.initialLng ?? -74.0721,
-    );
+    _initializeLocation();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  /// Inicializa la ubicación del mapa
+  Future<void> _initializeLocation() async {
+    // Si hay coordenadas previas, usarlas
+    if (widget.initialLat != null && widget.initialLng != null) {
+      setState(() {
+        _selectedLocation = LatLng(widget.initialLat!, widget.initialLng!);
+      });
+      return;
+    }
+
+    // Si se solicita usar ubicación actual por defecto
+    if (widget.useCurrentLocationAsDefault) {
+      await _goToCurrentLocation();
+    } else {
+      setState(() {
+        _selectedLocation = _defaultLocation;
+      });
+    }
+  }
+
+  /// Obtiene la ubicación actual del dispositivo
+  Future<void> _goToCurrentLocation() async {
+    setState(() => _isLoadingLocation = true);
+
+    try {
+      // Verificar permisos
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          _showError('Permiso de ubicación denegado');
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        _showError('Permiso de ubicación denegado permanentemente');
+        return;
+      }
+
+      // Obtener ubicación actual
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      final newLocation = LatLng(position.latitude, position.longitude);
+      
+      setState(() {
+        _selectedLocation = newLocation;
+        _isLoadingLocation = false;
+      });
+
+      // Mover el mapa a la ubicación actual
+      _mapController.move(newLocation, 16);
+
+      // Mostrar mensaje de éxito
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Ubicación actual obtenida'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() => _isLoadingLocation = false);
+      _showError('Error al obtener ubicación: $e');
+    }
+  }
+
+  void _showError(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  /// Busca ubicaciones usando Nominatim (OpenStreetMap)
+  Future<void> _searchLocation(String query) async {
+    if (query.trim().isEmpty) return;
+
+    setState(() => _isSearching = true);
+
+    try {
+      final encodedQuery = Uri.encodeComponent(query.trim());
+      final url = Uri.parse(
+        'https://nominatim.openstreetmap.org/search?q=$encodedQuery&format=json&limit=5&accept-language=es',
+      );
+
+      final response = await http.get(
+        url,
+        headers: {
+          'User-Agent': 'PromomaniaApp/1.0',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> results = jsonDecode(response.body);
+        
+        setState(() {
+          _searchResults = results.map((item) => {
+            'display_name': item['display_name'],
+            'lat': double.parse(item['lat']),
+            'lon': double.parse(item['lon']),
+          }).toList();
+          _isSearching = false;
+        });
+      } else {
+        throw Exception('Error en la búsqueda');
+      }
+    } catch (e) {
+      setState(() => _isSearching = false);
+      _showError('Error al buscar: $e');
+    }
+  }
+
+  /// Selecciona un resultado de búsqueda
+  void _selectSearchResult(Map<String, dynamic> result) {
+    final lat = result['lat'] as double;
+    final lon = result['lon'] as double;
+    final location = LatLng(lat, lon);
+
+    setState(() {
+      _selectedLocation = location;
+      _searchResults = [];
+      _searchController.text = result['display_name'].toString().split(',')[0];
+    });
+
+    _mapController.move(location, 16);
   }
 
   @override
@@ -536,18 +692,18 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
     final primaryColor = const Color(0xFFFF5733);
 
     return Dialog(
-      insetPadding: const EdgeInsets.all(16),
+      insetPadding: const EdgeInsets.all(12),
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.7,
+        height: MediaQuery.of(context).size.height * 0.8,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
           children: [
-            // Header
+            // Header con buscador
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: primaryColor.withOpacity(0.05),
                 borderRadius: const BorderRadius.only(
@@ -555,112 +711,211 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
                   topRight: Radius.circular(16),
                 ),
               ),
-              child: Row(
+              child: Column(
                 children: [
-                  Icon(Icons.map, color: primaryColor),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Seleccionar ubicación',
+                  Row(
+                    children: [
+                      Icon(Icons.map, color: primaryColor),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Buscar y seleccionar ubicación',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 15,
                             fontWeight: FontWeight.w700,
+                            color: primaryColor,
                           ),
                         ),
-                        Text(
-                          'Toca el mapa para seleccionar',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close, size: 22),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  // Campo de búsqueda
+                  TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Buscar dirección, ciudad, lugar...',
+                      hintStyle: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[500],
+                      ),
+                      prefixIcon: Icon(Icons.search, color: primaryColor, size: 20),
+                      suffixIcon: _isSearching
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : IconButton(
+                              icon: const Icon(Icons.clear, size: 18),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() => _searchResults = []);
+                              },
+                            ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: primaryColor.withOpacity(0.3)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: primaryColor.withOpacity(0.3)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: primaryColor, width: 1.5),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    ),
+                    onSubmitted: _searchLocation,
+                  ),
+                  
+                  // Resultados de búsqueda
+                  if (_searchResults.isNotEmpty)
+                    Container(
+                      margin: const EdgeInsets.only(top: 4),
+                      constraints: const BoxConstraints(maxHeight: 150),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
                           ),
+                        ],
+                      ),
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: _searchResults.length,
+                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        itemBuilder: (context, index) {
+                          final result = _searchResults[index];
+                          return ListTile(
+                            dense: true,
+                            leading: Icon(Icons.location_on, color: primaryColor, size: 20),
+                            title: Text(
+                              result['display_name'].toString().split(',')[0],
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle: Text(
+                              result['display_name'].toString(),
+                              style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            onTap: () => _selectSearchResult(result),
+                          );
+                        },
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // Mapa con botón de ubicación actual
+            Expanded(
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: FlutterMap(
+                      mapController: _mapController,
+                      options: MapOptions(
+                        initialCenter: _selectedLocation,
+                        initialZoom: 15,
+                        onTap: (tapPosition, latLng) {
+                          setState(() {
+                            _selectedLocation = latLng;
+                          });
+                        },
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          userAgentPackageName: 'com.promomania.app',
+                        ),
+                        MarkerLayer(
+                          markers: [
+                            Marker(
+                              point: _selectedLocation,
+                              width: 40,
+                              height: 40,
+                              child: Icon(
+                                Icons.location_pin,
+                                color: primaryColor,
+                                size: 40,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close),
+                  
+                  // Botón de ubicación actual
+                  Positioned(
+                    right: 12,
+                    bottom: 80,
+                    child: FloatingActionButton.small(
+                      heroTag: 'locationButton',
+                      onPressed: _isLoadingLocation ? null : _goToCurrentLocation,
+                      backgroundColor: Colors.white,
+                      foregroundColor: primaryColor,
+                      elevation: 4,
+                      child: _isLoadingLocation
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.my_location, size: 20),
+                    ),
                   ),
                 ],
               ),
             ),
 
-            // Mapa
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: FlutterMap(
-                  mapController: _mapController,
-                  options: MapOptions(
-                    initialCenter: _selectedLocation,
-                    initialZoom: 15,
-                    onTap: (tapPosition, latLng) {
-                      setState(() {
-                        _selectedLocation = latLng;
-                      });
-                    },
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'com.promomania.app',
-                    ),
-                    MarkerLayer(
-                      markers: [
-                        Marker(
-                          point: _selectedLocation,
-                          width: 40,
-                          height: 40,
-                          child: Icon(
-                            Icons.location_pin,
-                            color: primaryColor,
-                            size: 40,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
             // Info y botones
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: Colors.grey[100],
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.location_on,
-                          color: primaryColor,
-                          size: 20,
-                        ),
+                        Icon(Icons.location_on, color: primaryColor, size: 20),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'Coordenadas seleccionadas:',
+                                'Ubicación seleccionada:',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               Text(
-                                'Lat: ${_selectedLocation.latitude.toStringAsFixed(6)}\nLng: ${_selectedLocation.longitude.toStringAsFixed(6)}',
+                                'Lat: ${_selectedLocation.latitude.toStringAsFixed(6)}, Lng: ${_selectedLocation.longitude.toStringAsFixed(6)}',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 11,
                                   color: Colors.grey[700],
                                 ),
                               ),
@@ -670,14 +925,14 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () => Navigator.pop(context),
                           style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                             side: BorderSide(color: Colors.grey[300]!),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -686,14 +941,14 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
                           child: const Text('Cancelar'),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
                         flex: 2,
                         child: ElevatedButton.icon(
                           onPressed: () {
                             Navigator.pop(context, _selectedLocation);
                           },
-                          icon: const Icon(Icons.check, size: 18),
+                          icon: const Icon(Icons.check, size: 16),
                           label: const Text(
                             'Confirmar ubicación',
                             style: TextStyle(fontWeight: FontWeight.w600),
@@ -701,7 +956,7 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: primaryColor,
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),

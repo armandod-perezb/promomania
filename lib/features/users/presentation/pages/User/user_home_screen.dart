@@ -1,13 +1,15 @@
-// Importaciones necesarias para la pantalla de mapa principal
-import 'package:flutter/material.dart';           // UI framework principal
-import 'package:flutter/services.dart';           // Para feedback háptico y estilo de sistema
-import 'package:flutter_map/flutter_map.dart';     // Biblioteca para mapas interactivos
-import 'package:latlong2/latlong.dart' show LatLng; // Para coordenadas geográficas
-import '../../../../../Core/Routes/app_routes.dart';         // Definición de rutas de navegación
-import '../../../../../Core/di/app_scope.dart';                            // Para acceso a servicios globales
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart' show LatLng;
 
-/// Pantalla principal de mapa con promociones geolocalizadas
-/// Muestra mapa interactivo con marcadores de promociones y controles de navegación
+import '../../../../../Core/Routes/app_routes.dart';
+import '../../../../../Core/di/app_scope.dart';
+import '../../../../../features/promotions/domain/entities/promocion.dart';
+import '../../../../../features/promotions/domain/entities/supermercado.dart';
+
 class HomeMapScreen extends StatefulWidget {
   const HomeMapScreen({super.key});
 
@@ -17,219 +19,417 @@ class HomeMapScreen extends StatefulWidget {
 
 class _HomeMapScreenState extends State<HomeMapScreen>
     with TickerProviderStateMixin {
-  // Colores constantes de la aplicación
-  static const Color _primary = Color(0xFFFF4D2E);    // Color primario rojo/naranja
-  static const Color _darkBg = Color(0xFF1A1F2E);     // Fondo oscuro para elementos
-  
-  // Ubicación inicial del mapa (Bogotá, Colombia)
+  static const Color _primary = Color(0xFFFF4D2E);
   static const LatLng _defaultCenter = LatLng(4.7110, -74.0721);
+  static const double _nearbyRadiusKm = 5.0;
 
-  // Variables de estado de UI
-  int _selectedTab = 0;                    // Tab activa en navegación inferior
-  double _zoomLevel = 14;                  // Nivel de zoom actual del mapa
-  int _selectedPromo = 0;                  // ID de promoción seleccionada
-  final MapController _mapController = MapController(); // Controlador del mapa
+  int _selectedTab = 0;
+  double _zoomLevel = 14;
+  String? _selectedPromoCode;
+  bool _isLoadingMapData = true;
+  bool _isRefreshingLocation = false;
+  String? _locationWarning;
 
-  // Controladores de animación para el bottom sheet
-  late final AnimationController _cardController;  // Controlador principal
-  late final Animation<Offset> _cardSlide;        // Animación de deslizamiento
-  late final Animation<double> _cardFade;         // Animación de opacidad
+  LatLng _userLocation = _defaultCenter;
+  List<Promocion> _allActivePromotions = const [];
+  List<_MapPromo> _promos = const [];
 
-  // Lista de promociones de ejemplo para mostrar en el mapa
-  // Cada promo contiene: ID, etiqueta de descuento, color y coordenadas
-  final List<_MapPromo> _promos = const [
-    _MapPromo(
-      id: 0,
-      label: '-50%',
-      color: Color(0xFFE91E8C),  // Rosa
-      latLng: LatLng(4.7162, -74.0703),  // Coordenada Bogotá norte
-    ),
-    _MapPromo(
-      id: 1,
-      label: '50%',
-      color: Color(0xFFFF4D2E),  // Rojo primario
-      latLng: LatLng(4.7093, -74.0757),  // Coordenada Bogotá centro
-    ),
-    _MapPromo(
-      id: 2,
-      label: '-40%',
-      color: Color(0xFF3B82F6),  // Azul
-      latLng: LatLng(4.7058, -74.0682),  // Coordenada Bogotá oeste
-    ),
-    _MapPromo(
-      id: 3,
-      label: '-33%',
-      color: Color(0xFF10B981),  // Verde
-      latLng: LatLng(4.7018, -74.0801),  // Coordenada Bogotá sur
-    ),
-    _MapPromo(
-      id: 4,
-      label: '-33%',
-      color: Color(0xFF10B981),  // Verde
-      latLng: LatLng(4.6979, -74.0648),  // Coordenada Bogotá este
-    ),
-  ];
+  final MapController _mapController = MapController();
 
-  // Detalles completos de cada promoción para el bottom sheet
-  // Contiene información visual y descriptiva de cada oferta
-  final List<_PromoDetail> _promoDetails = const [
-    _PromoDetail(
-      category: 'Comida',
-      categoryColor: Color(0xFFFF4D2E),  // Rojo para comida
-      discount: '-50%',
-      title: '2x1 en Hamburguesa',
-      store: 'Burger House',
-      emoji: '🍔',
-    ),
-    _PromoDetail(
-      category: 'Moda',
-      categoryColor: Color(0xFFE91E8C),  // Rosa para moda
-      discount: '50%',
-      title: 'Descuento en ropa',
-      store: 'Fashion Store',
-      emoji: '👕',
-    ),
-    _PromoDetail(
-      category: 'Tech',
-      categoryColor: Color(0xFF3B82F6),  // Azul para tecnología
-      discount: '-40%',
-      title: 'Accesorios Apple',
-      store: 'iZone Store',
-      emoji: '📱',
-    ),
-    _PromoDetail(
-      category: 'Salud',
-      categoryColor: Color(0xFF10B981),  // Verde para salud
-      discount: '-33%',
-      title: 'Vitaminas y suplementos',
-      store: 'VitaShop',
-      emoji: '💊',
-    ),
-    _PromoDetail(
-      category: 'Salud',
-      categoryColor: Color(0xFF10B981),  // Verde para salud
-      discount: '-33%',
-      title: 'Consulta médica',
-      store: 'Clínica Norte',
-      emoji: '🏥',
-    ),
-  ];
+  late final AnimationController _cardController;
+  late final Animation<Offset> _cardSlide;
+  late final Animation<double> _cardFade;
 
   @override
   void initState() {
     super.initState();
-    // Inicializar controlador de animación para el bottom sheet
     _cardController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),  // Duración de la animación
+      duration: const Duration(milliseconds: 400),
     );
-    // Configurar animación de deslizamiento (de abajo hacia arriba)
     _cardSlide = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
         .animate(
           CurvedAnimation(parent: _cardController, curve: Curves.easeOutCubic),
         );
-    // Configurar animación de opacidad (fade in)
     _cardFade = CurvedAnimation(parent: _cardController, curve: Curves.easeOut);
-    // Iniciar animación al cargar la pantalla
     _cardController.forward();
+
+    _loadMapData();
   }
 
   @override
   void dispose() {
-    // Liberar recursos del controlador de animación
     _cardController.dispose();
     super.dispose();
   }
 
-  /// Selecciona una promoción y muestra su detalle en el bottom sheet
-  /// Actualiza el estado y reproduce la animación del card
-  /// Parámetro: id - ID de la promoción a seleccionar
-  void _selectPromo(int id) {
-    setState(() => _selectedPromo = id);  // Actualizar promoción seleccionada
-    _cardController.forward(from: 0);      // Reproducir animación desde el inicio
-    HapticFeedback.lightImpact();          // Feedback háptico ligero
+  Future<void> _loadMapData() async {
+    final locationResult = await _resolveUserLocation();
+    final activePromos = await _loadActivePromotions();
+    final nearbyPromos = _buildNearbyPromos(
+      activePromotions: activePromos,
+      userLocation: locationResult.location,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoadingMapData = false;
+      _locationWarning = locationResult.warning;
+      _userLocation = locationResult.location;
+      _allActivePromotions = activePromos;
+      _promos = nearbyPromos;
+      _selectedPromoCode = nearbyPromos.isEmpty
+          ? null
+          : nearbyPromos.first.code;
+    });
+
+    _mapController.move(_userLocation, _zoomLevel);
+    if (_locationWarning != null) {
+      _showInfoSnackBar(_locationWarning!);
+    }
+  }
+
+  Future<List<Promocion>> _loadActivePromotions() async {
+    try {
+      final remote = await promotionsController.getActivePromotions();
+      if (remote.isNotEmpty) return remote;
+    } catch (_) {
+      // Fallback a caché local.
+    }
+    return promotionsController.getActivePromotionsSync();
+  }
+
+  Future<void> _refreshWithCurrentLocation() async {
+    if (_isRefreshingLocation) return;
+
+    setState(() => _isRefreshingLocation = true);
+    final locationResult = await _resolveUserLocation();
+    final nearbyPromos = _buildNearbyPromos(
+      activePromotions: _allActivePromotions,
+      userLocation: locationResult.location,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isRefreshingLocation = false;
+      _locationWarning = locationResult.warning;
+      _userLocation = locationResult.location;
+      _promos = nearbyPromos;
+      _selectedPromoCode = nearbyPromos.isEmpty
+          ? null
+          : nearbyPromos.first.code;
+    });
+
+    _mapController.move(_userLocation, _zoomLevel);
+    if (_locationWarning != null) {
+      _showInfoSnackBar(_locationWarning!);
+    }
+  }
+
+  Future<_LocationResult> _resolveUserLocation() async {
+    try {
+      if (kIsWeb) {
+        final scheme = Uri.base.scheme.toLowerCase();
+        final host = Uri.base.host.toLowerCase();
+        final isLocalHost =
+            host == 'localhost' || host == '127.0.0.1' || host == '::1';
+        final isSecureContext = scheme == 'https' || isLocalHost;
+        if (!isSecureContext) {
+          return const _LocationResult(
+            location: _defaultCenter,
+            warning: 'En web, la ubicación actual requiere HTTPS o localhost.',
+          );
+        }
+      } else {
+        final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) {
+          return const _LocationResult(
+            location: _defaultCenter,
+            warning: 'Activa el servicio de ubicación del dispositivo.',
+          );
+        }
+      }
+
+      final permissionResult = await _ensureLocationPermission();
+      if (permissionResult != null) {
+        return _LocationResult(
+          location: _defaultCenter,
+          warning: permissionResult,
+        );
+      }
+
+      final position = await _getCurrentPositionForPlatform();
+      return _LocationResult(
+        location: LatLng(position.latitude, position.longitude),
+      );
+    } catch (_) {
+      if (!kIsWeb) {
+        try {
+          final lastKnown = await Geolocator.getLastKnownPosition();
+          if (lastKnown != null) {
+            return _LocationResult(
+              location: LatLng(lastKnown.latitude, lastKnown.longitude),
+              warning:
+                  'No se pudo obtener la ubicación en tiempo real. Se usó la última ubicación conocida.',
+            );
+          }
+        } catch (_) {
+          // Ignorar y usar fallback por defecto.
+        }
+      }
+      return const _LocationResult(
+        location: _defaultCenter,
+        warning:
+            'No se pudo obtener tu ubicación actual. Se muestra una ubicación por defecto.',
+      );
+    }
+  }
+
+  Future<String?> _ensureLocationPermission() async {
+    final permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      if (kIsWeb) {
+        return 'Permiso de ubicación denegado en el navegador.';
+      }
+      final requested = await Geolocator.requestPermission();
+      if (requested == LocationPermission.denied) {
+        return 'Permiso de ubicación denegado.';
+      }
+      if (requested == LocationPermission.deniedForever) {
+        return 'Permiso bloqueado. Habilítalo en ajustes del sistema.';
+      }
+      return null;
+    }
+    if (permission == LocationPermission.deniedForever) {
+      return kIsWeb
+          ? 'Permiso bloqueado en navegador. Habilítalo y recarga la página.'
+          : 'Permiso bloqueado. Habilítalo en ajustes del sistema.';
+    }
+    return null;
+  }
+
+  Future<Position> _getCurrentPositionForPlatform() {
+    if (!kIsWeb) {
+      return Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
+    }
+    return Geolocator.getCurrentPosition(
+      locationSettings: WebSettings(
+        accuracy: LocationAccuracy.medium,
+        maximumAge: const Duration(minutes: 5),
+        timeLimit: const Duration(seconds: 20),
+      ),
+    );
+  }
+
+  List<_MapPromo> _buildNearbyPromos({
+    required List<Promocion> activePromotions,
+    required LatLng userLocation,
+  }) {
+    final promos = <_MapPromo>[];
+    for (final promo in activePromotions) {
+      if (!_hasValidCoordinates(promo.lat, promo.lng)) continue;
+
+      final distanceMeters = Geolocator.distanceBetween(
+        userLocation.latitude,
+        userLocation.longitude,
+        promo.lat!,
+        promo.lng!,
+      );
+      final distanceKm = distanceMeters / 1000.0;
+      if (distanceKm > _nearbyRadiusKm) continue;
+
+      final supermercado = promotionsController.getSupermercadoSync(
+        promo.idSupermercado,
+      );
+      final categoria = catalogController.getCategoriaByIdSync(
+        promo.idCategoria,
+      );
+      final categoriaStyle = catalogController.getCategoriaStyleSync(
+        promo.idCategoria,
+      );
+      final categoryColor =
+          _parseHexColor(categoriaStyle['color']) ??
+          _fallbackCategoryColor(promo.idCategoria);
+      final discountLabel = _buildDiscountLabel(promo.descuento);
+
+      promos.add(
+        _MapPromo(
+          code: promo.codigo,
+          label: discountLabel,
+          color: categoryColor,
+          latLng: LatLng(promo.lat!, promo.lng!),
+          detail: _PromoDetail(
+            category: categoria?.nombre ?? 'General',
+            categoryColor: categoryColor,
+            discount: discountLabel,
+            title: promo.titulo,
+            store: _resolveStoreLabel(supermercado, promo),
+            emoji: categoriaStyle['emoji'] ?? '📦',
+          ),
+          distanceKm: distanceKm,
+        ),
+      );
+    }
+
+    promos.sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
+    return promos;
+  }
+
+  bool _hasValidCoordinates(double? lat, double? lng) {
+    if (lat == null || lng == null) return false;
+    if (lat.isNaN || lng.isNaN || lat.isInfinite || lng.isInfinite) {
+      return false;
+    }
+    final inRange = lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+    if (!inRange) return false;
+    return !(lat == 0.0 && lng == 0.0);
+  }
+
+  String _buildDiscountLabel(int? discount) {
+    if (discount == null || discount <= 0) return 'Oferta';
+    return '-$discount%';
+  }
+
+  String _resolveStoreLabel(Supermercado? supermercado, Promocion promo) {
+    if (supermercado?.nombre != null &&
+        supermercado!.nombre.trim().isNotEmpty) {
+      return supermercado.nombre;
+    }
+    if (promo.ubicacion != null && promo.ubicacion!.trim().isNotEmpty) {
+      return promo.ubicacion!;
+    }
+    return 'Sin ubicación';
+  }
+
+  Color _fallbackCategoryColor(int categoryId) {
+    const colors = [
+      Color(0xFFFF4D2E),
+      Color(0xFF3B82F6),
+      Color(0xFF10B981),
+      Color(0xFFE91E8C),
+      Color(0xFFF59E0B),
+    ];
+    return colors[categoryId % colors.length];
+  }
+
+  Color? _parseHexColor(String? value) {
+    if (value == null) return null;
+    final hex = value.replaceAll('#', '').trim();
+    if (hex.length != 6 && hex.length != 8) return null;
+    final normalized = hex.length == 6 ? 'FF$hex' : hex;
+    final parsed = int.tryParse(normalized, radix: 16);
+    if (parsed == null) return null;
+    return Color(parsed);
+  }
+
+  void _showInfoSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), duration: const Duration(seconds: 3)),
+    );
+  }
+
+  _MapPromo? get _selectedPromoData {
+    if (_promos.isEmpty) return null;
+    final selectedCode = _selectedPromoCode;
+    if (selectedCode == null) return _promos.first;
+    for (final promo in _promos) {
+      if (promo.code == selectedCode) return promo;
+    }
+    return _promos.first;
+  }
+
+  void _selectPromo(String code) {
+    setState(() => _selectedPromoCode = code);
+    _cardController.forward(from: 0);
+    HapticFeedback.lightImpact();
+  }
+
+  void _openSelectedPromotionDetails() {
+    final selected = _selectedPromoData;
+    if (selected == null) return;
+    Navigator.pushNamed(
+      context,
+      AppRoutes.promotionDetails,
+      arguments: selected.code,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,  // Establecer estilo de sistema (status bar oscuro)
+      value: SystemUiOverlayStyle.dark,
       child: Scaffold(
         backgroundColor: Colors.white,
         body: Stack(
           children: [
-            // ── Mapa real OpenStreetMap (gratis, sin API key) ──
             _buildOsmMap(),
-
-            // ── Barra de búsqueda ──
             _buildSearchBar(),
-
-            // ── Badge de zoom ──
             _buildZoomBadge(),
-
-            // ── Controles de mapa ──
             _buildMapControls(),
-
-            // ── Bottom sheet con promo activa ──
             _buildBottomPromoSheet(),
+            if (_isLoadingMapData)
+              const Positioned.fill(
+                child: ColoredBox(
+                  color: Color(0x66FFFFFF),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              ),
           ],
         ),
-        // Navegación inferior
         bottomNavigationBar: _buildBottomNav(),
       ),
     );
   }
 
-  // ── SECCIÓN DE MAPA ─────────────────────────────────────────────────────────────
-
-  /// Construye el mapa interactivo con OpenStreetMap
-  /// Muestra tiles de mapa, marcadores de promociones y ubicación del usuario
   Widget _buildOsmMap() {
     return Positioned.fill(
       child: FlutterMap(
-        mapController: _mapController,  // Controlador para manipular el mapa
+        mapController: _mapController,
         options: MapOptions(
-          initialCenter: _defaultCenter,  // Centro inicial (Bogotá)
-          initialZoom: _zoomLevel,       // Nivel de zoom inicial
-          minZoom: 5,                   // Zoom mínimo permitido
-          maxZoom: 19,                  // Zoom máximo permitido
+          initialCenter: _userLocation,
+          initialZoom: _zoomLevel,
+          minZoom: 5,
+          maxZoom: 19,
         ),
         children: [
-          // Capa de tiles del mapa (OpenStreetMap)
           TileLayer(
             urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            userAgentPackageName: 'com.promomania.app',  // Identificador de la app
+            userAgentPackageName: 'com.promomania.app',
           ),
-          // Capa de marcadores de promociones
           MarkerLayer(markers: _buildPromoMarkers()),
-          // Capa con marcador de ubicación del usuario
           MarkerLayer(markers: [_buildUserPin()]),
         ],
       ),
     );
   }
 
-  /// Construye la lista de marcadores de promociones para el mapa
-  /// Cada marcador es interactivo y muestra animación al ser seleccionado
   List<Marker> _buildPromoMarkers() {
-    return _promos.map((p) {
-      final isSelected = _selectedPromo == p.id;  // Verificar si está seleccionada
+    return _promos.map((promo) {
+      final isSelected = _selectedPromoCode == promo.code;
       return Marker(
-        point: p.latLng,  // Posición del marcador en el mapa
+        point: promo.latLng,
         width: 86,
         height: 56,
         child: GestureDetector(
           onTap: () {
-            _selectPromo(p.id);           // Seleccionar promoción
-            _mapController.move(p.latLng, _zoomLevel);  // Centrar mapa en la promoción
+            _selectPromo(promo.code);
+            _mapController.move(promo.latLng, _zoomLevel);
           },
           child: AnimatedScale(
-            scale: isSelected ? 1.2 : 1.0,  // Escala según selección
+            scale: isSelected ? 1.2 : 1.0,
             duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOutBack,     // Curva de animación suave
+            curve: Curves.easeOutBack,
             child: _PromoMarker(
-              label: p.label,
-              color: p.color,
+              label: promo.label,
+              color: promo.color,
               isSelected: isSelected,
             ),
           ),
@@ -238,23 +438,21 @@ class _HomeMapScreenState extends State<HomeMapScreen>
     }).toList();
   }
 
-  /// Construye el marcador de ubicación del usuario
-  /// Muestra un punto azul en el centro del mapa
   Marker _buildUserPin() {
     return Marker(
-      point: _defaultCenter,  // Posición del usuario (centro del mapa)
+      point: _userLocation,
       width: 22,
       height: 22,
       child: Container(
         width: 16,
         height: 16,
         decoration: BoxDecoration(
-          color: const Color(0xFF3B82F6),  // Azul para ubicación del usuario
+          color: const Color(0xFF3B82F6),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2.5),  // Borde blanco
+          border: Border.all(color: Colors.white, width: 2.5),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF3B82F6).withOpacity(0.4),  // Sombra azul
+              color: const Color(0xFF3B82F6).withValues(alpha: 0.4),
               blurRadius: 8,
               spreadRadius: 2,
             ),
@@ -264,18 +462,13 @@ class _HomeMapScreenState extends State<HomeMapScreen>
     );
   }
 
-  // ── SECCIÓN DE BARRA DE BÚSQUEDA ─────────────────────────────────────────────────────
-
-  /// Construye la barra de búsqueda superior con campo de texto y botón de filtros
-  /// Muestra: campo de búsqueda placeholder y botón de capas/filtros
   Widget _buildSearchBar() {
     return Positioned(
-      top: MediaQuery.of(context).padding.top + 10,  // Respetar área de status bar
+      top: MediaQuery.of(context).padding.top + 10,
       left: 16,
       right: 16,
       child: Row(
         children: [
-          // Campo de búsqueda
           Expanded(
             child: Container(
               height: 50,
@@ -284,7 +477,7 @@ class _HomeMapScreenState extends State<HomeMapScreen>
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.12),  // Sombra suave
+                    color: Colors.black.withValues(alpha: 0.12),
                     blurRadius: 16,
                     offset: const Offset(0, 4),
                   ),
@@ -293,40 +486,46 @@ class _HomeMapScreenState extends State<HomeMapScreen>
               child: Row(
                 children: [
                   const SizedBox(width: 14),
-                  // Icono de búsqueda
                   const Icon(
                     Icons.search_rounded,
-                    color: Color(0xFFB0B5CC),  // Gris claro
+                    color: Color(0xFFB0B5CC),
                     size: 20,
                   ),
                   const SizedBox(width: 10),
-                  // Texto placeholder
-                  Text(
-                    'Buscar promociones cerca...',
-                    style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                  Expanded(
+                    child: Text(
+                      _promos.isEmpty
+                          ? 'No hay promos en ${_nearbyRadiusKm.toInt()} km'
+                          : '${_promos.length} promociones cerca de ti',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 14,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
           const SizedBox(width: 10),
-          // Botón de filtros/capas
           Container(
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: _primary,  // Fondo primario
+              color: _primary,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: _primary.withOpacity(0.4),  // Sombra del color primario
+                  color: _primary.withValues(alpha: 0.4),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
             child: const Icon(
-              Icons.layers_rounded,  // Icono de capas/filtros
+              Icons.layers_rounded,
               color: Colors.white,
               size: 22,
             ),
@@ -336,13 +535,9 @@ class _HomeMapScreenState extends State<HomeMapScreen>
     );
   }
 
-  // ── SECCIÓN DE BADGE DE ZOOM ───────────────────────────────────────────────────────
-
-  /// Construye el indicador de nivel de zoom actual
-  /// Muestra el porcentaje de zoom basado en el nivel actual
   Widget _buildZoomBadge() {
     return Positioned(
-      top: MediaQuery.of(context).padding.top + 72,  // Debajo de la barra de búsqueda
+      top: MediaQuery.of(context).padding.top + 72,
       left: 16,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -351,45 +546,38 @@ class _HomeMapScreenState extends State<HomeMapScreen>
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),  // Sombra muy sutil
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Text(
-          // Calcular porcentaje de zoom (5-19 rango -> 0-100%)
           'Zoom: ${((_zoomLevel - 5) / 14 * 100).clamp(0, 100).toInt()}%',
           style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF1A1F2E),  // Gris oscuro
+            color: Color(0xFF1A1F2E),
           ),
         ),
       ),
     );
   }
 
-  // ── SECCIÓN DE CONTROLES DE MAPA ─────────────────────────────────────────────────────
-
-  /// Construye los controles de navegación del mapa
-  /// Muestra: botón de ubicación actual, zoom in y zoom out
   Widget _buildMapControls() {
     return Positioned(
       right: 16,
-      top: MediaQuery.of(context).padding.top + 72,  // Alineado con badge de zoom
+      top: MediaQuery.of(context).padding.top + 72,
       child: Column(
         children: [
-          // Botón de ubicación actual (centrar mapa)
           _mapControlBtn(
-            icon: Icons.near_me_outlined,
-            onTap: () {
+            icon: _isRefreshingLocation ? Icons.sync : Icons.near_me_outlined,
+            onTap: () async {
               HapticFeedback.lightImpact();
-              _mapController.move(_defaultCenter, _zoomLevel);  // Centrar en ubicación
+              await _refreshWithCurrentLocation();
             },
           ),
           const SizedBox(height: 8),
-          // Botón de zoom in
           _mapControlBtn(
             icon: Icons.add_rounded,
             onTap: () {
@@ -399,7 +587,6 @@ class _HomeMapScreenState extends State<HomeMapScreen>
             },
           ),
           const SizedBox(height: 8),
-          // Botón de zoom out
           _mapControlBtn(
             icon: Icons.remove_rounded,
             onTap: () {
@@ -413,11 +600,6 @@ class _HomeMapScreenState extends State<HomeMapScreen>
     );
   }
 
-  /// Construye un botón individual de control del mapa
-  /// Muestra: icono centrado con fondo blanco y sombra
-  /// Parámetros:
-  /// - icon: icono a mostrar
-  /// - onTap: acción al presionar
   Widget _mapControlBtn({required IconData icon, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
@@ -429,31 +611,28 @@ class _HomeMapScreenState extends State<HomeMapScreen>
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),  // Sombra suave
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
         ),
-        child: Icon(icon, color: const Color(0xFF1A1F2E), size: 20),  // Icono gris oscuro
+        child: Icon(icon, color: const Color(0xFF1A1F2E), size: 20),
       ),
     );
   }
 
-  // ── SECCIÓN DE BOTTOM SHEET DE PROMOCIÓN ───────────────────────────────────────────────
-
-  /// Construye el bottom sheet con detalles de la promoción seleccionada
-  /// Muestra: emoji/imagen, información completa y botón de acción
   Widget _buildBottomPromoSheet() {
-    final promo = _promoDetails[_selectedPromo];  // Obtener promoción seleccionada
+    final selected = _selectedPromoData;
+
     return Positioned(
       bottom: 0,
       left: 0,
       right: 0,
       child: SlideTransition(
-        position: _cardSlide,  // Animación de deslizamiento
+        position: _cardSlide,
         child: FadeTransition(
-          opacity: _cardFade,   // Animación de opacidad
+          opacity: _cardFade,
           child: Container(
             margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
             decoration: BoxDecoration(
@@ -461,121 +640,164 @@ class _HomeMapScreenState extends State<HomeMapScreen>
               borderRadius: BorderRadius.circular(22),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.14),  // Sombra pronunciada
+                  color: Colors.black.withValues(alpha: 0.14),
                   blurRadius: 24,
-                  offset: const Offset(0, -4),  // Sombra hacia arriba
+                  offset: const Offset(0, -4),
                 ),
               ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Row(
-                children: [
-                  // Emoji / imagen de la promoción
-                  Container(
-                    width: 68,
-                    height: 68,
-                    decoration: BoxDecoration(
-                      color: promo.categoryColor.withOpacity(0.1),  // Fondo con color de categoría
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Center(
-                      child: Text(
-                        promo.emoji,
-                        style: const TextStyle(fontSize: 30),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  // Sección de información
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Fila de badges (categoría y descuento)
-                        Row(
-                          children: [
-                            _categoryBadge(promo.category, promo.categoryColor),
-                            const SizedBox(width: 8),
-                            _discountBadge(promo.discount),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        // Título de la promoción
-                        Text(
-                          promo.title,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF1A1F2E),  // Gris oscuro
-                          ),
-                        ),
-                        const SizedBox(height: 3),
-                        // Fila de ubicación
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on_rounded,
-                              color: Color(0xFFB0B5CC),  // Gris claro
-                              size: 13,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              promo.store,
-                              style: const TextStyle(
-                                fontSize: 12.5,
-                                color: Color(0xFF8A8FA8),  // Gris claro
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  // FAB - Agregar Promoción
-                  GestureDetector(
-                    onTap: () =>
-                        Navigator.pushNamed(context, AppRoutes.addPromotions),
-                    child: Container(
-                      width: 46,
-                      height: 46,
-                      decoration: BoxDecoration(
-                        color: _primary,  // Fondo primario
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: _primary.withOpacity(0.35),  // Sombra del color primario
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.add_rounded,  // Icono de agregar
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            child: selected == null
+                ? _buildEmptyBottomSheet()
+                : _buildSelectedPromoBottomSheet(selected),
           ),
         ),
       ),
     );
   }
 
-  /// Construye un badge de categoría con color personalizado
-  /// Muestra: nombre de categoría con fondo del color correspondiente
-  /// Parámetros:
-  /// - label: nombre de la categoría
-  /// - color: color de la categoría
+  Widget _buildEmptyBottomSheet() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Container(
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(
+              color: const Color(0xFFEEF1F8),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(
+              Icons.location_off_outlined,
+              color: Color(0xFF8A8FA8),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Sin promociones cercanas',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1A1F2E),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'No encontramos promociones dentro de ${_nearbyRadiusKm.toInt()} km.',
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    color: Color(0xFF8A8FA8),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSelectedPromoBottomSheet(_MapPromo selected) {
+    final promo = selected.detail;
+    return Padding(
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        children: [
+          Container(
+            width: 68,
+            height: 68,
+            decoration: BoxDecoration(
+              color: promo.categoryColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Center(
+              child: Text(promo.emoji, style: const TextStyle(fontSize: 30)),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    _categoryBadge(promo.category, promo.categoryColor),
+                    const SizedBox(width: 8),
+                    _discountBadge(promo.discount),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  promo.title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF1A1F2E),
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on_rounded,
+                      color: Color(0xFFB0B5CC),
+                      size: 13,
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        '${promo.store} · ${selected.distanceKm.toStringAsFixed(2)} km',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          color: Color(0xFF8A8FA8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: _openSelectedPromotionDetails,
+            child: Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color: _primary,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: _primary.withValues(alpha: 0.35),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.arrow_forward_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _categoryBadge(String label, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),  // Color transparente de la categoría
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -589,14 +811,11 @@ class _HomeMapScreenState extends State<HomeMapScreen>
     );
   }
 
-  /// Construye un badge de descuento con color primario
-  /// Muestra: porcentaje de descuento con fondo primario y texto blanco
-  /// Parámetro: label - texto del descuento (ej: '-50%', '50%')
   Widget _discountBadge(String label) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: _primary,  // Fondo primario
+        color: _primary,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -610,19 +829,13 @@ class _HomeMapScreenState extends State<HomeMapScreen>
     );
   }
 
-  // ── SECCIÓN DE NAVEGACIÓN INFERIOR ─────────────────────────────────────────────────────
-
-  /// Construye la barra de navegación inferior con tabs animados
-  /// Muestra: 4 tabs principales con iconos y etiquetas
   Widget _buildBottomNav() {
-    // Definición de tabs con iconos y etiquetas
     final tabs = [
       _NavTab(icon: Icons.map_rounded, label: 'Inicio'),
       _NavTab(icon: Icons.explore_outlined, label: 'Explorar'),
       _NavTab(icon: Icons.favorite_border_rounded, label: 'Favoritos'),
       _NavTab(icon: Icons.person_outline_rounded, label: 'Perfil'),
     ];
-    // Rutas correspondientes a cada tab
     final routesByTab = [
       AppRoutes.userHome,
       AppRoutes.explore,
@@ -636,7 +849,7 @@ class _HomeMapScreenState extends State<HomeMapScreen>
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.07),
+            color: Colors.black.withValues(alpha: 0.07),
             blurRadius: 12,
             offset: const Offset(0, -2),
           ),
@@ -656,7 +869,6 @@ class _HomeMapScreenState extends State<HomeMapScreen>
 
               final route = routesByTab[i];
               final currentRoute = ModalRoute.of(context)?.settings.name;
-
               if (route != currentRoute) {
                 Navigator.pushNamed(context, route);
               }
@@ -675,7 +887,7 @@ class _HomeMapScreenState extends State<HomeMapScreen>
                     ),
                     decoration: BoxDecoration(
                       color: isActive
-                          ? _primary.withOpacity(0.1)
+                          ? _primary.withValues(alpha: 0.1)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -704,35 +916,38 @@ class _HomeMapScreenState extends State<HomeMapScreen>
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CLASES AUXILIARES INTERNAS
-// ─────────────────────────────────────────────────────────────────────────────
+class _LocationResult {
+  final LatLng location;
+  final String? warning;
 
-/// Modelo auxiliar para representar una promoción en el mapa
-/// Contiene: ID, etiqueta de descuento, color y coordenadas geográficas
+  const _LocationResult({required this.location, this.warning});
+}
+
 class _MapPromo {
-  final int id;           // Identificador único
-  final String label;     // Etiqueta de descuento (ej: '-50%')
-  final Color color;      // Color distintivo para el marcador
-  final LatLng latLng;    // Coordenadas geográficas
+  final String code;
+  final String label;
+  final Color color;
+  final LatLng latLng;
+  final _PromoDetail detail;
+  final double distanceKm;
 
   const _MapPromo({
-    required this.id,
+    required this.code,
     required this.label,
     required this.color,
     required this.latLng,
+    required this.detail,
+    required this.distanceKm,
   });
 }
 
-/// Modelo auxiliar para representar detalles completos de una promoción
-/// Contiene información visual y descriptiva para el bottom sheet
 class _PromoDetail {
-  final String category;       // Categoría de la promoción
-  final Color categoryColor;   // Color de la categoría
-  final String discount;       // Texto del descuento
-  final String title;          // Título descriptivo
-  final String store;          // Nombre de la tienda
-  final String emoji;          // Emoji representativo
+  final String category;
+  final Color categoryColor;
+  final String discount;
+  final String title;
+  final String store;
+  final String emoji;
 
   const _PromoDetail({
     required this.category,
@@ -744,24 +959,16 @@ class _PromoDetail {
   });
 }
 
-/// Modelo auxiliar para representar un tab de navegación
-/// Contiene icono y etiqueta para cada opción del menú inferior
 class _NavTab {
-  final IconData icon;    // Icono a mostrar en el tab
-  final String label;    // Etiqueta descriptiva del tab
+  final IconData icon;
+  final String label;
   const _NavTab({required this.icon, required this.label});
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// WIDGETS PERSONALIZADOS DE MAPA
-// ─────────────────────────────────────────────────────────────────────────────
-
-/// Widget personalizado para marcadores de promociones en el mapa
-/// Muestra: badge con etiqueta y punta triangular, con animación de selección
 class _PromoMarker extends StatelessWidget {
-  final String label;      // Etiqueta de descuento
-  final Color color;       // Color del marcador
-  final bool isSelected;    // Estado de selección
+  final String label;
+  final Color color;
+  final bool isSelected;
 
   const _PromoMarker({
     required this.label,
@@ -774,16 +981,15 @@ class _PromoMarker extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Badge principal del marcador
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
           decoration: BoxDecoration(
-            color: isSelected ? color : Colors.white,  // Fondo según selección
+            color: isSelected ? color : Colors.white,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: color, width: isSelected ? 0 : 2),  // Borde según selección
+            border: Border.all(color: color, width: isSelected ? 0 : 2),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(isSelected ? 0.4 : 0.2),  // Sombra según selección
+                color: color.withValues(alpha: isSelected ? 0.4 : 0.2),
                 blurRadius: isSelected ? 12 : 6,
                 offset: const Offset(0, 3),
               ),
@@ -792,18 +998,17 @@ class _PromoMarker extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: isSelected ? Colors.white : color,  // Texto según selección
+              color: isSelected ? Colors.white : color,
               fontSize: 11,
               fontWeight: FontWeight.w800,
             ),
           ),
         ),
-        // Punta triangular del marcador
         CustomPaint(
           size: const Size(10, 6),
           painter: _MarkerTipPainter(
             color: isSelected ? color : Colors.white,
-            borderColor: isSelected ? color : color,
+            borderColor: color,
           ),
         ),
       ],
@@ -811,26 +1016,23 @@ class _PromoMarker extends StatelessWidget {
   }
 }
 
-/// CustomPainter para dibujar la punta triangular del marcador
-/// Crea un triángulo invertido que apunta hacia abajo
 class _MarkerTipPainter extends CustomPainter {
-  final Color color;       // Color de relleno
-  final Color borderColor;  // Color del borde
+  final Color color;
+  final Color borderColor;
 
   const _MarkerTipPainter({required this.color, required this.borderColor});
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = color;
-    // Crear triángulo invertido
     final path = Path()
-      ..moveTo(0, 0)                    // Esquina izquierda
-      ..lineTo(size.width / 2, size.height)  // Punto inferior central
-      ..lineTo(size.width, 0)            // Esquina derecha
-      ..close();                         // Cerrar el triángulo
+      ..moveTo(0, 0)
+      ..lineTo(size.width / 2, size.height)
+      ..lineTo(size.width, 0)
+      ..close();
     canvas.drawPath(path, paint);
   }
 
   @override
-  bool shouldRepaint(_MarkerTipPainter old) => false;  // No necesita repintado
+  bool shouldRepaint(_MarkerTipPainter old) => false;
 }

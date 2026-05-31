@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'browser_geolocation_bridge.dart';
 
 /// Tipos de ubicación soportados
 enum TipoUbicacion {
@@ -717,7 +718,33 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
       );
     }
 
-    // Intento 1 (web): balanceado + permite caché reciente
+    // Intento 1 (web): usar API nativa del navegador.
+    try {
+      final browserPoint = await getBrowserGeolocation(
+        timeout: const Duration(seconds: 20),
+        maximumAge: const Duration(minutes: 5),
+        enableHighAccuracy: false,
+      );
+
+      return Position(
+        longitude: browserPoint.longitude,
+        latitude: browserPoint.latitude,
+        timestamp: DateTime.now(),
+        accuracy: 0,
+        altitude: 0,
+        altitudeAccuracy: 0,
+        heading: 0,
+        headingAccuracy: 0,
+        speed: 0,
+        speedAccuracy: 0,
+      );
+    } catch (browserError) {
+      if (kDebugMode) {
+        debugPrint('Browser geolocation fallo: $browserError');
+      }
+    }
+
+    // Intento 2 (web): fallback a Geolocator con configuración tolerante.
     try {
       return await Geolocator.getCurrentPosition(
         locationSettings: WebSettings(
@@ -728,11 +755,11 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
       );
     } catch (firstError) {
       if (kDebugMode) {
-        debugPrint('Geolocator web intento 1 falló: $firstError');
+        debugPrint('Geolocator web fallback 1 fallo: $firstError');
       }
     }
 
-    // Intento 2 (web): más permisivo en tiempo/caché
+    // Intento 3 (web): más permisivo en tiempo/caché
     return Geolocator.getCurrentPosition(
       locationSettings: WebSettings(
         accuracy: LocationAccuracy.low,

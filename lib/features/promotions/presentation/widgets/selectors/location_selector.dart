@@ -76,9 +76,11 @@ class _LocationSelectorState extends State<LocationSelector> {
     final textDark = const Color(0xFF1A1A2E);
     final textGray = const Color(0xFF8A8A9A);
 
-    final showFisica = widget.selectedTypes.contains(TipoUbicacion.fisica) ||
+    final showFisica =
+        widget.selectedTypes.contains(TipoUbicacion.fisica) ||
         widget.selectedTypes.contains(TipoUbicacion.ambas);
-    final showVirtual = widget.selectedTypes.contains(TipoUbicacion.virtual) ||
+    final showVirtual =
+        widget.selectedTypes.contains(TipoUbicacion.virtual) ||
         widget.selectedTypes.contains(TipoUbicacion.ambas);
 
     return Column(
@@ -123,9 +125,7 @@ class _LocationSelectorState extends State<LocationSelector> {
         ],
 
         // Campos de ubicación virtual
-        if (showVirtual) ...[
-          _buildVirtualSection(primaryColor),
-        ],
+        if (showVirtual) ...[_buildVirtualSection(primaryColor)],
       ],
     );
   }
@@ -133,7 +133,8 @@ class _LocationSelectorState extends State<LocationSelector> {
   Widget _buildTipoUbicacionSelector(Color primaryColor, Color textDark) {
     return Column(
       children: TipoUbicacion.values.map((tipo) {
-        final isSelected = widget.selectedTypes.contains(tipo) ||
+        final isSelected =
+            widget.selectedTypes.contains(tipo) ||
             (tipo == TipoUbicacion.fisica &&
                 widget.selectedTypes.contains(TipoUbicacion.ambas)) ||
             (tipo == TipoUbicacion.virtual &&
@@ -190,7 +191,9 @@ class _LocationSelectorState extends State<LocationSelector> {
                     tipo.displayName,
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w500,
                       color: isSelected ? primaryColor : textDark,
                     ),
                   ),
@@ -201,17 +204,15 @@ class _LocationSelectorState extends State<LocationSelector> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isSelected ? primaryColor : const Color(0xFFCDD0DB),
+                      color: isSelected
+                          ? primaryColor
+                          : const Color(0xFFCDD0DB),
                       width: 2,
                     ),
                     color: isSelected ? primaryColor : Colors.transparent,
                   ),
                   child: isSelected
-                      ? const Icon(
-                          Icons.check,
-                          color: Colors.white,
-                          size: 14,
-                        )
+                      ? const Icon(Icons.check, color: Colors.white, size: 14)
                       : null,
                 ),
               ],
@@ -259,7 +260,8 @@ class _LocationSelectorState extends State<LocationSelector> {
             controller: widget.descripcionUbicacionController,
             maxLines: 2,
             decoration: InputDecoration(
-              hintText: 'Ej: Frente al centro comercial, al lado de la farmacia',
+              hintText:
+                  'Ej: Frente al centro comercial, al lado de la farmacia',
               hintStyle: TextStyle(
                 color: Colors.grey.withOpacity(0.5),
                 fontSize: 13,
@@ -287,8 +289,7 @@ class _LocationSelectorState extends State<LocationSelector> {
           const SizedBox(height: 14),
 
           // Botón para elegir ubicación en mapa
-          if (widget.onLocationSelected != null)
-            _buildMapButton(primaryColor),
+          if (widget.onLocationSelected != null) _buildMapButton(primaryColor),
 
           // Mostrar coordenadas seleccionadas
           if (widget.latitud != null && widget.longitud != null)
@@ -298,17 +299,11 @@ class _LocationSelectorState extends State<LocationSelector> {
               decoration: BoxDecoration(
                 color: Colors.green.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: Colors.green.withOpacity(0.3),
-                ),
+                border: Border.all(color: Colors.green.withOpacity(0.3)),
               ),
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.location_on,
-                    color: Colors.green,
-                    size: 18,
-                  ),
+                  const Icon(Icons.location_on, color: Colors.green, size: 18),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
@@ -341,10 +336,7 @@ class _LocationSelectorState extends State<LocationSelector> {
               padding: const EdgeInsets.only(top: 8),
               child: Text(
                 widget.ubicacionError!,
-                style: const TextStyle(
-                  color: Colors.red,
-                  fontSize: 11,
-                ),
+                style: const TextStyle(color: Colors.red, fontSize: 11),
               ),
             ),
         ],
@@ -360,18 +352,12 @@ class _LocationSelectorState extends State<LocationSelector> {
         decoration: BoxDecoration(
           color: primaryColor.withOpacity(0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: primaryColor.withOpacity(0.3),
-          ),
+          border: Border.all(color: primaryColor.withOpacity(0.3)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.map_outlined,
-              color: primaryColor,
-              size: 20,
-            ),
+            Icon(Icons.map_outlined, color: primaryColor, size: 20),
             const SizedBox(width: 8),
             Text(
               widget.latitud != null
@@ -492,8 +478,9 @@ class _LocationSelectorState extends State<LocationSelector> {
 
   void _showMapPicker(BuildContext context) async {
     // Si no hay coordenadas previas, usar ubicación actual por defecto
-    final bool useCurrentLocation = widget.latitud == null || widget.longitud == null;
-    
+    final bool useCurrentLocation =
+        widget.latitud == null || widget.longitud == null;
+
     final result = await showDialog<LatLng>(
       context: context,
       builder: (context) => MapPickerDialog(
@@ -528,15 +515,15 @@ class MapPickerDialog extends StatefulWidget {
 }
 
 class _MapPickerDialogState extends State<MapPickerDialog> {
-  late LatLng _selectedLocation;
+  LatLng _selectedLocation = _defaultLocation;
   final MapController _mapController = MapController();
   final TextEditingController _searchController = TextEditingController();
-  
+
   // Estado de búsqueda
   bool _isSearching = false;
   bool _isLoadingLocation = false;
   List<Map<String, dynamic>> _searchResults = [];
-  
+
   // Coordenadas por defecto (Bogotá, Colombia)
   static const LatLng _defaultLocation = LatLng(4.7110, -74.0721);
 
@@ -556,19 +543,13 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
   Future<void> _initializeLocation() async {
     // Si hay coordenadas previas, usarlas
     if (widget.initialLat != null && widget.initialLng != null) {
-      setState(() {
-        _selectedLocation = LatLng(widget.initialLat!, widget.initialLng!);
-      });
+      _selectedLocation = LatLng(widget.initialLat!, widget.initialLng!);
       return;
     }
 
     // Si se solicita usar ubicación actual por defecto
     if (widget.useCurrentLocationAsDefault) {
       await _goToCurrentLocation();
-    } else {
-      setState(() {
-        _selectedLocation = _defaultLocation;
-      });
     }
   }
 
@@ -598,7 +579,7 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
       );
 
       final newLocation = LatLng(position.latitude, position.longitude);
-      
+
       setState(() {
         _selectedLocation = newLocation;
         _isLoadingLocation = false;
@@ -625,10 +606,7 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
   void _showError(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
       );
     }
   }
@@ -647,20 +625,22 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
 
       final response = await http.get(
         url,
-        headers: {
-          'User-Agent': 'PromomaniaApp/1.0',
-        },
+        headers: {'User-Agent': 'PromomaniaApp/1.0'},
       );
 
       if (response.statusCode == 200) {
         final List<dynamic> results = jsonDecode(response.body);
-        
+
         setState(() {
-          _searchResults = results.map((item) => {
-            'display_name': item['display_name'],
-            'lat': double.parse(item['lat']),
-            'lon': double.parse(item['lon']),
-          }).toList();
+          _searchResults = results
+              .map(
+                (item) => {
+                  'display_name': item['display_name'],
+                  'lat': double.parse(item['lat']),
+                  'lon': double.parse(item['lon']),
+                },
+              )
+              .toList();
           _isSearching = false;
         });
       } else {
@@ -734,7 +714,7 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  
+
                   // Campo de búsqueda
                   TextField(
                     controller: _searchController,
@@ -744,7 +724,11 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
                         fontSize: 13,
                         color: Colors.grey[500],
                       ),
-                      prefixIcon: Icon(Icons.search, color: primaryColor, size: 20),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: primaryColor,
+                        size: 20,
+                      ),
                       suffixIcon: _isSearching
                           ? const SizedBox(
                               width: 20,
@@ -762,21 +746,28 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: primaryColor.withOpacity(0.3)),
+                        borderSide: BorderSide(
+                          color: primaryColor.withOpacity(0.3),
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: primaryColor.withOpacity(0.3)),
+                        borderSide: BorderSide(
+                          color: primaryColor.withOpacity(0.3),
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide(color: primaryColor, width: 1.5),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                     ),
                     onSubmitted: _searchLocation,
                   ),
-                  
+
                   // Resultados de búsqueda
                   if (_searchResults.isNotEmpty)
                     Container(
@@ -801,16 +792,26 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
                           final result = _searchResults[index];
                           return ListTile(
                             dense: true,
-                            leading: Icon(Icons.location_on, color: primaryColor, size: 20),
+                            leading: Icon(
+                              Icons.location_on,
+                              color: primaryColor,
+                              size: 20,
+                            ),
                             title: Text(
                               result['display_name'].toString().split(',')[0],
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             subtitle: Text(
                               result['display_name'].toString(),
-                              style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey[600],
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -842,7 +843,8 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
                       ),
                       children: [
                         TileLayer(
-                          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          urlTemplate:
+                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                           userAgentPackageName: 'com.promomania.app',
                         ),
                         MarkerLayer(
@@ -862,14 +864,16 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
                       ],
                     ),
                   ),
-                  
+
                   // Botón de ubicación actual
                   Positioned(
                     right: 12,
                     bottom: 80,
                     child: FloatingActionButton.small(
                       heroTag: 'locationButton',
-                      onPressed: _isLoadingLocation ? null : _goToCurrentLocation,
+                      onPressed: _isLoadingLocation
+                          ? null
+                          : _goToCurrentLocation,
                       backgroundColor: Colors.white,
                       foregroundColor: primaryColor,
                       elevation: 4,
@@ -926,44 +930,65 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            side: BorderSide(color: Colors.grey[300]!),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text('Cancelar'),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        flex: 2,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.pop(context, _selectedLocation);
-                          },
-                          icon: const Icon(Icons.check, size: 16),
-                          label: const Text(
-                            'Confirmar ubicación',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final cancelButton = OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          side: BorderSide(color: Colors.grey[300]!),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                      ),
-                    ],
+                        child: const Text('Cancelar'),
+                      );
+
+                      final confirmButton = ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context, _selectedLocation);
+                        },
+                        icon: const Icon(Icons.check, size: 16),
+                        label: const Text(
+                          'Confirmar ubicación',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      );
+
+                      final useVerticalButtons = constraints.maxWidth < 360;
+
+                      if (useVerticalButtons) {
+                        return Column(
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: confirmButton,
+                            ),
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              width: double.infinity,
+                              child: cancelButton,
+                            ),
+                          ],
+                        );
+                      }
+
+                      return Row(
+                        children: [
+                          Expanded(child: cancelButton),
+                          const SizedBox(width: 10),
+                          Expanded(flex: 2, child: confirmButton),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),

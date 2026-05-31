@@ -21,10 +21,7 @@ import 'crear_supermercado_modal.dart';
 class EditarPromoModal extends StatefulWidget {
   final Promocion promocion;
 
-  const EditarPromoModal({
-    super.key,
-    required this.promocion,
-  });
+  const EditarPromoModal({super.key, required this.promocion});
 
   @override
   State<EditarPromoModal> createState() => _EditarPromoModalState();
@@ -76,13 +73,21 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
     // Inicializar controllers
     _codigoController = TextEditingController(text: promo.codigo);
     _tituloController = TextEditingController(text: promo.titulo);
-    _descripcionController = TextEditingController(text: promo.descripcion ?? '');
+    _descripcionController = TextEditingController(
+      text: promo.descripcion ?? '',
+    );
     _precioController = TextEditingController(text: promo.precio.toString());
-    _descuentoController = TextEditingController(text: promo.descuento?.toString() ?? '');
+    _descuentoController = TextEditingController(
+      text: promo.descuento?.toString() ?? '',
+    );
     _descripcionTipoController = TextEditingController();
-    _descripcionUbicacionController = TextEditingController(text: promo.ubicacion ?? '');
+    _descripcionUbicacionController = TextEditingController(
+      text: promo.ubicacion ?? '',
+    );
     _urlController = TextEditingController(text: promo.url ?? '');
-    _fechaInicioController = TextEditingController(text: promo.fechaInicio ?? '');
+    _fechaInicioController = TextEditingController(
+      text: promo.fechaInicio ?? '',
+    );
     _fechaFinController = TextEditingController(text: promo.fechaFin ?? '');
 
     // Inicializar estados
@@ -92,19 +97,26 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
     _supermercadoId = promo.idSupermercado;
     _latitud = _redondearCoordenada(promo.lat);
     _longitud = _redondearCoordenada(promo.lng);
+    if (!_hasValidCoordinates(_latitud, _longitud)) {
+      _latitud = null;
+      _longitud = null;
+    }
 
     // Determinar tipo de promoción
-    final tipoPromocion = promoService.tiposPromocion
-        .firstWhere((t) => t.id == promo.idTipoPromocion, orElse: () =>
-            TipoPromocion(id: 1, nombre: 'Descuento', estado: 'activo'));
+    final tipoPromocion = promoService.tiposPromocion.firstWhere(
+      (t) => t.id == promo.idTipoPromocion,
+      orElse: () => TipoPromocion(id: 1, nombre: 'Descuento', estado: 'activo'),
+    );
 
     final tipoEnum = TipoPromocionEnum.fromTipoPromocion(tipoPromocion);
     _tipoPromocionId = tipoEnum.id;
 
     // Determinar tipos de ubicación
-    if (promo.lat != null && promo.lng != null && promo.url != null) {
+    final hasPhysicalCoordinates = _hasValidCoordinates(_latitud, _longitud);
+
+    if (hasPhysicalCoordinates && promo.url != null) {
       _tiposUbicacion = {TipoUbicacion.ambas};
-    } else if (promo.lat != null && promo.lng != null) {
+    } else if (hasPhysicalCoordinates) {
       _tiposUbicacion = {TipoUbicacion.fisica};
     } else if (promo.url != null) {
       _tiposUbicacion = {TipoUbicacion.virtual};
@@ -171,9 +183,11 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
     if (_tiposUbicacion.isEmpty) {
       _errors['ubicacion'] = 'Selecciona al menos una opción de ubicación';
     } else {
-      final tieneFisica = _tiposUbicacion.contains(TipoUbicacion.fisica) ||
+      final tieneFisica =
+          _tiposUbicacion.contains(TipoUbicacion.fisica) ||
           _tiposUbicacion.contains(TipoUbicacion.ambas);
-      final tieneVirtual = _tiposUbicacion.contains(TipoUbicacion.virtual) ||
+      final tieneVirtual =
+          _tiposUbicacion.contains(TipoUbicacion.virtual) ||
           _tiposUbicacion.contains(TipoUbicacion.ambas);
 
       if (tieneFisica) {
@@ -237,6 +251,18 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
     return double.parse(valor.toStringAsFixed(6));
   }
 
+  bool _hasValidCoordinates(double? lat, double? lng) {
+    if (lat == null || lng == null) return false;
+    if (lat.isNaN || lng.isNaN || lat.isInfinite || lng.isInfinite) {
+      return false;
+    }
+
+    final isInRange = lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+    if (!isInRange) return false;
+
+    return !(lat == 0.0 && lng == 0.0);
+  }
+
   // ACTUALIZAR PROMOCIÓN
   // ============================================================================
 
@@ -258,8 +284,8 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
         final tipos = promoService.tiposPromocion;
         final tipoEncontrado = tipos.firstWhere(
           (t) => t.nombre.toLowerCase().contains(
-                tipoEnum.displayName.toLowerCase(),
-              ),
+            tipoEnum.displayName.toLowerCase(),
+          ),
           orElse: () => tipos.isNotEmpty
               ? tipos.first
               : TipoPromocion(
@@ -292,8 +318,9 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
         fechaInicio: _tipoVigencia == 'por_fecha'
             ? _fechaInicioController.text
             : null,
-        fechaFin:
-            _tipoVigencia == 'por_fecha' ? _fechaFinController.text : null,
+        fechaFin: _tipoVigencia == 'por_fecha'
+            ? _fechaFinController.text
+            : null,
         idSupermercado: _supermercadoId!,
         idCategoria: _categoriaId!,
         idTipoPromocion: idTipoPromocion,
@@ -416,11 +443,7 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
                     color: primaryOrange.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
-                    Icons.edit,
-                    color: primaryOrange,
-                    size: 24,
-                  ),
+                  child: const Icon(Icons.edit, color: primaryOrange, size: 24),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -437,10 +460,7 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
                       ),
                       Text(
                         'Código: ${widget.promocion.codigo}',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: textGray,
-                        ),
+                        style: TextStyle(fontSize: 13, color: textGray),
                       ),
                     ],
                   ),
@@ -510,7 +530,8 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
                     tipoPromocionId: _tipoPromocionId,
                     descuentoController: _descuentoController,
                     descripcionTipoController: _descripcionTipoController,
-                    errorText: _errors['descuento'] ?? _errors['descripcion_tipo'],
+                    errorText:
+                        _errors['descuento'] ?? _errors['descripcion_tipo'],
                   ),
 
                   const SizedBox(height: 20),
@@ -558,8 +579,8 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
                     },
                     urlController: _urlController,
                     urlError: _errors['url'],
-                    ubicacionError: _errors['ubicacion'] ??
-                        _errors['ubicacion_fisica'],
+                    ubicacionError:
+                        _errors['ubicacion'] ?? _errors['ubicacion_fisica'],
                   ),
                   const SizedBox(height: 20),
 
@@ -696,8 +717,9 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
                             height: 18,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             ),
                           )
                         : const Icon(Icons.save_outlined, size: 20),
@@ -737,12 +759,7 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
       decoration: BoxDecoration(
         color: primaryOrange.withOpacity(0.05),
         borderRadius: BorderRadius.circular(8),
-        border: Border(
-          left: BorderSide(
-            color: primaryOrange,
-            width: 3,
-          ),
-        ),
+        border: Border(left: BorderSide(color: primaryOrange, width: 3)),
       ),
       child: Text(
         title,
@@ -791,9 +808,7 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
           maxLines: maxLines,
           readOnly: readOnly,
           onTap: onTap,
-          style: readOnly
-              ? TextStyle(color: Colors.grey[600])
-              : null,
+          style: readOnly ? TextStyle(color: Colors.grey[600]) : null,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
@@ -829,9 +844,7 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
-                color: Colors.grey[300]!,
-              ),
+              borderSide: BorderSide(color: Colors.grey[300]!),
             ),
             fillColor: readOnly ? Colors.grey[100] : null,
             filled: readOnly,
@@ -846,10 +859,7 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
             padding: const EdgeInsets.only(top: 4, left: 4),
             child: Text(
               errorText,
-              style: const TextStyle(
-                color: Colors.red,
-                fontSize: 11,
-              ),
+              style: const TextStyle(color: Colors.red, fontSize: 11),
             ),
           ),
       ],

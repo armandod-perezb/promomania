@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
@@ -70,6 +72,19 @@ class LocationSelector extends StatefulWidget {
 }
 
 class _LocationSelectorState extends State<LocationSelector> {
+  bool _hasValidCoordinates(double? lat, double? lng) {
+    if (lat == null || lng == null) return false;
+    if (lat.isNaN || lng.isNaN || lat.isInfinite || lng.isInfinite) {
+      return false;
+    }
+
+    final isInRange = lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+    if (!isInRange) return false;
+
+    // (0, 0) suele representar "sin coordenadas" en persistencias antiguas.
+    return !(lat == 0.0 && lng == 0.0);
+  }
+
   @override
   Widget build(BuildContext context) {
     final primaryColor = const Color(0xFFFF5733);
@@ -345,6 +360,11 @@ class _LocationSelectorState extends State<LocationSelector> {
   }
 
   Widget _buildMapButton(Color primaryColor) {
+    final hasCoordinates = _hasValidCoordinates(
+      widget.latitud,
+      widget.longitud,
+    );
+
     return GestureDetector(
       onTap: () => _showMapPicker(context),
       child: Container(
@@ -360,7 +380,7 @@ class _LocationSelectorState extends State<LocationSelector> {
             Icon(Icons.map_outlined, color: primaryColor, size: 20),
             const SizedBox(width: 8),
             Text(
-              widget.latitud != null
+              hasCoordinates
                   ? 'Cambiar ubicación en mapa'
                   : 'Elegir ubicación en mapa',
               style: TextStyle(
@@ -477,16 +497,17 @@ class _LocationSelectorState extends State<LocationSelector> {
   }
 
   void _showMapPicker(BuildContext context) async {
-    // Si no hay coordenadas previas, usar ubicación actual por defecto
-    final bool useCurrentLocation =
-        widget.latitud == null || widget.longitud == null;
+    final bool hasCoordinates = _hasValidCoordinates(
+      widget.latitud,
+      widget.longitud,
+    );
 
     final result = await showDialog<LatLng>(
       context: context,
       builder: (context) => MapPickerDialog(
-        initialLat: widget.latitud,
-        initialLng: widget.longitud,
-        useCurrentLocationAsDefault: useCurrentLocation,
+        initialLat: hasCoordinates ? widget.latitud : null,
+        initialLng: hasCoordinates ? widget.longitud : null,
+        useCurrentLocationAsDefault: !hasCoordinates,
       ),
     );
 
@@ -541,8 +562,17 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
 
   /// Inicializa la ubicación del mapa
   Future<void> _initializeLocation() async {
+    final hasValidInitialCoordinates =
+        widget.initialLat != null &&
+        widget.initialLng != null &&
+        widget.initialLat! >= -90 &&
+        widget.initialLat! <= 90 &&
+        widget.initialLng! >= -180 &&
+        widget.initialLng! <= 180 &&
+        !(widget.initialLat == 0.0 && widget.initialLng == 0.0);
+
     // Si hay coordenadas previas, usarlas
-    if (widget.initialLat != null && widget.initialLng != null) {
+    if (hasValidInitialCoordinates) {
       _selectedLocation = LatLng(widget.initialLat!, widget.initialLng!);
       return;
     }
@@ -555,28 +585,63 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
 
   /// Obtiene la ubicación actual del dispositivo
   Future<void> _goToCurrentLocation() async {
+    if (_isLoadingLocation) return;
     setState(() => _isLoadingLocation = true);
 
     try {
-      // Verificar permisos
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          _showError('Permiso de ubicación denegado');
+      if (kIsWeb) {
+        final scheme = Uri.base.scheme.toLowerCase();
+        final host = Uri.base.host.toLowerCase();
+        final isLocalHost =
+            host == 'localhost' || host == '127.0.0.1' || host == '::1';
+        final isSecureContext = scheme == 'https' || isLocalHost;
+
+        if (!isSecureContext) {
+          setState(() => _isLoadingLocation = false);
+          _showError('En web, la ubicación actual requiere HTTPS o localhost.');
           return;
         }
       }
 
-      if (permission == LocationPermission.deniedForever) {
-        _showError('Permiso de ubicación denegado permanentemente');
-        return;
+      if (!kIsWeb) {
+        final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) {
+          setState(() => _isLoadingLocation = false);
+          _showError('Activa el servicio de ubicación del dispositivo.');
+          return;
+        }
+
+        // Verificar permisos solo en móvil/desktop.
+        LocationPermission permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+          if (permission == LocationPermission.denied) {
+            setState(() => _isLoadingLocation = false);
+            _showError('Permiso de ubicación denegado.');
+            return;
+          }
+        }
+
+        if (permission == LocationPermission.deniedForever) {
+          setState(() => _isLoadingLocation = false);
+          _showError('Permiso bloqueado. Habilítalo en ajustes del sistema.');
+          return;
+        }
+      } else {
+        // En web no usamos requestPermission por inconsistencias del plugin:
+        // requestPermission intenta obtener posición y puede devolver deniedForever
+        // en errores de proveedor, aunque el permiso del sitio esté concedido.
+        final webPermission = await Geolocator.checkPermission();
+        if (webPermission == LocationPermission.deniedForever) {
+          setState(() => _isLoadingLocation = false);
+          _showError(
+            'Permiso bloqueado. Habilítalo en el candado del navegador y recarga la página.',
+          );
+          return;
+        }
       }
 
-      // Obtener ubicación actual
-      final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+      final position = await _getCurrentPositionWithWatchdog();
 
       final newLocation = LatLng(position.latitude, position.longitude);
 
@@ -598,9 +663,115 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
         );
       }
     } catch (e) {
-      setState(() => _isLoadingLocation = false);
-      _showError('Error al obtener ubicación: $e');
+      Position? lastKnownPosition;
+      if (!kIsWeb) {
+        try {
+          lastKnownPosition = await Geolocator.getLastKnownPosition();
+        } catch (_) {
+          lastKnownPosition = null;
+        }
+      }
+
+      if (lastKnownPosition != null) {
+        final fallbackLocation = LatLng(
+          lastKnownPosition.latitude,
+          lastKnownPosition.longitude,
+        );
+
+        setState(() {
+          _selectedLocation = fallbackLocation;
+          _isLoadingLocation = false;
+        });
+
+        _mapController.move(fallbackLocation, 16);
+        _showError(
+          'No se pudo obtener la ubicación en tiempo real. Se usó la última ubicación conocida.',
+        );
+        return;
+      }
+
+      if (mounted) {
+        setState(() => _isLoadingLocation = false);
+      }
+      _showError(_buildFriendlyLocationError(e));
     }
+  }
+
+  Future<Position> _getCurrentPositionWithWatchdog() {
+    return Future.any<Position>([
+      _getCurrentPositionForPlatform(),
+      Future<Position>.delayed(
+        const Duration(seconds: 25),
+        () => throw TimeoutException('Hard timeout waiting for location'),
+      ),
+    ]);
+  }
+
+  Future<Position> _getCurrentPositionForPlatform() async {
+    if (!kIsWeb) {
+      return Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
+    }
+
+    // Intento 1 (web): balanceado + permite caché reciente
+    try {
+      return await Geolocator.getCurrentPosition(
+        locationSettings: WebSettings(
+          accuracy: LocationAccuracy.medium,
+          maximumAge: const Duration(minutes: 5),
+          timeLimit: const Duration(seconds: 20),
+        ),
+      );
+    } catch (firstError) {
+      if (kDebugMode) {
+        debugPrint('Geolocator web intento 1 falló: $firstError');
+      }
+    }
+
+    // Intento 2 (web): más permisivo en tiempo/caché
+    return Geolocator.getCurrentPosition(
+      locationSettings: WebSettings(
+        accuracy: LocationAccuracy.low,
+        maximumAge: const Duration(minutes: 15),
+        timeLimit: const Duration(seconds: 35),
+      ),
+    );
+  }
+
+  String _buildFriendlyLocationError(Object error) {
+    final raw = error.toString().toLowerCase();
+
+    if (raw.contains('permission') || raw.contains('denied')) {
+      return kIsWeb
+          ? 'Permiso de ubicación denegado. Revisa el candado del navegador y permite ubicación.'
+          : 'Permiso de ubicación denegado. Revisa los ajustes del dispositivo.';
+    }
+
+    if (raw.contains('secure') || raw.contains('https')) {
+      return 'La ubicación en web requiere HTTPS o localhost.';
+    }
+
+    if (raw.contains('timeout')) {
+      return 'No se pudo obtener la ubicación a tiempo. Intenta nuevamente.';
+    }
+
+    if (raw.contains('position updates')) {
+      return 'El navegador no pudo leer la ubicación en este momento. Intenta recargar la página y permitir ubicación.';
+    }
+
+    if (raw.contains('position unavailable')) {
+      return 'La ubicación no está disponible ahora mismo. Verifica GPS/Wi-Fi y vuelve a intentar.';
+    }
+
+    if (raw.contains('listening for position updates')) {
+      return 'No se pudo conectar con el proveedor de ubicación del navegador en este momento. Intenta nuevamente.';
+    }
+
+    return 'No se pudo obtener tu ubicación actual. Intenta nuevamente.';
   }
 
   void _showError(String message) {

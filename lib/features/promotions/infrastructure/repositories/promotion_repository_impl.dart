@@ -160,6 +160,27 @@ class PromotionRepositoryImpl implements PromotionRepository {
   Future<Uint8List?> getPromotionImageBytes(String codigo) => dataSource.getPromotionImageBytes(codigo);
 
   @override
+  Future<Supermercado> createSupermercado(Supermercado supermercado) async {
+    // Asignar ID automáticamente (máximo + 1)
+    final maxId = dataSource.supermercados.isEmpty
+        ? 0
+        : dataSource.supermercados.map((s) => s.id).reduce((a, b) => a > b ? a : b);
+    final newId = maxId + 1;
+    
+    final created = Supermercado(
+      id: newId,
+      nombre: supermercado.nombre,
+      direccion: supermercado.direccion,
+      ciudad: supermercado.ciudad,
+      estado: supermercado.estado,
+    );
+    
+    dataSource.supermercados.add(created);
+    await dataSource.saveLocalData();
+    return created;
+  }
+
+  @override
   Future<void> addSupermercado(Supermercado supermercado) async {
     dataSource.supermercados.add(supermercado);
     await dataSource.saveLocalData();

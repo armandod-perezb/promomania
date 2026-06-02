@@ -11,6 +11,16 @@ class Promocion {
     return int.tryParse(value.toString()) ?? fallback;
   }
 
+  /// Método específico para IDs de claves foráneas.
+  /// Lanza excepción si el valor es null o 0 para evitar enviar IDs inválidos al backend.
+  static int _asId(dynamic value, String fieldName) {
+    final result = _asInt(value, fallback: 0);
+    if (result <= 0) {
+      throw FormatException('ID inválido para $fieldName: $value (debe ser mayor que 0)');
+    }
+    return result;
+  }
+
   static double _asDouble(dynamic value, {double fallback = 0.0}) {
     if (value == null) return fallback;
     if (value is double) return value;
@@ -113,7 +123,13 @@ class Promocion {
     required this.idTipoPromocion,
     this.lat,
     this.lng,
-  });
+  }) {
+    // Validar que los IDs de claves foráneas sean mayores que 0
+    assert(idUsuario > 0, 'idUsuario debe ser mayor que 0');
+    assert(idSupermercado > 0, 'idSupermercado debe ser mayor que 0');
+    assert(idCategoria > 0, 'idCategoria debe ser mayor que 0');
+    assert(idTipoPromocion > 0, 'idTipoPromocion debe ser mayor que 0');
+  }
 
   /// Crea una instancia a partir de un `Map` (por ejemplo, parseado desde JSON).
   ///
@@ -136,10 +152,10 @@ class Promocion {
       fechaFin: json['fecha_fin'] as String?,
       estado: json['estado'] as String? ?? 'pendiente',
       vistas: _asInt(json['vistas']),
-      idUsuario: _asInt(json['id_usuario']),
-      idSupermercado: _asInt(json['id_supermercado']),
-      idCategoria: _asInt(json['id_categoria']),
-      idTipoPromocion: _asInt(json['id_tipo_promocion']),
+      idUsuario: _asId(json['id_usuario'], 'id_usuario'),
+      idSupermercado: _asId(json['id_supermercado'], 'id_supermercado'),
+      idCategoria: _asId(json['id_categoria'], 'id_categoria'),
+      idTipoPromocion: _asId(json['id_tipo_promocion'], 'id_tipo_promocion'),
       lat: json['lat'] == null ? null : _asDouble(json['lat']),
       lng: json['lng'] == null ? null : _asDouble(json['lng']),
     );

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:app/core/errors/exceptions.dart';
 import 'package:app/features/promotions/domain/entities/promocion.dart';
 import 'package:app/features/promotions/domain/entities/promocion_horario.dart';
@@ -297,6 +298,41 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
   @override
   Future<Uint8List?> getPromotionImageBytes(String codigo) =>
       promoService.getPromotionImageBytes(codigo);
+
+  @override
+  Future<Supermercado> createSupermercado(Supermercado supermercado) async {
+    debugPrint('DEBUG REPO - createSupermercado llamado: ${supermercado.nombre}');
+    debugPrint('DEBUG REPO - remoteDataSource: ${remoteDataSource != null}');
+    
+    if (remoteDataSource != null) {
+      try {
+        debugPrint('DEBUG REPO - Llamando a API...');
+        final created = await remoteDataSource!.createSupermercado(supermercado);
+        debugPrint('DEBUG REPO - API respondió con ID: ${created.id}');
+        _upsertLocalSupermercado(created);
+        return created;
+      } catch (e) {
+        debugPrint('DEBUG REPO - Error en API: $e');
+        if (!_shouldFallbackToLocal(e)) {
+          debugPrint('DEBUG REPO - Relanzando error: $e');
+          rethrow;
+        }
+        debugPrint('DEBUG REPO - Fallback a local por NetworkException');
+      }
+    }
+    // Fallback: asignar ID local temporal y agregar
+    debugPrint('DEBUG REPO - Creando supermercado local (fallback)');
+    final localId = promoService.getSupermercados().length + 1;
+    final localSupermercado = Supermercado(
+      id: localId,
+      nombre: supermercado.nombre,
+      direccion: supermercado.direccion,
+      ciudad: supermercado.ciudad,
+      estado: supermercado.estado,
+    );
+    promoService.addSupermercado(localSupermercado);
+    return localSupermercado;
+  }
 
   @override
   Future<void> addSupermercado(Supermercado supermercado) async {

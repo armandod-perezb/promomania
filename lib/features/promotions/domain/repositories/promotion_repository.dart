@@ -59,6 +59,7 @@ abstract class PromotionRepository {
   Future<String?> savePromotionImage(String codigo, Uint8List bytes);
   Future<Uint8List?> getPromotionImageBytes(String codigo);
 
+  Future<Supermercado> createSupermercado(Supermercado supermercado);
   Future<void> addSupermercado(Supermercado supermercado);
   Future<void> updateSupermercado(Supermercado supermercado);
   Future<void> deleteSupermercado(int id);

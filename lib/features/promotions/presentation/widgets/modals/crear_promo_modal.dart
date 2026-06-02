@@ -201,30 +201,41 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
       return;
     }
 
+    // Validación adicional: verificar que los IDs sean válidos (> 0)
+    if (_supermercadoId == null || _supermercadoId! <= 0) {
+      setState(() => _errors['supermercado'] = 'Selecciona un supermercado válido');
+      _scrollToFirstError();
+      return;
+    }
+    if (_categoriaId == null || _categoriaId! <= 0) {
+      setState(() => _errors['categoria'] = 'Selecciona una categoría válida');
+      _scrollToFirstError();
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
       // Usar promoService singleton desde app_scope
 
       // Calcular ID de tipo de promoción basado en el enum
-      int idTipoPromocion = 1;
+      int idTipoPromocion = 0;
       final tipoEnum = TipoPromocionEnum.fromId(_tipoPromocionId);
       if (tipoEnum != null) {
-        // Buscar el tipo en la lista del servicio o usar el índice + 1
+        // Buscar el tipo en la lista del servicio
         final tipos = promoService.tiposPromocion;
         final tipoEncontrado = tipos.firstWhere(
           (t) => t.nombre.toLowerCase().contains(
                 tipoEnum.displayName.toLowerCase(),
               ),
-          orElse: () => tipos.isNotEmpty
-              ? tipos.first
-              : TipoPromocion(
-                  id: 1,
-                  nombre: tipoEnum.displayName,
-                  estado: 'activo',
-                ),
+          orElse: () => tipos.isNotEmpty ? tipos.first : null as TipoPromocion,
         );
         idTipoPromocion = tipoEncontrado.id;
+      }
+      
+      // Validar que el ID de tipo de promoción sea válido
+      if (idTipoPromocion <= 0) {
+        throw Exception('Tipo de promoción no válido');
       }
 
       final nuevaPromo = Promocion(
@@ -290,11 +301,20 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
   }
 
   void _scrollToFirstError() {
-    // Mostrar mensaje general
+    // Construir mensaje específico con los errores actuales
+    final errorMessages = _errors.entries.map((e) => '${e.key}: ${e.value}').join('\n');
+    final mensaje = errorMessages.isNotEmpty
+        ? 'Errores:\n$errorMessages'
+        : 'Por favor completa todos los campos obligatorios';
+    
+    debugPrint('DEBUG - _supermercadoId: $_supermercadoId, _categoriaId: $_categoriaId');
+    debugPrint('DEBUG - Errores: $_errors');
+    
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Por favor completa todos los campos obligatorios'),
+      SnackBar(
+        content: Text(mensaje),
         backgroundColor: Colors.orange,
+        duration: const Duration(seconds: 5),
       ),
     );
   }
@@ -329,6 +349,20 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
       backgroundColor: Colors.transparent,
       builder: (context) => CrearSupermercadoModal(
         onSupermercadoCreated: (supermercado) {
+          debugPrint('DEBUG - Supermercado creado recibido: ID=${supermercado.id}, nombre=${supermercado.nombre}');
+          
+          // Verificar que tenga ID válido
+          if (supermercado.id <= 0) {
+            debugPrint('ERROR - Supermercado sin ID válido: ${supermercado.id}');
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Error: El supermercado no tiene ID válido'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            return;
+          }
+          
           // Agregar al servicio (async sin await)
           promoService.addSupermercado(supermercado);
 
@@ -336,6 +370,8 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
           setState(() {
             _supermercadoId = supermercado.id;
           });
+          
+          debugPrint('DEBUG - _supermercadoId actualizado a: $_supermercadoId');
         },
       ),
     );

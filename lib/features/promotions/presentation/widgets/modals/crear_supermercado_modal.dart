@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
+import 'package:app/core/di/app_scope.dart';
 import 'package:app/features/promotions/domain/entities/supermercado.dart';
 
 /// Modal para crear un nuevo supermercado/tienda
@@ -51,10 +53,9 @@ class _CrearSupermercadoModalState extends State<CrearSupermercadoModal> {
     });
 
     try {
-      // Crear el supermercado
-      // El ID se asignará automáticamente (máximo + 1)
-      final nuevoSupermercado = Supermercado(
-        id: 0, // Será reemplazado por el repositorio
+      // Crear el supermercado temporal (sin ID)
+      final supermercadoTemp = Supermercado(
+        id: 0, // Temporal, será reemplazado por la API
         nombre: _nombreController.text.trim(),
         direccion: _direccionController.text.trim().isEmpty
             ? null
@@ -65,14 +66,21 @@ class _CrearSupermercadoModalState extends State<CrearSupermercadoModal> {
         estado: 'activo',
       );
 
-      // Notificar al padre
-      widget.onSupermercadoCreated(nuevoSupermercado);
+      debugPrint('DEBUG - Enviando a crear supermercado: ${supermercadoTemp.nombre}');
+      
+      // Enviar a la API y obtener el supermercado con ID real
+      final supermercadoCreado = await promoService.createSupermercado(supermercadoTemp);
+      
+      debugPrint('DEBUG - Supermercado recibido de API: ID=${supermercadoCreado.id}, nombre=${supermercadoCreado.nombre}');
+
+      // Notificar al padre con el supermercado que tiene ID real
+      widget.onSupermercadoCreated(supermercadoCreado);
 
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Supermercado registrado exitosamente'),
+          SnackBar(
+            content: Text('Supermercado "${supermercadoCreado.nombre}" registrado con ID ${supermercadoCreado.id}'),
             backgroundColor: Colors.green,
           ),
         );

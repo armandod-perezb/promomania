@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:app/core/errors/exceptions.dart';
 import 'package:app/core/network/api_client.dart';
 import 'package:app/core/network/api_exception.dart';
@@ -131,15 +132,25 @@ class ApiRemoteAdminPromotionDataSource
 
   @override
   Future<Supermercado> createSupermercado(Supermercado supermercado) async {
+    debugPrint('DEBUG API - createSupermercado llamado: ${supermercado.nombre}');
     try {
+      final data = _supermercadoToApi(supermercado, includeId: false);
+      debugPrint('DEBUG API - Enviando POST /supermercados/ con data: $data');
+      
       final created = await _client.post(
             '/supermercados/',
-            _supermercadoToApi(supermercado, includeId: false),
+            data,
           )
           as Map<String, dynamic>;
+      
+      debugPrint('DEBUG API - Respuesta recibida: $created');
       return _supermercadoFromApi(created);
     } on ApiRequestException catch (e) {
+      debugPrint('DEBUG API - ApiRequestException: ${e.statusCode} - ${e.message}');
       throw _mapApiException(e);
+    } catch (e) {
+      debugPrint('DEBUG API - Error inesperado: $e');
+      rethrow;
     }
   }
 
@@ -187,10 +198,10 @@ class ApiRemoteAdminPromotionDataSource
       fechaFin: json['fecha_fin']?.toString(),
       estado: _normalizePromotionStatus(json['estado']),
       vistas: _asInt(json['vistas']),
-      idUsuario: _asInt(json['id_usuario']),
-      idSupermercado: _asInt(json['id_supermercado']),
-      idCategoria: _asInt(json['id_categoria']),
-      idTipoPromocion: _asInt(json['id_tipo_promocion']),
+      idUsuario: _asId(json['id_usuario'], 'id_usuario'),
+      idSupermercado: _asId(json['id_supermercado'], 'id_supermercado'),
+      idCategoria: _asId(json['id_categoria'], 'id_categoria'),
+      idTipoPromocion: _asId(json['id_tipo_promocion'], 'id_tipo_promocion'),
       lat: json['lat'] == null ? null : _asDouble(json['lat']),
       lng: json['lng'] == null ? null : _asDouble(json['lng']),
     );
@@ -207,6 +218,20 @@ class ApiRemoteAdminPromotionDataSource
   }
 
   Map<String, dynamic> _promotionToApi(Promocion promocion) {
+    // Validar que los IDs de claves foráneas sean válidos (> 0)
+    if (promocion.idSupermercado <= 0) {
+      throw ValidationException('El supermercado seleccionado no es válido (ID: ${promocion.idSupermercado})');
+    }
+    if (promocion.idCategoria <= 0) {
+      throw ValidationException('La categoría seleccionada no es válida (ID: ${promocion.idCategoria})');
+    }
+    if (promocion.idTipoPromocion <= 0) {
+      throw ValidationException('El tipo de promoción seleccionado no es válido (ID: ${promocion.idTipoPromocion})');
+    }
+    if (promocion.idUsuario <= 0) {
+      throw ValidationException('El usuario no es válido (ID: ${promocion.idUsuario})');
+    }
+    
     return {
       'codigo': promocion.codigo,
       'titulo': promocion.titulo,
@@ -261,6 +286,16 @@ class ApiRemoteAdminPromotionDataSource
     if (value is int) return value;
     if (value is num) return value.toInt();
     return int.tryParse(value.toString()) ?? fallback;
+  }
+
+  /// Método específico para IDs de claves foráneas.
+  /// Lanza excepción si el valor es null o 0 para evitar IDs inválidos.
+  static int _asId(dynamic value, String fieldName) {
+    final result = _asInt(value, fallback: 0);
+    if (result <= 0) {
+      throw ValidationException('ID inválido para $fieldName: $value (debe ser mayor que 0)');
+    }
+    return result;
   }
 
   static double _asDouble(dynamic value, {double fallback = 0.0}) {

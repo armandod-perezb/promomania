@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart' show LatLng;
 
 import '../../../../../Core/Routes/app_routes.dart';
 import '../../../../../Core/di/app_scope.dart';
+import '../../../../../Core/services/manual_location_service.dart';
 import '../../../../../features/promotions/domain/entities/promocion.dart';
 import '../../../../../features/promotions/domain/entities/supermercado.dart';
 
@@ -179,6 +180,19 @@ class _HomeMapScreenState extends State<HomeMapScreen>
           // Ignorar y usar fallback por defecto.
         }
       }
+      
+      // Intentar usar ubicación manual guardada (especialmente útil en web)
+      final manualLocation = await ManualLocationService.getSavedLocation();
+      if (manualLocation != null) {
+        final address = await ManualLocationService.getSavedAddress();
+        return _LocationResult(
+          location: manualLocation,
+          warning: address != null 
+            ? 'Usando ubicación manual: $address'
+            : 'Usando ubicación manual configurada.',
+        );
+      }
+      
       return const _LocationResult(
         location: _defaultCenter,
         warning:
@@ -360,6 +374,162 @@ class _HomeMapScreenState extends State<HomeMapScreen>
       AppRoutes.promotionDetails,
       arguments: selected.code,
     );
+  }
+
+  /// Muestra diálogo para configurar ubicación manual
+  void _showManualLocationDialog() async {
+    final savedLocation = await ManualLocationService.getSavedLocation();
+    final savedAddress = await ManualLocationService.getSavedAddress();
+    
+    final latController = TextEditingController(
+      text: savedLocation?.latitude.toString() ?? '',
+    );
+    final lngController = TextEditingController(
+      text: savedLocation?.longitude.toString() ?? '',
+    );
+    final addressController = TextEditingController(
+      text: savedAddress ?? '',
+    );
+
+    if (!mounted) return;
+
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.edit_location_alt, color: _primary),
+            const SizedBox(width: 8),
+            const Text('Configurar ubicación manual'),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Ingresa las coordenadas de tu ubicación:',
+                style: TextStyle(fontSize: 13, color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: latController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                  labelText: 'Latitud',
+                  hintText: 'Ej: 4.7110',
+                  prefixIcon: Icon(Icons.location_on),
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: lngController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                  labelText: 'Longitud',
+                  hintText: 'Ej: -74.0721',
+                  prefixIcon: Icon(Icons.location_on),
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: addressController,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre de la ubicación (opcional)',
+                  hintText: 'Ej: Mi casa, Oficina',
+                  prefixIcon: Icon(Icons.label_outline),
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.info_outline, size: 16, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Esta ubicación se usará cuando no se pueda obtener la ubicación actual del dispositivo.',
+                        style: TextStyle(fontSize: 12, color: Colors.blue),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await ManualLocationService.clearLocation();
+              if (context.mounted) {
+                Navigator.pop(context);
+                _showInfoSnackBar('Ubicación manual eliminada');
+              }
+            },
+            child: const Text('Borrar', style: TextStyle(color: Colors.red)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final lat = double.tryParse(latController.text.replaceAll(',', '.'));
+              final lng = double.tryParse(lngController.text.replaceAll(',', '.'));
+              
+              if (lat == null || lng == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Ingresa coordenadas válidas')),
+                );
+                return;
+              }
+              
+              if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Coordenadas fuera de rango')),
+                );
+                return;
+              }
+              
+              Navigator.pop(context, {
+                'location': LatLng(lat, lng),
+                'address': addressController.text,
+              });
+            },
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+
+    latController.dispose();
+    lngController.dispose();
+    addressController.dispose();
+
+    if (result != null && result['location'] != null) {
+      final address = result['address'] as String?;
+      await ManualLocationService.saveLocation(
+        result['location'] as LatLng,
+        address: address?.isNotEmpty == true ? address : null,
+      );
+      
+      // Recargar con la nueva ubicación
+      await _refreshWithCurrentLocation();
+      
+      if (mounted) {
+        _showInfoSnackBar('Ubicación manual guardada y aplicada');
+      }
+    }
   }
 
   @override
@@ -594,6 +764,12 @@ class _HomeMapScreenState extends State<HomeMapScreen>
               setState(() => _zoomLevel = nextZoom);
               _mapController.move(_mapController.camera.center, _zoomLevel);
             },
+          ),
+          // Botón para configurar ubicación manual (visible siempre pero especialmente útil en web)
+          const SizedBox(height: 8),
+          _mapControlBtn(
+            icon: Icons.edit_location_alt_outlined,
+            onTap: () => _showManualLocationDialog(),
           ),
         ],
       ),

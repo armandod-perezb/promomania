@@ -201,6 +201,15 @@ class PromoService extends ChangeNotifier {
     }
   }
 
+  /// Crea un supermercado en la API y lo agrega a la lista local.
+  /// Retorna el supermercado creado con el ID asignado por el backend.
+  Future<Supermercado> createSupermercado(Supermercado supermercado) async {
+    final created = await _promotionRepository.createSupermercado(supermercado);
+    _dataSource.supermercados.add(created);
+    notifyListeners();
+    return created;
+  }
+
   void addSupermercado(Supermercado supermercado) {
     _dataSource.supermercados.add(supermercado);
     notifyListeners();

@@ -243,7 +243,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             ),
             const SizedBox(height: 2),
             Text(
-              '6 usuarios registrados  •  4 activos',
+              '${_users.length} usuarios registrados  •  ${_users.where((u) => u.estado == 'activo').length} activos',
               style: const TextStyle(color: textGray, fontSize: 12),
             ),
           ],

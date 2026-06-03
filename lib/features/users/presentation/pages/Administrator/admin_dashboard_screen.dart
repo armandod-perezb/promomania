@@ -201,70 +201,67 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Widget _headerStat(IconData icon, String value, String label, String badge) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Ícono en la izquierda
-            Icon(icon, color: primaryOrange, size: 24),
-            const SizedBox(width: 8),
-            // Valor y label en el centro
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      color: textDark,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+            // Fila superior: icono + badge
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(icon, color: primaryOrange, size: 20),
+                // Badge de tendencia compacto
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: greenAccent.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      color: textGray,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.trending_up, color: greenAccent, size: 8),
+                      const SizedBox(width: 2),
+                      Text(
+                        badge,
+                        style: const TextStyle(
+                          color: greenAccent,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(width: 6),
-            // Badge de tendencia en la derecha
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-              decoration: BoxDecoration(
-                color: greenAccent.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(6),
+            const SizedBox(height: 6),
+            // Valor
+            Text(
+              value,
+              style: const TextStyle(
+                color: textDark,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.trending_up, color: greenAccent, size: 10),
-                  const SizedBox(width: 2),
-                  Text(
-                    badge,
-                    style: const TextStyle(
-                      color: greenAccent,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            // Label
+            Text(
+              label,
+              style: const TextStyle(
+                color: textGray,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

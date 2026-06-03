@@ -362,11 +362,9 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
             );
             return;
           }
-          
-          // Agregar al servicio (async sin await)
-          promoService.addSupermercado(supermercado);
 
-          // Seleccionar el nuevo supermercado
+          // El supermercado ya fue agregado al servicio por el repository adapter
+          // Solo necesitamos seleccionarlo
           setState(() {
             _supermercadoId = supermercado.id;
           });

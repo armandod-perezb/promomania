@@ -342,7 +342,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
     }
   }
 
-  void _mostrarCrearSupermercado({String? initialName}) {
+  void _mostrarCrearSupermercado([String? initialName]) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,

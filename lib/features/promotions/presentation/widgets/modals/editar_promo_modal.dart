@@ -387,16 +387,15 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
     }
   }
 
-  void _mostrarCrearSupermercado() {
+  void _mostrarCrearSupermercado([String? initialName]) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => CrearSupermercadoModal(
+        initialName: initialName,
         onSupermercadoCreated: (supermercado) {
-          // Agregar al servicio (async sin await)
-          promoService.addSupermercado(supermercado);
-
+          // El supermercado ya fue agregado al servicio por el repository adapter
           setState(() {
             _supermercadoId = supermercado.id;
           });

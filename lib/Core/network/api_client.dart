@@ -22,11 +22,12 @@ class ApiClient {
   ApiClient._();
 
   static String get baseUrl {
-    if (kIsWeb) return 'http://localhost:8001/api';
+    if (kIsWeb) return 'https://backend-promomania.onrender.com/api';
     try {
-      if (Platform.isAndroid) return 'http://10.0.2.2:8001/api';
+      if (Platform.isAndroid)
+        return 'https://backend-promomania.onrender.com/api';
     } catch (_) {}
-    return 'http://localhost:8001/api';
+    return 'https://backend-promomania.onrender.com/api';
   }
 
   String? _token;
@@ -184,17 +185,19 @@ class ApiClient {
     try {
       // Detectar si la respuesta es HTML (error de servidor/no encontrado)
       final trimmedBody = body.trim();
-      if (trimmedBody.startsWith('<!DOCTYPE') || 
+      if (trimmedBody.startsWith('<!DOCTYPE') ||
           trimmedBody.startsWith('<html') ||
           trimmedBody.contains('<head>') ||
           trimmedBody.toLowerCase().contains('page not found') ||
           trimmedBody.toLowerCase().contains('<title>')) {
-        message = 'No se pudo conectar al servidor. '
-                  'Verifica que el backend esté corriendo en $baseUrl';
+        message =
+            'No se pudo conectar al servidor. '
+            'Verifica que el backend esté corriendo en $baseUrl';
       } else {
         final decoded = json.decode(body);
         if (decoded is Map) {
-          message = decoded['detail']?.toString() ??
+          message =
+              decoded['detail']?.toString() ??
               decoded['error']?.toString() ??
               decoded['non_field_errors']?.toString() ??
               (decoded.isNotEmpty

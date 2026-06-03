@@ -10,10 +10,12 @@ import 'package:app/features/promotions/domain/entities/supermercado.dart';
 /// Retorna el Supermercado creado o null si se cancela
 class CrearSupermercadoModal extends StatefulWidget {
   final Function(Supermercado) onSupermercadoCreated;
+  final String? initialName;
 
   const CrearSupermercadoModal({
     super.key,
     required this.onSupermercadoCreated,
+    this.initialName,
   });
 
   @override
@@ -32,6 +34,15 @@ class _CrearSupermercadoModalState extends State<CrearSupermercadoModal> {
   static const Color primaryOrange = Color(0xFFFF5733);
   static const Color textDark = Color(0xFF1A1A2E);
   static const Color textGray = Color(0xFF8A8A9A);
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-llenar el nombre si se proporcionó
+    if (widget.initialName != null && widget.initialName!.isNotEmpty) {
+      _nombreController.text = widget.initialName!;
+    }
+  }
 
   @override
   void dispose() {

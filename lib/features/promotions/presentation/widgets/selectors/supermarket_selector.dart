@@ -9,7 +9,7 @@ class SupermarketSelector extends StatefulWidget {
   final List<Supermercado> supermercados;
   final int? selectedId;
   final ValueChanged<int?> onChanged;
-  final VoidCallback? onCreateNew;
+  final ValueChanged<String>? onCreateNew;
   final String? label;
   final bool isRequired;
   final String? errorText;
@@ -366,7 +366,8 @@ class _SupermarketSelectorState extends State<SupermarketSelector> {
     return InkWell(
       onTap: () {
         setState(() => _isOpen = false);
-        widget.onCreateNew?.call();
+        // Pasar el texto de búsqueda como sugerencia inicial
+        widget.onCreateNew?.call(_searchController.text.trim());
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),

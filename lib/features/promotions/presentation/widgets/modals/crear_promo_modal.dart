@@ -342,12 +342,13 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
     }
   }
 
-  void _mostrarCrearSupermercado() {
+  void _mostrarCrearSupermercado({String? initialName}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => CrearSupermercadoModal(
+        initialName: initialName,
         onSupermercadoCreated: (supermercado) {
           debugPrint('DEBUG - Supermercado creado recibido: ID=${supermercado.id}, nombre=${supermercado.nombre}');
           

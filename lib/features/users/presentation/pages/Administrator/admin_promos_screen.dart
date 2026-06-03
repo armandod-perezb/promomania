@@ -16,6 +16,8 @@ class ManagePromotionsScreen extends StatefulWidget {
 
 class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
   int _selectedIndex = 2;
+  // Estado de carga para mostrar loader mientras se cargan datos
+  bool _isLoading = true;
 
   static const Color primaryOrange = Color(0xFFFF5733);
   static const Color textDark = Color(0xFF1A1A2E);
@@ -24,7 +26,35 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
   static const Color bgColor = Color(0xFFF5F5F8);
   static const Color yellowAccent = Color(0xFFF39C12); // Para 'pendiente'
 
-  List<Promocion> get _promos => promotionsController.getAllPromotionsSync();
+  List<Promocion> get _promos => promoService.promociones;
+
+  @override
+  void initState() {
+    super.initState();
+    // Cargar datos al entrar a la pantalla
+    _loadData();
+  }
+
+  /// Carga datos desde el backend
+  Future<void> _loadData() async {
+    setState(() => _isLoading = true);
+    try {
+      await promoService.reinitializeFromApi();
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al cargar datos: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,17 +67,42 @@ class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
               children: [
                 _buildTopBar(),
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildTitleRow(),
-                        const SizedBox(height: 20),
-                        ..._promos.map((p) => _buildPromoCard(p)),
-                      ],
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: primaryOrange,
+                          ),
+                        )
+                      : RefreshIndicator(
+                          onRefresh: _loadData,
+                          color: primaryOrange,
+                          child: SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildTitleRow(),
+                                const SizedBox(height: 20),
+                                if (_promos.isEmpty)
+                                  const Padding(
+                                    padding: EdgeInsets.only(top: 40),
+                                    child: Center(
+                                      child: Text(
+                                        'No se encontraron promociones',
+                                        style: TextStyle(
+                                          color: textGray,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                else
+                                  ..._promos.map((p) => _buildPromoCard(p)),
+                              ],
+                            ),
+                          ),
+                        ),
                 ),
                 _buildBottomNav(),
               ],

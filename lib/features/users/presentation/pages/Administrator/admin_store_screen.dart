@@ -28,6 +28,8 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
   // ── Estado local ────────────────────────────────────────────────────────────
   // Índice del ítem activo en el BottomNav. Valor 3 = "Comercios".
   int _selectedIndex = 3;
+  // Estado de carga para mostrar loader mientras se cargan datos
+  bool _isLoading = true;
 
   // Constantes de color como static const → compiladas en tiempo de build,
   // accesibles en todos los métodos sin instanciar.
@@ -37,10 +39,37 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
   static const Color greenAccent = Color(0xFF2ECC71);
   static const Color bgColor = Color(0xFFF5F5F8);
 
-  // Getter reactivo: siempre retorna la lista actualizada de supermercados.
-  // Al ser un getter (no una variable), siempre apunta al estado más reciente
-  // de promotionsController.getSupermercadosSync() sin necesidad de setState().
-  List<Supermercado> get _stores => promotionsController.getSupermercadosSync();
+  // Lista de supermercados cargada desde el datasource
+  List<Supermercado> get _stores => promoService.supermercados;
+
+  @override
+  void initState() {
+    super.initState();
+    // Cargar datos al entrar a la pantalla
+    _loadData();
+  }
+
+  /// Carga datos desde el backend
+  Future<void> _loadData() async {
+    setState(() => _isLoading = true);
+    try {
+      // Reinitialize carga todos los datos desde la API
+      await promoService.reinitializeFromApi();
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al cargar datos: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   // ============================================================================
   // BUILD PRINCIPAL
@@ -59,19 +88,44 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
               children: [
                 _buildTopBar(),
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Título "Comercios" + contador + botón "Nuevo Comercio".
-                        _buildTitleRow(),
-                        const SizedBox(height: 20),
-                        // Spread operator: genera un _buildStoreCard por cada comercio.
-                        ..._stores.map((s) => _buildStoreCard(s)),
-                      ],
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: primaryOrange,
+                          ),
+                        )
+                      : RefreshIndicator(
+                          onRefresh: _loadData,
+                          color: primaryOrange,
+                          child: SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Título "Comercios" + contador + botón "Nuevo Comercio".
+                                _buildTitleRow(),
+                                const SizedBox(height: 20),
+                                // Spread operator: genera un _buildStoreCard por cada comercio.
+                                if (_stores.isEmpty)
+                                  const Padding(
+                                    padding: EdgeInsets.only(top: 40),
+                                    child: Center(
+                                      child: Text(
+                                        'No se encontraron comercios',
+                                        style: TextStyle(
+                                          color: textGray,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                else
+                                  ..._stores.map((s) => _buildStoreCard(s)),
+                              ],
+                            ),
+                          ),
+                        ),
                 ),
                 _buildBottomNav(),
               ],

@@ -20,6 +20,10 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
   // Controlador del campo de busqueda para limpiar/restaurar texto.
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  // Estado de carga para mostrar loader mientras se cargan usuarios
+  bool _isLoading = true;
+  // Lista de usuarios cargada desde el backend
+  List<Usuario> _users = [];
 
   static const Color primaryOrange = Color(0xFFFF5733);
   static const Color textDark = Color(0xFF1A1A2E);
@@ -28,8 +32,37 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
   static const Color cardBg = Color(0xFFFFFFFF);
   static const Color bgColor = Color(0xFFF5F5F8);
 
-  /// Obtiene usuarios del servicio
-  List<Usuario> get _users => usersController.getUsersSync();
+  @override
+  void initState() {
+    super.initState();
+    // Cargar usuarios al entrar a la pantalla
+    _loadUsers();
+  }
+
+  /// Carga usuarios desde el backend
+  Future<void> _loadUsers() async {
+    setState(() => _isLoading = true);
+    try {
+      final users = await usersController.getAllUsers();
+      if (mounted) {
+        setState(() {
+          _users = users;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        // Mostrar error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al cargar usuarios: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   /// Filtra usuarios según búsqueda
   List<Usuario> get _filteredUsers {
@@ -53,43 +86,64 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PromoService>(
-      builder: (context, promoService, child) {
-        return Scaffold(
-          backgroundColor: bgColor,
-          body: SafeArea(
-            child: Column(
-              children: [
-                _buildTopBar(),
-                _buildBreadcrumb(),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 16),
-                        // Resumen y accion principal para alta de usuarios.
-                        _buildTitleRow(),
-                        const SizedBox(height: 14),
-                        // Busqueda reactiva por nombre/correo.
-                        _buildSearchBar(),
-                        const SizedBox(height: 12),
-                        // Filtros visuales y contadores rapidos.
-                        _buildFilterRow(),
-                        const SizedBox(height: 16),
-                        // Tarjetas de usuario renderizadas segun el filtro activo.
-                        ..._filteredUsers.map((u) => _buildUserCard(u)),
-                      ],
+    return Scaffold(
+      backgroundColor: bgColor,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildTopBar(),
+            _buildBreadcrumb(),
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: primaryOrange,
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _loadUsers,
+                      color: primaryOrange,
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 16),
+                            // Resumen y accion principal para alta de usuarios.
+                            _buildTitleRow(),
+                            const SizedBox(height: 14),
+                            // Busqueda reactiva por nombre/correo.
+                            _buildSearchBar(),
+                            const SizedBox(height: 12),
+                            // Filtros visuales y contadores rapidos.
+                            _buildFilterRow(),
+                            const SizedBox(height: 16),
+                            // Tarjetas de usuario renderizadas segun el filtro activo.
+                            if (_filteredUsers.isEmpty)
+                              const Padding(
+                                padding: EdgeInsets.only(top: 40),
+                                child: Center(
+                                  child: Text(
+                                    'No se encontraron usuarios',
+                                    style: TextStyle(
+                                      color: textGray,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            else
+                              ..._filteredUsers.map((u) => _buildUserCard(u)),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                _buildBottomNav(),
-              ],
             ),
-          ),
-        );
-      },
+            _buildBottomNav(),
+          ],
+        ),
+      ),
     );
   }
 

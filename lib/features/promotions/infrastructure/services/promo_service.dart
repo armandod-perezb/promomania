@@ -98,6 +98,12 @@ class PromoService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Recarga todos los datos desde la API, ignorando el estado de carga previo.
+  Future<void> reinitializeFromApi() async {
+    await _dataSource.reinitializeFromApi();
+    notifyListeners();
+  }
+
   Future<void> loadLocalPromociones() async {
     await _loadLocalPromotionsUseCase.execute();
     notifyListeners();

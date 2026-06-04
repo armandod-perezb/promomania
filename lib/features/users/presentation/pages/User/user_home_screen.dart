@@ -317,7 +317,6 @@ class _HomeMapScreenState extends State<HomeMapScreen>
           color: categoryColor,
           latLng: LatLng(promo.lat!, promo.lng!),
           detail: _PromoDetail(
-            code: promo.codigo,
             category: categoria?.nombre ?? 'General',
             categoryColor: categoryColor,
             discount: discountLabel,
@@ -970,7 +969,7 @@ class _HomeMapScreenState extends State<HomeMapScreen>
       padding: const EdgeInsets.all(14),
       child: Row(
         children: [
-          _buildSelectedPromoImage(promo),
+          _buildSelectedPromoImage(selected),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -1045,9 +1044,10 @@ class _HomeMapScreenState extends State<HomeMapScreen>
     );
   }
 
-  Widget _buildSelectedPromoImage(_PromoDetail promo) {
+  Widget _buildSelectedPromoImage(_MapPromo selected) {
+    final promo = selected.detail;
     final dataUrlBytes = ImageStorageService.dataUrlToBytes(promo.image);
-    final cachedBytes = promotionsController.getCachedImageBytes(promo.code);
+    final cachedBytes = promotionsController.getCachedImageBytes(selected.code);
     final imageBytes = cachedBytes ?? dataUrlBytes;
     final imageUrl = promo.image?.trim();
     final canUseNetworkImage =
@@ -1232,7 +1232,6 @@ class _MapPromo {
 }
 
 class _PromoDetail {
-  final String code;
   final String category;
   final Color categoryColor;
   final String discount;
@@ -1242,7 +1241,6 @@ class _PromoDetail {
   final String? image;
 
   const _PromoDetail({
-    required this.code,
     required this.category,
     required this.categoryColor,
     required this.discount,

@@ -13,6 +13,7 @@ import '../../../../../Core/storage/image_storage_service.dart';
 import '../../../../../features/promotions/domain/entities/promocion.dart';
 import '../../../../../features/promotions/domain/entities/supermercado.dart';
 
+/// Pantalla de usuarios; construye la interfaz y conecta acciones del usuario con los controladores.
 class HomeMapScreen extends StatefulWidget {
   const HomeMapScreen({super.key});
 
@@ -20,6 +21,7 @@ class HomeMapScreen extends StatefulWidget {
   State<HomeMapScreen> createState() => _HomeMapScreenState();
 }
 
+/// Estado interno de `HomeMapScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _HomeMapScreenState extends State<HomeMapScreen>
     with TickerProviderStateMixin {
   static const Color _primary = Color(0xFFFF4D2E);
@@ -1206,6 +1208,7 @@ class _HomeMapScreenState extends State<HomeMapScreen>
   }
 }
 
+/// Tipo auxiliar interno usado por usuarios para mantener la pantalla organizada.
 class _LocationResult {
   final LatLng location;
   final String? warning;
@@ -1213,6 +1216,7 @@ class _LocationResult {
   const _LocationResult({required this.location, this.warning});
 }
 
+/// Tipo auxiliar interno usado por usuarios para mantener la pantalla organizada.
 class _MapPromo {
   final String code;
   final String label;
@@ -1231,6 +1235,7 @@ class _MapPromo {
   });
 }
 
+/// Tipo auxiliar interno usado por usuarios para mantener la pantalla organizada.
 class _PromoDetail {
   final String category;
   final Color categoryColor;
@@ -1251,12 +1256,14 @@ class _PromoDetail {
   });
 }
 
+/// Modelo interno que define una opcion de navegacion inferior.
 class _NavTab {
   final IconData icon;
   final String label;
   const _NavTab({required this.icon, required this.label});
 }
 
+/// Tipo auxiliar interno usado por usuarios para mantener la pantalla organizada.
 class _PromoMarker extends StatelessWidget {
   final String label;
   final Color color;
@@ -1308,6 +1315,7 @@ class _PromoMarker extends StatelessWidget {
   }
 }
 
+/// Painter interno que encapsula el dibujo personalizado de la pantalla.
 class _MarkerTipPainter extends CustomPainter {
   final Color color;
   final Color borderColor;

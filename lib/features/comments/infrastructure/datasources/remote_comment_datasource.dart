@@ -3,6 +3,7 @@ import 'package:app/core/network/api_client.dart';
 import 'package:app/core/network/api_exception.dart';
 import 'package:app/features/comments/domain/entities/comentario.dart';
 
+/// Contrato de fuente de datos de comentarios; separa el origen concreto de la informacion del resto de la app.
 abstract class RemoteCommentDataSource {
   Future<List<Comentario>> getAllComments();
   Future<List<Comentario>> getCommentsByPromotion(String promotionCode);
@@ -11,6 +12,7 @@ abstract class RemoteCommentDataSource {
   Future<void> deleteComment(int id);
 }
 
+/// Fuente de datos de comentarios; obtiene y transforma informacion desde servicios o almacenamiento local.
 class ApiRemoteCommentDataSource implements RemoteCommentDataSource {
   final ApiClient _client;
 
@@ -25,7 +27,9 @@ class ApiRemoteCommentDataSource implements RemoteCommentDataSource {
           .toList();
     } on ApiRequestException catch (e) {
       if (e.statusCode == 401 || e.statusCode == 403) {
-        throw UnauthorizedException('Tu sesión no es válida. Inicia sesión de nuevo.');
+        throw UnauthorizedException(
+          'Tu sesión no es válida. Inicia sesión de nuevo.',
+        );
       }
       throw ServerException(e.message);
     }
@@ -46,18 +50,22 @@ class ApiRemoteCommentDataSource implements RemoteCommentDataSource {
   @override
   Future<Comentario> addComment(Comentario comentario) async {
     try {
-      final created = await _client.post('/comentarios/', {
-        'contenido': comentario.contenido,
-        'fecha': comentario.fecha,
-        'id_usuario': comentario.idUsuario,
-        'codigo_promocion': comentario.codigoPromocion,
-        'id_comment_reply': comentario.idCommentReply,
-      }) as Map<String, dynamic>;
+      final created =
+          await _client.post('/comentarios/', {
+                'contenido': comentario.contenido,
+                'fecha': comentario.fecha,
+                'id_usuario': comentario.idUsuario,
+                'codigo_promocion': comentario.codigoPromocion,
+                'id_comment_reply': comentario.idCommentReply,
+              })
+              as Map<String, dynamic>;
       return _comentarioFromApi(created);
     } on ApiRequestException catch (e) {
       if (e.statusCode == 400) throw ValidationException(e.message);
       if (e.statusCode == 401 || e.statusCode == 403) {
-        throw UnauthorizedException('Tu sesión no es válida. Inicia sesión de nuevo.');
+        throw UnauthorizedException(
+          'Tu sesión no es válida. Inicia sesión de nuevo.',
+        );
       }
       throw ServerException(e.message);
     }
@@ -70,7 +78,9 @@ class ApiRemoteCommentDataSource implements RemoteCommentDataSource {
     } on ApiRequestException catch (e) {
       if (e.statusCode == 404) return;
       if (e.statusCode == 401 || e.statusCode == 403) {
-        throw UnauthorizedException('Tu sesión no es válida. Inicia sesión de nuevo.');
+        throw UnauthorizedException(
+          'Tu sesión no es válida. Inicia sesión de nuevo.',
+        );
       }
       throw ServerException(e.message);
     }

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 import '../../../../../Core/di/app_scope.dart';
@@ -17,16 +17,16 @@ enum _ActivityType { user, promo, store, system }
 /// Modelo de datos inmutable que representa un evento de auditoría.
 /// Es "const" porque ninguno de sus campos cambia una vez creado (inmutable).
 class _ActivityItem {
-  final String actor;           // Nombre del actor (usuario, comercio o sistema)
-  final String actorInitial;    // Inicial para el avatar circular
-  final Color actorColor;       // Color único que identifica al actor
-  final String action;          // Verbo de la acción (canjeó, creó, eliminó…)
-  final String title;           // Nombre de la entidad afectada
-  final List<String> details;   // Líneas de detalle adicionales (fecha, lugar…)
-  final String time;            // Tiempo relativo desde el evento (ej. "Hace 2m")
-  final _ActivityType type;     // Categoría del evento para el filtro
-  final String? badge;          // Etiqueta visual del tipo de evento (opcional)
-  final Color? badgeColor;      // Color de la etiqueta (opcional)
+  final String actor; // Nombre del actor (usuario, comercio o sistema)
+  final String actorInitial; // Inicial para el avatar circular
+  final Color actorColor; // Color único que identifica al actor
+  final String action; // Verbo de la acción (canjeó, creó, eliminó…)
+  final String title; // Nombre de la entidad afectada
+  final List<String> details; // Líneas de detalle adicionales (fecha, lugar…)
+  final String time; // Tiempo relativo desde el evento (ej. "Hace 2m")
+  final _ActivityType type; // Categoría del evento para el filtro
+  final String? badge; // Etiqueta visual del tipo de evento (opcional)
+  final Color? badgeColor; // Color de la etiqueta (opcional)
 
   const _ActivityItem({
     required this.actor,
@@ -46,6 +46,7 @@ class _ActivityItem {
 // PANTALLA AUDITORÍA ADMIN
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Pantalla administrativa de auditoria con actividad reciente del sistema.
 class AdminAuditScreen extends StatefulWidget {
   const AdminAuditScreen({super.key});
 
@@ -57,22 +58,25 @@ class AdminAuditScreen extends StatefulWidget {
 /// AnimationControllers; también permite que sus hijos usen vsync: this.
 class _AdminAuditScreenState extends State<AdminAuditScreen>
     with TickerProviderStateMixin {
-
   // ── Paleta de colores centralizada ──────────────────────────────────────────
   // Definidas como constantes estáticas para que no se recreen en cada build.
-  static const Color _primary  = Color(0xFFFF4D2E); // Naranja/rojo de la marca
-  static const Color _darkBg   = Color(0xFF1A1F2E); // Fondo oscuro de cards premium
-  static const Color _green    = Color(0xFF10B981); // Verde para estados positivos
-  static const Color _blue     = Color(0xFF3B82F6); // Azul para promos y push
-  static const Color _purple   = Color(0xFF8B5CF6); // Morado para sistema/vistas
-  static const Color _amber    = Color(0xFFF59E0B); // Ámbar para alertas/expirados
-  static const Color _pink     = Color(0xFFEC4899); // Rosa para ciertos usuarios
-  static const Color _lightBg  = Color(0xFFF5F6FA); // Fondo gris muy claro
+  static const Color _primary = Color(0xFFFF4D2E); // Naranja/rojo de la marca
+  static const Color _darkBg = Color(
+    0xFF1A1F2E,
+  ); // Fondo oscuro de cards premium
+  static const Color _green = Color(0xFF10B981); // Verde para estados positivos
+  static const Color _blue = Color(0xFF3B82F6); // Azul para promos y push
+  static const Color _purple = Color(0xFF8B5CF6); // Morado para sistema/vistas
+  static const Color _amber = Color(0xFFF59E0B); // Ámbar para alertas/expirados
+  static const Color _pink = Color(0xFFEC4899); // Rosa para ciertos usuarios
+  static const Color _lightBg = Color(0xFFF5F6FA); // Fondo gris muy claro
 
   // ── Índices de estado de navegación ─────────────────────────────────────────
-  int _selectedTab = 0;       // Tab activo dentro de la auditoría (Actividad/Reportes/…)
-  int _selectedFilter = 0;    // Filtro activo de la lista (Todas/Usuarios/Promos/…)
-  int _selectedNavTab = 4;    // Tab activo en la barra inferior (4 = Avisos)
+  int _selectedTab =
+      0; // Tab activo dentro de la auditoría (Actividad/Reportes/…)
+  int _selectedFilter =
+      0; // Filtro activo de la lista (Todas/Usuarios/Promos/…)
+  int _selectedNavTab = 4; // Tab activo en la barra inferior (4 = Avisos)
 
   // ── Dataset de actividad ─────────────────────────────────────────────────────
   // Lista constante de eventos de ejemplo. En producción vendría del backend.
@@ -216,7 +220,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
         backgroundColor: _lightBg,
         body: Column(
           children: [
-            _buildAdminTopBar(),  // Barra de marca + notificaciones + avatar
+            _buildAdminTopBar(), // Barra de marca + notificaciones + avatar
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -226,11 +230,11 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                       color: Colors.white,
                       child: Column(
                         children: [
-                          _buildPageHeader(),      // Título "Auditoría"
-                          _buildPushNotifCard(),   // Card oscura con estadísticas push
+                          _buildPageHeader(), // Título "Auditoría"
+                          _buildPushNotifCard(), // Card oscura con estadísticas push
                           const SizedBox(height: 4),
-                          _buildStatsRow(),        // Vacío por ahora (SizedBox.shrink)
-                          _buildTabBar(),          // Tabs: Actividad/Reportes/Alertas/Exportar
+                          _buildStatsRow(), // Vacío por ahora (SizedBox.shrink)
+                          _buildTabBar(), // Tabs: Actividad/Reportes/Alertas/Exportar
                         ],
                       ),
                     ),
@@ -240,10 +244,10 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                       color: Colors.white,
                       child: Column(
                         children: [
-                          _buildFilterChips(),     // Chips horizontales de filtro
-                          _buildActivityHeader(),  // Título "Actividad en Tiempo Real"
-                          _buildActivityList(),    // Lista de eventos filtrados
-                          _buildVerMas(),          // Botón "Ver más actividad"
+                          _buildFilterChips(), // Chips horizontales de filtro
+                          _buildActivityHeader(), // Título "Actividad en Tiempo Real"
+                          _buildActivityList(), // Lista de eventos filtrados
+                          _buildVerMas(), // Botón "Ver más actividad"
                         ],
                       ),
                     ),
@@ -448,7 +452,10 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
               children: [
                 // Badge azul translúcido que identifica la sección
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF3B82F6).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(8),
@@ -475,7 +482,10 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                 const Spacer(),
                 // Botón de acción principal (sin navegación implementada aún)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: _primary,
                     borderRadius: BorderRadius.circular(10),
@@ -614,7 +624,8 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
           final t = tabs[i];
           return Expanded(
             child: GestureDetector(
-              onTap: () => _onAuditTabTap(i), // Navega al sub-módulo correspondiente
+              onTap: () =>
+                  _onAuditTabTap(i), // Navega al sub-módulo correspondiente
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
@@ -630,7 +641,8 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                   children: [
                     // Stack permite superponer el badge encima del ícono
                     Stack(
-                      clipBehavior: Clip.none, // Permite que el badge salga del bounds
+                      clipBehavior:
+                          Clip.none, // Permite que el badge salga del bounds
                       children: [
                         Icon(
                           t.icon,
@@ -652,7 +664,7 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                t.badge!,  // ! afirma que no es null (ya lo chequeamos)
+                                t.badge!, // ! afirma que no es null (ya lo chequeamos)
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 8,
@@ -668,7 +680,9 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                       t.label,
                       style: TextStyle(
                         fontSize: 10,
-                        fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
+                        fontWeight: isActive
+                            ? FontWeight.w800
+                            : FontWeight.w500,
                         color: isActive ? _primary : const Color(0xFFB0B5CC),
                       ),
                     ),
@@ -709,7 +723,10 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                 // y el nuevo en 180ms, animando color y borde sin código extra.
                 duration: const Duration(milliseconds: 180),
                 margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 7,
+                ),
                 decoration: BoxDecoration(
                   color: isActive ? _darkBg : Colors.white,
                   borderRadius: BorderRadius.circular(20),
@@ -772,7 +789,11 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
               ),
               child: const Row(
                 children: [
-                  Icon(Icons.refresh_rounded, size: 13, color: Color(0xFF8A8FA8)),
+                  Icon(
+                    Icons.refresh_rounded,
+                    size: 13,
+                    color: Color(0xFF8A8FA8),
+                  ),
                   SizedBox(width: 4),
                   Text(
                     'Actualizar',
@@ -918,7 +939,10 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                     decoration: BoxDecoration(
                       color: const Color(0xFFF8F9FC),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFEEF0F6), width: 1),
+                      border: Border.all(
+                        color: const Color(0xFFEEF0F6),
+                        width: 1,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1035,11 +1059,11 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
   /// El tab activo (_selectedNavTab = 4, Avisos) se resalta con naranja.
   Widget _buildBottomNav() {
     final tabs = [
-      _NavItem(icon: Icons.dashboard_outlined,       label: 'Panel'),
-      _NavItem(icon: Icons.people_outline_rounded,   label: 'Usuarios'),
-      _NavItem(icon: Icons.local_offer_outlined,     label: 'Promos'),
-      _NavItem(icon: Icons.storefront_outlined,      label: 'Comercios'),
-      _NavItem(icon: Icons.notifications_outlined,   label: 'Avisos'),
+      _NavItem(icon: Icons.dashboard_outlined, label: 'Panel'),
+      _NavItem(icon: Icons.people_outline_rounded, label: 'Usuarios'),
+      _NavItem(icon: Icons.local_offer_outlined, label: 'Promos'),
+      _NavItem(icon: Icons.storefront_outlined, label: 'Comercios'),
+      _NavItem(icon: Icons.notifications_outlined, label: 'Avisos'),
     ];
 
     return Container(
@@ -1072,7 +1096,10 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
                   // AnimatedContainer anima el fondo naranja al seleccionar un tab
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: isActive
                           ? _primary.withOpacity(0.1)
@@ -1108,11 +1135,16 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
   /// Traduce el índice del bottom nav a la ruta del módulo correspondiente.
   String _routeForIndex(int index) {
     switch (index) {
-      case 0: return AppRoutes.adminDashboard;
-      case 1: return AppRoutes.manageUsers;
-      case 2: return AppRoutes.managePromotions;
-      case 3: return AppRoutes.manageStores;
-      default: return AppRoutes.manageNotifications;
+      case 0:
+        return AppRoutes.adminDashboard;
+      case 1:
+        return AppRoutes.manageUsers;
+      case 2:
+        return AppRoutes.managePromotions;
+      case 3:
+        return AppRoutes.manageStores;
+      default:
+        return AppRoutes.manageNotifications;
     }
   }
 
@@ -1120,10 +1152,14 @@ class _AdminAuditScreenState extends State<AdminAuditScreen>
   /// Cada sub-pantalla de auditoría tiene su propia ruta en AppRoutes.
   String _notiRouteForTab(int index) {
     switch (index) {
-      case 0: return AppRoutes.adminNotiActivity;
-      case 1: return AppRoutes.adminNotiReport;
-      case 2: return AppRoutes.adminNotiAlert;
-      default: return AppRoutes.adminNotiExport;
+      case 0:
+        return AppRoutes.adminNotiActivity;
+      case 1:
+        return AppRoutes.adminNotiReport;
+      case 2:
+        return AppRoutes.adminNotiAlert;
+      default:
+        return AppRoutes.adminNotiExport;
     }
   }
 

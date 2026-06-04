@@ -31,6 +31,7 @@ class MisFavoritosScreen extends StatefulWidget {
   State<MisFavoritosScreen> createState() => _MisFavoritosScreenState();
 }
 
+/// Estado interno de `MisFavoritosScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _MisFavoritosScreenState extends State<MisFavoritosScreen>
     with TickerProviderStateMixin {
   // Colores constantes de la aplicación

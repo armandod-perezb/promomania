@@ -32,6 +32,7 @@ class ExploreScreen extends StatefulWidget {
   State<ExploreScreen> createState() => _ExploreScreenState();
 }
 
+/// Estado interno de `ExploreScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _ExploreScreenState extends State<ExploreScreen>
     with TickerProviderStateMixin {
   // Colores constantes de la aplicación

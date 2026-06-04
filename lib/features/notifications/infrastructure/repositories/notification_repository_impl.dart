@@ -6,6 +6,7 @@ import 'package:app/features/notifications/domain/repositories/notification_repo
 import 'package:app/features/notifications/infrastructure/datasources/notification_datasource.dart';
 import 'package:app/features/notifications/infrastructure/datasources/remote_notification_datasource.dart';
 
+/// Implementacion del repositorio de notificaciones; adapta fuentes de datos remotas/locales al contrato de dominio.
 class NotificationRepositoryImpl implements NotificationRepository {
   final NotificationDataSource dataSource;
   final RemoteNotificationDataSource? remoteDataSource;

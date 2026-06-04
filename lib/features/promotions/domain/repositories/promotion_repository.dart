@@ -17,7 +17,10 @@ abstract class PromotionRepository {
 
   // ── Queries síncronas ─────────────────────────────────────────────────────
 
-  List<Promocion> getActivePromotionsSync({int? categoryId, int? supermarketId});
+  List<Promocion> getActivePromotionsSync({
+    int? categoryId,
+    int? supermarketId,
+  });
   List<Promocion> getAllPromotionsSync();
   Promocion? getPromotionByCodeSync(String codigo);
   List<Promocion> getPromotionsByUserSync(int userId);

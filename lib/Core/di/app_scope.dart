@@ -43,6 +43,7 @@ import 'package:app/features/users/infrastructure/datasources/user_datasource.da
 import 'package:app/features/users/infrastructure/repositories/user_repository_impl.dart';
 import 'package:app/features/users/presentation/controllers/users_controller.dart';
 
+/// Contenedor central de dependencias de la aplicacion; instancia servicios, repositorios, casos de uso y controladores compartidos.
 class AppScope {
   static final SessionManager sessionManager = SessionManager();
   static final ApiClient apiClient = ApiClient.instance;

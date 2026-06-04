@@ -3,6 +3,7 @@ import '../entities/notification_item.dart';
 import '../entities/push_campaign.dart';
 import '../repositories/notification_repository.dart';
 
+/// Caso de uso para GetAdminNotificationSummary; mantiene la regla de negocio fuera de la interfaz.
 class GetAdminNotificationSummaryUseCase {
   final NotificationRepository repository;
 
@@ -13,6 +14,7 @@ class GetAdminNotificationSummaryUseCase {
   }
 }
 
+/// Caso de uso para GetReportesBadgeCount; mantiene la regla de negocio fuera de la interfaz.
 class GetReportesBadgeCountUseCase {
   final NotificationRepository repository;
 
@@ -23,6 +25,7 @@ class GetReportesBadgeCountUseCase {
   }
 }
 
+/// Caso de uso para GetAllNotifications; mantiene la regla de negocio fuera de la interfaz.
 class GetAllNotificationsUseCase {
   final NotificationRepository repository;
 
@@ -33,6 +36,7 @@ class GetAllNotificationsUseCase {
   }
 }
 
+/// Caso de uso para CreateNotification; mantiene la regla de negocio fuera de la interfaz.
 class CreateNotificationUseCase {
   final NotificationRepository repository;
 
@@ -43,6 +47,7 @@ class CreateNotificationUseCase {
   }
 }
 
+/// Caso de uso para UpdateNotification; mantiene la regla de negocio fuera de la interfaz.
 class UpdateNotificationUseCase {
   final NotificationRepository repository;
 
@@ -53,6 +58,7 @@ class UpdateNotificationUseCase {
   }
 }
 
+/// Caso de uso para eliminar una notificacion; mantiene la regla de negocio fuera de la interfaz.
 class DeleteNotificationUseCase {
   final NotificationRepository repository;
 
@@ -63,6 +69,7 @@ class DeleteNotificationUseCase {
   }
 }
 
+/// Caso de uso para GetAllPushCampaigns; mantiene la regla de negocio fuera de la interfaz.
 class GetAllPushCampaignsUseCase {
   final NotificationRepository repository;
 
@@ -73,6 +80,7 @@ class GetAllPushCampaignsUseCase {
   }
 }
 
+/// Caso de uso para crear una campana push; mantiene la regla de negocio fuera de la interfaz.
 class CreatePushCampaignUseCase {
   final NotificationRepository repository;
 
@@ -83,6 +91,7 @@ class CreatePushCampaignUseCase {
   }
 }
 
+/// Caso de uso para UpdatePushCampaign; mantiene la regla de negocio fuera de la interfaz.
 class UpdatePushCampaignUseCase {
   final NotificationRepository repository;
 
@@ -93,6 +102,7 @@ class UpdatePushCampaignUseCase {
   }
 }
 
+/// Caso de uso para eliminar una campana push; mantiene la regla de negocio fuera de la interfaz.
 class DeletePushCampaignUseCase {
   final NotificationRepository repository;
 

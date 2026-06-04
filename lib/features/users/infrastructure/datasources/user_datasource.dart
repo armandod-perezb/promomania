@@ -1,6 +1,7 @@
 ﻿import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 import 'package:app/features/users/domain/entities/usuario.dart';
 
+/// Contrato de fuente de datos de usuarios; separa el origen concreto de la informacion del resto de la app.
 abstract class UserDataSource {
   List<Usuario> getAllUsers();
   Usuario? getUserById(int id);
@@ -9,6 +10,7 @@ abstract class UserDataSource {
   void deleteUser(int userId);
 }
 
+/// Fuente de datos de usuarios; obtiene y transforma informacion desde servicios o almacenamiento local.
 class PromoUserDataSource implements UserDataSource {
   final PromoService promoService;
 

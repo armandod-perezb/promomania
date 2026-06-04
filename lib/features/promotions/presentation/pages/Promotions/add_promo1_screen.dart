@@ -37,6 +37,7 @@ class PromoType {
   });
 }
 
+/// Pantalla de promociones; construye la interfaz y conecta acciones del usuario con los controladores.
 class AddPromotion1Screen extends StatefulWidget {
   const AddPromotion1Screen({super.key});
 
@@ -44,6 +45,7 @@ class AddPromotion1Screen extends StatefulWidget {
   State<AddPromotion1Screen> createState() => _AddPromotion1ScreenState();
 }
 
+/// Estado interno de `AddPromotion1Screen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _AddPromotion1ScreenState extends State<AddPromotion1Screen> {
   static const Color _primary = Color(0xFFFF4D2E);
   static const Color _darkBg = Color(0xFF1A1F2E);
@@ -464,6 +466,7 @@ class _AddPromotion1ScreenState extends State<AddPromotion1Screen> {
 
 // ── Modelo auxiliar ────────────────────────────────────────────────────────────
 
+/// Tipo auxiliar interno usado por promociones para mantener la pantalla organizada.
 class _WizardStep {
   final IconData icon;
   final String label;

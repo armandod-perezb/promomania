@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 // PANTALLA ACERCA DE PROMOMANIA
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Pantalla de informacion sobre Promomania y su proposito.
 class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
 
@@ -12,6 +13,7 @@ class AboutScreen extends StatefulWidget {
   State<AboutScreen> createState() => _AboutScreenState();
 }
 
+/// Estado interno de `AboutScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _AboutScreenState extends State<AboutScreen>
     with TickerProviderStateMixin {
   static const Color _primary = Color(0xFFFF4D2E);
@@ -612,6 +614,7 @@ class _AboutScreenState extends State<AboutScreen>
 // PAINTERS
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Painter interno encargado de dibujar la reticula decorativa de la pantalla.
 class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -631,6 +634,7 @@ class _GridPainter extends CustomPainter {
   bool shouldRepaint(_GridPainter o) => false;
 }
 
+/// Painter interno usado para dibujar trazos del mapa decorativo.
 class _StreetPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -679,6 +683,7 @@ class _StreetPainter extends CustomPainter {
 // PIN WIDGET
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Widget interno que renderiza un pin de mapa dentro de composiciones visuales.
 class _PinWidget extends StatelessWidget {
   final String label;
   final Color color;
@@ -721,6 +726,7 @@ class _PinWidget extends StatelessWidget {
   }
 }
 
+/// Painter interno que dibuja la punta del pin de mapa.
 class _PinTipPainter extends CustomPainter {
   final Color color;
   const _PinTipPainter({required this.color});
@@ -744,6 +750,7 @@ class _PinTipPainter extends CustomPainter {
 // MODELOS
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Modelo interno con la posicion y estilo de un pin de mapa.
 class _MapPin {
   final String label;
   final Color color;
@@ -757,6 +764,7 @@ class _MapPin {
   });
 }
 
+/// Modelo interno para listar razones o beneficios dentro de la pantalla.
 class _Reason {
   final IconData icon;
   final Color iconColor;
@@ -772,6 +780,7 @@ class _Reason {
   });
 }
 
+/// Modelo interno que describe un miembro del equipo mostrado en la pantalla.
 class _TeamMember {
   final String initials;
   final String name;
@@ -789,6 +798,7 @@ class _TeamMember {
 // PLACEHOLDER para navegar al help center
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Widget interno usado como contenido temporal o estado auxiliar de la interfaz.
 class _HelpCenterPlaceholder extends StatelessWidget {
   const _HelpCenterPlaceholder();
 

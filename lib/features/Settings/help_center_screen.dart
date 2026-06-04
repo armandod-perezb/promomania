@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 // PANTALLA CENTRO DE AYUDA
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Pantalla de centro de ayuda con preguntas y canales de soporte.
 class HelpCenterScreen extends StatefulWidget {
   const HelpCenterScreen({super.key});
 
@@ -12,6 +13,7 @@ class HelpCenterScreen extends StatefulWidget {
   State<HelpCenterScreen> createState() => _HelpCenterScreenState();
 }
 
+/// Estado interno de `HelpCenterScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _HelpCenterScreenState extends State<HelpCenterScreen> {
   static const Color _primary = Color(0xFFFF4D2E);
   static const Color _darkBg = Color(0xFF1A1F2E);
@@ -497,6 +499,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
 // MODELO
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Modelo interno para representar un tema del centro de ayuda.
 class _HelpTopic {
   final IconData icon;
   final String label;

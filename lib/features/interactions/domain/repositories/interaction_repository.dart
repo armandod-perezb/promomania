@@ -1,6 +1,7 @@
 import '../entities/favorito.dart';
 import '../entities/valoracion.dart';
 
+/// Contrato de repositorio de favoritos y valoraciones; define las operaciones que consume la capa de dominio.
 abstract class InteractionRepository {
   // ── Sync queries ──────────────────────────────────────────────────────────
   List<Favorito> getFavoritosByUsuarioSync(int userId);

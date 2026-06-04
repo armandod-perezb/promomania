@@ -1,3 +1,4 @@
+/// Entidad que modela una campana de notificaciones push.
 class PushCampaign {
   final int id;
   final String titulo;

@@ -3,6 +3,7 @@ import 'package:app/core/network/api_client.dart';
 import 'package:app/core/network/api_exception.dart';
 import 'package:app/features/users/domain/entities/usuario.dart';
 
+/// Contrato de fuente de datos de usuarios; separa el origen concreto de la informacion del resto de la app.
 abstract class RemoteUserDataSource {
   Future<List<Usuario>> getAllUsers();
   Future<Usuario> getUserById(int id);
@@ -11,6 +12,7 @@ abstract class RemoteUserDataSource {
   Future<void> deleteUser(int userId);
 }
 
+/// Fuente de datos de usuarios; obtiene y transforma informacion desde servicios o almacenamiento local.
 class ApiRemoteUserDataSource implements RemoteUserDataSource {
   final ApiClient _client;
 

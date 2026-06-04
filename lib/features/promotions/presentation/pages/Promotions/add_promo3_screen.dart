@@ -23,6 +23,7 @@ class AddPromotion3Screen extends StatefulWidget {
   State<AddPromotion3Screen> createState() => _AddPromotion3ScreenState();
 }
 
+/// Estado interno de `AddPromotion3Screen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _AddPromotion3ScreenState extends State<AddPromotion3Screen> {
   static const Color _primary = Color(0xFFFF4D2E);
   static const Color _darkBg = Color(0xFF1A1F2E);
@@ -763,6 +764,7 @@ class _AddPromotion3ScreenState extends State<AddPromotion3Screen> {
 
 // ── Modelo auxiliar ────────────────────────────────────────────────────────────
 
+/// Tipo auxiliar interno usado por promociones para mantener la pantalla organizada.
 class _WizardStep {
   final IconData icon;
   final String label;

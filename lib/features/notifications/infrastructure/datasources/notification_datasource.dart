@@ -3,6 +3,7 @@ import 'package:app/features/notifications/domain/entities/push_campaign.dart';
 import 'package:app/features/notifications/domain/entities/notification_summary.dart';
 import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 
+/// Contrato de fuente de datos de notificaciones; separa el origen concreto de la informacion del resto de la app.
 abstract class NotificationDataSource {
   NotificationSummary getAdminSummary();
   int getReportesBadgeCount();
@@ -16,6 +17,7 @@ abstract class NotificationDataSource {
   void deletePushCampaign(int id);
 }
 
+/// Fuente de datos de notificaciones; obtiene y transforma informacion desde servicios o almacenamiento local.
 class PromoNotificationDataSource implements NotificationDataSource {
   final PromoService promoService;
   final List<NotificationItem> _notifications = [];
@@ -30,8 +32,9 @@ class PromoNotificationDataSource implements NotificationDataSource {
     final usuarios = promoService.getUsuarios();
     final comentarios = promoService.getComentarios();
 
-    final promocionesPendientes =
-        promociones.where((p) => p.estado.toLowerCase() == 'pendiente').length;
+    final promocionesPendientes = promociones
+        .where((p) => p.estado.toLowerCase() == 'pendiente')
+        .length;
 
     return NotificationSummary(
       reportesPendientes: reportes.length,
@@ -48,7 +51,8 @@ class PromoNotificationDataSource implements NotificationDataSource {
   }
 
   @override
-  List<NotificationItem> getAllNotifications() => List.unmodifiable(_notifications);
+  List<NotificationItem> getAllNotifications() =>
+      List.unmodifiable(_notifications);
 
   @override
   NotificationItem createNotification(NotificationItem item) {

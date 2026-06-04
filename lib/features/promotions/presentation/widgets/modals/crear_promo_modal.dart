@@ -26,6 +26,7 @@ class CrearPromoModal extends StatefulWidget {
   State<CrearPromoModal> createState() => _CrearPromoModalState();
 }
 
+/// Estado interno de `CrearPromoModal`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _CrearPromoModalState extends State<CrearPromoModal> {
   // Form key para validaciones
   final _formKey = GlobalKey<FormState>();
@@ -47,7 +48,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
   String? _tipoPromocionId;
   int? _categoriaId;
   int? _supermercadoId;
-  Set<TipoUbicacion> _tiposUbicacion = {};
+  Set<TipoUbicacion> _tiposUbicacion = {TipoUbicacion.fisica};
   double? _latitud;
   double? _longitud;
   String _condicionProducto = 'nuevo';
@@ -595,8 +596,14 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
 
                   LocationSelector(
                     selectedTypes: _tiposUbicacion,
-                    onTypesChanged: (types) =>
-                        setState(() => _tiposUbicacion = types),
+                    onTypesChanged: (types) {
+                      setState(() {
+                        _tiposUbicacion = types;
+                        _errors.remove('ubicacion');
+                        _errors.remove('ubicacion_fisica');
+                        _errors.remove('url');
+                      });
+                    },
                     descripcionUbicacionController:
                         _descripcionUbicacionController,
                     latitud: _latitud,
@@ -615,6 +622,8 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                   const SizedBox(height: 20),
 
                   if (_tieneUbicacionFisica) ...[
+                    _buildSectionTitle('5. Horario de Promoción'),
+                    const SizedBox(height: 16),
                     PromotionScheduleSelector(
                       controller: _horarioController,
                       onChanged: (_) => setState(() {}),
@@ -622,8 +631,12 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                     const SizedBox(height: 20),
                   ],
 
-                  // ==== SECCIÓN 5: PRECIO Y VIGENCIA ====
-                  _buildSectionTitle('5. Precio y Vigencia'),
+                  // ==== SECCIÓN 6: PRECIO Y VIGENCIA ====
+                  _buildSectionTitle(
+                    _tieneUbicacionFisica
+                        ? '6. Precio y Vigencia'
+                        : '5. Precio y Vigencia',
+                  ),
                   const SizedBox(height: 16),
 
                   // Precio

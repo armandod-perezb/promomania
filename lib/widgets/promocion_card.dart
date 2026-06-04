@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import '../features/promotions/domain/entities/promocion.dart';
 
+/// Widget reutilizable para representar una promocion con estilo compacto.
 class PromocionCard extends StatelessWidget {
   final Promocion promocion;
 

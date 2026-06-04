@@ -6,6 +6,7 @@ import 'package:app/features/promotions/domain/entities/promocion.dart';
 import 'package:app/features/promotions/domain/entities/promocion_horario.dart';
 import 'package:app/features/promotions/domain/entities/supermercado.dart';
 
+/// Contrato de fuente de datos de promociones; separa el origen concreto de la informacion del resto de la app.
 abstract class RemoteAdminPromotionDataSource {
   Future<List<Promocion>> getAllPromotions();
   Future<Promocion?> getPromotionByCode(String codigo);
@@ -23,6 +24,7 @@ abstract class RemoteAdminPromotionDataSource {
   Future<void> deleteSupermercado(int id);
 }
 
+/// Fuente de datos de promociones; obtiene y transforma informacion desde servicios o almacenamiento local.
 class ApiRemoteAdminPromotionDataSource
     implements RemoteAdminPromotionDataSource {
   final ApiClient _client;

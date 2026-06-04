@@ -7,6 +7,7 @@ import '../../../../../features/promotions/domain/entities/promocion.dart';
 import '../../../../../features/promotions/presentation/widgets/modals/crear_promo_modal.dart';
 import '../../../../../features/promotions/presentation/widgets/modals/editar_promo_modal.dart';
 
+/// Pantalla administrativa para revisar, aprobar y mantener promociones.
 class ManagePromotionsScreen extends StatefulWidget {
   const ManagePromotionsScreen({super.key});
 
@@ -14,6 +15,7 @@ class ManagePromotionsScreen extends StatefulWidget {
   State<ManagePromotionsScreen> createState() => _ManagePromotionsScreenState();
 }
 
+/// Estado interno de `ManagePromotionsScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _ManagePromotionsScreenState extends State<ManagePromotionsScreen> {
   int _selectedIndex = 2;
   // Estado de carga para mostrar loader mientras se cargan datos

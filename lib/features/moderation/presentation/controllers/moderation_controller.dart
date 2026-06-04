@@ -1,6 +1,7 @@
 import 'package:app/features/moderation/domain/entities/reporte.dart';
 import 'package:app/features/moderation/domain/usecases/moderation_usecases.dart';
 
+/// Controlador de moderacion; coordina casos de uso y expone operaciones para la capa de presentacion.
 class ModerationController {
   final GetReportesSyncUseCase _getReportesSyncUseCase;
   final GetAllReportesUseCase _getAllReportesUseCase;

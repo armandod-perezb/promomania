@@ -6,6 +6,7 @@ import '../../../../../Core/Routes/app_routes.dart';
 import '../../controllers/auth_controller.dart';
 
 // Widget Stateful porque maneja estado (loading, input)
+/// Pantalla para solicitar el codigo de recuperacion de contrasena.
 class ForgotPasswordScreen extends StatefulWidget {
   final AuthController authController;
 
@@ -18,8 +19,8 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 // Clase que maneja el estado de la pantalla
+/// Estado interno de `ForgotPasswordScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-
   // Controlador para capturar el email ingresado
   final TextEditingController _emailController = TextEditingController();
 
@@ -38,7 +39,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   // Método que se ejecuta cuando el widget se destruye
   @override
   void dispose() {
-
     // Libera memoria del controlador
     _emailController.dispose();
 
@@ -48,10 +48,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   // Método para enviar el código de recuperación
   void _sendCode() async {
-
     // Valida si el campo está vacío
     if (_emailController.text.isEmpty) {
-
       // Muestra mensaje de error
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor ingresa tu email')),
@@ -67,25 +65,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     setState(() => _isLoading = true);
 
     try {
-
       await widget.authController.sendRecoveryCode(correo: email);
 
       // Navega a la pantalla de verificación
       if (mounted) {
         Navigator.pushNamed(context, AppRoutes.verifyCode, arguments: email);
       }
-
     } catch (e) {
-
       // Manejo de errores
       if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
-
     } finally {
-
       // Siempre desactiva el loading
       if (mounted) {
         setState(() => _isLoading = false);
@@ -96,31 +89,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   // Método principal que construye la interfaz
   @override
   Widget build(BuildContext context) {
-
     // Retorna la estructura visual
     return Scaffold(
-
       // Color de fondo
       backgroundColor: _lightBg,
 
       // Contenido principal
       body: Column(
         children: [
-
           // Header superior oscuro
           _buildHeader(),
 
           // Contenido principal expandible
           Expanded(
             child: SingleChildScrollView(
-
               // Espaciado interno
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
 
               // Columna con los elementos
               child: Column(
                 children: [
-
                   // Icono de correo
                   _buildEmailIcon(),
 
@@ -175,7 +163,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   // Método que construye el header
   Widget _buildHeader() {
     return Container(
-
       // Ocupa todo el ancho
       width: double.infinity,
 
@@ -195,7 +182,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           // Botón para regresar
           GestureDetector(
             onTap: () => Navigator.pop(context),
@@ -248,7 +234,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget _buildStepIndicators({required int currentStep}) {
     return Row(
       children: List.generate(3, (i) {
-
         // Determina si el paso está activo
         final isActive = i == currentStep;
 
@@ -283,7 +268,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         const Text(
           'CORREO ELECTRÓNICO',
           style: TextStyle(

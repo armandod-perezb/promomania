@@ -27,6 +27,7 @@ import 'package:app/Core/storage/image_storage_service.dart'; // Servicio para m
 // - Sistema de valoraciones y comentarios
 // - Funcionalidades de favoritos y reportes
 
+/// Pantalla de detalle de una promocion; concentra la informacion, comentarios e interacciones del usuario.
 class PromoDetailScreen extends StatefulWidget {
   const PromoDetailScreen({super.key});
 
@@ -34,6 +35,7 @@ class PromoDetailScreen extends StatefulWidget {
   State<PromoDetailScreen> createState() => _PromoDetailScreenState();
 }
 
+/// Estado interno de `PromoDetailScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _PromoDetailScreenState extends State<PromoDetailScreen>
     with TickerProviderStateMixin {
   // Colores constantes de la aplicación

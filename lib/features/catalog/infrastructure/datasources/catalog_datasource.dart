@@ -1,7 +1,8 @@
-﻿import 'package:app/features/catalog/domain/entities/categoria.dart';
+import 'package:app/features/catalog/domain/entities/categoria.dart';
 import 'package:app/features/catalog/domain/entities/tipo_promocion.dart';
 import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 
+/// Contrato de fuente de datos de catalogo; separa el origen concreto de la informacion del resto de la app.
 abstract class CatalogDataSource {
   List<Categoria> getCategorias();
   List<TipoPromocion> getTiposPromocion();
@@ -11,6 +12,7 @@ abstract class CatalogDataSource {
   Map<String, String> getCategoriaStyle(int idCategoria);
 }
 
+/// Fuente de datos de catalogo; obtiene y transforma informacion desde servicios o almacenamiento local.
 class PromoCatalogDataSource implements CatalogDataSource {
   final PromoService promoService;
 
@@ -29,7 +31,8 @@ class PromoCatalogDataSource implements CatalogDataSource {
   Categoria? getCategoriaByIdSync(int id) => promoService.getCategoria(id);
 
   @override
-  TipoPromocion? getTipoPromocionById(int id) => promoService.getTipoPromocion(id);
+  TipoPromocion? getTipoPromocionById(int id) =>
+      promoService.getTipoPromocion(id);
 
   @override
   Map<String, String> getCategoriaStyle(int idCategoria) =>

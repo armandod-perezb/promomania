@@ -22,6 +22,7 @@ class EditarPromoModal extends StatefulWidget {
   State<EditarPromoModal> createState() => _EditarPromoModalState();
 }
 
+/// Estado interno de `EditarPromoModal`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _EditarPromoModalState extends State<EditarPromoModal> {
   // Form key para validaciones
   final _formKey = GlobalKey<FormState>();

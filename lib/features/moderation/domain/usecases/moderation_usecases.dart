@@ -1,12 +1,14 @@
 import '../entities/reporte.dart';
 import '../repositories/moderation_repository.dart';
 
+/// Caso de uso para GetReportesSync; mantiene la regla de negocio fuera de la interfaz.
 class GetReportesSyncUseCase {
   final ModerationRepository repository;
   GetReportesSyncUseCase(this.repository);
   List<Reporte> execute() => repository.getReportesSync();
 }
 
+/// Caso de uso para GetAllReportes; mantiene la regla de negocio fuera de la interfaz.
 class GetAllReportesUseCase {
   final ModerationRepository repository;
 
@@ -17,6 +19,7 @@ class GetAllReportesUseCase {
   }
 }
 
+/// Caso de uso para GetReportesByUsuario; mantiene la regla de negocio fuera de la interfaz.
 class GetReportesByUsuarioUseCase {
   final ModerationRepository repository;
 
@@ -27,6 +30,7 @@ class GetReportesByUsuarioUseCase {
   }
 }
 
+/// Caso de uso para GetReportesByPromocion; mantiene la regla de negocio fuera de la interfaz.
 class GetReportesByPromocionUseCase {
   final ModerationRepository repository;
 
@@ -37,6 +41,7 @@ class GetReportesByPromocionUseCase {
   }
 }
 
+/// Caso de uso para AddReporte; mantiene la regla de negocio fuera de la interfaz.
 class AddReporteUseCase {
   final ModerationRepository repository;
 
@@ -47,6 +52,7 @@ class AddReporteUseCase {
   }
 }
 
+/// Caso de uso para UpdateReporte; mantiene la regla de negocio fuera de la interfaz.
 class UpdateReporteUseCase {
   final ModerationRepository repository;
 
@@ -57,6 +63,7 @@ class UpdateReporteUseCase {
   }
 }
 
+/// Caso de uso para eliminar un reporte; mantiene la regla de negocio fuera de la interfaz.
 class DeleteReporteUseCase {
   final ModerationRepository repository;
 

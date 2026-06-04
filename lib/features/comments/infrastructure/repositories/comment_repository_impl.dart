@@ -4,6 +4,7 @@ import 'package:app/features/comments/domain/repositories/comment_repository.dar
 import 'package:app/features/comments/infrastructure/datasources/comment_datasource.dart';
 import 'package:app/features/comments/infrastructure/datasources/remote_comment_datasource.dart';
 
+/// Implementacion del repositorio de comentarios; adapta fuentes de datos remotas/locales al contrato de dominio.
 class CommentRepositoryImpl implements CommentRepository {
   final CommentDataSource dataSource;
   final RemoteCommentDataSource? remoteDataSource;
@@ -30,7 +31,9 @@ class CommentRepositoryImpl implements CommentRepository {
   Future<List<Comentario>> getCommentsByPromotion(String promotionCode) async {
     if (remoteDataSource != null) {
       try {
-        final remote = await remoteDataSource!.getCommentsByPromotion(promotionCode);
+        final remote = await remoteDataSource!.getCommentsByPromotion(
+          promotionCode,
+        );
         return remote;
       } catch (e) {
         if (!_shouldFallbackToLocal(e)) rethrow;

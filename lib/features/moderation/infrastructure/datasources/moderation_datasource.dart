@@ -1,6 +1,7 @@
 import 'package:app/features/moderation/domain/entities/reporte.dart';
 import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 
+/// Contrato de fuente de datos de moderacion; separa el origen concreto de la informacion del resto de la app.
 abstract class ModerationDataSource {
   List<Reporte> getAllReportes();
   List<Reporte> getReportesByUsuario(int userId);
@@ -10,6 +11,7 @@ abstract class ModerationDataSource {
   void deleteReporte(int id);
 }
 
+/// Fuente de datos de moderacion; obtiene y transforma informacion desde servicios o almacenamiento local.
 class PromoModerationDataSource implements ModerationDataSource {
   final PromoService promoService;
 

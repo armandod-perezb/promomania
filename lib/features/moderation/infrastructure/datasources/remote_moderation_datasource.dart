@@ -3,6 +3,7 @@ import 'package:app/core/network/api_client.dart';
 import 'package:app/core/network/api_exception.dart';
 import 'package:app/features/moderation/domain/entities/reporte.dart';
 
+/// Contrato de fuente de datos de moderacion; separa el origen concreto de la informacion del resto de la app.
 abstract class RemoteModerationDataSource {
   Future<List<Reporte>> getAllReportes();
   Future<List<Reporte>> getReportesByUsuario(int userId);
@@ -12,6 +13,7 @@ abstract class RemoteModerationDataSource {
   Future<void> deleteReporte(int id);
 }
 
+/// Fuente de datos de moderacion; obtiene y transforma informacion desde servicios o almacenamiento local.
 class ApiRemoteModerationDataSource implements RemoteModerationDataSource {
   final ApiClient _client;
 
@@ -21,7 +23,9 @@ class ApiRemoteModerationDataSource implements RemoteModerationDataSource {
   Future<List<Reporte>> getAllReportes() async {
     try {
       final all = await _client.getAllPages('/reportes/');
-      return all.map((item) => _reporteFromApi(item as Map<String, dynamic>)).toList();
+      return all
+          .map((item) => _reporteFromApi(item as Map<String, dynamic>))
+          .toList();
     } on ApiRequestException catch (e) {
       throw _mapApiException(e);
     }
@@ -42,8 +46,9 @@ class ApiRemoteModerationDataSource implements RemoteModerationDataSource {
   @override
   Future<Reporte> addReporte(Reporte reporte) async {
     try {
-      final created = await _client.post('/reportes/', _reporteToApi(reporte))
-          as Map<String, dynamic>;
+      final created =
+          await _client.post('/reportes/', _reporteToApi(reporte))
+              as Map<String, dynamic>;
       return _reporteFromApi(created);
     } on ApiRequestException catch (e) {
       throw _mapApiException(e);
@@ -53,11 +58,12 @@ class ApiRemoteModerationDataSource implements RemoteModerationDataSource {
   @override
   Future<Reporte> updateReporte(Reporte reporte) async {
     try {
-      final updated = await _client.patch(
-            '/reportes/${reporte.id}/',
-            _reporteToApi(reporte),
-          )
-          as Map<String, dynamic>;
+      final updated =
+          await _client.patch(
+                '/reportes/${reporte.id}/',
+                _reporteToApi(reporte),
+              )
+              as Map<String, dynamic>;
       return _reporteFromApi(updated);
     } on ApiRequestException catch (e) {
       throw _mapApiException(e);
@@ -99,7 +105,9 @@ class ApiRemoteModerationDataSource implements RemoteModerationDataSource {
   Exception _mapApiException(ApiRequestException e) {
     if (e.statusCode == 400) return ValidationException(e.message);
     if (e.statusCode == 401 || e.statusCode == 403) {
-      return UnauthorizedException('Tu sesión no es válida. Inicia sesión de nuevo.');
+      return UnauthorizedException(
+        'Tu sesión no es válida. Inicia sesión de nuevo.',
+      );
     }
     return ServerException(e.message);
   }

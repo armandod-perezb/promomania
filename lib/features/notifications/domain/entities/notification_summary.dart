@@ -1,3 +1,4 @@
+/// Entidad resumen con metricas agregadas de notificaciones.
 class NotificationSummary {
   final int reportesPendientes;
   final int promocionesPendientes;

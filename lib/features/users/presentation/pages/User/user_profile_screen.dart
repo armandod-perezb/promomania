@@ -9,6 +9,7 @@ import '../../../../../features/comments/domain/entities/comentario.dart';
 // PANTALLA DE PERFIL
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Pantalla de perfil del usuario; muestra sus datos, publicaciones, favoritos y logros.
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
 
@@ -16,6 +17,7 @@ class UserProfileScreen extends StatefulWidget {
   State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
 
+/// Estado interno de `UserProfileScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _UserProfileScreenState extends State<UserProfileScreen>
     with TickerProviderStateMixin {
   static const Color _primary = Color(0xFFFF4D2E);
@@ -1971,6 +1973,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 // MODELOS AUXILIARES
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Modelo interno para mostrar una metrica compacta dentro de la pantalla.
 class _ProfileStat extends StatelessWidget {
   final String value;
   final String label;
@@ -2004,6 +2007,7 @@ class _ProfileStat extends StatelessWidget {
   }
 }
 
+/// Modelo interno que describe una accion rapida de la interfaz.
 class _QuickAction {
   final IconData icon;
   final String label;
@@ -2019,6 +2023,7 @@ class _QuickAction {
   });
 }
 
+/// Modelo interno para representar una insignia visual.
 class _Badge {
   final String emoji;
   final String title;
@@ -2032,6 +2037,7 @@ class _Badge {
   });
 }
 
+/// Modelo interno para mostrar una pieza de informacion de perfil.
 class _InfoItem {
   final IconData icon;
   final String label;
@@ -2045,6 +2051,7 @@ class _InfoItem {
   });
 }
 
+/// Modelo interno que define una opcion de navegacion inferior.
 class _NavTab {
   final IconData icon;
   final String label;

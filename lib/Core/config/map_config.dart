@@ -1,3 +1,4 @@
+/// Configuracion relacionada con mapas, coordenadas por defecto y proveedores de ubicacion.
 class AppMapConfig {
   AppMapConfig._();
 

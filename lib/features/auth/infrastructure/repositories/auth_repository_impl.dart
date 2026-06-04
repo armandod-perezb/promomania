@@ -5,6 +5,7 @@ import 'package:app/features/auth/infrastructure/datasources/auth_user_datasourc
 import 'package:app/features/auth/infrastructure/datasources/remote_login_datasource.dart';
 import 'package:app/features/users/domain/entities/usuario.dart';
 
+/// Implementacion del repositorio de autenticacion; adapta fuentes de datos remotas/locales al contrato de dominio.
 class AuthRepositoryImpl implements AuthRepository {
   final AuthUserDataSource userDataSource;
   final AuthSessionDataSource sessionDataSource;
@@ -30,7 +31,10 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Usuario> login({required String correo, required String password}) async {
+  Future<Usuario> login({
+    required String correo,
+    required String password,
+  }) async {
     final normalizedEmail = _normalizeEmail(correo);
 
     if (remoteLoginDataSource != null) {
@@ -39,7 +43,10 @@ class AuthRepositoryImpl implements AuthRepository {
           correo: normalizedEmail,
           password: password,
         );
-        await sessionDataSource.saveSession(result.usuario, token: result.token);
+        await sessionDataSource.saveSession(
+          result.usuario,
+          token: result.token,
+        );
         return result.usuario;
       } catch (e) {
         if (!_shouldFallbackToLocal(e)) rethrow;
@@ -72,7 +79,10 @@ class AuthRepositoryImpl implements AuthRepository {
           correo: normalizedEmail,
           password: password,
         );
-        await sessionDataSource.saveSession(result.usuario, token: result.token);
+        await sessionDataSource.saveSession(
+          result.usuario,
+          token: result.token,
+        );
         return result.usuario;
       } catch (e) {
         if (!_shouldFallbackToLocal(e)) rethrow;
@@ -126,7 +136,10 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<bool> verifyRecoveryCode({required String correo, required String code}) async {
+  Future<bool> verifyRecoveryCode({
+    required String correo,
+    required String code,
+  }) async {
     final normalizedEmail = _normalizeEmail(correo);
     final usuario = userDataSource.findByEmail(normalizedEmail);
     if (usuario == null) {
@@ -147,7 +160,10 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> resetPassword({required String correo, required String newPassword}) async {
+  Future<void> resetPassword({
+    required String correo,
+    required String newPassword,
+  }) async {
     final normalizedEmail = _normalizeEmail(correo);
     final usuario = userDataSource.findByEmail(normalizedEmail);
     if (usuario == null) {
@@ -163,6 +179,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 }
 
+/// Tipo auxiliar interno usado por autenticacion para mantener la pantalla organizada.
 class _RecoveryCodeEntry {
   final String code;
   final DateTime expiresAt;

@@ -2,6 +2,7 @@ import 'package:app/features/catalog/domain/entities/categoria.dart';
 import 'package:app/features/catalog/domain/entities/tipo_promocion.dart';
 import 'package:app/features/catalog/domain/usecases/catalog_usecases.dart';
 
+/// Controlador de catalogo; coordina casos de uso y expone operaciones para la capa de presentacion.
 class CatalogController {
   final GetCategoriasUseCase _getCategoriasUseCase;
   final GetTiposPromocionUseCase _getTiposPromocionUseCase;
@@ -25,9 +26,14 @@ class CatalogController {
        _getCategoriaStyleUseCase = getCategoriaStyleUseCase;
 
   Future<List<Categoria>> getCategorias() => _getCategoriasUseCase.execute();
-  Future<List<TipoPromocion>> getTiposPromocion() => _getTiposPromocionUseCase.execute();
-  Future<Categoria?> getCategoriaById(int id) => _getCategoriaByIdUseCase.execute(id);
-  Future<TipoPromocion?> getTipoPromocionById(int id) => _getTipoPromocionByIdUseCase.execute(id);
-  Categoria? getCategoriaByIdSync(int id) => _getCategoriaByIdSyncUseCase.execute(id);
-  Map<String, String> getCategoriaStyleSync(int idCategoria) => _getCategoriaStyleUseCase.execute(idCategoria);
+  Future<List<TipoPromocion>> getTiposPromocion() =>
+      _getTiposPromocionUseCase.execute();
+  Future<Categoria?> getCategoriaById(int id) =>
+      _getCategoriaByIdUseCase.execute(id);
+  Future<TipoPromocion?> getTipoPromocionById(int id) =>
+      _getTipoPromocionByIdUseCase.execute(id);
+  Categoria? getCategoriaByIdSync(int id) =>
+      _getCategoriaByIdSyncUseCase.execute(id);
+  Map<String, String> getCategoriaStyleSync(int idCategoria) =>
+      _getCategoriaStyleUseCase.execute(idCategoria);
 }

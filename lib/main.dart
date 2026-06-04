@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'Core/Routes/app_routes.dart';
 import 'features/auth/presentation/pages/Authentication/login_screen.dart';
@@ -41,14 +41,13 @@ void main() async {
 
   runApp(
     MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: AppScope.promoService),
-      ],
+      providers: [ChangeNotifierProvider.value(value: AppScope.promoService)],
       child: const MyApp(),
     ),
   );
 }
 
+/// Widget raiz de Promomania; configura tema, rutas iniciales y alcance visual de la app.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -70,11 +69,10 @@ class MyApp extends StatelessWidget {
               ? settings.arguments as String
               : '';
           return MaterialPageRoute(
-            builder: (context) =>
-                VerifyCodeScreen(
-                  email: email,
-                  authController: AppScope.authController,
-                ),
+            builder: (context) => VerifyCodeScreen(
+              email: email,
+              authController: AppScope.authController,
+            ),
             settings: settings,
           );
         }

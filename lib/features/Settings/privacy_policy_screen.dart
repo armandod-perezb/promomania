@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/// Pantalla informativa con la politica de privacidad de la aplicacion.
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
 
@@ -14,7 +15,10 @@ class PrivacyPolicyScreen extends StatelessWidget {
           backgroundColor: Colors.white,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1A1F2E)),
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              color: Color(0xFF1A1F2E),
+            ),
             onPressed: () => Navigator.pop(context),
           ),
           title: const Text(

@@ -1,5 +1,6 @@
 import 'dart:html' as html;
 
+/// Coordenada obtenida desde la API de geolocalizacion del navegador.
 class BrowserGeolocationPoint {
   const BrowserGeolocationPoint({
     required this.latitude,
@@ -10,6 +11,7 @@ class BrowserGeolocationPoint {
   final double longitude;
 }
 
+/// Solicita la ubicacion actual del navegador usando la implementacion web.
 Future<BrowserGeolocationPoint> getBrowserGeolocation({
   required Duration timeout,
   required Duration maximumAge,

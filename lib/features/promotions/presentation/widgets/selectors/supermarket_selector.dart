@@ -29,6 +29,7 @@ class SupermarketSelector extends StatefulWidget {
   State<SupermarketSelector> createState() => _SupermarketSelectorState();
 }
 
+/// Estado interno de `SupermarketSelector`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _SupermarketSelectorState extends State<SupermarketSelector> {
   final TextEditingController _searchController = TextEditingController();
   bool _isOpen = false;
@@ -247,10 +248,7 @@ class _SupermarketSelectorState extends State<SupermarketSelector> {
             padding: const EdgeInsets.only(top: 4, left: 4),
             child: Text(
               widget.errorText!,
-              style: const TextStyle(
-                color: Colors.red,
-                fontSize: 11,
-              ),
+              style: const TextStyle(color: Colors.red, fontSize: 11),
             ),
           ),
       ],
@@ -270,10 +268,7 @@ class _SupermarketSelectorState extends State<SupermarketSelector> {
           const SizedBox(height: 8),
           Text(
             'No se encontraron supermercados',
-            style: TextStyle(
-              color: Colors.grey.withOpacity(0.6),
-              fontSize: 13,
-            ),
+            style: TextStyle(color: Colors.grey.withOpacity(0.6), fontSize: 13),
           ),
         ],
       ),
@@ -296,10 +291,7 @@ class _SupermarketSelectorState extends State<SupermarketSelector> {
         decoration: BoxDecoration(
           color: isSelected ? primaryColor.withOpacity(0.05) : null,
           border: Border(
-            bottom: BorderSide(
-              color: Colors.grey.withOpacity(0.1),
-              width: 1,
-            ),
+            bottom: BorderSide(color: Colors.grey.withOpacity(0.1), width: 1),
           ),
         ),
         child: Row(
@@ -328,7 +320,9 @@ class _SupermarketSelectorState extends State<SupermarketSelector> {
                     supermercado.nombre,
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w500,
                       color: isSelected ? primaryColor : textDark,
                     ),
                   ),
@@ -351,11 +345,7 @@ class _SupermarketSelectorState extends State<SupermarketSelector> {
               ),
             ),
             if (isSelected)
-              Icon(
-                Icons.check_circle,
-                color: primaryColor,
-                size: 20,
-              ),
+              Icon(Icons.check_circle, color: primaryColor, size: 20),
           ],
         ),
       ),
@@ -381,11 +371,7 @@ class _SupermarketSelectorState extends State<SupermarketSelector> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.add_circle_outline,
-              color: primaryColor,
-              size: 20,
-            ),
+            Icon(Icons.add_circle_outline, color: primaryColor, size: 20),
             const SizedBox(width: 8),
             Text(
               'Registrar nuevo supermercado',

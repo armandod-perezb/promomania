@@ -36,7 +36,10 @@ abstract class AuthRepository {
   Future<void> sendRecoveryCode({required String correo});
 
   /// Verifica el código de recuperación asociado a un correo.
-  Future<bool> verifyRecoveryCode({required String correo, required String code});
+  Future<bool> verifyRecoveryCode({
+    required String correo,
+    required String code,
+  });
 
   /// Actualiza la contraseña del usuario asociado al correo.
   Future<void> resetPassword({

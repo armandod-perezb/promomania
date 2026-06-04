@@ -4,6 +4,7 @@ import 'package:app/core/network/api_exception.dart';
 import 'package:app/features/interactions/domain/entities/favorito.dart';
 import 'package:app/features/interactions/domain/entities/valoracion.dart';
 
+/// Contrato de fuente de datos de favoritos y valoraciones; separa el origen concreto de la informacion del resto de la app.
 abstract class RemoteFavoriteDataSource {
   Future<List<Favorito>> getFavoritosByUsuario(int userId);
   Future<Favorito?> findFavorito(int userId, String promotionCode);
@@ -15,6 +16,7 @@ abstract class RemoteFavoriteDataSource {
   Future<void> deleteValoracion(int valoracionId);
 }
 
+/// Fuente de datos de favoritos y valoraciones; obtiene y transforma informacion desde servicios o almacenamiento local.
 class ApiRemoteFavoriteDataSource implements RemoteFavoriteDataSource {
   final ApiClient _client;
 
@@ -30,7 +32,9 @@ class ApiRemoteFavoriteDataSource implements RemoteFavoriteDataSource {
           .toList();
     } on ApiRequestException catch (e) {
       if (e.statusCode == 401 || e.statusCode == 403) {
-        throw UnauthorizedException('Tu sesión no es válida. Inicia sesión de nuevo.');
+        throw UnauthorizedException(
+          'Tu sesión no es válida. Inicia sesión de nuevo.',
+        );
       }
       throw ServerException(e.message);
     }
@@ -50,11 +54,13 @@ class ApiRemoteFavoriteDataSource implements RemoteFavoriteDataSource {
   @override
   Future<Favorito> addFavorito(int userId, String promotionCode) async {
     try {
-      final created = await _client.post('/favoritos/', {
-        'id_usuario': userId,
-        'codigo_promocion': promotionCode,
-        'fecha': DateTime.now().toIso8601String(),
-      }) as Map<String, dynamic>;
+      final created =
+          await _client.post('/favoritos/', {
+                'id_usuario': userId,
+                'codigo_promocion': promotionCode,
+                'fecha': DateTime.now().toIso8601String(),
+              })
+              as Map<String, dynamic>;
       return _favoritoFromApi(created);
     } on ApiRequestException catch (e) {
       if (e.statusCode == 400) {
@@ -65,7 +71,9 @@ class ApiRemoteFavoriteDataSource implements RemoteFavoriteDataSource {
         throw ValidationException(e.message);
       }
       if (e.statusCode == 401 || e.statusCode == 403) {
-        throw UnauthorizedException('Tu sesión no es válida. Inicia sesión de nuevo.');
+        throw UnauthorizedException(
+          'Tu sesión no es válida. Inicia sesión de nuevo.',
+        );
       }
       throw ServerException(e.message);
     }
@@ -80,14 +88,18 @@ class ApiRemoteFavoriteDataSource implements RemoteFavoriteDataSource {
         return;
       }
       if (e.statusCode == 401 || e.statusCode == 403) {
-        throw UnauthorizedException('Tu sesión no es válida. Inicia sesión de nuevo.');
+        throw UnauthorizedException(
+          'Tu sesión no es válida. Inicia sesión de nuevo.',
+        );
       }
       throw ServerException(e.message);
     }
   }
 
   @override
-  Future<List<Valoracion>> getValoracionesByPromocion(String promotionCode) async {
+  Future<List<Valoracion>> getValoracionesByPromocion(
+    String promotionCode,
+  ) async {
     final all = await getAllValoraciones();
     return all.where((v) => v.codigoPromocion == promotionCode).toList();
   }
@@ -101,7 +113,9 @@ class ApiRemoteFavoriteDataSource implements RemoteFavoriteDataSource {
           .toList();
     } on ApiRequestException catch (e) {
       if (e.statusCode == 401 || e.statusCode == 403) {
-        throw UnauthorizedException('Tu sesión no es válida. Inicia sesión de nuevo.');
+        throw UnauthorizedException(
+          'Tu sesión no es válida. Inicia sesión de nuevo.',
+        );
       }
       throw ServerException(e.message);
     }
@@ -110,16 +124,20 @@ class ApiRemoteFavoriteDataSource implements RemoteFavoriteDataSource {
   @override
   Future<Valoracion> addValoracion(Valoracion valoracion) async {
     try {
-      final created = await _client.post('/valoraciones/', {
-        'tipo': valoracion.tipo,
-        'id_usuario': valoracion.idUsuario,
-        'codigo_promocion': valoracion.codigoPromocion,
-      }) as Map<String, dynamic>;
+      final created =
+          await _client.post('/valoraciones/', {
+                'tipo': valoracion.tipo,
+                'id_usuario': valoracion.idUsuario,
+                'codigo_promocion': valoracion.codigoPromocion,
+              })
+              as Map<String, dynamic>;
       return _valoracionFromApi(created);
     } on ApiRequestException catch (e) {
       if (e.statusCode == 400) throw ValidationException(e.message);
       if (e.statusCode == 401 || e.statusCode == 403) {
-        throw UnauthorizedException('Tu sesión no es válida. Inicia sesión de nuevo.');
+        throw UnauthorizedException(
+          'Tu sesión no es válida. Inicia sesión de nuevo.',
+        );
       }
       throw ServerException(e.message);
     }
@@ -132,7 +150,9 @@ class ApiRemoteFavoriteDataSource implements RemoteFavoriteDataSource {
     } on ApiRequestException catch (e) {
       if (e.statusCode == 404) return;
       if (e.statusCode == 401 || e.statusCode == 403) {
-        throw UnauthorizedException('Tu sesión no es válida. Inicia sesión de nuevo.');
+        throw UnauthorizedException(
+          'Tu sesión no es válida. Inicia sesión de nuevo.',
+        );
       }
       throw ServerException(e.message);
     }

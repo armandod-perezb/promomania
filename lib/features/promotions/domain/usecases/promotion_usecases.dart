@@ -4,6 +4,7 @@ import 'package:app/features/promotions/domain/entities/promocion.dart';
 import 'package:app/features/promotions/domain/entities/promocion_horario.dart';
 import 'package:app/features/promotions/domain/entities/supermercado.dart';
 
+/// Caso de uso para inicializar promociones; mantiene la regla de negocio fuera de la interfaz.
 class InitializePromotionsUseCase {
   final Future<void> Function() initData;
 
@@ -12,6 +13,7 @@ class InitializePromotionsUseCase {
   Future<void> execute() => initData();
 }
 
+/// Caso de uso para cargar promociones locales; mantiene la regla de negocio fuera de la interfaz.
 class LoadLocalPromotionsUseCase {
   final Future<void> Function() loadLocal;
 
@@ -20,6 +22,7 @@ class LoadLocalPromotionsUseCase {
   Future<void> execute() => loadLocal();
 }
 
+/// Caso de uso para obtener promociones activas; mantiene la regla de negocio fuera de la interfaz.
 class GetActivePromotionsUseCase {
   final PromotionRepository repository;
 
@@ -40,6 +43,7 @@ class GetActivePromotionsUseCase {
   }
 }
 
+/// Caso de uso para buscar una promocion por codigo; mantiene la regla de negocio fuera de la interfaz.
 class GetPromotionByCodeUseCase {
   final PromotionRepository repository;
 
@@ -50,6 +54,7 @@ class GetPromotionByCodeUseCase {
   }
 }
 
+/// Caso de uso para crear una promocion; mantiene la regla de negocio fuera de la interfaz.
 class CreatePromotionUseCase {
   final PromotionRepository repository;
 
@@ -60,6 +65,7 @@ class CreatePromotionUseCase {
   }
 }
 
+/// Caso de uso para actualizar una promocion; mantiene la regla de negocio fuera de la interfaz.
 class UpdatePromotionUseCase {
   final PromotionRepository repository;
 
@@ -70,6 +76,7 @@ class UpdatePromotionUseCase {
   }
 }
 
+/// Caso de uso para eliminar una promocion; mantiene la regla de negocio fuera de la interfaz.
 class DeletePromotionUseCase {
   final PromotionRepository repository;
 
@@ -80,6 +87,7 @@ class DeletePromotionUseCase {
   }
 }
 
+/// Caso de uso para registrar vistas de una promocion; mantiene la regla de negocio fuera de la interfaz.
 class IncrementPromotionViewsUseCase {
   final PromotionRepository repository;
 
@@ -90,6 +98,7 @@ class IncrementPromotionViewsUseCase {
   }
 }
 
+/// Caso de uso para obtener promociones publicadas por un usuario; mantiene la regla de negocio fuera de la interfaz.
 class GetPromotionsByUserUseCase {
   final PromotionRepository repository;
 
@@ -100,6 +109,7 @@ class GetPromotionsByUserUseCase {
   }
 }
 
+/// Caso de uso para aprobar una promocion; mantiene la regla de negocio fuera de la interfaz.
 class ApprovePromotionUseCase {
   final PromotionRepository repository;
 
@@ -110,6 +120,7 @@ class ApprovePromotionUseCase {
   }
 }
 
+/// Caso de uso para rechazar una promocion; mantiene la regla de negocio fuera de la interfaz.
 class RejectPromotionUseCase {
   final PromotionRepository repository;
 
@@ -120,6 +131,7 @@ class RejectPromotionUseCase {
   }
 }
 
+/// Caso de uso para obtener promociones por categoria; mantiene la regla de negocio fuera de la interfaz.
 class GetPromotionsByCategoryUseCase {
   final PromotionRepository repository;
 
@@ -130,6 +142,7 @@ class GetPromotionsByCategoryUseCase {
   }
 }
 
+/// Caso de uso para obtener promociones por supermercado; mantiene la regla de negocio fuera de la interfaz.
 class GetPromotionsBySupermarketUseCase {
   final PromotionRepository repository;
 
@@ -142,6 +155,7 @@ class GetPromotionsBySupermarketUseCase {
 
 // ── Sync query use cases ──────────────────────────────────────────────────────
 
+/// Caso de uso para obtener promociones activas desde cache local; mantiene la regla de negocio fuera de la interfaz.
 class GetActivePromotionsSyncUseCase {
   final PromotionRepository repository;
   GetActivePromotionsSyncUseCase(this.repository);
@@ -152,12 +166,14 @@ class GetActivePromotionsSyncUseCase {
       );
 }
 
+/// Caso de uso para obtener todas las promociones desde cache local; mantiene la regla de negocio fuera de la interfaz.
 class GetAllPromotionsSyncUseCase {
   final PromotionRepository repository;
   GetAllPromotionsSyncUseCase(this.repository);
   List<Promocion> execute() => repository.getAllPromotionsSync();
 }
 
+/// Caso de uso para buscar una promocion por codigo en cache local; mantiene la regla de negocio fuera de la interfaz.
 class GetPromotionByCodeSyncUseCase {
   final PromotionRepository repository;
   GetPromotionByCodeSyncUseCase(this.repository);
@@ -165,6 +181,7 @@ class GetPromotionByCodeSyncUseCase {
       repository.getPromotionByCodeSync(codigo);
 }
 
+/// Caso de uso para obtener ofertas relampago desde cache local; mantiene la regla de negocio fuera de la interfaz.
 class GetFlashDealsSyncUseCase {
   final PromotionRepository repository;
   GetFlashDealsSyncUseCase(this.repository);
@@ -172,6 +189,7 @@ class GetFlashDealsSyncUseCase {
       repository.getFlashDealsSync(limit: limit);
 }
 
+/// Caso de uso para obtener comercios cercanos desde cache local; mantiene la regla de negocio fuera de la interfaz.
 class GetNearbyStoresSyncUseCase {
   final PromotionRepository repository;
   GetNearbyStoresSyncUseCase(this.repository);
@@ -179,12 +197,14 @@ class GetNearbyStoresSyncUseCase {
       repository.getNearbyStoresSync(limit: limit);
 }
 
+/// Caso de uso para calcular la urgencia visual de una promocion; mantiene la regla de negocio fuera de la interfaz.
 class GetPromocionUrgencyUseCase {
   final PromotionRepository repository;
   GetPromocionUrgencyUseCase(this.repository);
   String execute(Promocion promo) => repository.getPromocionUrgency(promo);
 }
 
+/// Caso de uso para agrupar promociones por urgencia desde cache local; mantiene la regla de negocio fuera de la interfaz.
 class GetPromocionesByUrgencySyncUseCase {
   final PromotionRepository repository;
   GetPromocionesByUrgencySyncUseCase(this.repository);
@@ -192,18 +212,21 @@ class GetPromocionesByUrgencySyncUseCase {
       repository.getPromocionesByUrgencySync(userId);
 }
 
+/// Caso de uso para calcular la valoracion de una promocion desde cache local; mantiene la regla de negocio fuera de la interfaz.
 class GetPromocionRatingSyncUseCase {
   final PromotionRepository repository;
   GetPromocionRatingSyncUseCase(this.repository);
   double execute(String codigo) => repository.getPromocionRatingSync(codigo);
 }
 
+/// Caso de uso para calcular el precio final con descuento; mantiene la regla de negocio fuera de la interfaz.
 class GetPrecioConDescuentoUseCase {
   final PromotionRepository repository;
   GetPrecioConDescuentoUseCase(this.repository);
   double execute(Promocion promo) => repository.getPrecioConDescuento(promo);
 }
 
+/// Caso de uso para obtener horarios de una promocion por codigo; mantiene la regla de negocio fuera de la interfaz.
 class GetPromocionesHorariosByCodigoUseCase {
   final PromotionRepository repository;
   GetPromocionesHorariosByCodigoUseCase(this.repository);
@@ -211,24 +234,28 @@ class GetPromocionesHorariosByCodigoUseCase {
       repository.getPromocionesHorariosByCodigoSync(codigo);
 }
 
+/// Caso de uso para calcular el siguiente identificador de horario; mantiene la regla de negocio fuera de la interfaz.
 class GetNextHorarioIdUseCase {
   final PromotionRepository repository;
   GetNextHorarioIdUseCase(this.repository);
   int execute() => repository.getNextHorarioIdSync();
 }
 
+/// Caso de uso para obtener un supermercado desde cache local; mantiene la regla de negocio fuera de la interfaz.
 class GetSupermercadoSyncUseCase {
   final PromotionRepository repository;
   GetSupermercadoSyncUseCase(this.repository);
   Supermercado? execute(int id) => repository.getSupermercadoSync(id);
 }
 
+/// Caso de uso para obtener supermercados desde cache local; mantiene la regla de negocio fuera de la interfaz.
 class GetSupermercadosSyncUseCase {
   final PromotionRepository repository;
   GetSupermercadosSyncUseCase(this.repository);
   List<Supermercado> execute() => repository.getSupermercadosSync();
 }
 
+/// Caso de uso para leer bytes de imagen ya cargados en memoria; mantiene la regla de negocio fuera de la interfaz.
 class GetCachedImageBytesUseCase {
   final PromotionRepository repository;
   GetCachedImageBytesUseCase(this.repository);
@@ -237,6 +264,7 @@ class GetCachedImageBytesUseCase {
 
 // ── Async command use cases ───────────────────────────────────────────────────
 
+/// Caso de uso para agregar un horario a una promocion; mantiene la regla de negocio fuera de la interfaz.
 class AddPromocionHorarioUseCase {
   final PromotionRepository repository;
   AddPromocionHorarioUseCase(this.repository);
@@ -244,6 +272,7 @@ class AddPromocionHorarioUseCase {
       repository.addPromocionHorario(horario);
 }
 
+/// Caso de uso para guardar la imagen de una promocion; mantiene la regla de negocio fuera de la interfaz.
 class SavePromotionImageUseCase {
   final PromotionRepository repository;
   SavePromotionImageUseCase(this.repository);
@@ -251,6 +280,7 @@ class SavePromotionImageUseCase {
       repository.savePromotionImage(codigo, bytes);
 }
 
+/// Caso de uso para recuperar la imagen de una promocion; mantiene la regla de negocio fuera de la interfaz.
 class GetPromotionImageBytesUseCase {
   final PromotionRepository repository;
   GetPromotionImageBytesUseCase(this.repository);
@@ -258,6 +288,7 @@ class GetPromotionImageBytesUseCase {
       repository.getPromotionImageBytes(codigo);
 }
 
+/// Caso de uso para agregar un supermercado; mantiene la regla de negocio fuera de la interfaz.
 class AddSupermercadoUseCase {
   final PromotionRepository repository;
   AddSupermercadoUseCase(this.repository);
@@ -265,6 +296,7 @@ class AddSupermercadoUseCase {
       repository.addSupermercado(supermercado);
 }
 
+/// Caso de uso para crear un supermercado; mantiene la regla de negocio fuera de la interfaz.
 class CreateSupermercadoUseCase {
   final PromotionRepository repository;
   CreateSupermercadoUseCase(this.repository);
@@ -272,6 +304,7 @@ class CreateSupermercadoUseCase {
       repository.createSupermercado(supermercado);
 }
 
+/// Caso de uso para actualizar un supermercado; mantiene la regla de negocio fuera de la interfaz.
 class UpdateSupermercadoUseCase {
   final PromotionRepository repository;
   UpdateSupermercadoUseCase(this.repository);
@@ -279,24 +312,28 @@ class UpdateSupermercadoUseCase {
       repository.updateSupermercado(supermercado);
 }
 
+/// Caso de uso para eliminar un supermercado; mantiene la regla de negocio fuera de la interfaz.
 class DeleteSupermercadoUseCase {
   final PromotionRepository repository;
   DeleteSupermercadoUseCase(this.repository);
   Future<void> execute(int id) => repository.deleteSupermercado(id);
 }
 
+/// Caso de uso para reinicializar la carga de promociones; mantiene la regla de negocio fuera de la interfaz.
 class ReinitializePromotionsUseCase {
   final PromotionRepository repository;
   ReinitializePromotionsUseCase(this.repository);
   Future<void> execute() => repository.reinitialize();
 }
 
+/// Caso de uso para consultar si los datos principales ya estan cargados; mantiene la regla de negocio fuera de la interfaz.
 class IsLoadedUseCase {
   final PromotionRepository repository;
   IsLoadedUseCase(this.repository);
   bool execute() => repository.isLoaded;
 }
 
+/// Caso de uso para consultar el ultimo error de carga; mantiene la regla de negocio fuera de la interfaz.
 class GetLoadErrorUseCase {
   final PromotionRepository repository;
   GetLoadErrorUseCase(this.repository);

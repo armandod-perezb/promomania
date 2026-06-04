@@ -20,6 +20,7 @@ class CrearSupermercadoModal extends StatefulWidget {
   State<CrearSupermercadoModal> createState() => _CrearSupermercadoModalState();
 }
 
+/// Estado interno de `CrearSupermercadoModal`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _CrearSupermercadoModalState extends State<CrearSupermercadoModal> {
   final _formKey = GlobalKey<FormState>();
   final _nombreController = TextEditingController();

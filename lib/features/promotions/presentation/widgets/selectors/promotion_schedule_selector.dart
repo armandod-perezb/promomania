@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Modelo auxiliar de datos usado por componentes de promociones.
 class PromotionScheduleData {
   final List<String> days;
   final String startTime;
@@ -12,6 +13,7 @@ class PromotionScheduleData {
   });
 }
 
+/// Utilidades de promociones; concentran reglas de formato, calculo o conversion reutilizables.
 class PromotionScheduleUtils {
   static const dayOrder = [
     'lunes',
@@ -146,6 +148,7 @@ class PromotionScheduleUtils {
   }
 }
 
+/// Widget selector de promociones; encapsula seleccion, validacion visual y callbacks de formulario.
 class PromotionScheduleSelector extends StatefulWidget {
   final TextEditingController controller;
   final String? errorText;
@@ -163,6 +166,7 @@ class PromotionScheduleSelector extends StatefulWidget {
       _PromotionScheduleSelectorState();
 }
 
+/// Estado interno de `PromotionScheduleSelector`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _PromotionScheduleSelectorState extends State<PromotionScheduleSelector> {
   static const _primaryColor = Color(0xFFFF5733);
   static const _textDark = Color(0xFF1A1A2E);

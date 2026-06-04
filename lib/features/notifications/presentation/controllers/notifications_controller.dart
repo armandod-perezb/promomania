@@ -3,6 +3,7 @@ import 'package:app/features/notifications/domain/entities/push_campaign.dart';
 import 'package:app/features/notifications/domain/entities/notification_summary.dart';
 import 'package:app/features/notifications/domain/usecases/notification_usecases.dart';
 
+/// Controlador de notificaciones; coordina casos de uso y expone operaciones para la capa de presentacion.
 class NotificationsController {
   final GetAdminNotificationSummaryUseCase _getAdminSummaryUseCase;
   final GetReportesBadgeCountUseCase _getReportesBadgeCountUseCase;

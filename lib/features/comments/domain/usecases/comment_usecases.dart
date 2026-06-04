@@ -1,12 +1,14 @@
 import '../entities/comentario.dart';
 import '../repositories/comment_repository.dart';
 
+/// Caso de uso para obtener comentarios desde cache local; mantiene la regla de negocio fuera de la interfaz.
 class GetComentariosSyncUseCase {
   final CommentRepository repository;
   GetComentariosSyncUseCase(this.repository);
   List<Comentario> execute() => repository.getComentariosSync();
 }
 
+/// Caso de uso para obtener todos los comentarios; mantiene la regla de negocio fuera de la interfaz.
 class GetAllCommentsUseCase {
   final CommentRepository repository;
 
@@ -17,6 +19,7 @@ class GetAllCommentsUseCase {
   }
 }
 
+/// Caso de uso para obtener comentarios de una promocion; mantiene la regla de negocio fuera de la interfaz.
 class GetCommentsByPromotionUseCase {
   final CommentRepository repository;
 
@@ -27,6 +30,7 @@ class GetCommentsByPromotionUseCase {
   }
 }
 
+/// Caso de uso para obtener comentarios de un usuario; mantiene la regla de negocio fuera de la interfaz.
 class GetCommentsByUserUseCase {
   final CommentRepository repository;
 
@@ -37,6 +41,7 @@ class GetCommentsByUserUseCase {
   }
 }
 
+/// Caso de uso para agregar un comentario; mantiene la regla de negocio fuera de la interfaz.
 class AddCommentUseCase {
   final CommentRepository repository;
 
@@ -47,6 +52,7 @@ class AddCommentUseCase {
   }
 }
 
+/// Caso de uso para eliminar un comentario; mantiene la regla de negocio fuera de la interfaz.
 class DeleteCommentUseCase {
   final CommentRepository repository;
 

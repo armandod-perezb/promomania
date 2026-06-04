@@ -4,6 +4,7 @@ import '../features/promotions/domain/entities/promocion.dart';
 import '../features/users/domain/entities/usuario.dart';
 import '../features/promotions/domain/entities/supermercado.dart';
 
+/// Widget reutilizable para mostrar una promocion resumida en listas o grillas.
 class PromoCard extends StatelessWidget {
   final Promocion promocion;
   final Usuario? usuario;

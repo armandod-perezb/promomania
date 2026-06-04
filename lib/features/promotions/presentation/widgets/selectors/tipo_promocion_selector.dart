@@ -166,10 +166,7 @@ class TipoPromocionSelector extends StatelessWidget {
             padding: const EdgeInsets.only(top: 6, left: 4),
             child: Text(
               errorText!,
-              style: const TextStyle(
-                color: Colors.red,
-                fontSize: 11,
-              ),
+              style: const TextStyle(color: Colors.red, fontSize: 11),
             ),
           ),
       ],
@@ -216,11 +213,7 @@ class TipoPromocionSelector extends StatelessWidget {
                   bottomLeft: Radius.circular(12),
                 ),
               ),
-              child: Icon(
-                tipo.icon,
-                color: tipo.color,
-                size: 28,
-              ),
+              child: Icon(tipo.icon, color: tipo.color, size: 28),
             ),
             const SizedBox(width: 14),
             // Textos
@@ -262,11 +255,7 @@ class TipoPromocionSelector extends StatelessWidget {
                 color: isSelected ? tipo.color : Colors.transparent,
               ),
               child: isSelected
-                  ? const Icon(
-                      Icons.check,
-                      color: Colors.white,
-                      size: 14,
-                    )
+                  ? const Icon(Icons.check, color: Colors.white, size: 14)
                   : null,
             ),
           ],
@@ -365,10 +354,7 @@ class TipoPromocionDynamicFields extends StatelessWidget {
       maxLines: maxLines,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(
-          color: Colors.grey.withOpacity(0.5),
-          fontSize: 13,
-        ),
+        hintStyle: TextStyle(color: Colors.grey.withOpacity(0.5), fontSize: 13),
         suffixText: suffix,
         suffixStyle: const TextStyle(
           color: Color(0xFF8A8A9A),

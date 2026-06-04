@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 import '../../controllers/auth_controller.dart';
 
+/// Pantalla para validar el codigo enviado durante la recuperacion de cuenta.
 class VerifyCodeScreen extends StatefulWidget {
   final String email;
   final AuthController authController;
@@ -18,6 +19,7 @@ class VerifyCodeScreen extends StatefulWidget {
   State<VerifyCodeScreen> createState() => _VerifyCodeScreenState();
 }
 
+/// Estado interno de `VerifyCodeScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
   static const int _codeLength = 6;
   static const int _resendSeconds = 58;
@@ -136,9 +138,9 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
       await widget.authController.sendRecoveryCode(correo: widget.email);
       if (mounted) {
         _startTimer();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Codigo reenviado')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Codigo reenviado')));
       }
     } catch (e) {
       if (mounted) {
@@ -426,18 +428,19 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
         text: TextSpan(
           text: canResend ? 'Reenviar código' : 'Reenviar código en ',
           style: TextStyle(
-            color: canResend && !_isResending ? _primary : const Color(0xFF8A8FA8),
+            color: canResend && !_isResending
+                ? _primary
+                : const Color(0xFF8A8FA8),
             fontSize: 13.5,
-            fontWeight: canResend && !_isResending ? FontWeight.w600 : FontWeight.w400,
+            fontWeight: canResend && !_isResending
+                ? FontWeight.w600
+                : FontWeight.w400,
           ),
           children: [
             if (_isResending)
               const TextSpan(
                 text: '...',
-                style: TextStyle(
-                  color: _primary,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: TextStyle(color: _primary, fontWeight: FontWeight.w700),
               ),
             if (!canResend)
               TextSpan(

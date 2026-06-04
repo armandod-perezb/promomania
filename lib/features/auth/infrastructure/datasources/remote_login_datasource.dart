@@ -28,6 +28,7 @@ abstract class RemoteLoginDataSource {
   });
 }
 
+/// Fuente de datos de autenticacion; obtiene y transforma informacion desde servicios o almacenamiento local.
 class ApiRemoteLoginDataSource implements RemoteLoginDataSource {
   final ApiClient _client;
 

@@ -4,6 +4,7 @@ import 'package:app/features/moderation/domain/repositories/moderation_repositor
 import 'package:app/features/moderation/infrastructure/datasources/moderation_datasource.dart';
 import 'package:app/features/moderation/infrastructure/datasources/remote_moderation_datasource.dart';
 
+/// Implementacion del repositorio de moderacion; adapta fuentes de datos remotas/locales al contrato de dominio.
 class ModerationRepositoryImpl implements ModerationRepository {
   final ModerationDataSource dataSource;
   final RemoteModerationDataSource? remoteDataSource;

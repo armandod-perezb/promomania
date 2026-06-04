@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 import '../../../../../Core/di/app_scope.dart';
@@ -8,6 +8,7 @@ import '../../../../../Core/utils/validators.dart';
 // PANTALLA EDITAR PERFIL
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Pantalla de usuarios; construye la interfaz y conecta acciones del usuario con los controladores.
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
 
@@ -15,6 +16,7 @@ class EditProfileScreen extends StatefulWidget {
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
+/// Estado interno de `EditProfileScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _EditProfileScreenState extends State<EditProfileScreen> {
   static const Color _primary = Color(0xFFFF4D2E);
   static const Color _darkBg = Color(0xFF1A1F2E);
@@ -103,9 +105,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
 
     if (emailError != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(emailError)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(emailError)));
       return;
     }
 
@@ -130,9 +132,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     } catch (e) {
       if (mounted) {
         final message = e.toString().replaceFirst('Exception: ', '');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     } finally {
       if (mounted) {

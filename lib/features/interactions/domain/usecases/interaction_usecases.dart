@@ -2,30 +2,38 @@ import '../entities/favorito.dart';
 import '../entities/valoracion.dart';
 import '../repositories/interaction_repository.dart';
 
+/// Caso de uso para obtener favoritos de un usuario desde cache local; mantiene la regla de negocio fuera de la interfaz.
 class GetFavoritosByUsuarioSyncUseCase {
   final InteractionRepository repository;
   GetFavoritosByUsuarioSyncUseCase(this.repository);
-  List<Favorito> execute(int userId) => repository.getFavoritosByUsuarioSync(userId);
+  List<Favorito> execute(int userId) =>
+      repository.getFavoritosByUsuarioSync(userId);
 }
 
+/// Caso de uso para consultar si una promocion es favorita desde cache local; mantiene la regla de negocio fuera de la interfaz.
 class IsFavoritoSyncUseCase {
   final InteractionRepository repository;
   IsFavoritoSyncUseCase(this.repository);
-  bool execute(int userId, String promotionCode) => repository.isFavoritoSync(userId, promotionCode);
+  bool execute(int userId, String promotionCode) =>
+      repository.isFavoritoSync(userId, promotionCode);
 }
 
+/// Caso de uso para obtener valoraciones de una promocion desde cache local; mantiene la regla de negocio fuera de la interfaz.
 class GetValoracionesByPromocionSyncUseCase {
   final InteractionRepository repository;
   GetValoracionesByPromocionSyncUseCase(this.repository);
-  List<Valoracion> execute(String promotionCode) => repository.getValoracionesByPromocionSync(promotionCode);
+  List<Valoracion> execute(String promotionCode) =>
+      repository.getValoracionesByPromocionSync(promotionCode);
 }
 
+/// Caso de uso para obtener todas las valoraciones desde cache local; mantiene la regla de negocio fuera de la interfaz.
 class GetAllValoracionesSyncUseCase {
   final InteractionRepository repository;
   GetAllValoracionesSyncUseCase(this.repository);
   List<Valoracion> execute() => repository.getAllValoracionesSync();
 }
 
+/// Caso de uso para obtener favoritos de un usuario; mantiene la regla de negocio fuera de la interfaz.
 class GetFavoritosByUsuarioUseCase {
   final InteractionRepository repository;
 
@@ -36,6 +44,7 @@ class GetFavoritosByUsuarioUseCase {
   }
 }
 
+/// Caso de uso para consultar si una promocion esta marcada como favorita; mantiene la regla de negocio fuera de la interfaz.
 class IsFavoritoUseCase {
   final InteractionRepository repository;
 
@@ -46,6 +55,7 @@ class IsFavoritoUseCase {
   }
 }
 
+/// Caso de uso para agregar o quitar una promocion de favoritos; mantiene la regla de negocio fuera de la interfaz.
 class ToggleFavoritoUseCase {
   final InteractionRepository repository;
 
@@ -56,6 +66,7 @@ class ToggleFavoritoUseCase {
   }
 }
 
+/// Caso de uso para obtener valoraciones de una promocion; mantiene la regla de negocio fuera de la interfaz.
 class GetValoracionesByPromocionUseCase {
   final InteractionRepository repository;
 
@@ -66,6 +77,7 @@ class GetValoracionesByPromocionUseCase {
   }
 }
 
+/// Caso de uso para contar valoraciones positivas; mantiene la regla de negocio fuera de la interfaz.
 class CountPositiveRatingsUseCase {
   final InteractionRepository repository;
 
@@ -76,6 +88,7 @@ class CountPositiveRatingsUseCase {
   }
 }
 
+/// Caso de uso para contar valoraciones negativas; mantiene la regla de negocio fuera de la interfaz.
 class CountNegativeRatingsUseCase {
   final InteractionRepository repository;
 
@@ -86,6 +99,7 @@ class CountNegativeRatingsUseCase {
   }
 }
 
+/// Caso de uso para agregar una valoracion; mantiene la regla de negocio fuera de la interfaz.
 class AddValoracionUseCase {
   final InteractionRepository repository;
 
@@ -96,6 +110,7 @@ class AddValoracionUseCase {
   }
 }
 
+/// Caso de uso para eliminar una valoracion; mantiene la regla de negocio fuera de la interfaz.
 class DeleteValoracionUseCase {
   final InteractionRepository repository;
 

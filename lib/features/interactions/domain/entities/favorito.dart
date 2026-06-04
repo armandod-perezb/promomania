@@ -1,3 +1,4 @@
+/// Entidad que vincula un usuario con una promocion guardada como favorita.
 class Favorito {
   final int id;
   final int idUsuario;

@@ -1,6 +1,6 @@
 // Clase que representa una categoría dentro del sistema (modelo de datos)
+/// Entidad de categoria usada para clasificar promociones.
 class Categoria {
-
   // Identificador único de la categoría (clave primaria)
   final int id;
 
@@ -12,19 +12,13 @@ class Categoria {
 
   // Constructor de la clase con parámetros nombrados
   // "required" obliga a enviar id y nombre
-  Categoria({
-    required this.id,
-    required this.nombre,
-    this.descripcion,
-  });
+  Categoria({required this.id, required this.nombre, this.descripcion});
 
   // Factory constructor que crea una instancia desde un JSON (Map)
   // Se usa cuando los datos vienen de una API o base de datos
   factory Categoria.fromJson(Map<String, dynamic> json) {
-
     // Retorna un nuevo objeto Categoria con los datos del JSON
     return Categoria(
-
       // Convierte el valor 'id' del JSON a entero
       id: json['id'] as int,
 
@@ -39,10 +33,8 @@ class Categoria {
   // Método que convierte el objeto Categoria a JSON (Map)
   // Se usa para enviar datos al backend o guardar en base de datos
   Map<String, dynamic> toJson() {
-
     // Retorna un mapa con las propiedades del objeto
     return {
-
       // Clave 'id' con su valor correspondiente
       'id': id,
 
@@ -57,7 +49,6 @@ class Categoria {
   // Método copyWith para crear una copia del objeto con cambios parciales
   // Aplica el principio de inmutabilidad (no modifica el objeto original)
   Categoria copyWith({
-
     // Parámetro opcional para nuevo id
     int? id,
 
@@ -67,10 +58,8 @@ class Categoria {
     // Parámetro opcional para nueva descripción
     String? descripcion,
   }) {
-
     // Retorna una nueva instancia de Categoria
     return Categoria(
-
       // Si id es null, mantiene el valor actual
       id: id ?? this.id,
 

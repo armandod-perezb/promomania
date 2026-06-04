@@ -42,6 +42,7 @@ class AddPromotion5Screen extends StatefulWidget {
   State<AddPromotion5Screen> createState() => _AddPromotion5ScreenState();
 }
 
+/// Estado interno de `AddPromotion5Screen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
   static const Color _primary = Color(0xFFFF4D2E);
   static const Color _darkBg = Color(0xFF1A1F2E);
@@ -1022,6 +1023,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
 
 // ── Widgets auxiliares ────────────────────────────────────────────────────────
 
+/// Modelo interno para mostrar una metrica compacta dentro de la pantalla.
 class _ImpactStat extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
@@ -1059,6 +1061,7 @@ class _ImpactStat extends StatelessWidget {
   }
 }
 
+/// Tipo auxiliar interno usado por promociones para mantener la pantalla organizada.
 class _ImpactDivider extends StatelessWidget {
   const _ImpactDivider();
 
@@ -1072,6 +1075,7 @@ class _ImpactDivider extends StatelessWidget {
   }
 }
 
+/// Tipo auxiliar interno usado por promociones para mantener la pantalla organizada.
 class _WizardStep {
   final IconData icon;
   final String label;

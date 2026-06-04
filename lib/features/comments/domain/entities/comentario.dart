@@ -1,4 +1,5 @@
 // Clase que representa un comentario dentro del sistema
+/// Entidad de comentario publicado por un usuario sobre una promocion.
 class Comentario {
   // Identificador único del comentario (clave primaria)
   final int id;

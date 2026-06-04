@@ -1,4 +1,5 @@
 // Clase que representa una categoría dentro del sistema (modelo de datos)
+/// Entidad de categoria usada para clasificar promociones.
 class Categoria {
   // Identificador único de la categoría (clave primaria)
   final int id;

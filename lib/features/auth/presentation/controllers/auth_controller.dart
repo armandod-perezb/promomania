@@ -1,6 +1,7 @@
 import 'package:app/features/auth/domain/usecases/auth_usecases.dart';
 import 'package:app/features/users/domain/entities/usuario.dart';
 
+/// Controlador de autenticacion; coordina casos de uso y expone operaciones para la capa de presentacion.
 class AuthController {
   final LoginUseCase _loginUseCase;
   final RegisterUseCase _registerUseCase;

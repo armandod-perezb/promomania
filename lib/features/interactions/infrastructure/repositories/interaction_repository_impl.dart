@@ -5,6 +5,7 @@ import 'package:app/features/interactions/domain/repositories/interaction_reposi
 import 'package:app/features/interactions/infrastructure/datasources/interaction_datasource.dart';
 import 'package:app/features/interactions/infrastructure/datasources/remote_favorite_datasource.dart';
 
+/// Implementacion del repositorio de favoritos y valoraciones; adapta fuentes de datos remotas/locales al contrato de dominio.
 class InteractionRepositoryImpl implements InteractionRepository {
   final InteractionDataSource dataSource;
   final RemoteFavoriteDataSource? remoteFavoriteDataSource;
@@ -12,10 +13,12 @@ class InteractionRepositoryImpl implements InteractionRepository {
   InteractionRepositoryImpl(this.dataSource, {this.remoteFavoriteDataSource});
 
   @override
-  List<Favorito> getFavoritosByUsuarioSync(int userId) => dataSource.getFavoritosByUsuario(userId);
+  List<Favorito> getFavoritosByUsuarioSync(int userId) =>
+      dataSource.getFavoritosByUsuario(userId);
 
   @override
-  bool isFavoritoSync(int userId, String promotionCode) => dataSource.isFavorito(userId, promotionCode);
+  bool isFavoritoSync(int userId, String promotionCode) =>
+      dataSource.isFavorito(userId, promotionCode);
 
   @override
   List<Valoracion> getValoracionesByPromocionSync(String promotionCode) =>
@@ -28,7 +31,8 @@ class InteractionRepositoryImpl implements InteractionRepository {
   Future<List<Favorito>> getFavoritosByUsuario(int userId) async {
     if (remoteFavoriteDataSource != null) {
       try {
-        final remoteFavoritos = await remoteFavoriteDataSource!.getFavoritosByUsuario(userId);
+        final remoteFavoritos = await remoteFavoriteDataSource!
+            .getFavoritosByUsuario(userId);
 
         final localFavoritos = dataSource.getFavoritosByUsuario(userId);
         for (final local in localFavoritos) {
@@ -55,7 +59,8 @@ class InteractionRepositoryImpl implements InteractionRepository {
           userId,
           promotionCode,
         );
-        if (favorito != null && dataSource.getFavorito(userId, promotionCode) == null) {
+        if (favorito != null &&
+            dataSource.getFavorito(userId, promotionCode) == null) {
           dataSource.addFavorito(favorito);
         }
         return favorito != null;
@@ -96,11 +101,14 @@ class InteractionRepositoryImpl implements InteractionRepository {
   }
 
   @override
-  Future<List<Valoracion>> getValoracionesByPromocion(String promotionCode) async =>
-      remoteFavoriteDataSource != null
+  Future<List<Valoracion>> getValoracionesByPromocion(
+    String promotionCode,
+  ) async => remoteFavoriteDataSource != null
       ? await (() async {
           try {
-            return await remoteFavoriteDataSource!.getValoracionesByPromocion(promotionCode);
+            return await remoteFavoriteDataSource!.getValoracionesByPromocion(
+              promotionCode,
+            );
           } catch (e) {
             if (!_shouldFallbackToLocal(e)) rethrow;
             return dataSource.getValoracionesByPromocion(promotionCode);
@@ -124,7 +132,9 @@ class InteractionRepositoryImpl implements InteractionRepository {
   Future<void> addValoracion(Valoracion valoracion) async {
     if (remoteFavoriteDataSource != null) {
       try {
-        final created = await remoteFavoriteDataSource!.addValoracion(valoracion);
+        final created = await remoteFavoriteDataSource!.addValoracion(
+          valoracion,
+        );
         dataSource.addValoracion(created);
         return;
       } catch (e) {

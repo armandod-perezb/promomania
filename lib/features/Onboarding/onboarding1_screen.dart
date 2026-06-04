@@ -4,6 +4,7 @@ import '../../Core/Routes/app_routes.dart';
 
 // ─── Splash Screen ────────────────────────────────────────────────────────────
 
+/// Pantalla inicial de bienvenida; prepara la navegacion hacia el flujo principal.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -11,6 +12,7 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
+/// Estado interno de `SplashScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
   // Controllers
@@ -83,20 +85,25 @@ class _SplashScreenState extends State<SplashScreen>
     )..repeat();
 
     // Background
-    _bgScale = Tween<double>(begin: 1.3, end: 1.0).animate(
-      CurvedAnimation(parent: _bgController, curve: Curves.easeOut),
-    );
+    _bgScale = Tween<double>(
+      begin: 1.3,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _bgController, curve: Curves.easeOut));
 
     // Logo
     _logoScale = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(begin: 0.0, end: 1.15)
-            .chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(
+          begin: 0.0,
+          end: 1.15,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 60,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 1.15, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeInOut)),
+        tween: Tween(
+          begin: 1.15,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
         weight: 40,
       ),
     ]).animate(_logoController);
@@ -108,9 +115,10 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    _logoY = Tween<double>(begin: 30.0, end: 0.0).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.easeOut),
-    );
+    _logoY = Tween<double>(
+      begin: 30.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _logoController, curve: Curves.easeOut));
 
     // Icon inner
     _iconRotate = Tween<double>(begin: -0.3, end: 0.0).animate(
@@ -119,43 +127,53 @@ class _SplashScreenState extends State<SplashScreen>
 
     _iconScale = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(begin: 0.6, end: 1.1)
-            .chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(
+          begin: 0.6,
+          end: 1.1,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 70,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 1.1, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween(
+          begin: 1.1,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeIn)),
         weight: 30,
       ),
     ]).animate(_logoController);
 
     // Text
-    _textOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _textController, curve: Curves.easeIn),
-    );
+    _textOpacity = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeIn));
 
-    _textY = Tween<double>(begin: 16.0, end: 0.0).animate(
-      CurvedAnimation(parent: _textController, curve: Curves.easeOut),
-    );
+    _textY = Tween<double>(
+      begin: 16.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeOut));
 
-    _letterSpacing = Tween<double>(begin: 8.0, end: 1.5).animate(
-      CurvedAnimation(parent: _textController, curve: Curves.easeOut),
-    );
+    _letterSpacing = Tween<double>(
+      begin: 8.0,
+      end: 1.5,
+    ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeOut));
 
     // Dots
-    _dotsOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _dotsController, curve: Curves.easeIn),
-    );
+    _dotsOpacity = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _dotsController, curve: Curves.easeIn));
 
     // Pulse
-    _pulseScale = Tween<double>(begin: 1.0, end: 2.2).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeOut),
-    );
+    _pulseScale = Tween<double>(
+      begin: 1.0,
+      end: 2.2,
+    ).animate(CurvedAnimation(parent: _pulseController, curve: Curves.easeOut));
 
-    _pulseOpacity = Tween<double>(begin: 0.35, end: 0.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeOut),
-    );
+    _pulseOpacity = Tween<double>(
+      begin: 0.35,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _pulseController, curve: Curves.easeOut));
 
     // Particles
     _particleProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -250,18 +268,23 @@ class _SplashScreenState extends State<SplashScreen>
 
                             // Inner pulse ring (offset)
                             Opacity(
-                              opacity: (_pulseOpacity.value * 0.6)
-                                  .clamp(0.0, 1.0),
+                              opacity: (_pulseOpacity.value * 0.6).clamp(
+                                0.0,
+                                1.0,
+                              ),
                               child: Transform.scale(
-                                scale: (_pulseScale.value * 0.75)
-                                    .clamp(0.0, 3.0),
+                                scale: (_pulseScale.value * 0.75).clamp(
+                                  0.0,
+                                  3.0,
+                                ),
                                 child: Container(
                                   width: 88,
                                   height: 88,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: const Color(0xFFFF6B47)
-                                        .withOpacity(0.08),
+                                    color: const Color(
+                                      0xFFFF6B47,
+                                    ).withOpacity(0.08),
                                   ),
                                 ),
                               ),
@@ -479,6 +502,7 @@ class _SplashScreenState extends State<SplashScreen>
 
 // ─── Particle data ─────────────────────────────────────────────────────────
 
+/// Modelo interno con posicion y animacion de una particula visual.
 class _ParticleData {
   final double x, y, size, phase;
   const _ParticleData(this.x, this.y, this.size, this.phase);
@@ -486,11 +510,13 @@ class _ParticleData {
 
 // ─── Animated dots loader ─────────────────────────────────────────────────
 
+/// Widget interno de puntos animados usado como indicador visual.
 class _AnimatedDots extends StatefulWidget {
   @override
   State<_AnimatedDots> createState() => _AnimatedDotsState();
 }
 
+/// Estado interno de `AnimatedDots`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _AnimatedDotsState extends State<_AnimatedDots>
     with SingleTickerProviderStateMixin {
   late AnimationController _c;

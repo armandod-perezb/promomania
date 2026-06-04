@@ -1,6 +1,6 @@
 // Clase que representa un comentario dentro del sistema
+/// Entidad de comentario publicado por un usuario sobre una promocion.
 class Comentario {
-
   // Identificador único del comentario (clave primaria)
   final int id;
 
@@ -34,10 +34,8 @@ class Comentario {
   // Factory que convierte un JSON (Map) en un objeto Comentario
   // Se usa cuando los datos vienen de una API o base de datos
   factory Comentario.fromJson(Map<String, dynamic> json) {
-
     // Retorna una nueva instancia de Comentario
     return Comentario(
-
       // Convierte el campo 'id' del JSON a entero
       id: json['id'] as int,
 
@@ -61,10 +59,8 @@ class Comentario {
   // Método que convierte el objeto Comentario a JSON (Map)
   // Se usa para enviar datos al backend o almacenarlos
   Map<String, dynamic> toJson() {
-
     // Retorna un mapa con todos los atributos del comentario
     return {
-
       // Clave 'id' con su valor correspondiente
       'id': id,
 

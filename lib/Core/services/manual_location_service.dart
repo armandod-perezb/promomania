@@ -19,7 +19,9 @@ class ManualLocationService {
       await prefs.setString(_addressKey, address);
     }
     if (kDebugMode) {
-      debugPrint('Ubicación manual guardada: ${location.latitude}, ${location.longitude}');
+      debugPrint(
+        'Ubicación manual guardada: ${location.latitude}, ${location.longitude}',
+      );
     }
   }
 
@@ -28,7 +30,7 @@ class ManualLocationService {
     final prefs = await SharedPreferences.getInstance();
     final lat = prefs.getDouble(_latKey);
     final lng = prefs.getDouble(_lngKey);
-    
+
     if (lat != null && lng != null) {
       // Validar rangos
       if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {

@@ -1,10 +1,11 @@
-﻿import 'dart:typed_data';
+import 'dart:typed_data';
 import 'package:app/features/promotions/domain/repositories/promotion_repository.dart';
 import 'package:app/features/promotions/infrastructure/datasources/promo_local_datasource.dart';
 import 'package:app/features/promotions/domain/entities/promocion.dart';
 import 'package:app/features/promotions/domain/entities/promocion_horario.dart';
 import 'package:app/features/promotions/domain/entities/supermercado.dart';
 
+/// Implementacion del repositorio de promociones; adapta fuentes de datos remotas/locales al contrato de dominio.
 class PromotionRepositoryImpl implements PromotionRepository {
   final PromoLocalDataSource dataSource;
 
@@ -24,10 +25,15 @@ class PromotionRepositoryImpl implements PromotionRepository {
   // ── Sync queries ──────────────────────────────────────────────────────────
 
   @override
-  List<Promocion> getActivePromotionsSync({int? categoryId, int? supermarketId}) {
+  List<Promocion> getActivePromotionsSync({
+    int? categoryId,
+    int? supermarketId,
+  }) {
     var list = dataSource.getPromocionesAprobadas();
-    if (categoryId != null) list = list.where((p) => p.idCategoria == categoryId).toList();
-    if (supermarketId != null) list = list.where((p) => p.idSupermercado == supermarketId).toList();
+    if (categoryId != null)
+      list = list.where((p) => p.idCategoria == categoryId).toList();
+    if (supermarketId != null)
+      list = list.where((p) => p.idSupermercado == supermarketId).toList();
     return list;
   }
 
@@ -35,32 +41,42 @@ class PromotionRepositoryImpl implements PromotionRepository {
   List<Promocion> getAllPromotionsSync() => dataSource.promociones;
 
   @override
-  Promocion? getPromotionByCodeSync(String codigo) => dataSource.getPromocionByCodigo(codigo);
+  Promocion? getPromotionByCodeSync(String codigo) =>
+      dataSource.getPromocionByCodigo(codigo);
 
   @override
-  List<Promocion> getPromotionsByUserSync(int userId) => dataSource.getPromocionesById(userId);
+  List<Promocion> getPromotionsByUserSync(int userId) =>
+      dataSource.getPromocionesById(userId);
 
   @override
-  List<Promocion> getFlashDealsSync({int limit = 5}) => dataSource.getFlashDeals(limit: limit);
+  List<Promocion> getFlashDealsSync({int limit = 5}) =>
+      dataSource.getFlashDeals(limit: limit);
 
   @override
-  List<Map<String, dynamic>> getNearbyStoresSync({int limit = 5}) => dataSource.getNearbyStores(limit: limit);
+  List<Map<String, dynamic>> getNearbyStoresSync({int limit = 5}) =>
+      dataSource.getNearbyStores(limit: limit);
 
   @override
-  String getPromocionUrgency(Promocion promo) => dataSource.getPromocionUrgency(promo);
+  String getPromocionUrgency(Promocion promo) =>
+      dataSource.getPromocionUrgency(promo);
 
   @override
-  Map<String, List<Promocion>> getPromocionesByUrgencySync(int userId) => dataSource.getPromocionesByUrgency(userId);
+  Map<String, List<Promocion>> getPromocionesByUrgencySync(int userId) =>
+      dataSource.getPromocionesByUrgency(userId);
 
   @override
-  double getPromocionRatingSync(String codigo) => dataSource.getPromocionRating(codigo);
+  double getPromocionRatingSync(String codigo) =>
+      dataSource.getPromocionRating(codigo);
 
   @override
-  double getPrecioConDescuento(Promocion promo) => dataSource.getPrecioConDescuento(promo);
+  double getPrecioConDescuento(Promocion promo) =>
+      dataSource.getPrecioConDescuento(promo);
 
   @override
   List<PromocionHorario> getPromocionesHorariosByCodigoSync(String codigo) =>
-      dataSource.promocionesHorarios.where((h) => h.codigoPromocion == codigo).toList();
+      dataSource.promocionesHorarios
+          .where((h) => h.codigoPromocion == codigo)
+          .toList();
 
   @override
   int getNextHorarioIdSync() {
@@ -75,7 +91,8 @@ class PromotionRepositoryImpl implements PromotionRepository {
   List<Supermercado> getSupermercadosSync() => dataSource.supermercados;
 
   @override
-  Uint8List? getCachedImageBytes(String codigo) => dataSource.imageCache[codigo];
+  Uint8List? getCachedImageBytes(String codigo) =>
+      dataSource.imageCache[codigo];
 
   // ── Async commands ────────────────────────────────────────────────────────
 
@@ -87,11 +104,20 @@ class PromotionRepositoryImpl implements PromotionRepository {
   }
 
   @override
-  Future<Promocion?> getPromotionByCode(String codigo) async => dataSource.getPromocionByCodigo(codigo);
+  Future<Promocion?> getPromotionByCode(String codigo) async =>
+      dataSource.getPromocionByCodigo(codigo);
 
   @override
-  Future<List<Promocion>> getActivePromotions({int? categoryId, int? supermarketId, int? page, int? pageSize}) async {
-    var list = getActivePromotionsSync(categoryId: categoryId, supermarketId: supermarketId);
+  Future<List<Promocion>> getActivePromotions({
+    int? categoryId,
+    int? supermarketId,
+    int? page,
+    int? pageSize,
+  }) async {
+    var list = getActivePromotionsSync(
+      categoryId: categoryId,
+      supermarketId: supermarketId,
+    );
     if (page != null && pageSize != null && page > 0 && pageSize > 0) {
       final start = (page - 1) * pageSize;
       if (start >= list.length) return [];
@@ -109,7 +135,8 @@ class PromotionRepositoryImpl implements PromotionRepository {
       dataSource.getPromocionesBySupermercado(supermarketId);
 
   @override
-  Future<List<Promocion>> getPromotionsByUser(int userId) async => dataSource.getPromocionesById(userId);
+  Future<List<Promocion>> getPromotionsByUser(int userId) async =>
+      dataSource.getPromocionesById(userId);
 
   @override
   Future<Promocion> updatePromotion(Promocion promocion) async {
@@ -157,16 +184,19 @@ class PromotionRepositoryImpl implements PromotionRepository {
       dataSource.savePromotionImage(codigo, bytes);
 
   @override
-  Future<Uint8List?> getPromotionImageBytes(String codigo) => dataSource.getPromotionImageBytes(codigo);
+  Future<Uint8List?> getPromotionImageBytes(String codigo) =>
+      dataSource.getPromotionImageBytes(codigo);
 
   @override
   Future<Supermercado> createSupermercado(Supermercado supermercado) async {
     // Asignar ID automáticamente (máximo + 1)
     final maxId = dataSource.supermercados.isEmpty
         ? 0
-        : dataSource.supermercados.map((s) => s.id).reduce((a, b) => a > b ? a : b);
+        : dataSource.supermercados
+              .map((s) => s.id)
+              .reduce((a, b) => a > b ? a : b);
     final newId = maxId + 1;
-    
+
     final created = Supermercado(
       id: newId,
       nombre: supermercado.nombre,
@@ -174,7 +204,7 @@ class PromotionRepositoryImpl implements PromotionRepository {
       ciudad: supermercado.ciudad,
       estado: supermercado.estado,
     );
-    
+
     dataSource.supermercados.add(created);
     await dataSource.saveLocalData();
     return created;
@@ -188,7 +218,9 @@ class PromotionRepositoryImpl implements PromotionRepository {
 
   @override
   Future<void> updateSupermercado(Supermercado supermercado) async {
-    final index = dataSource.supermercados.indexWhere((s) => s.id == supermercado.id);
+    final index = dataSource.supermercados.indexWhere(
+      (s) => s.id == supermercado.id,
+    );
     if (index != -1) {
       dataSource.supermercados[index] = supermercado;
       await dataSource.saveLocalData();

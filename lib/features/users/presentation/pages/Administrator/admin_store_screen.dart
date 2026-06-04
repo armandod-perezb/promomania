@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // ARCHIVO: manage_stores_screen.dart
 // PROPÓSITO: Pantalla de gestión CRUD de comercios (supermercados) del panel admin.
 //            Permite crear comercios, alternar su estado activo/pausado y eliminarlos.
@@ -17,6 +17,7 @@ import '../../../../../features/promotions/domain/entities/supermercado.dart'; /
 // ============================================================================
 // WIDGET PRINCIPAL: ManageStoresScreen
 // ============================================================================
+/// Pantalla administrativa para consultar y mantener supermercados o comercios.
 class ManageStoresScreen extends StatefulWidget {
   const ManageStoresScreen({super.key});
 
@@ -24,6 +25,7 @@ class ManageStoresScreen extends StatefulWidget {
   State<ManageStoresScreen> createState() => _ManageStoresScreenState();
 }
 
+/// Estado interno de `ManageStoresScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _ManageStoresScreenState extends State<ManageStoresScreen> {
   // ── Estado local ────────────────────────────────────────────────────────────
   // Índice del ítem activo en el BottomNav. Valor 3 = "Comercios".
@@ -730,6 +732,7 @@ class _ManageStoresScreenState extends State<ManageStoresScreen> {
 //   dirección y ciudad se pasan como null si están vacíos,
 //   ya que el modelo Supermercado los acepta como nullable.
 // ============================================================================
+/// Modal de usuarios; agrupa el formulario y las acciones necesarias para crear o editar datos.
 class CrearComercioModal extends StatefulWidget {
   const CrearComercioModal({super.key});
 
@@ -737,6 +740,7 @@ class CrearComercioModal extends StatefulWidget {
   State<CrearComercioModal> createState() => _CrearComercioModalState();
 }
 
+/// Estado interno de `CrearComercioModal`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _CrearComercioModalState extends State<CrearComercioModal> {
   // Controladores de los tres campos del formulario
   final _nombre = TextEditingController();
@@ -771,7 +775,8 @@ class _CrearComercioModalState extends State<CrearComercioModal> {
     final newId =
         (promotionsController.getSupermercadosSync().isEmpty
             ? 0
-            : promotionsController.getSupermercadosSync()
+            : promotionsController
+                  .getSupermercadosSync()
                   .map((s) => s.id)
                   .reduce((a, b) => a > b ? a : b)) +
         1;
@@ -789,9 +794,9 @@ class _CrearComercioModalState extends State<CrearComercioModal> {
       await promotionsController.addSupermercado(nuevoComercio);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No se pudo crear comercio: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('No se pudo crear comercio: $e')));
       return;
     }
 

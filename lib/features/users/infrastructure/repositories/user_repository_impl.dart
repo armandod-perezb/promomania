@@ -5,6 +5,7 @@ import 'package:app/features/users/domain/repositories/user_repository.dart';
 import 'package:app/features/users/infrastructure/datasources/remote_user_datasource.dart';
 import 'package:app/features/users/infrastructure/datasources/user_datasource.dart';
 
+/// Implementacion del repositorio de usuarios; adapta fuentes de datos remotas/locales al contrato de dominio.
 class UserRepositoryImpl implements UserRepository {
   final UserDataSource dataSource;
   final SessionManager sessionManager;

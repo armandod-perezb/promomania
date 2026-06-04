@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 // PANTALLA TÉRMINOS DE SERVICIO
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Pantalla de terminos de servicio y condiciones de uso.
 class TermsOfServiceScreen extends StatefulWidget {
   const TermsOfServiceScreen({super.key});
 
@@ -12,6 +13,7 @@ class TermsOfServiceScreen extends StatefulWidget {
   State<TermsOfServiceScreen> createState() => _TermsOfServiceScreenState();
 }
 
+/// Estado interno de `TermsOfServiceScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _TermsOfServiceScreenState extends State<TermsOfServiceScreen> {
   static const Color _primary = Color(0xFFFF4D2E);
   static const Color _darkBg = Color(0xFF1A1F2E);
@@ -510,6 +512,7 @@ class _TermsOfServiceScreenState extends State<TermsOfServiceScreen> {
 // MODELO
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Modelo interno para organizar secciones de terminos y condiciones.
 class _Clause {
   final String number;
   final String title;

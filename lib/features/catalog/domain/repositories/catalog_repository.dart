@@ -1,6 +1,7 @@
 import '../entities/categoria.dart';
 import '../entities/tipo_promocion.dart';
 
+/// Contrato de repositorio de catalogo; define las operaciones que consume la capa de dominio.
 abstract class CatalogRepository {
   Future<List<Categoria>> getCategorias();
   Future<List<TipoPromocion>> getTiposPromocion();

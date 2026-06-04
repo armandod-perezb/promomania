@@ -88,11 +88,11 @@ class CategorySelector extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(10),
                 dropdownColor: Colors.white,
-                style: TextStyle(
-                  color: textDark,
-                  fontSize: 14,
+                style: TextStyle(color: textDark, fontSize: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 items: [
                   // Opción placeholder
                   DropdownMenuItem<int?>(
@@ -130,10 +130,7 @@ class CategorySelector extends StatelessWidget {
             padding: const EdgeInsets.only(top: 4, left: 4),
             child: Text(
               errorText!,
-              style: const TextStyle(
-                color: Colors.red,
-                fontSize: 11,
-              ),
+              style: const TextStyle(color: Colors.red, fontSize: 11),
             ),
           ),
       ],
@@ -161,10 +158,13 @@ class CategorySelectorWithSearch extends StatefulWidget {
   });
 
   @override
-  State<CategorySelectorWithSearch> createState() => _CategorySelectorWithSearchState();
+  State<CategorySelectorWithSearch> createState() =>
+      _CategorySelectorWithSearchState();
 }
 
-class _CategorySelectorWithSearchState extends State<CategorySelectorWithSearch> {
+/// Estado interno de `CategorySelectorWithSearch`; coordina datos, eventos y reconstrucciones de la pantalla.
+class _CategorySelectorWithSearchState
+    extends State<CategorySelectorWithSearch> {
   final TextEditingController _searchController = TextEditingController();
   bool _isOpen = false;
 
@@ -355,10 +355,7 @@ class _CategorySelectorWithSearchState extends State<CategorySelectorWithSearch>
             padding: const EdgeInsets.only(top: 4, left: 4),
             child: Text(
               widget.errorText!,
-              style: const TextStyle(
-                color: Colors.red,
-                fontSize: 11,
-              ),
+              style: const TextStyle(color: Colors.red, fontSize: 11),
             ),
           ),
       ],

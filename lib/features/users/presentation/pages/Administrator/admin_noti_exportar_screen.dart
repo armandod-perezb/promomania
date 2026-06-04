@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // ARCHIVO: admin_noti_export_screen.dart
 // PROPÓSITO: Pantalla de exportación de datos del módulo de avisos.
 //            Permite al administrador descargar datos en CSV, JSON o PDF,
@@ -15,24 +15,45 @@ import '../../../../../Core/di/app_scope.dart'; // Expone `promoService` (Change
 // ── Paleta de colores a nivel de archivo ─────────────────────────────────────
 // Se declaran como `const` fuera de la clase para que el compilador las trate
 // como constantes en tiempo de compilación (mayor eficiencia).
-const kOrange = Color(0xFFFF4500);       // Rojo-naranja principal de la marca
-const kNavyDark = Color(0xFF1A1F36);     // Azul marino oscuro para tarjetas y tabs activos
-const kBgGray = Color(0xFFF4F5F9);       // Gris claro usado como fondo general del Scaffold
-const kWhite = Colors.white;             // Blanco para superficies de tarjetas
-const kTextDark = Color(0xFF1A1F36);     // Color de texto principal (casi negro)
-const kTextGray = Color(0xFF8A8FA8);     // Color de texto secundario / subtítulos
-const kGreen = Color(0xFF00C48C);        // Verde para indicadores positivos (tendencias)
-const kYellowBg = Color(0xFFFFF3E0);     // Fondo amarillo suave para la tarjeta de auditoría
-const kYellowText = Color(0xFFFF9800);   // Naranja/amarillo para iconos y bordes en auditoría
-const kBlueInfo = Color(0xFF3B82F6);     // Azul informativo para la tarjeta de seguridad
-const kBlueLightBg = Color(0xFFEFF6FF); // Fondo azul muy claro para tarjeta informativa
-const kToggleOn = Color(0xFF22C55E);     // Verde para el estado activo de los Switch
-const kCodeOrange = Color(0xFFFF6B35);   // Naranja alternativo (declarado pero sin uso activo)
-const kCodeBlue = Color(0xFF6366F1);     // Azul índigo usado en el ícono de exportar JSON
+const kOrange = Color(0xFFFF4500); // Rojo-naranja principal de la marca
+const kNavyDark = Color(
+  0xFF1A1F36,
+); // Azul marino oscuro para tarjetas y tabs activos
+const kBgGray = Color(
+  0xFFF4F5F9,
+); // Gris claro usado como fondo general del Scaffold
+const kWhite = Colors.white; // Blanco para superficies de tarjetas
+const kTextDark = Color(0xFF1A1F36); // Color de texto principal (casi negro)
+const kTextGray = Color(0xFF8A8FA8); // Color de texto secundario / subtítulos
+const kGreen = Color(
+  0xFF00C48C,
+); // Verde para indicadores positivos (tendencias)
+const kYellowBg = Color(
+  0xFFFFF3E0,
+); // Fondo amarillo suave para la tarjeta de auditoría
+const kYellowText = Color(
+  0xFFFF9800,
+); // Naranja/amarillo para iconos y bordes en auditoría
+const kBlueInfo = Color(
+  0xFF3B82F6,
+); // Azul informativo para la tarjeta de seguridad
+const kBlueLightBg = Color(
+  0xFFEFF6FF,
+); // Fondo azul muy claro para tarjeta informativa
+const kToggleOn = Color(
+  0xFF22C55E,
+); // Verde para el estado activo de los Switch
+const kCodeOrange = Color(
+  0xFFFF6B35,
+); // Naranja alternativo (declarado pero sin uso activo)
+const kCodeBlue = Color(
+  0xFF6366F1,
+); // Azul índigo usado en el ícono de exportar JSON
 
 // ============================================================================
 // WIDGET PRINCIPAL: AdminNotiExportScreen
 // ============================================================================
+/// Pantalla administrativa para configurar exportaciones y reportes de notificaciones.
 class AdminNotiExportScreen extends StatefulWidget {
   const AdminNotiExportScreen({super.key});
 
@@ -40,8 +61,8 @@ class AdminNotiExportScreen extends StatefulWidget {
   State<AdminNotiExportScreen> createState() => _AdminNotiExportScreenState();
 }
 
+/// Estado interno de `AdminNotiExportScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
-
   // ── Estado local ────────────────────────────────────────────────────────────
   // Controla qué tab interna del módulo de avisos está activa (0-3).
   // Valor 3 = "Exportar" → esta misma pantalla.
@@ -199,7 +220,6 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
             ],
           ),
           const Spacer(), // Empuja los íconos de acción hacia la derecha
-
           // Ícono de campana con badge naranja (punto decorativo, no dinámico)
           Stack(
             children: [
@@ -361,7 +381,10 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
               ),
               // Botón "Nueva Campaña" — decorativo, sin acción implementada
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: kOrange,
                   borderRadius: BorderRadius.circular(20),
@@ -387,7 +410,11 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
           // Descripción del módulo
           const Text(
             'Llega a tus usuarios en tiempo real\ncon mensajes personalizados',
-            style: TextStyle(color: Colors.white60, fontSize: 11.5, height: 1.5),
+            style: TextStyle(
+              color: Colors.white60,
+              fontSize: 11.5,
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 16),
           // Fila de métricas: 3 estadísticas separadas por divisores verticales
@@ -420,11 +447,18 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.white54, fontSize: 10)),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white54, fontSize: 10),
+        ),
         const SizedBox(height: 2),
         Text(
           value,
-          style: const TextStyle(color: kWhite, fontWeight: FontWeight.bold, fontSize: 18),
+          style: const TextStyle(
+            color: kWhite,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
         const SizedBox(height: 2),
         // Indicador de tendencia con flecha e ícono verde
@@ -451,7 +485,11 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
         const SizedBox(height: 2),
         Text(
           value,
-          style: const TextStyle(color: kWhite, fontWeight: FontWeight.bold, fontSize: 18),
+          style: const TextStyle(
+            color: kWhite,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
         const SizedBox(height: 2),
         Row(
@@ -478,10 +516,14 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
 
     // Lista de tabs con su ícono, etiqueta y badge numérico
     final tabs = [
-      {'icon': Icons.bar_chart_outlined,     'label': 'Actividad', 'badge': 0},
-      {'icon': Icons.description_outlined,   'label': 'Reportes',  'badge': reportesBadge},
-      {'icon': Icons.notifications_outlined, 'label': 'Alertas',   'badge': 1},
-      {'icon': Icons.file_upload_outlined,   'label': 'Exportar',  'badge': 0},
+      {'icon': Icons.bar_chart_outlined, 'label': 'Actividad', 'badge': 0},
+      {
+        'icon': Icons.description_outlined,
+        'label': 'Reportes',
+        'badge': reportesBadge,
+      },
+      {'icon': Icons.notifications_outlined, 'label': 'Alertas', 'badge': 1},
+      {'icon': Icons.file_upload_outlined, 'label': 'Exportar', 'badge': 0},
     ];
 
     return Container(
@@ -509,7 +551,8 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
                   children: [
                     // Stack permite superponer el badge sobre el ícono
                     Stack(
-                      clipBehavior: Clip.none, // Permite que el badge sobresalga
+                      clipBehavior:
+                          Clip.none, // Permite que el badge sobresalga
                       children: [
                         Icon(
                           tabs[i]['icon'] as IconData,
@@ -548,7 +591,9 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
                       tabs[i]['label'] as String,
                       style: TextStyle(
                         fontSize: 10,
-                        fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isActive
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                         color: isActive ? kWhite : kTextGray,
                       ),
                     ),
@@ -568,11 +613,11 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
   // El botón de descarga (file_download_outlined) no tiene onTap implementado.
   // ============================================================================
   Widget _buildExportCard({
-    required IconData icon,       // Ícono representativo del formato
-    required Color iconColor,     // Color del ícono y su fondo semitransparente
-    required String title,        // Nombre del formato: "Exportar CSV", etc.
-    required String subtitle,     // Descripción del uso del formato
-    required String size,         // Tamaño estimado del archivo resultante
+    required IconData icon, // Ícono representativo del formato
+    required Color iconColor, // Color del ícono y su fondo semitransparente
+    required String title, // Nombre del formato: "Exportar CSV", etc.
+    required String subtitle, // Descripción del uso del formato
+    required String size, // Tamaño estimado del archivo resultante
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -607,12 +652,18 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(subtitle, style: const TextStyle(fontSize: 11.5, color: kTextGray)),
+                Text(
+                  subtitle,
+                  style: const TextStyle(fontSize: 11.5, color: kTextGray),
+                ),
                 const SizedBox(height: 4),
                 // Tamaño del archivo con opacidad reducida (dato secundario)
                 Text(
                   size,
-                  style: TextStyle(fontSize: 11, color: kTextGray.withOpacity(0.7)),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: kTextGray.withOpacity(0.7),
+                  ),
                 ),
               ],
             ),
@@ -625,7 +676,11 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
               color: kBgGray,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.file_download_outlined, color: kTextGray, size: 20),
+            child: const Icon(
+              Icons.file_download_outlined,
+              color: kTextGray,
+              size: 20,
+            ),
           ),
         ],
       ),
@@ -679,10 +734,14 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
               Switch(
                 value: _incluirDatos,
                 onChanged: (v) => setState(() => _incluirDatos = v),
-                activeColor: kToggleOn,                         // Thumb activo: verde
-                activeTrackColor: kToggleOn.withOpacity(0.35),  // Track activo: verde translúcido
-                inactiveThumbColor: Colors.grey.shade400,        // Thumb inactivo: gris
-                inactiveTrackColor: Colors.grey.shade200,        // Track inactivo: gris claro
+                activeColor: kToggleOn, // Thumb activo: verde
+                activeTrackColor: kToggleOn.withOpacity(
+                  0.35,
+                ), // Track activo: verde translúcido
+                inactiveThumbColor:
+                    Colors.grey.shade400, // Thumb inactivo: gris
+                inactiveTrackColor:
+                    Colors.grey.shade200, // Track inactivo: gris claro
               ),
             ],
           ),
@@ -757,7 +816,11 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
                 SizedBox(height: 5),
                 Text(
                   'Todos los datos se exportan de forma encriptada y se eliminan automáticamente después de 24 horas.',
-                  style: TextStyle(fontSize: 12, color: kTextGray, height: 1.45),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: kTextGray,
+                    height: 1.45,
+                  ),
                 ),
               ],
             ),
@@ -776,18 +839,22 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
   Widget _buildBottomNav() {
     // Definición de los 5 ítems del menú inferior
     final items = [
-      {'icon': Icons.grid_view_outlined,    'label': 'Panel'},
-      {'icon': Icons.people_outline,        'label': 'Usuarios'},
-      {'icon': Icons.local_offer_outlined,  'label': 'Promos'},
-      {'icon': Icons.store_outlined,        'label': 'Comercios'},
-      {'icon': Icons.notifications_outlined,'label': 'Avisos'},
+      {'icon': Icons.grid_view_outlined, 'label': 'Panel'},
+      {'icon': Icons.people_outline, 'label': 'Usuarios'},
+      {'icon': Icons.local_offer_outlined, 'label': 'Promos'},
+      {'icon': Icons.store_outlined, 'label': 'Comercios'},
+      {'icon': Icons.notifications_outlined, 'label': 'Avisos'},
     ];
 
     return Container(
       decoration: const BoxDecoration(
         color: kWhite,
         boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, -2)),
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 8,
+            offset: Offset(0, -2),
+          ),
         ],
       ),
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -828,10 +895,14 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
   // ============================================================================
   String _notiRouteForTab(int index) {
     switch (index) {
-      case 0: return AppRoutes.adminNotiActivity; // Pantalla de actividad
-      case 1: return AppRoutes.adminNotiReport;   // Pantalla de reportes
-      case 2: return AppRoutes.adminNotiAlert;    // Pantalla de alertas
-      default: return AppRoutes.adminNotiExport;  // Esta misma pantalla (Exportar)
+      case 0:
+        return AppRoutes.adminNotiActivity; // Pantalla de actividad
+      case 1:
+        return AppRoutes.adminNotiReport; // Pantalla de reportes
+      case 2:
+        return AppRoutes.adminNotiAlert; // Pantalla de alertas
+      default:
+        return AppRoutes.adminNotiExport; // Esta misma pantalla (Exportar)
     }
   }
 
@@ -848,11 +919,16 @@ class _AdminNotiExportScreenState extends State<AdminNotiExportScreen> {
   // ============================================================================
   String _routeForBottomIndex(int index) {
     switch (index) {
-      case 0: return AppRoutes.adminDashboard;       // Panel general
-      case 1: return AppRoutes.manageUsers;           // Gestión de usuarios
-      case 2: return AppRoutes.managePromotions;      // Gestión de promociones
-      case 3: return AppRoutes.manageStores;          // Gestión de comercios
-      default: return AppRoutes.manageNotifications; // Módulo de avisos
+      case 0:
+        return AppRoutes.adminDashboard; // Panel general
+      case 1:
+        return AppRoutes.manageUsers; // Gestión de usuarios
+      case 2:
+        return AppRoutes.managePromotions; // Gestión de promociones
+      case 3:
+        return AppRoutes.manageStores; // Gestión de comercios
+      default:
+        return AppRoutes.manageNotifications; // Módulo de avisos
     }
   }
 

@@ -17,6 +17,7 @@ class RegisterScreen extends StatefulWidget {
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
+/// Estado interno de `RegisterScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _RegisterScreenState extends State<RegisterScreen> {
   // Controladores para los campos de texto del formulario
   final TextEditingController _nameController =

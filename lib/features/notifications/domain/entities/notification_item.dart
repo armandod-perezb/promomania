@@ -1,3 +1,4 @@
+/// Entidad de notificacion individual mostrada al usuario o al administrador.
 class NotificationItem {
   final int id;
   final String titulo;

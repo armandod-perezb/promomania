@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 import '../../../../../Core/Routes/app_routes.dart';
@@ -14,6 +14,7 @@ class ManageUsersScreen extends StatefulWidget {
   State<ManageUsersScreen> createState() => _ManageUsersScreenState();
 }
 
+/// Estado interno de `ManageUsersScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _ManageUsersScreenState extends State<ManageUsersScreen> {
   // Estado local de navegacion y filtros de busqueda.
   int _selectedIndex = 1;
@@ -96,9 +97,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             Expanded(
               child: _isLoading
                   ? const Center(
-                      child: CircularProgressIndicator(
-                        color: primaryOrange,
-                      ),
+                      child: CircularProgressIndicator(color: primaryOrange),
                     )
                   : RefreshIndicator(
                       onRefresh: _loadUsers,
@@ -1014,6 +1013,7 @@ const kChipBg = Color(0xFFFFF0EE);
 const kChipBord = Color(0xFFFFCCC5);
 const kPreviewBg = Color(0xFF1E2440);
 
+/// Modal de usuarios; agrupa el formulario y las acciones necesarias para crear o editar datos.
 class CrearUsuarioModal extends StatefulWidget {
   const CrearUsuarioModal({super.key});
 
@@ -1021,6 +1021,7 @@ class CrearUsuarioModal extends StatefulWidget {
   State<CrearUsuarioModal> createState() => _CrearUsuarioModalState();
 }
 
+/// Estado interno de `CrearUsuarioModal`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _CrearUsuarioModalState extends State<CrearUsuarioModal> {
   final _nombre = TextEditingController();
   final _email = TextEditingController();
@@ -1084,7 +1085,8 @@ class _CrearUsuarioModalState extends State<CrearUsuarioModal> {
     final newId =
         (usersController.getUsersSync().isEmpty
             ? 0
-            : usersController.getUsersSync()
+            : usersController
+                  .getUsersSync()
                   .map((u) => u.id)
                   .reduce((a, b) => a > b ? a : b)) +
         1;
@@ -1103,9 +1105,9 @@ class _CrearUsuarioModalState extends State<CrearUsuarioModal> {
       await usersController.addUser(nuevoUsuario);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No se pudo crear usuario: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('No se pudo crear usuario: $e')));
       return;
     }
 

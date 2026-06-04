@@ -5,6 +5,7 @@ import 'package:app/features/notifications/domain/entities/notification_item.dar
 import 'package:app/features/notifications/domain/entities/notification_summary.dart';
 import 'package:app/features/notifications/domain/entities/push_campaign.dart';
 
+/// Contrato de fuente de datos de notificaciones; separa el origen concreto de la informacion del resto de la app.
 abstract class RemoteNotificationDataSource {
   Future<NotificationSummary> getAdminSummary();
   Future<int> getReportesBadgeCount();
@@ -18,6 +19,7 @@ abstract class RemoteNotificationDataSource {
   Future<void> deletePushCampaign(int id);
 }
 
+/// Fuente de datos de notificaciones; obtiene y transforma informacion desde servicios o almacenamiento local.
 class ApiRemoteNotificationDataSource implements RemoteNotificationDataSource {
   final ApiClient _client;
 
@@ -37,7 +39,13 @@ class ApiRemoteNotificationDataSource implements RemoteNotificationDataSource {
       final usuarios = results[2];
       final comentarios = results[3];
       final promocionesPendientes = promociones
-          .where((p) => _asString((p as Map<String, dynamic>)['estado']).toLowerCase() == 'pendiente')
+          .where(
+            (p) =>
+                _asString(
+                  (p as Map<String, dynamic>)['estado'],
+                ).toLowerCase() ==
+                'pendiente',
+          )
           .length;
       return NotificationSummary(
         reportesPendientes: reportes.length,
@@ -76,8 +84,9 @@ class ApiRemoteNotificationDataSource implements RemoteNotificationDataSource {
   @override
   Future<NotificationItem> createNotification(NotificationItem item) async {
     try {
-      final created = await _client.post('/notificaciones/', _notificationToApi(item))
-          as Map<String, dynamic>;
+      final created =
+          await _client.post('/notificaciones/', _notificationToApi(item))
+              as Map<String, dynamic>;
       return _notificationFromApi(created);
     } on ApiRequestException catch (e) {
       throw _mapApiException(e);
@@ -87,8 +96,12 @@ class ApiRemoteNotificationDataSource implements RemoteNotificationDataSource {
   @override
   Future<NotificationItem> updateNotification(NotificationItem item) async {
     try {
-      final updated = await _client.patch('/notificaciones/${item.id}/', _notificationToApi(item))
-          as Map<String, dynamic>;
+      final updated =
+          await _client.patch(
+                '/notificaciones/${item.id}/',
+                _notificationToApi(item),
+              )
+              as Map<String, dynamic>;
       return _notificationFromApi(updated);
     } on ApiRequestException catch (e) {
       throw _mapApiException(e);
@@ -109,7 +122,9 @@ class ApiRemoteNotificationDataSource implements RemoteNotificationDataSource {
   Future<List<PushCampaign>> getAllPushCampaigns() async {
     try {
       final all = await _client.getAllPages('/notificaciones-push/');
-      return all.map((item) => _pushFromApi(item as Map<String, dynamic>)).toList();
+      return all
+          .map((item) => _pushFromApi(item as Map<String, dynamic>))
+          .toList();
     } on ApiRequestException catch (e) {
       throw _mapApiException(e);
     }
@@ -118,8 +133,9 @@ class ApiRemoteNotificationDataSource implements RemoteNotificationDataSource {
   @override
   Future<PushCampaign> createPushCampaign(PushCampaign campaign) async {
     try {
-      final created = await _client.post('/notificaciones-push/', _pushToApi(campaign))
-          as Map<String, dynamic>;
+      final created =
+          await _client.post('/notificaciones-push/', _pushToApi(campaign))
+              as Map<String, dynamic>;
       return _pushFromApi(created);
     } on ApiRequestException catch (e) {
       throw _mapApiException(e);
@@ -129,11 +145,12 @@ class ApiRemoteNotificationDataSource implements RemoteNotificationDataSource {
   @override
   Future<PushCampaign> updatePushCampaign(PushCampaign campaign) async {
     try {
-      final updated = await _client.patch(
-            '/notificaciones-push/${campaign.id}/',
-            _pushToApi(campaign),
-          )
-          as Map<String, dynamic>;
+      final updated =
+          await _client.patch(
+                '/notificaciones-push/${campaign.id}/',
+                _pushToApi(campaign),
+              )
+              as Map<String, dynamic>;
       return _pushFromApi(updated);
     } on ApiRequestException catch (e) {
       throw _mapApiException(e);
@@ -205,7 +222,9 @@ class ApiRemoteNotificationDataSource implements RemoteNotificationDataSource {
   Exception _mapApiException(ApiRequestException e) {
     if (e.statusCode == 400) return ValidationException(e.message);
     if (e.statusCode == 401 || e.statusCode == 403) {
-      return UnauthorizedException('Tu sesión no es válida. Inicia sesión de nuevo.');
+      return UnauthorizedException(
+        'Tu sesión no es válida. Inicia sesión de nuevo.',
+      );
     }
     return ServerException(e.message);
   }

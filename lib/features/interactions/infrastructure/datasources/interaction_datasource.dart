@@ -1,7 +1,8 @@
-﻿import 'package:app/features/interactions/domain/entities/favorito.dart';
+import 'package:app/features/interactions/domain/entities/favorito.dart';
 import 'package:app/features/interactions/domain/entities/valoracion.dart';
 import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 
+/// Contrato de fuente de datos de favoritos y valoraciones; separa el origen concreto de la informacion del resto de la app.
 abstract class InteractionDataSource {
   List<Favorito> getFavoritosByUsuario(int userId);
   Favorito? getFavorito(int userId, String promotionCode);
@@ -17,13 +18,15 @@ abstract class InteractionDataSource {
   void deleteValoracion(int id);
 }
 
+/// Fuente de datos de favoritos y valoraciones; obtiene y transforma informacion desde servicios o almacenamiento local.
 class PromoInteractionDataSource implements InteractionDataSource {
   final PromoService promoService;
 
   PromoInteractionDataSource(this.promoService);
 
   @override
-  List<Favorito> getFavoritosByUsuario(int userId) => promoService.getFavoritosByUsuario(userId);
+  List<Favorito> getFavoritosByUsuario(int userId) =>
+      promoService.getFavoritosByUsuario(userId);
 
   @override
   Favorito? getFavorito(int userId, String promotionCode) {
@@ -37,7 +40,8 @@ class PromoInteractionDataSource implements InteractionDataSource {
   }
 
   @override
-  bool isFavorito(int userId, String promotionCode) => promoService.isFavorito(userId, promotionCode);
+  bool isFavorito(int userId, String promotionCode) =>
+      promoService.isFavorito(userId, promotionCode);
 
   @override
   void addFavorito(Favorito favorito) => promoService.addFavorito(favorito);
@@ -47,7 +51,8 @@ class PromoInteractionDataSource implements InteractionDataSource {
       promoService.removeFavorito(userId, promotionCode);
 
   @override
-  void toggleFavorito(int userId, String promotionCode) => promoService.toggleFavorito(userId, promotionCode);
+  void toggleFavorito(int userId, String promotionCode) =>
+      promoService.toggleFavorito(userId, promotionCode);
 
   @override
   List<Valoracion> getValoracionesByPromocion(String promotionCode) =>
@@ -57,13 +62,16 @@ class PromoInteractionDataSource implements InteractionDataSource {
   List<Valoracion> getAllValoraciones() => promoService.getValoraciones();
 
   @override
-  int countPositiveRatings(String promotionCode) => promoService.contarValoracionesPositivas(promotionCode);
+  int countPositiveRatings(String promotionCode) =>
+      promoService.contarValoracionesPositivas(promotionCode);
 
   @override
-  int countNegativeRatings(String promotionCode) => promoService.contarValoracionesNegativas(promotionCode);
+  int countNegativeRatings(String promotionCode) =>
+      promoService.contarValoracionesNegativas(promotionCode);
 
   @override
-  void addValoracion(Valoracion valoracion) => promoService.addValoracion(valoracion);
+  void addValoracion(Valoracion valoracion) =>
+      promoService.addValoracion(valoracion);
 
   @override
   void deleteValoracion(int id) => promoService.deleteValoracion(id);

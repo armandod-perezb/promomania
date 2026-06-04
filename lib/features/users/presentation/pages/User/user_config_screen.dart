@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 import '../../../../../Core/di/app_scope.dart';
 
+/// Pantalla de usuarios; construye la interfaz y conecta acciones del usuario con los controladores.
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -10,6 +11,7 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
+/// Estado interno de `SettingsScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _SettingsScreenState extends State<SettingsScreen> {
   bool promosNearby = true;
   bool urgentPromos = true;

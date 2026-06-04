@@ -14,6 +14,7 @@ import 'package:app/features/users/domain/entities/usuario.dart';
 import 'package:app/features/interactions/domain/entities/valoracion.dart';
 import 'package:http/http.dart' as http;
 
+/// Fuente de datos de promociones; obtiene y transforma informacion desde servicios o almacenamiento local.
 class PromoLocalDataSource {
   List<Usuario> usuarios = [];
   List<Supermercado> supermercados = [];

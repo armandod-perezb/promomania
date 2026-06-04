@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 import '../../../../../Core/Routes/app_routes.dart';
@@ -14,19 +14,30 @@ class AdminDashboardScreen extends StatefulWidget {
   State<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
 }
 
+/// Estado interno de `AdminDashboardScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   // Índice del tab activo en la barra de navegación inferior (empieza en 0 = Panel).
   int _selectedIndex = 0;
 
   // ── Paleta de colores centralizada para reutilizarla en toda la pantalla ──
-  static const Color primaryOrange = Color(0xFFFF5733);       // Color principal de la marca
-  static const Color lightOrange = Color(0xFFFF7755);         // Variante más clara del naranja
-  static const Color darkBg = Color(0xFF1A1A2E);              // Fondo oscuro (cards oscuras)
-  static const Color cardBg = Color(0xFFFFFFFF);              // Fondo blanco de las cards
-  static const Color textDark = Color(0xFF1A1A2E);            // Texto principal (casi negro)
-  static const Color textGray = Color(0xFF8A8A9A);            // Texto secundario (gris)
-  static const Color greenAccent = Color(0xFF2ECC71);         // Verde para métricas positivas
-  static const Color greenLight = Color(0xFFE8F8F0);          // Fondo suave para badges verdes
+  static const Color primaryOrange = Color(
+    0xFFFF5733,
+  ); // Color principal de la marca
+  static const Color lightOrange = Color(
+    0xFFFF7755,
+  ); // Variante más clara del naranja
+  static const Color darkBg = Color(0xFF1A1A2E); // Fondo oscuro (cards oscuras)
+  static const Color cardBg = Color(0xFFFFFFFF); // Fondo blanco de las cards
+  static const Color textDark = Color(
+    0xFF1A1A2E,
+  ); // Texto principal (casi negro)
+  static const Color textGray = Color(0xFF8A8A9A); // Texto secundario (gris)
+  static const Color greenAccent = Color(
+    0xFF2ECC71,
+  ); // Verde para métricas positivas
+  static const Color greenLight = Color(
+    0xFFE8F8F0,
+  ); // Fondo suave para badges verdes
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +47,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return Consumer<PromoService>(
       builder: (context, promoService, child) {
         return Scaffold(
-          backgroundColor: const Color(0xFFF5F5F8), // Fondo gris muy suave de la pantalla
+          backgroundColor: const Color(
+            0xFFF5F5F8,
+          ), // Fondo gris muy suave de la pantalla
           body: SafeArea(
             // SafeArea evita que el contenido quede tapado por la cámara o la barra del sistema
             child: Column(
@@ -46,21 +59,21 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     // Permite hacer scroll vertical cuando el contenido es mayor que la pantalla
                     child: Column(
                       children: [
-                        _buildHeader(),             // Encabezado con KPIs y saludo
+                        _buildHeader(), // Encabezado con KPIs y saludo
                         const SizedBox(height: 16),
-                        _buildMetricsGrid(),        // Cuadrícula de 4 métricas
+                        _buildMetricsGrid(), // Cuadrícula de 4 métricas
                         const SizedBox(height: 16),
                         _buildWeeklyRevenueChart(), // Gráfica de ingresos de la semana
                         const SizedBox(height: 16),
-                        _buildTopUsers(),           // Lista de usuarios más activos
+                        _buildTopUsers(), // Lista de usuarios más activos
                         const SizedBox(height: 16),
-                        _buildTopStores(),          // Lista de comercios con más promos
+                        _buildTopStores(), // Lista de comercios con más promos
                         const SizedBox(height: 16),
-                        _buildGeoDistribution(),    // Distribución por ciudad con barras
+                        _buildGeoDistribution(), // Distribución por ciudad con barras
                         const SizedBox(height: 16),
-                        _buildRecentActivity(),     // Feed de eventos recientes
+                        _buildRecentActivity(), // Feed de eventos recientes
                         const SizedBox(height: 16),
-                        _buildQuickActions(),       // Botones de acción rápida
+                        _buildQuickActions(), // Botones de acción rápida
                         const SizedBox(height: 16),
                       ],
                     ),
@@ -115,11 +128,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
               Row(
                 children: [
-                  _headerIconBtn(Icons.notifications_outlined), // Ícono de campana
+                  _headerIconBtn(
+                    Icons.notifications_outlined,
+                  ), // Ícono de campana
                   const SizedBox(width: 10),
                   // Avatar "A" que lleva al perfil de usuario
                   GestureDetector(
-                    onTap: () => Navigator.pushNamed(context, AppRoutes.userProfile),
+                    onTap: () =>
+                        Navigator.pushNamed(context, AppRoutes.userProfile),
                     child: Container(
                       width: 34,
                       height: 34,
@@ -158,21 +174,27 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             children: [
               _headerStat(
                 Icons.people_outline,
-                usersController.getUsersSync().length.toString(),     // Cantidad real de usuarios
+                usersController
+                    .getUsersSync()
+                    .length
+                    .toString(), // Cantidad real de usuarios
                 'Usuarios',
                 '+50%',
               ),
               const SizedBox(width: 12),
               _headerStat(
                 Icons.confirmation_number_outlined,
-                promotionsController.getAllPromotionsSync().length.toString(),  // Cantidad real de tickets
+                promotionsController
+                    .getAllPromotionsSync()
+                    .length
+                    .toString(), // Cantidad real de tickets
                 'Tickets',
                 '+32%',
               ),
               const SizedBox(width: 12),
               _headerStat(
                 Icons.attach_money,
-                '\$4.2M',                                     // Revenue
+                '\$4.2M', // Revenue
                 'Revenue',
                 '+32%',
               ),
@@ -189,7 +211,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       width: 34,
       height: 34,
       decoration: BoxDecoration(
-        color: Colors.white24,                    // Blanco translúcido
+        color: Colors.white24, // Blanco translúcido
         borderRadius: BorderRadius.circular(10),
       ),
       child: Icon(icon, color: Colors.white, size: 18),
@@ -217,7 +239,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 Icon(icon, color: primaryOrange, size: 20),
                 // Badge de tendencia compacto
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: greenAccent.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(4),
@@ -285,7 +310,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 child: _metricCard(
                   icon: Icons.show_chart,
                   iconColor: primaryOrange,
-                  iconBg: const Color(0xFFFFF0ED),  // Fondo naranja muy claro
+                  iconBg: const Color(0xFFFFF0ED), // Fondo naranja muy claro
                   value: '68%',
                   label: 'Conversión',
                   sublabel: 'Tasa de canje',
@@ -298,8 +323,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 child: _metricCard(
                   icon: Icons.multiline_chart,
                   iconColor: textDark,
-                  iconBg: textDark,                 // Card con fondo oscuro (variante)
-                  iconColorOverride: Colors.white,  // Ícono blanco sobre fondo oscuro
+                  iconBg: textDark, // Card con fondo oscuro (variante)
+                  iconColorOverride:
+                      Colors.white, // Ícono blanco sobre fondo oscuro
                   value: '8.4',
                   label: 'Engagement',
                   sublabel: 'Promos/Usuario',
@@ -318,7 +344,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   icon: Icons.storefront,
                   iconColor: greenAccent,
                   iconBg: greenLight,
-                  value: promotionsController.getSupermercadosSync().length.toString(), // Dato en tiempo real
+                  value: promotionsController
+                      .getSupermercadosSync()
+                      .length
+                      .toString(), // Dato en tiempo real
                   label: 'Comercios',
                   sublabel: 'Activos ahora',
                   badge: '+2',
@@ -351,7 +380,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     required IconData icon,
     required Color iconColor,
     required Color iconBg,
-    Color? iconColorOverride,   // Opcional: sobreescribe el color del ícono
+    Color? iconColorOverride, // Opcional: sobreescribe el color del ícono
     required String value,
     required String label,
     required String sublabel,
@@ -388,7 +417,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ),
                 child: Icon(
                   icon,
-                  color: iconColorOverride ?? iconColor, // ?? = usa override si existe
+                  color:
+                      iconColorOverride ??
+                      iconColor, // ?? = usa override si existe
                   size: 20,
                 ),
               ),
@@ -507,8 +538,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             SizedBox(
               height: 120,
               child: CustomPaint(
-                painter: _LineChartPainter(), // CustomPainter definido al final del archivo
-                size: Size.infinite,          // Ocupa todo el ancho disponible
+                painter:
+                    _LineChartPainter(), // CustomPainter definido al final del archivo
+                size: Size.infinite, // Ocupa todo el ancho disponible
               ),
             ),
             const SizedBox(height: 8),
@@ -604,7 +636,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     ),
                   ],
                 ),
-                const Icon(Icons.chevron_right, color: textGray), // Flecha "ver más"
+                const Icon(
+                  Icons.chevron_right,
+                  color: textGray,
+                ), // Flecha "ver más"
               ],
             ),
             const SizedBox(height: 16),
@@ -660,7 +695,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                Text(sub, style: const TextStyle(color: textGray, fontSize: 12)),
+                Text(
+                  sub,
+                  style: const TextStyle(color: textGray, fontSize: 12),
+                ),
               ],
             ),
           ),
@@ -697,9 +735,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   /// Lista de los 3 comercios con más promociones activas.
   Widget _buildTopStores() {
     final stores = [
-      {'name': 'Sport Zone',    'city': 'Cali',     'count': '15', 'badge': '+23%'},
-      {'name': 'TechStore',     'city': 'Bogotá',   'count': '12', 'badge': '+18%'},
-      {'name': 'Pizza Express', 'city': 'Medellín', 'count': '8',  'badge': '+10%'},
+      {'name': 'Sport Zone', 'city': 'Cali', 'count': '15', 'badge': '+23%'},
+      {'name': 'TechStore', 'city': 'Bogotá', 'count': '12', 'badge': '+18%'},
+      {
+        'name': 'Pizza Express',
+        'city': 'Medellín',
+        'count': '8',
+        'badge': '+10%',
+      },
     ];
 
     return Padding(
@@ -812,9 +855,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 // Ciudad con ícono de pin de ubicación
                 Row(
                   children: [
-                    const Icon(Icons.location_on_outlined, size: 11, color: textGray),
+                    const Icon(
+                      Icons.location_on_outlined,
+                      size: 11,
+                      color: textGray,
+                    ),
                     const SizedBox(width: 2),
-                    Text(city, style: const TextStyle(color: textGray, fontSize: 12)),
+                    Text(
+                      city,
+                      style: const TextStyle(color: textGray, fontSize: 12),
+                    ),
                   ],
                 ),
               ],
@@ -862,7 +912,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         'city': 'Bogotá',
         'stores': '12 tiendas',
         'users': '245 usuarios',
-        'pct': 0.40,           // 40% del total
+        'pct': 0.40, // 40% del total
         'color': primaryOrange,
       },
       {
@@ -954,7 +1004,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     required String city,
     required String stores,
     required String users,
-    required double pct,   // Valor entre 0.0 y 1.0
+    required double pct, // Valor entre 0.0 y 1.0
     required Color color,
   }) {
     return Padding(
@@ -1034,7 +1084,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         'detail': '2×1 Pizzas',
         'time': 'hace 2h',
         'color': greenAccent,
-        'icon': Icons.swap_horiz,           // Ícono de canje
+        'icon': Icons.swap_horiz, // Ícono de canje
       },
       {
         'text': 'Carlos López',
@@ -1042,7 +1092,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         'detail': '30% Laptops HP',
         'time': 'hace 5h',
         'color': const Color(0xFF3498DB),
-        'icon': Icons.add_circle_outline,   // Ícono de creación
+        'icon': Icons.add_circle_outline, // Ícono de creación
       },
       {
         'text': 'Ana Martínez',
@@ -1050,7 +1100,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         'detail': '50% Zapatillas',
         'time': 'hace 10h',
         'color': textGray,
-        'icon': Icons.visibility_outlined,  // Ícono de vista
+        'icon': Icons.visibility_outlined, // Ícono de vista
       },
       {
         'text': 'Sistema',
@@ -1058,7 +1108,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         'detail': 'Oferta Flash',
         'time': 'hace 15h',
         'color': const Color(0xFFF5A623),
-        'icon': Icons.timer_off_outlined,   // Ícono de expiración
+        'icon': Icons.timer_off_outlined, // Ícono de expiración
       },
     ];
 
@@ -1091,7 +1141,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         color: primaryOrange.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(9),
                       ),
-                      child: const Icon(Icons.bolt, color: primaryOrange, size: 18),
+                      child: const Icon(
+                        Icons.bolt,
+                        color: primaryOrange,
+                        size: 18,
+                      ),
                     ),
                     const SizedBox(width: 10),
                     const Text(
@@ -1164,12 +1218,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 children: [
                   TextSpan(
                     text: name,
-                    style: const TextStyle(fontWeight: FontWeight.w600), // Nombre en negrita
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                    ), // Nombre en negrita
                   ),
-                  TextSpan(text: ' $action '),                           // Acción normal
+                  TextSpan(text: ' $action '), // Acción normal
                   TextSpan(
                     text: detail,
-                    style: const TextStyle(fontWeight: FontWeight.w600), // Detalle en negrita
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                    ), // Detalle en negrita
                   ),
                 ],
               ),
@@ -1193,7 +1251,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: textDark,                  // Fondo oscuro para contrastar con el resto
+          color: textDark, // Fondo oscuro para contrastar con el resto
           borderRadius: BorderRadius.circular(22),
         ),
         child: Column(
@@ -1222,21 +1280,26 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   icon: Icons.person_add_outlined,
                   label: 'Nuevo\nUsuario',
                   color: primaryOrange,
-                  onTap: () => Navigator.pushNamed(context, AppRoutes.manageUsers),
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.manageUsers),
                 ),
                 // Navega a gestión de promociones
                 _quickActionBtn(
                   icon: Icons.local_offer_outlined,
                   label: 'Crear\nPromo',
                   color: greenAccent,
-                  onTap: () => Navigator.pushNamed(context, AppRoutes.managePromotions),
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.managePromotions),
                 ),
                 // Navega a gestión de notificaciones
                 _quickActionBtn(
                   icon: Icons.notifications_outlined,
                   label: 'Notificar',
                   color: const Color(0xFFF5A623),
-                  onTap: () => Navigator.pushNamed(context, AppRoutes.manageNotifications),
+                  onTap: () => Navigator.pushNamed(
+                    context,
+                    AppRoutes.manageNotifications,
+                  ),
                 ),
               ],
             ),
@@ -1286,11 +1349,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   /// Devuelve la ruta correspondiente al índice del tab seleccionado.
   String _routeForIndex(int index) {
     switch (index) {
-      case 0: return AppRoutes.adminDashboard;
-      case 1: return AppRoutes.manageUsers;
-      case 2: return AppRoutes.managePromotions;
-      case 3: return AppRoutes.manageStores;
-      default: return AppRoutes.manageNotifications;
+      case 0:
+        return AppRoutes.adminDashboard;
+      case 1:
+        return AppRoutes.manageUsers;
+      case 2:
+        return AppRoutes.managePromotions;
+      case 3:
+        return AppRoutes.manageStores;
+      default:
+        return AppRoutes.manageNotifications;
     }
   }
 
@@ -1307,11 +1375,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   /// El tab activo se resalta con fondo naranja translúcido y texto naranja.
   Widget _buildBottomNav() {
     final items = [
-      {'icon': Icons.dashboard,             'label': 'Panel'},
-      {'icon': Icons.people_outline,        'label': 'Usuarios'},
-      {'icon': Icons.local_offer_outlined,  'label': 'Promos'},
-      {'icon': Icons.storefront_outlined,   'label': 'Comercios'},
-      {'icon': Icons.notifications_outlined,'label': 'Avisos'},
+      {'icon': Icons.dashboard, 'label': 'Panel'},
+      {'icon': Icons.people_outline, 'label': 'Usuarios'},
+      {'icon': Icons.local_offer_outlined, 'label': 'Promos'},
+      {'icon': Icons.storefront_outlined, 'label': 'Comercios'},
+      {'icon': Icons.notifications_outlined, 'label': 'Avisos'},
     ];
 
     return Container(
@@ -1319,7 +1387,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         color: Colors.white,
         boxShadow: [
           // Sombra hacia arriba para separar la barra del contenido
-          BoxShadow(color: Color(0x10000000), blurRadius: 12, offset: Offset(0, -2)),
+          BoxShadow(
+            color: Color(0x10000000),
+            blurRadius: 12,
+            offset: Offset(0, -2),
+          ),
         ],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
@@ -1335,7 +1407,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
                 // Solo el tab activo tiene fondo naranja translúcido
-                color: selected ? primaryOrange.withOpacity(0.12) : Colors.transparent,
+                color: selected
+                    ? primaryOrange.withOpacity(0.12)
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -1343,7 +1417,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 children: [
                   Icon(
                     items[i]['icon'] as IconData,
-                    color: selected ? primaryOrange : textGray, // Color según estado
+                    color: selected
+                        ? primaryOrange
+                        : textGray, // Color según estado
                     size: 22,
                   ),
                   const SizedBox(height: 3),
@@ -1352,7 +1428,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     style: TextStyle(
                       color: selected ? primaryOrange : textGray,
                       fontSize: 10,
-                      fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
+                      fontWeight: selected
+                          ? FontWeight.w700
+                          : FontWeight.normal,
                     ),
                   ),
                 ],
@@ -1377,7 +1455,13 @@ class _LineChartPainter extends CustomPainter {
 
     // ── Etiquetas del eje Y ──
     final yLabelStyle = TextStyle(color: Colors.grey.shade400, fontSize: 10);
-    final yLabels = ['\$3.2\nM', '\$2.4\nM', '\$1.6\nM', '\$0.8\nM', '\$0.0\nM'];
+    final yLabels = [
+      '\$3.2\nM',
+      '\$2.4\nM',
+      '\$1.6\nM',
+      '\$0.8\nM',
+      '\$0.0\nM',
+    ];
 
     // Dibuja cada etiqueta del eje Y distribuida verticalmente
     for (int i = 0; i < yLabels.length; i++) {
@@ -1407,14 +1491,15 @@ class _LineChartPainter extends CustomPainter {
     // Convierte los valores normalizados a coordenadas de pantalla (Offset)
     final pts = List.generate(dataPoints.length, (i) {
       return Offset(
-        leftPad + i * (w / (dataPoints.length - 1)), // X distribuido uniformemente
-        h - dataPoints[i] * h,                        // Y invertido (0 = abajo en canvas)
+        leftPad +
+            i * (w / (dataPoints.length - 1)), // X distribuido uniformemente
+        h - dataPoints[i] * h, // Y invertido (0 = abajo en canvas)
       );
     });
 
     // ── Área rellena bajo la curva ──
     final fillPath = Path();
-    fillPath.moveTo(pts[0].dx, h);      // Empieza en la base del primer punto
+    fillPath.moveTo(pts[0].dx, h); // Empieza en la base del primer punto
     fillPath.lineTo(pts[0].dx, pts[0].dy);
     for (int i = 1; i < pts.length; i++) {
       // Curva cúbica de Bézier para suavizar la línea entre puntos
@@ -1451,14 +1536,23 @@ class _LineChartPainter extends CustomPainter {
       Paint()
         ..color = orange
         ..strokeWidth = 2.5
-        ..style = PaintingStyle.stroke // Solo el borde, sin relleno
+        ..style = PaintingStyle
+            .stroke // Solo el borde, sin relleno
         ..strokeCap = StrokeCap.round,
     );
 
     // ── Puntos circulares sobre cada dato ──
     for (final p in pts) {
-      canvas.drawCircle(p, 4, Paint()..color = orange);   // Círculo naranja exterior
-      canvas.drawCircle(p, 2.5, Paint()..color = Colors.white); // Punto blanco interior
+      canvas.drawCircle(
+        p,
+        4,
+        Paint()..color = orange,
+      ); // Círculo naranja exterior
+      canvas.drawCircle(
+        p,
+        2.5,
+        Paint()..color = Colors.white,
+      ); // Punto blanco interior
     }
   }
 

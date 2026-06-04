@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 import '../../../../../Core/di/app_scope.dart';
@@ -12,6 +12,7 @@ class AdminDashboardSimplifiedScreen extends StatefulWidget {
       _AdminDashboardSimplifiedScreenState();
 }
 
+/// Estado interno de `AdminDashboardSimplifiedScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _AdminDashboardSimplifiedScreenState
     extends State<AdminDashboardSimplifiedScreen> {
   // Construye un resumen de usuarios, promociones y actividad agregada.
@@ -65,33 +66,37 @@ class _AdminDashboardSimplifiedScreenState
                 // NeverScrollableScrollPhysics evita conflicto de scroll entre
                 // el GridView y el SingleChildScrollView que lo contiene.
                 GridView.count(
-                  crossAxisCount: 2,                              // 2 columnas
+                  crossAxisCount: 2, // 2 columnas
                   shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),  // Sin scroll propio
-                  mainAxisSpacing: 12,                            // Espacio vertical entre cards
-                  crossAxisSpacing: 12,                           // Espacio horizontal entre cards
+                  physics:
+                      const NeverScrollableScrollPhysics(), // Sin scroll propio
+                  mainAxisSpacing: 12, // Espacio vertical entre cards
+                  crossAxisSpacing: 12, // Espacio horizontal entre cards
                   children: [
                     _StatCard(
                       title: 'Usuarios',
-                      value: usuarios.length.toString(),          // Dato en tiempo real
+                      value: usuarios.length.toString(), // Dato en tiempo real
                       icon: Icons.people,
                       color: Colors.blue,
                     ),
                     _StatCard(
                       title: 'Promociones',
-                      value: promociones.length.toString(),       // Dato en tiempo real
+                      value: promociones.length
+                          .toString(), // Dato en tiempo real
                       icon: Icons.local_offer,
                       color: Colors.orange,
                     ),
                     _StatCard(
                       title: 'Supermercados',
-                      value: supermercados.length.toString(),     // Dato en tiempo real
+                      value: supermercados.length
+                          .toString(), // Dato en tiempo real
                       icon: Icons.store,
                       color: Colors.green,
                     ),
                     _StatCard(
                       title: 'Comentarios',
-                      value: comentarios.length.toString(),       // Dato en tiempo real
+                      value: comentarios.length
+                          .toString(), // Dato en tiempo real
                       icon: Icons.comment,
                       color: Colors.purple,
                     ),
@@ -130,7 +135,9 @@ class _AdminDashboardSimplifiedScreenState
                   decoration: BoxDecoration(
                     color: Colors.yellow[50],
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.yellow[700]!), // ! afirma que no es null
+                    border: Border.all(
+                      color: Colors.yellow[700]!,
+                    ), // ! afirma que no es null
                   ),
                   child: ListTile(
                     title: const Text('Pendientes'),
@@ -204,10 +211,10 @@ class _AdminDashboardSimplifiedScreenState
 /// Es un StatelessWidget porque no maneja estado propio;
 /// solo muestra la información que recibe por parámetros.
 class _StatCard extends StatelessWidget {
-  final String title;  // Nombre del KPI (ej. "Usuarios")
-  final String value;  // Valor numérico ya convertido a String
+  final String title; // Nombre del KPI (ej. "Usuarios")
+  final String value; // Valor numérico ya convertido a String
   final IconData icon; // Ícono representativo de la categoría
-  final Color color;   // Color temático de la card (fondo, borde e ícono)
+  final Color color; // Color temático de la card (fondo, borde e ícono)
 
   const _StatCard({
     required this.title,
@@ -224,13 +231,16 @@ class _StatCard extends StatelessWidget {
         // manteniendo legibilidad y diferenciando visualmente cada card.
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color), // Borde del mismo color para coherencia
+        border: Border.all(
+          color: color,
+        ), // Borde del mismo color para coherencia
       ),
       padding: const EdgeInsets.all(12),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center, // Centra el contenido verticalmente
+        mainAxisAlignment:
+            MainAxisAlignment.center, // Centra el contenido verticalmente
         children: [
-          Icon(icon, color: color, size: 32),  // Ícono grande del color temático
+          Icon(icon, color: color, size: 32), // Ícono grande del color temático
           const SizedBox(height: 8),
           // Número principal del KPI en grande y en negrita
           Text(

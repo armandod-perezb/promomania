@@ -1,10 +1,10 @@
+/// Nombres de rutas usados por la navegacion declarativa de la aplicacion.
 class AppRoutes {
-
   // ==========================================================================
   // MÓDULO: AUTENTICACIÓN
   // Rutas relacionadas con login, registro y recuperación de contraseña.
   // ==========================================================================
-  
+
   // Pantalla de inicio de sesión
   static const login = '/login';
 
@@ -20,12 +20,11 @@ class AppRoutes {
   // Crear nueva contraseña después de verificación
   static const newPassword = '/new_password';
 
-
   // ==========================================================================
   // MÓDULO: ONBOARDING
   // Flujo de introducción a la app (pantallas iniciales tipo tutorial)
   // ==========================================================================
-  
+
   // 👇 ESTA ES LA LÍNEA QUE NECESITAS AGREGAR
   static const onboarding1 = '/onboarding1';
 
@@ -37,13 +36,12 @@ class AppRoutes {
   static const onboarding3 = '/onboarding3';
   static const onboarding4 = '/onboarding4';
 
-
   // ==========================================================================
   // MÓDULO: ADMINISTRADOR
   // Panel de control exclusivo para administradores
   // Incluye gestión completa del sistema
   // ==========================================================================
-  
+
   // Dashboard principal del admin (métricas, resumen)
   static const adminDashboard = '/admin/dashboard';
 
@@ -60,17 +58,17 @@ class AppRoutes {
   static const manageNotifications = '/admin/manage_notifications';
 
   // Submódulos de notificaciones (segmentación funcional)
-  static const adminNotiActivity = '/admin/noti/activity'; // actividad del sistema
-  static const adminNotiReport   = '/admin/noti/report';   // reportes generados
-  static const adminNotiAlert    = '/admin/noti/alert';    // alertas críticas
-  static const adminNotiExport   = '/admin/noti/export';   // exportaciones
-
+  static const adminNotiActivity =
+      '/admin/noti/activity'; // actividad del sistema
+  static const adminNotiReport = '/admin/noti/report'; // reportes generados
+  static const adminNotiAlert = '/admin/noti/alert'; // alertas críticas
+  static const adminNotiExport = '/admin/noti/export'; // exportaciones
 
   // ==========================================================================
   // 👤 MÓDULO: USUARIO
   // Rutas del usuario final dentro de la app
   // ==========================================================================
-  
+
   // Pantalla principal del usuario
   static const userHome = '/user/home';
 
@@ -92,12 +90,11 @@ class AppRoutes {
   // Detalle de una promoción específica
   static const promotionDetails = '/user/promotion_details';
 
-
   // ==========================================================================
   // MÓDULO: CREACIÓN DE PROMOCIONES
   // Flujo paso a paso (multi-step form)
   // ==========================================================================
-  
+
   // Paso 1
   static const addPromotions = '/promotions/add';
 
@@ -113,12 +110,11 @@ class AppRoutes {
   // Paso 5
   static const addPromotions5 = '/promotions/add5';
 
-
   // ==========================================================================
   // MÓDULO: CONFIGURACIONES
   // Información legal y ayuda al usuario
   // ==========================================================================
-  
+
   // Términos y condiciones del servicio
   static const termsService = '/settings/terms_service';
 

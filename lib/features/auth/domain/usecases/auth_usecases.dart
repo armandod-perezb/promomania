@@ -1,6 +1,7 @@
 import 'package:app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:app/features/users/domain/entities/usuario.dart';
 
+/// Caso de uso para iniciar sesion; mantiene la regla de negocio fuera de la interfaz.
 class LoginUseCase {
   final AuthRepository repository;
 
@@ -11,6 +12,7 @@ class LoginUseCase {
   }
 }
 
+/// Caso de uso para registrar un usuario; mantiene la regla de negocio fuera de la interfaz.
 class RegisterUseCase {
   final AuthRepository repository;
 
@@ -29,6 +31,7 @@ class RegisterUseCase {
   }
 }
 
+/// Caso de uso para enviar un codigo de recuperacion; mantiene la regla de negocio fuera de la interfaz.
 class SendRecoveryCodeUseCase {
   final AuthRepository repository;
 
@@ -39,6 +42,7 @@ class SendRecoveryCodeUseCase {
   }
 }
 
+/// Caso de uso para verificar un codigo de recuperacion; mantiene la regla de negocio fuera de la interfaz.
 class VerifyRecoveryCodeUseCase {
   final AuthRepository repository;
 
@@ -49,6 +53,7 @@ class VerifyRecoveryCodeUseCase {
   }
 }
 
+/// Caso de uso para restablecer la contrasena; mantiene la regla de negocio fuera de la interfaz.
 class ResetPasswordUseCase {
   final AuthRepository repository;
 
@@ -59,6 +64,7 @@ class ResetPasswordUseCase {
   }
 }
 
+/// Caso de uso para cerrar sesion; mantiene la regla de negocio fuera de la interfaz.
 class LogoutUseCase {
   final AuthRepository repository;
 

@@ -1,3 +1,4 @@
+/// Coordenada compatible con la implementacion web de geolocalizacion.
 class BrowserGeolocationPoint {
   const BrowserGeolocationPoint({
     required this.latitude,
@@ -8,6 +9,7 @@ class BrowserGeolocationPoint {
   final double longitude;
 }
 
+/// Implementacion de reserva para plataformas donde `dart:html` no existe.
 Future<BrowserGeolocationPoint> getBrowserGeolocation({
   required Duration timeout,
   required Duration maximumAge,

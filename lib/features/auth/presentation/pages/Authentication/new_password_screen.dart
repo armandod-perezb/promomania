@@ -2,16 +2,22 @@ import 'package:flutter/material.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 import '../../controllers/auth_controller.dart';
 
+/// Pantalla para establecer una nueva contrasena despues de validar el codigo.
 class NewPasswordScreen extends StatefulWidget {
   final String? email;
   final AuthController authController;
 
-  const NewPasswordScreen({super.key, this.email, required this.authController});
+  const NewPasswordScreen({
+    super.key,
+    this.email,
+    required this.authController,
+  });
 
   @override
   State<NewPasswordScreen> createState() => _NewPasswordScreenState();
 }
 
+/// Estado interno de `NewPasswordScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _NewPasswordScreenState extends State<NewPasswordScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();

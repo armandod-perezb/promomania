@@ -73,6 +73,7 @@ class LocationSelector extends StatefulWidget {
   State<LocationSelector> createState() => _LocationSelectorState();
 }
 
+/// Estado interno de `LocationSelector`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _LocationSelectorState extends State<LocationSelector> {
   bool _hasValidCoordinates(double? lat, double? lng) {
     if (lat == null || lng == null) return false;
@@ -531,6 +532,7 @@ class MapPickerDialog extends StatefulWidget {
   State<MapPickerDialog> createState() => _MapPickerDialogState();
 }
 
+/// Estado interno de `MapPickerDialog`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _MapPickerDialogState extends State<MapPickerDialog> {
   LatLng _selectedLocation = _defaultLocation;
   final MapController _mapController = MapController();

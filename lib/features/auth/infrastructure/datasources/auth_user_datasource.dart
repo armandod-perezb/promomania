@@ -1,6 +1,7 @@
 import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 import 'package:app/features/users/domain/entities/usuario.dart';
 
+/// Contrato de fuente de datos de autenticacion; separa el origen concreto de la informacion del resto de la app.
 abstract class AuthUserDataSource {
   Usuario? findByEmail(String correo);
   List<Usuario> getAllUsers();
@@ -8,6 +9,7 @@ abstract class AuthUserDataSource {
   void updateUser(Usuario usuario);
 }
 
+/// Fuente de datos de autenticacion; obtiene y transforma informacion desde servicios o almacenamiento local.
 class PromoAuthUserDataSource implements AuthUserDataSource {
   final PromoService promoService;
 

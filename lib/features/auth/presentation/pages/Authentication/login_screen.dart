@@ -16,6 +16,7 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
+/// Estado interno de `LoginScreen`; coordina datos, eventos y reconstrucciones de la pantalla.
 class _LoginScreenState extends State<LoginScreen> {
   // Controladores para los campos de texto del formulario
   final TextEditingController _emailController =
@@ -58,9 +59,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final emailError = Validators.validateEmail(email);
     if (emailError != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(emailError)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(emailError)));
       return;
     }
 
@@ -86,9 +87,9 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       if (mounted) {
         final message = e.toString().replaceFirst('Exception: ', '');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     } finally {
       // Siempre detener el estado de carga al finalizar

@@ -1,6 +1,7 @@
 import 'package:app/features/comments/domain/entities/comentario.dart';
 import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 
+/// Contrato de fuente de datos de comentarios; separa el origen concreto de la informacion del resto de la app.
 abstract class CommentDataSource {
   List<Comentario> getAllComments();
   List<Comentario> getCommentsByPromotion(String promotionCode);
@@ -9,6 +10,7 @@ abstract class CommentDataSource {
   void deleteComment(int id);
 }
 
+/// Fuente de datos de comentarios; obtiene y transforma informacion desde servicios o almacenamiento local.
 class PromoCommentDataSource implements CommentDataSource {
   final PromoService promoService;
 

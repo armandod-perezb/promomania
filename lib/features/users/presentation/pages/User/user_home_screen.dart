@@ -412,6 +412,11 @@ class _HomeMapScreenState extends State<HomeMapScreen>
     );
   }
 
+  void _navigateToCreatePromotion() {
+    HapticFeedback.lightImpact();
+    Navigator.pushNamed(context, AppRoutes.addPromotions);
+  }
+
   /// Muestra diálogo para configurar ubicación manual
   void _showManualLocationDialog() async {
     final savedLocation = await ManualLocationService.getSavedLocation();
@@ -852,22 +857,57 @@ class _HomeMapScreenState extends State<HomeMapScreen>
         position: _cardSlide,
         child: FadeTransition(
           opacity: _cardFade,
-          child: Container(
-            margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(22),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.14),
-                  blurRadius: 24,
-                  offset: const Offset(0, -4),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Card de promoción
+              Container(
+                margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(22),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.14),
+                      blurRadius: 24,
+                      offset: const Offset(0, -4),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: selected == null
-                ? _buildEmptyBottomSheet()
-                : _buildSelectedPromoBottomSheet(selected),
+                child: selected == null
+                    ? _buildEmptyBottomSheet()
+                    : _buildSelectedPromoBottomSheet(selected),
+              ),
+              // Botón + flotante posicionado por encima del card
+              Positioned(
+                right: 20,
+                top: -70,
+                child: GestureDetector(
+                  onTap: _navigateToCreatePromotion,
+                  child: Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: _primary,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: _primary.withValues(alpha: 0.4),
+                          blurRadius: 12,
+                          spreadRadius: 2,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.add_rounded,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

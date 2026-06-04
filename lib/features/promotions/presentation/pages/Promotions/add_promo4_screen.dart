@@ -4,6 +4,7 @@ import '../../../../../Core/di/app_scope.dart';
 import '../../../../../features/promotions/domain/entities/supermercado.dart';
 import '../../widgets/modals/crear_supermercado_modal.dart';
 import '../../widgets/selectors/location_selector.dart';
+import '../../widgets/selectors/promotion_schedule_selector.dart';
 import '../../widgets/selectors/supermarket_selector.dart';
 import 'add_promo5_screen.dart';
 
@@ -28,7 +29,6 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
   static const Color _darkBg = Color(0xFF1A1F2E);
   static const Color _lightBg = Color(0xFFF5F6FA);
 
-  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _urlController = TextEditingController();
   final TextEditingController _locationDescriptionController =
       TextEditingController();
@@ -52,7 +52,6 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
     _urlController.addListener(_onLocationFieldsChanged);
     _locationDescriptionController.addListener(_onLocationFieldsChanged);
 
-    _phoneController.text = (draft['phone'] as String?) ?? '';
     _urlController.text =
         (draft['url'] as String?) ?? (draft['website'] as String?) ?? '';
     _locationDescriptionController.text =
@@ -86,7 +85,6 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
   void dispose() {
     _urlController.removeListener(_onLocationFieldsChanged);
     _locationDescriptionController.removeListener(_onLocationFieldsChanged);
-    _phoneController.dispose();
     _urlController.dispose();
     _locationDescriptionController.dispose();
     _scheduleController.dispose();
@@ -242,7 +240,6 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
       'supermarketId': _supermercadoId,
       'idSupermercado': _supermercadoId,
       'storeName': store?.nombre ?? '',
-      'phone': _phoneController.text.trim(),
       'website': _hasVirtual ? _urlController.text.trim() : '',
       'url': _hasVirtual ? _urlController.text.trim() : null,
       'locationDescription': _hasFisica
@@ -344,16 +341,6 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
                     errorText: _errors['supermercado'],
                   ),
                   const SizedBox(height: 18),
-                  _buildLabeledField(
-                    label: 'Teléfono',
-                    child: _buildTextField(
-                      controller: _phoneController,
-                      hint: '300 000 0000',
-                      keyboardType: TextInputType.phone,
-                      prefixIcon: Icons.phone_outlined,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
                   LocationSelector(
                     selectedTypes: _tiposUbicacion,
                     onTypesChanged: (types) {
@@ -382,13 +369,9 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
                   ),
                   if (_hasFisica) ...[
                     const SizedBox(height: 18),
-                    _buildLabeledField(
-                      label: 'Horario',
-                      child: _buildTextField(
-                        controller: _scheduleController,
-                        hint: 'Lun-Sáb 9-7pm',
-                        prefixIcon: Icons.access_time_rounded,
-                      ),
+                    PromotionScheduleSelector(
+                      controller: _scheduleController,
+                      onChanged: (_) => setState(() {}),
                     ),
                   ],
                   const SizedBox(height: 100),
@@ -447,7 +430,7 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: _primary.withOpacity(0.12),
+                  color: _primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Text(
@@ -561,73 +544,6 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
     );
   }
 
-  Widget _buildLabeledField({
-    required String label,
-    bool required = false,
-    required Widget child,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF1A1F2E),
-              ),
-            ),
-            if (required)
-              const Text(' *', style: TextStyle(color: _primary, fontSize: 14)),
-          ],
-        ),
-        const SizedBox(height: 10),
-        child,
-      ],
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hint,
-    TextInputType keyboardType = TextInputType.text,
-    IconData? prefixIcon,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      onChanged: (_) => setState(() {}),
-      style: const TextStyle(fontSize: 14, color: Color(0xFF1A1F2E)),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Color(0xFFCDD0DB), fontSize: 13.5),
-        prefixIcon: prefixIcon != null
-            ? Icon(prefixIcon, color: const Color(0xFFB0B5CC), size: 18)
-            : null,
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 15,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE8EAF0), width: 1.5),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE8EAF0), width: 1.5),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: _primary, width: 1.8),
-        ),
-      ),
-    );
-  }
-
   Widget _buildBottomBar() {
     return Container(
       color: Colors.white,
@@ -685,7 +601,7 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _darkBg,
                       foregroundColor: Colors.white,
-                      disabledBackgroundColor: _darkBg.withOpacity(0.4),
+                      disabledBackgroundColor: _darkBg.withValues(alpha: 0.4),
                       disabledForegroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),

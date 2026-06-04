@@ -24,15 +24,13 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
   int _selectedTab = 0; // 0=Publicaciones 1=Guardados 2=Logros
   int _selectedNavTab = 3; // Perfil activo
-  
+
   List<Promocion> _promocionesPublicadas = [];
   List<Promocion> _promocionesFavoritas = [];
   List<Comentario> _comentariosUsuario = [];
   bool _cargandoPublicadas = false;
   bool _cargandoFavoritas = false;
   bool _cargandoComentarios = false;
-
-  @override
 
   @override
   Widget build(BuildContext context) {
@@ -364,74 +362,6 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     );
   }
 
-  // ── Top bar ───────────────────────────────────────────────────────────────────
-
-  Widget _buildTopBar() {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF1A1F2E), Color(0xFF2D1B3D), Color(0xFF1A2E3A)],
-        ),
-      ),
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 10,
-        left: 16,
-        right: 16,
-        bottom: 16,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.15),
-                  width: 1,
-                ),
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: Colors.white,
-                size: 18,
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              Navigator.pushNamed(context, AppRoutes.userConfig);
-            },
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.15),
-                  width: 1,
-                ),
-              ),
-              child: const Icon(
-                Icons.settings_outlined,
-                color: Colors.white,
-                size: 18,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   // ── Nivel y XP ───────────────────────────────────────────────────────────────
 
   Widget _buildLevelSection() {
@@ -525,7 +455,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     const SizedBox(height: 2),
                     Text(
                       '$puntosRestantes XP para Nivel ${nivel + 1}',
-                      style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF6B7280),
+                      ),
                     ),
                   ],
                 ),
@@ -587,13 +520,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               ),
             ],
           ),
-
         ],
       ),
     );
   }
-
-
 
   // ── Métricas ──────────────────────────────────────────────────────────────────
 
@@ -862,7 +792,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               GestureDetector(
                 onTap: () => _mostrarDialogoAgregarComentario(),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFF1EF),
                     borderRadius: BorderRadius.circular(16),
@@ -870,11 +803,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   ),
                   child: const Row(
                     children: [
-                      Icon(
-                        Icons.add,
-                        color: _primary,
-                        size: 18,
-                      ),
+                      Icon(Icons.add, color: _primary, size: 18),
                       SizedBox(width: 4),
                       Text(
                         'Agregar un comentario',
@@ -926,11 +855,11 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: _comentariosUsuario.length > 3 ? 3 : _comentariosUsuario.length,
-              separatorBuilder: (context, index) => const Divider(
-                color: Color(0xFFF0F1F5),
-                height: 1,
-              ),
+              itemCount: _comentariosUsuario.length > 3
+                  ? 3
+                  : _comentariosUsuario.length,
+              separatorBuilder: (context, index) =>
+                  const Divider(color: Color(0xFFF0F1F5), height: 1),
               itemBuilder: (context, index) {
                 final comentario = _comentariosUsuario[index];
                 return _buildCommentCard(comentario);
@@ -944,10 +873,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   HapticFeedback.lightImpact();
                   // Navigate to all reviews screen if needed
                 },
-                child: const Center(
+                child: Center(
                   child: Text(
                     'Ver todas las reseñas (${_comentariosUsuario.length})',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: _primary,
@@ -962,9 +891,11 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   }
 
   Widget _buildCommentCard(Comentario comentario) {
-    final promo = promotionsController.getPromotionByCodeSync(comentario.codigoPromocion);
+    final promo = promotionsController.getPromotionByCodeSync(
+      comentario.codigoPromocion,
+    );
     final promoTitle = promo?.titulo ?? 'Promoción';
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
@@ -1029,7 +960,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       final date = DateTime.parse(fecha);
       final now = DateTime.now();
       final difference = now.difference(date);
-      
+
       if (difference.inDays == 0) {
         return 'Hoy';
       } else if (difference.inDays == 1) {
@@ -1056,7 +987,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text(
           'Agregar comentario',
           style: TextStyle(
@@ -1104,7 +1035,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text(
               'Cancelar',
               style: TextStyle(
@@ -1116,11 +1047,12 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           ElevatedButton(
             onPressed: () async {
               if (controller.text.trim().isEmpty) return;
-              
+              final messenger = ScaffoldMessenger.of(context);
+
               final nextId = (commentsController.getComentariosSync().isNotEmpty
                   ? commentsController.getComentariosSync().last.id + 1
                   : 1);
-              
+
               final nuevoComentario = Comentario(
                 id: nextId,
                 contenido: controller.text.trim(),
@@ -1128,23 +1060,22 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 idUsuario: usuario.id,
                 codigoPromocion: promoCode,
               );
-              
+
               try {
                 await commentsController.addComment(nuevoComentario);
+                if (!mounted || !dialogContext.mounted) return;
+                Navigator.pop(dialogContext);
+                await _cargarComentariosUsuario();
                 if (!mounted) return;
-                Navigator.pop(context);
-                setState(() {
-                  _cargarComentariosUsuario();
-                });
-                ScaffoldMessenger.of(context).showSnackBar(
+                messenger.showSnackBar(
                   const SnackBar(
                     content: Text('Comentario agregado exitosamente'),
                     backgroundColor: _green,
                   ),
                 );
               } catch (e) {
-                if (!mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
+                if (!mounted || !dialogContext.mounted) return;
+                messenger.showSnackBar(
                   SnackBar(
                     content: Text('Error al agregar comentario: $e'),
                     backgroundColor: Colors.red,
@@ -1162,10 +1093,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             ),
             child: const Text(
               'Publicar',
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
-              ),
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
             ),
           ),
         ],
@@ -1189,7 +1117,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     }
 
     if (!mounted) return null;
-    
+
     String? selectedCode;
     await showDialog(
       context: context,
@@ -1220,9 +1148,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 ),
                 subtitle: Text(
                   '\$${promo.precio.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    color: Color(0xFF6B7280),
-                  ),
+                  style: const TextStyle(color: Color(0xFF6B7280)),
                 ),
                 onTap: () {
                   selectedCode = promo.codigo;
@@ -1240,7 +1166,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         ],
       ),
     );
-    
+
     return selectedCode;
   }
 
@@ -1344,7 +1270,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
     setState(() => _cargandoPublicadas = true);
     try {
-      final promos = await AppScope.promotionsController.getPromotionsByUser(usuario.id);
+      final promos = await AppScope.promotionsController.getPromotionsByUser(
+        usuario.id,
+      );
       setState(() => _promocionesPublicadas = promos);
     } catch (e) {
       debugPrint('Error al cargar promociones: $e');
@@ -1359,10 +1287,13 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
     setState(() => _cargandoFavoritas = true);
     try {
-      final favoritos = await AppScope.interactionsRepository.getFavoritosByUsuario(usuario.id);
+      final favoritos = await AppScope.interactionsRepository
+          .getFavoritosByUsuario(usuario.id);
       final promociones = <Promocion>[];
       for (final fav in favoritos) {
-        final promo = AppScope.promotionsController.getPromotionByCodeSync(fav.codigoPromocion);
+        final promo = AppScope.promotionsController.getPromotionByCodeSync(
+          fav.codigoPromocion,
+        );
         if (promo != null) {
           promociones.add(promo);
         }
@@ -1381,7 +1312,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
     setState(() => _cargandoComentarios = true);
     try {
-      final comentarios = await AppScope.commentsController.getCommentsByUser(usuario.id);
+      final comentarios = await AppScope.commentsController.getCommentsByUser(
+        usuario.id,
+      );
       setState(() => _comentariosUsuario = comentarios);
     } catch (e) {
       debugPrint('Error al cargar comentarios: $e');
@@ -1394,9 +1327,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     if (_cargandoPublicadas) {
       return const Padding(
         padding: EdgeInsets.all(40),
-        child: Center(
-          child: CircularProgressIndicator(color: _primary),
-        ),
+        child: Center(child: CircularProgressIndicator(color: _primary)),
       );
     }
 
@@ -1440,14 +1371,17 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           mainAxisSpacing: 12,
           childAspectRatio: 0.88,
         ),
-        itemBuilder: (context, index) => _buildPromoCard(_promocionesPublicadas[index]),
+        itemBuilder: (context, index) =>
+            _buildPromoCard(_promocionesPublicadas[index]),
       ),
     );
   }
 
   Widget _buildPromoCard(Promocion promo) {
-    final fotoUrl = promo.foto ?? 'https://via.placeholder.com/300x300?text=${promo.titulo}';
-    
+    final fotoUrl =
+        promo.foto ??
+        'https://via.placeholder.com/300x300?text=${promo.titulo}';
+
     return GestureDetector(
       onTap: () {
         // Navegar a detalle de promoción si es necesario
@@ -1494,7 +1428,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               top: 12,
               right: 12,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.55),
                   borderRadius: BorderRadius.circular(16),
@@ -1570,9 +1507,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     if (_cargandoFavoritas) {
       return const Padding(
         padding: EdgeInsets.all(40),
-        child: Center(
-          child: CircularProgressIndicator(color: _primary),
-        ),
+        child: Center(child: CircularProgressIndicator(color: _primary)),
       );
     }
 
@@ -1617,7 +1552,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
           mainAxisSpacing: 12,
           childAspectRatio: 0.88,
         ),
-        itemBuilder: (context, index) => _buildPromoCard(_promocionesFavoritas[index]),
+        itemBuilder: (context, index) =>
+            _buildPromoCard(_promocionesFavoritas[index]),
       ),
     );
   }
@@ -1763,7 +1699,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             ],
           ),
         ),
-        ...items.map((item) => _buildInfoRow(item)).toList(),
+        ...items.map((item) => _buildInfoRow(item)),
         const SizedBox(height: 8),
       ],
     );
@@ -1788,7 +1724,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: item.color.withOpacity(0.1),
+                color: item.color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(item.icon, color: item.color, size: 18),
@@ -1848,11 +1784,31 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     // Si el usuario es administrador, mostrar la barra de admin (navegación administrativa)
     if (usuario?.rol == 'admin') {
       final items = [
-        {'icon': Icons.dashboard, 'label': 'Panel', 'route': AppRoutes.adminDashboard},
-        {'icon': Icons.people_outline, 'label': 'Usuarios', 'route': AppRoutes.manageUsers},
-        {'icon': Icons.local_offer_outlined, 'label': 'Promos', 'route': AppRoutes.managePromotions},
-        {'icon': Icons.storefront_outlined, 'label': 'Comercios', 'route': AppRoutes.manageStores},
-        {'icon': Icons.notifications_outlined, 'label': 'Avisos', 'route': AppRoutes.manageNotifications},
+        {
+          'icon': Icons.dashboard,
+          'label': 'Panel',
+          'route': AppRoutes.adminDashboard,
+        },
+        {
+          'icon': Icons.people_outline,
+          'label': 'Usuarios',
+          'route': AppRoutes.manageUsers,
+        },
+        {
+          'icon': Icons.local_offer_outlined,
+          'label': 'Promos',
+          'route': AppRoutes.managePromotions,
+        },
+        {
+          'icon': Icons.storefront_outlined,
+          'label': 'Comercios',
+          'route': AppRoutes.manageStores,
+        },
+        {
+          'icon': Icons.notifications_outlined,
+          'label': 'Avisos',
+          'route': AppRoutes.manageNotifications,
+        },
       ];
 
       final currentRoute = ModalRoute.of(context)?.settings.name;
@@ -1878,26 +1834,40 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             return GestureDetector(
               onTap: () {
                 if (i == selectedIndex) return;
-                Navigator.pushReplacementNamed(context, items[i]['route'] as String);
+                Navigator.pushReplacementNamed(
+                  context,
+                  items[i]['route'] as String,
+                );
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: selected ? _primary.withOpacity(0.12) : Colors.transparent,
+                  color: selected
+                      ? _primary.withValues(alpha: 0.12)
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(items[i]['icon'] as IconData, color: selected ? _primary : const Color(0xFF8A8FA8), size: 22),
+                    Icon(
+                      items[i]['icon'] as IconData,
+                      color: selected ? _primary : const Color(0xFF8A8FA8),
+                      size: 22,
+                    ),
                     const SizedBox(height: 3),
                     Text(
                       items[i]['label'] as String,
                       style: TextStyle(
                         color: selected ? _primary : const Color(0xFF8A8FA8),
                         fontSize: 10,
-                        fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
+                        fontWeight: selected
+                            ? FontWeight.w700
+                            : FontWeight.normal,
                       ),
                     ),
                   ],
@@ -1929,7 +1899,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.07),
+            color: Colors.black.withValues(alpha: 0.07),
             blurRadius: 12,
             offset: const Offset(0, -2),
           ),
@@ -1967,7 +1937,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                       vertical: 5,
                     ),
                     decoration: BoxDecoration(
-                      color: isActive ? _primary.withOpacity(0.1) : Colors.transparent,
+                      color: isActive
+                          ? _primary.withValues(alpha: 0.1)
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -2030,33 +2002,6 @@ class _ProfileStat extends StatelessWidget {
       ],
     );
   }
-}
-
-class _DotsPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.white.withValues(alpha: 0.08);
-    final positions = <Offset>[
-      Offset(size.width * 0.18, size.height * 0.30),
-      Offset(size.width * 0.42, size.height * 0.18),
-      Offset(size.width * 0.56, size.height * 0.64),
-      Offset(size.width * 0.72, size.height * 0.28),
-      Offset(size.width * 0.78, size.height * 0.72),
-      Offset(size.width * 0.87, size.height * 0.46),
-    ];
-    for (final pos in positions) {
-      canvas.drawCircle(pos, 3.2, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _Stat {
-  final String value;
-  final String label;
-  const _Stat(this.value, this.label);
 }
 
 class _QuickAction {

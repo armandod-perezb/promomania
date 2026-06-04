@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'package:app/Core/di/app_scope.dart';
 import 'package:app/features/promotions/domain/entities/promocion.dart';
+import 'package:app/features/promotions/domain/entities/promocion_horario.dart';
 import 'package:app/features/promotions/domain/entities/supermercado.dart';
 import '../selectors/category_selector.dart';
 import '../selectors/location_selector.dart';
+import '../selectors/promotion_schedule_selector.dart';
 import '../selectors/supermarket_selector.dart';
 import '../selectors/tipo_promocion_selector.dart';
 import 'crear_supermercado_modal.dart';
@@ -39,6 +41,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
   final _urlController = TextEditingController();
   final _fechaInicioController = TextEditingController();
   final _fechaFinController = TextEditingController();
+  final _horarioController = TextEditingController(text: 'Lun-Vie 9am-7pm');
 
   // Estados
   String? _tipoPromocionId;
@@ -70,6 +73,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
     _urlController.dispose();
     _fechaInicioController.dispose();
     _fechaFinController.dispose();
+    _horarioController.dispose();
     super.dispose();
   }
 
@@ -118,14 +122,11 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
     if (_tiposUbicacion.isEmpty) {
       _errors['ubicacion'] = 'Selecciona al menos una opción de ubicación';
     } else {
-      final tieneFisica =
-          _tiposUbicacion.contains(TipoUbicacion.fisica) ||
-          _tiposUbicacion.contains(TipoUbicacion.ambas);
       final tieneVirtual =
           _tiposUbicacion.contains(TipoUbicacion.virtual) ||
           _tiposUbicacion.contains(TipoUbicacion.ambas);
 
-      if (tieneFisica) {
+      if (_tieneUbicacionFisica) {
         if (_descripcionUbicacionController.text.trim().isEmpty &&
             (_latitud == null || _longitud == null)) {
           _errors['ubicacion_fisica'] =
@@ -184,6 +185,30 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
   double? _redondearCoordenada(double? valor) {
     if (valor == null) return null;
     return double.parse(valor.toStringAsFixed(6));
+  }
+
+  bool get _tieneUbicacionFisica =>
+      _tiposUbicacion.contains(TipoUbicacion.fisica) ||
+      _tiposUbicacion.contains(TipoUbicacion.ambas);
+
+  Future<void> _guardarHorariosPromocion(Promocion promocion) async {
+    if (!_tieneUbicacionFisica) return;
+
+    final data = PromotionScheduleUtils.parse(_horarioController.text);
+    var nextId = promotionsController.getNextHorarioId();
+
+    for (final dia in data.days) {
+      await promotionsController.addPromocionHorario(
+        PromocionHorario(
+          id: nextId,
+          diaSemana: dia,
+          horaInicio: data.startTime,
+          horaFin: data.endTime,
+          codigoPromocion: promocion.codigo,
+        ),
+      );
+      nextId++;
+    }
   }
 
   // ============================================================================
@@ -275,7 +300,10 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
         lng: _redondearCoordenada(_longitud),
       );
 
-      await promotionsController.createPromotion(nuevaPromo);
+      final promoCreada = await promotionsController.createPromotion(
+        nuevaPromo,
+      );
+      await _guardarHorariosPromocion(promoCreada);
 
       if (mounted) {
         Navigator.pop(context);
@@ -419,7 +447,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.3),
+              color: Colors.grey.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -433,7 +461,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: primaryOrange.withOpacity(0.1),
+                    color: primaryOrange.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -580,6 +608,14 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                   ),
                   const SizedBox(height: 20),
 
+                  if (_tieneUbicacionFisica) ...[
+                    PromotionScheduleSelector(
+                      controller: _horarioController,
+                      onChanged: (_) => setState(() {}),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+
                   // ==== SECCIÓN 5: PRECIO Y VIGENCIA ====
                   _buildSectionTitle('5. Precio y Vigencia'),
                   const SizedBox(height: 16),
@@ -674,7 +710,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
+                  color: Colors.black.withValues(alpha: 0.08),
                   blurRadius: 12,
                   offset: const Offset(0, -4),
                 ),
@@ -753,7 +789,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       decoration: BoxDecoration(
-        color: primaryOrange.withOpacity(0.05),
+        color: primaryOrange.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(8),
         border: Border(left: BorderSide(color: primaryOrange, width: 3)),
       ),
@@ -807,7 +843,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              color: Colors.grey.withOpacity(0.5),
+              color: Colors.grey.withValues(alpha: 0.5),
               fontSize: 13,
             ),
             prefixText: prefix,

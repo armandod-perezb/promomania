@@ -3,6 +3,7 @@ import 'package:app/core/errors/exceptions.dart';
 import 'package:app/core/network/api_client.dart';
 import 'package:app/core/network/api_exception.dart';
 import 'package:app/features/promotions/domain/entities/promocion.dart';
+import 'package:app/features/promotions/domain/entities/promocion_horario.dart';
 import 'package:app/features/promotions/domain/entities/supermercado.dart';
 
 abstract class RemoteAdminPromotionDataSource {
@@ -14,6 +15,7 @@ abstract class RemoteAdminPromotionDataSource {
   Future<void> approvePromotion(String codigo);
   Future<void> rejectPromotion(String codigo);
   Future<void> incrementViews(String codigo);
+  Future<PromocionHorario> createPromocionHorario(PromocionHorario horario);
 
   Future<List<Supermercado>> getAllSupermercados();
   Future<Supermercado> createSupermercado(Supermercado supermercado);
@@ -114,6 +116,23 @@ class ApiRemoteAdminPromotionDataSource
       await _client.patch('/promociones/$codigo/', {
         'vistas': promo.vistas + 1,
       });
+    } on ApiRequestException catch (e) {
+      throw _mapApiException(e);
+    }
+  }
+
+  @override
+  Future<PromocionHorario> createPromocionHorario(
+    PromocionHorario horario,
+  ) async {
+    try {
+      final created =
+          await _client.post(
+                '/promociones-horarios/',
+                _promocionHorarioToApi(horario),
+              )
+              as Map<String, dynamic>;
+      return _promocionHorarioFromApi(created);
     } on ApiRequestException catch (e) {
       throw _mapApiException(e);
     }
@@ -282,6 +301,29 @@ class ApiRemoteAdminPromotionDataSource
       'direccion': supermercado.direccion,
       'ciudad': supermercado.ciudad,
       'estado': supermercado.estado,
+    };
+  }
+
+  PromocionHorario _promocionHorarioFromApi(Map<String, dynamic> json) {
+    return PromocionHorario(
+      id: _asInt(json['id']),
+      diaSemana: _asString(json['dia_semana']),
+      horaInicio: _asString(json['hora_inicio']),
+      horaFin: _asString(json['hora_fin']),
+      codigoPromocion: _asString(json['codigo_promocion']),
+    );
+  }
+
+  Map<String, dynamic> _promocionHorarioToApi(PromocionHorario horario) {
+    if (horario.codigoPromocion.trim().isEmpty) {
+      throw ValidationException('La promoción del horario no es válida.');
+    }
+
+    return {
+      'dia_semana': horario.diaSemana,
+      'hora_inicio': horario.horaInicio,
+      'hora_fin': horario.horaFin,
+      'codigo_promocion': horario.codigoPromocion,
     };
   }
 

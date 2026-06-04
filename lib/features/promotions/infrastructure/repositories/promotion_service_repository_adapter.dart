@@ -289,8 +289,18 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
   }
 
   @override
-  Future<void> addPromocionHorario(PromocionHorario horario) async =>
-      promoService.addPromocionHorario(horario);
+  Future<void> addPromocionHorario(PromocionHorario horario) async {
+    if (remoteDataSource != null) {
+      try {
+        final created = await remoteDataSource!.createPromocionHorario(horario);
+        _upsertLocalPromocionHorario(created);
+        return;
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    _upsertLocalPromocionHorario(horario);
+  }
 
   @override
   Future<String?> savePromotionImage(String codigo, Uint8List bytes) =>
@@ -393,6 +403,17 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
       return;
     }
     promoService.updateSupermercado(supermercado);
+  }
+
+  void _upsertLocalPromocionHorario(PromocionHorario horario) {
+    final exists = promoService.getPromocionesHorarios().any(
+      (item) => item.id == horario.id,
+    );
+    if (exists) {
+      promoService.updatePromocionHorario(horario);
+      return;
+    }
+    promoService.addPromocionHorario(horario);
   }
 
   bool _shouldFallbackToLocal(Object error) {

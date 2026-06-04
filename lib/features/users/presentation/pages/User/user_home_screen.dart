@@ -413,6 +413,7 @@ class _HomeMapScreenState extends State<HomeMapScreen>
   }
 
   void _navigateToCreatePromotion() {
+    debugPrint('>>> BOTON + PRESIONADO - navegando a crear promocion...');
     HapticFeedback.lightImpact();
     Navigator.pushNamed(context, AppRoutes.addPromotions);
   }
@@ -592,6 +593,7 @@ class _HomeMapScreenState extends State<HomeMapScreen>
             _buildZoomBadge(),
             _buildMapControls(),
             _buildBottomPromoSheet(),
+            _buildFloatingAddButton(),
             if (_isLoadingMapData)
               Positioned(
                 top: MediaQuery.of(context).padding.top + 126,
@@ -878,36 +880,38 @@ class _HomeMapScreenState extends State<HomeMapScreen>
                     ? _buildEmptyBottomSheet()
                     : _buildSelectedPromoBottomSheet(selected),
               ),
-              // Botón + flotante posicionado por encima del card
-              Positioned(
-                right: 20,
-                top: -70,
-                child: GestureDetector(
-                  onTap: _navigateToCreatePromotion,
-                  child: Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: _primary,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: _primary.withValues(alpha: 0.4),
-                          blurRadius: 12,
-                          spreadRadius: 2,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.add_rounded,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                  ),
-                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFloatingAddButton() {
+    return Positioned(
+      right: 15,
+      bottom: 175 + MediaQuery.of(context).padding.bottom,
+      child: GestureDetector(
+        onTap: _navigateToCreatePromotion,
+        child: Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            color: _primary,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: _primary.withValues(alpha: 0.4),
+                blurRadius: 12,
+                spreadRadius: 2,
+                offset: const Offset(0, 4),
               ),
             ],
+          ),
+          child: const Icon(
+            Icons.add_rounded,
+            color: Colors.white,
+            size: 30,
           ),
         ),
       ),

@@ -103,6 +103,7 @@ class AppScope {
     getCommentsByPromotionUseCase: GetCommentsByPromotionUseCase(
       commentsRepository,
     ),
+    getCommentsByUserUseCase: GetCommentsByUserUseCase(commentsRepository),
     addCommentUseCase: AddCommentUseCase(commentsRepository),
     deleteCommentUseCase: DeleteCommentUseCase(commentsRepository),
   );

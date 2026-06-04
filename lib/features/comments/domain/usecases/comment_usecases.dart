@@ -27,6 +27,16 @@ class GetCommentsByPromotionUseCase {
   }
 }
 
+class GetCommentsByUserUseCase {
+  final CommentRepository repository;
+
+  GetCommentsByUserUseCase(this.repository);
+
+  Future<List<Comentario>> execute(int userId) {
+    return repository.getCommentsByUser(userId);
+  }
+}
+
 class AddCommentUseCase {
   final CommentRepository repository;
 

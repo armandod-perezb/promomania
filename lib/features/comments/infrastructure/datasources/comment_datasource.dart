@@ -4,6 +4,7 @@ import 'package:app/features/promotions/infrastructure/services/promo_service.da
 abstract class CommentDataSource {
   List<Comentario> getAllComments();
   List<Comentario> getCommentsByPromotion(String promotionCode);
+  List<Comentario> getCommentsByUser(int userId);
   void addComment(Comentario comentario);
   void deleteComment(int id);
 }
@@ -21,6 +22,11 @@ class PromoCommentDataSource implements CommentDataSource {
   @override
   List<Comentario> getCommentsByPromotion(String promotionCode) {
     return promoService.getComentariosByPromocion(promotionCode);
+  }
+
+  @override
+  List<Comentario> getCommentsByUser(int userId) {
+    return promoService.getComentariosByUsuario(userId);
   }
 
   @override

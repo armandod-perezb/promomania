@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 import '../../../../../Core/di/app_scope.dart';
 import '../../../../../features/promotions/domain/entities/promocion.dart';
+import '../../../../../features/comments/domain/entities/comentario.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PANTALLA DE PERFIL
@@ -26,8 +27,10 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   
   List<Promocion> _promocionesPublicadas = [];
   List<Promocion> _promocionesFavoritas = [];
+  List<Comentario> _comentariosUsuario = [];
   bool _cargandoPublicadas = false;
   bool _cargandoFavoritas = false;
+  bool _cargandoComentarios = false;
 
   @override
 
@@ -101,6 +104,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               _buildMetricsRow(),
               const SizedBox(height: 14),
               _buildQuickActions(),
+              const SizedBox(height: 14),
+              _buildReviewsSection(),
               const SizedBox(height: 10),
               // Tabs + contenido
               Container(
@@ -809,6 +814,436 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     );
   }
 
+  // ── Reseñas ───────────────────────────────────────────────────────────────────
+
+  Widget _buildReviewsSection() {
+    final usuario = sessionManager.usuarioActual;
+    if (usuario == null) return const SizedBox();
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color(0xFFECEFF5)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.rate_review_outlined,
+                    color: _primary,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Reseñas (${_comentariosUsuario.length})',
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF131A2F),
+                    ),
+                  ),
+                ],
+              ),
+              GestureDetector(
+                onTap: () => _mostrarDialogoAgregarComentario(),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF1EF),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFFFD5C6)),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(
+                        Icons.add,
+                        color: _primary,
+                        size: 18,
+                      ),
+                      SizedBox(width: 4),
+                      Text(
+                        'Agregar un comentario',
+                        style: TextStyle(
+                          color: _primary,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (_cargandoComentarios)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: CircularProgressIndicator(color: _primary),
+              ),
+            )
+          else if (_comentariosUsuario.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.comment_outlined,
+                      size: 48,
+                      color: const Color(0xFFCDD0DB),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Sin reseñas aún',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF8A8FA8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _comentariosUsuario.length > 3 ? 3 : _comentariosUsuario.length,
+              separatorBuilder: (context, index) => const Divider(
+                color: Color(0xFFF0F1F5),
+                height: 1,
+              ),
+              itemBuilder: (context, index) {
+                final comentario = _comentariosUsuario[index];
+                return _buildCommentCard(comentario);
+              },
+            ),
+          if (_comentariosUsuario.length > 3)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  // Navigate to all reviews screen if needed
+                },
+                child: const Center(
+                  child: Text(
+                    'Ver todas las reseñas (${_comentariosUsuario.length})',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: _primary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCommentCard(Comentario comentario) {
+    final promo = promotionsController.getPromotionByCodeSync(comentario.codigoPromocion);
+    final promoTitle = promo?.titulo ?? 'Promoción';
+    
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F6FA),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.person_outline,
+                  color: Color(0xFF8A8FA8),
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      promoTitle,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1A1F2E),
+                      ),
+                    ),
+                    Text(
+                      _formatDate(comentario.fecha),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF8A8FA8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            comentario.contenido,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Color(0xFF4B5563),
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(String fecha) {
+    try {
+      final date = DateTime.parse(fecha);
+      final now = DateTime.now();
+      final difference = now.difference(date);
+      
+      if (difference.inDays == 0) {
+        return 'Hoy';
+      } else if (difference.inDays == 1) {
+        return 'Ayer';
+      } else if (difference.inDays < 7) {
+        return 'Hace ${difference.inDays} días';
+      } else {
+        return '${date.day}/${date.month}/${date.year}';
+      }
+    } catch (e) {
+      return fecha;
+    }
+  }
+
+  Future<void> _mostrarDialogoAgregarComentario() async {
+    final usuario = sessionManager.usuarioActual;
+    if (usuario == null) return;
+
+    final controller = TextEditingController();
+    final promoCode = await _seleccionarPromocion();
+    if (promoCode == null) return;
+
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'Agregar comentario',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF131A2F),
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Escribe tu reseña:',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF4B5563),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              maxLines: 4,
+              decoration: InputDecoration(
+                hintText: 'Comparte tu experiencia...',
+                hintStyle: const TextStyle(color: Color(0xFF9CA3AF)),
+                filled: true,
+                fillColor: const Color(0xFFF9FAFB),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: _primary, width: 2),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Cancelar',
+              style: TextStyle(
+                color: Color(0xFF6B7280),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (controller.text.trim().isEmpty) return;
+              
+              final nextId = (commentsController.getComentariosSync().isNotEmpty
+                  ? commentsController.getComentariosSync().last.id + 1
+                  : 1);
+              
+              final nuevoComentario = Comentario(
+                id: nextId,
+                contenido: controller.text.trim(),
+                fecha: DateTime.now().toIso8601String(),
+                idUsuario: usuario.id,
+                codigoPromocion: promoCode,
+              );
+              
+              try {
+                await commentsController.addComment(nuevoComentario);
+                if (!mounted) return;
+                Navigator.pop(context);
+                setState(() {
+                  _cargarComentariosUsuario();
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Comentario agregado exitosamente'),
+                    backgroundColor: _green,
+                  ),
+                );
+              } catch (e) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error al agregar comentario: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text(
+              'Publicar',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<String?> _seleccionarPromocion() async {
+    final usuario = sessionManager.usuarioActual;
+    if (usuario == null) return null;
+
+    final promos = await promotionsController.getPromotionsByUser(usuario.id);
+    if (promos.isEmpty) {
+      if (!mounted) return null;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No tienes promociones publicadas para comentar'),
+        ),
+      );
+      return null;
+    }
+
+    if (!mounted) return null;
+    
+    String? selectedCode;
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'Selecciona una promoción',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF131A2F),
+          ),
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.separated(
+            shrinkWrap: true,
+            itemCount: promos.length,
+            separatorBuilder: (context, index) => const Divider(),
+            itemBuilder: (context, index) {
+              final promo = promos[index];
+              return ListTile(
+                title: Text(
+                  promo.titulo,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1A1F2E),
+                  ),
+                ),
+                subtitle: Text(
+                  '\$${promo.precio.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                  ),
+                ),
+                onTap: () {
+                  selectedCode = promo.codigo;
+                  Navigator.pop(context);
+                },
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+        ],
+      ),
+    );
+    
+    return selectedCode;
+  }
+
   // ── Content tab bar ───────────────────────────────────────────────────────────
 
   Widget _buildContentTabBar() {
@@ -900,6 +1335,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     super.initState();
     _cargarPromocionesPublicadas();
     _cargarPromocionesFavoritas();
+    _cargarComentariosUsuario();
   }
 
   Future<void> _cargarPromocionesPublicadas() async {
@@ -936,6 +1372,21 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       debugPrint('Error al cargar favoritos: $e');
     } finally {
       setState(() => _cargandoFavoritas = false);
+    }
+  }
+
+  Future<void> _cargarComentariosUsuario() async {
+    final usuario = AppScope.sessionManager.usuarioActual;
+    if (usuario == null) return;
+
+    setState(() => _cargandoComentarios = true);
+    try {
+      final comentarios = await AppScope.commentsController.getCommentsByUser(usuario.id);
+      setState(() => _comentariosUsuario = comentarios);
+    } catch (e) {
+      debugPrint('Error al cargar comentarios: $e');
+    } finally {
+      setState(() => _cargandoComentarios = false);
     }
   }
 

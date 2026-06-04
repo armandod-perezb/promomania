@@ -391,6 +391,9 @@ class PromoLocalDataSource {
   List<Comentario> getComentariosByPromocion(String codigoPromocion) =>
       comentarios.where((c) => c.codigoPromocion == codigoPromocion).toList();
 
+  List<Comentario> getComentariosByUsuario(int idUsuario) =>
+      comentarios.where((c) => c.idUsuario == idUsuario).toList();
+
   void addComentario(Comentario comentario) {
     comentarios.add(comentario);
   }

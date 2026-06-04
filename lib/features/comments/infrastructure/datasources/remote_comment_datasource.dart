@@ -6,6 +6,7 @@ import 'package:app/features/comments/domain/entities/comentario.dart';
 abstract class RemoteCommentDataSource {
   Future<List<Comentario>> getAllComments();
   Future<List<Comentario>> getCommentsByPromotion(String promotionCode);
+  Future<List<Comentario>> getCommentsByUser(int userId);
   Future<Comentario> addComment(Comentario comentario);
   Future<void> deleteComment(int id);
 }
@@ -34,6 +35,12 @@ class ApiRemoteCommentDataSource implements RemoteCommentDataSource {
   Future<List<Comentario>> getCommentsByPromotion(String promotionCode) async {
     final all = await getAllComments();
     return all.where((c) => c.codigoPromocion == promotionCode).toList();
+  }
+
+  @override
+  Future<List<Comentario>> getCommentsByUser(int userId) async {
+    final all = await getAllComments();
+    return all.where((c) => c.idUsuario == userId).toList();
   }
 
   @override

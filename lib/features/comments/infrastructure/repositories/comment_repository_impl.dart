@@ -40,6 +40,19 @@ class CommentRepositoryImpl implements CommentRepository {
   }
 
   @override
+  Future<List<Comentario>> getCommentsByUser(int userId) async {
+    if (remoteDataSource != null) {
+      try {
+        final remote = await remoteDataSource!.getCommentsByUser(userId);
+        return remote;
+      } catch (e) {
+        if (!_shouldFallbackToLocal(e)) rethrow;
+      }
+    }
+    return dataSource.getCommentsByUser(userId);
+  }
+
+  @override
   Future<void> addComment(Comentario comentario) async {
     if (remoteDataSource != null) {
       try {

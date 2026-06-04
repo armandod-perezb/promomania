@@ -238,6 +238,9 @@ class PromoService extends ChangeNotifier {
   List<Comentario> getComentariosByPromocion(String codigoPromocion) =>
       _dataSource.getComentariosByPromocion(codigoPromocion);
 
+  List<Comentario> getComentariosByUsuario(int idUsuario) =>
+      _dataSource.getComentariosByUsuario(idUsuario);
+
   void addComentario(Comentario comentario) {
     _dataSource.addComentario(comentario);
     notifyListeners();

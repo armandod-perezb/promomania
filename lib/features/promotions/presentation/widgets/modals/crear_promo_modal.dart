@@ -196,9 +196,10 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
 
     final data = PromotionScheduleUtils.parse(_horarioController.text);
     var nextId = promotionsController.getNextHorarioId();
+    final horarios = <PromocionHorario>[];
 
     for (final dia in data.days) {
-      await promotionsController.addPromocionHorario(
+      horarios.add(
         PromocionHorario(
           id: nextId,
           diaSemana: dia,
@@ -209,6 +210,11 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
       );
       nextId++;
     }
+
+    await Future.wait(
+      horarios.map(promotionsController.addPromocionHorario),
+      eagerError: true,
+    );
   }
 
   // ============================================================================

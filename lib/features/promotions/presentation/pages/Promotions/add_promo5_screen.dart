@@ -7,6 +7,7 @@ import '../../../../../features/promotions/domain/entities/promocion_horario.dar
 import '../../../../../features/promotions/domain/entities/supermercado.dart';
 import 'package:app/Core/storage/image_storage_service.dart';
 import '../../../../../Core/Routes/app_routes.dart';
+import '../../widgets/selectors/promotion_schedule_selector.dart';
 
 /// Pantalla paso 5 (final) del wizard de creación de promociones: Vista previa
 /// y publicación.
@@ -236,93 +237,27 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
     return url == null || url.isEmpty ? null : url;
   }
 
-  String _normalizeHourTo24h(String rawHour, String? period) {
-    var hour = int.tryParse(rawHour.trim()) ?? 0;
-    var suffix = period?.toLowerCase().trim() ?? '';
-
-    if (suffix == 'pm' && hour < 12) hour += 12;
-    if (suffix == 'am' && hour == 12) hour = 0;
-    if (hour < 0) hour = 0;
-    if (hour > 23) hour = 23;
-
-    return '${hour.toString().padLeft(2, '0')}:00';
-  }
-
-  List<String> _extractDaysFromSchedule(String schedule) {
-    final normalized = schedule.toLowerCase();
-    final dayOrder = [
-      'lunes',
-      'martes',
-      'miercoles',
-      'jueves',
-      'viernes',
-      'sabado',
-      'domingo',
-    ];
-
-    final dayAliases = <String, String>{
-      'lun': 'lunes',
-      'lunes': 'lunes',
-      'mar': 'martes',
-      'martes': 'martes',
-      'mie': 'miercoles',
-      'mié': 'miercoles',
-      'mier': 'miercoles',
-      'miércoles': 'miercoles',
-      'miercoles': 'miercoles',
-      'jue': 'jueves',
-      'jueves': 'jueves',
-      'vie': 'viernes',
-      'viernes': 'viernes',
-      'sab': 'sabado',
-      'sáb': 'sabado',
-      'sabado': 'sabado',
-      'sábado': 'sabado',
-      'dom': 'domingo',
-      'domingo': 'domingo',
-    };
-
-    final range = RegExp(r'([a-záéíóú]{3,10})\s*-\s*([a-záéíóú]{3,10})');
-    final match = range.firstMatch(normalized);
-    if (match != null) {
-      final startAlias = match.group(1) ?? '';
-      final endAlias = match.group(2) ?? '';
-      final startDay = dayAliases[startAlias];
-      final endDay = dayAliases[endAlias];
-      if (startDay != null && endDay != null) {
-        final startIndex = dayOrder.indexOf(startDay);
-        final endIndex = dayOrder.indexOf(endDay);
-        if (startIndex != -1 && endIndex != -1 && startIndex <= endIndex) {
-          return dayOrder.sublist(startIndex, endIndex + 1);
-        }
-      }
-    }
-
-    final explicitDays = <String>[];
-    for (final entry in dayAliases.entries) {
-      if (normalized.contains(entry.key) &&
-          !explicitDays.contains(entry.value)) {
-        explicitDays.add(entry.value);
-      }
-    }
-
-    if (explicitDays.isNotEmpty) return explicitDays;
-    return ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
-  }
-
-  List<String> _extractTimeRange(String schedule) {
-    final normalized = schedule.toLowerCase();
-    final timeRange = RegExp(
-      r'(\d{1,2})(?::\d{2})?\s*(am|pm)?\s*-\s*(\d{1,2})(?::\d{2})?\s*(am|pm)?',
+  PromotionScheduleData _draftScheduleData(Map<String, dynamic> draft) {
+    final fallback = PromotionScheduleUtils.parse(
+      (draft['schedule'] as String?)?.trim() ?? '',
     );
-    final match = timeRange.firstMatch(normalized);
-    if (match == null) {
-      return ['09:00', '18:00'];
-    }
+    final daysValue = draft['scheduleDays'];
+    final days = daysValue is Iterable
+        ? daysValue
+              .map((day) => day.toString())
+              .where(PromotionScheduleUtils.dayOrder.contains)
+              .toList()
+        : fallback.days;
+    final startTime = (draft['scheduleStartTime'] as String?)?.trim();
+    final endTime = (draft['scheduleEndTime'] as String?)?.trim();
 
-    final start = _normalizeHourTo24h(match.group(1) ?? '9', match.group(2));
-    final end = _normalizeHourTo24h(match.group(3) ?? '18', match.group(4));
-    return [start, end];
+    return PromotionScheduleData(
+      days: days.isEmpty ? fallback.days : days,
+      startTime: startTime?.isNotEmpty == true
+          ? startTime!
+          : fallback.startTime,
+      endTime: endTime?.isNotEmpty == true ? endTime! : fallback.endTime,
+    );
   }
 
   Future<void> _savePromocionHorarios(
@@ -333,23 +268,27 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
     // draft. Si la promo no tiene local físico, no crea horarios.
     if (!_draftHasPhysicalLocation(draft)) return;
 
-    final schedule = (draft['schedule'] as String?)?.trim() ?? '';
-    final days = _extractDaysFromSchedule(schedule);
-    final timeRange = _extractTimeRange(schedule);
+    final schedule = _draftScheduleData(draft);
     var nextId = _nextHorarioId();
+    final horarios = <PromocionHorario>[];
 
-    for (final day in days) {
-      await promotionsController.addPromocionHorario(
+    for (final day in schedule.days) {
+      horarios.add(
         PromocionHorario(
           id: nextId,
           diaSemana: day,
-          horaInicio: timeRange[0],
-          horaFin: timeRange[1],
+          horaInicio: schedule.startTime,
+          horaFin: schedule.endTime,
           codigoPromocion: promo.codigo,
         ),
       );
       nextId++;
     }
+
+    await Future.wait(
+      horarios.map(promotionsController.addPromocionHorario),
+      eagerError: true,
+    );
   }
 
   void _publishPromo() async {
@@ -367,75 +306,90 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
 
     setState(() => _isPublishing = true);
 
-    // Generar código de promoción primero
-    final promoCode = _buildPromoCode(draft['code'] as String?);
+    try {
+      // Generar código de promoción primero
+      final promoCode = _buildPromoCode(draft['code'] as String?);
 
-    // Preparar la imagen para persistencia remota. El backend guarda `foto`
-    // como texto, así que en móvil se adjunta como data URL base64.
-    String? finalImageName = _previewImage;
-    bool isLocalImage = false;
+      // Preparar la imagen para persistencia remota. El backend guarda `foto`
+      // como texto, así que en móvil se adjunta como data URL base64.
+      String? finalImageName = _previewImage;
+      bool isLocalImage = false;
 
-    if (_previewImage != null &&
-        !_previewImage!.startsWith('http') &&
-        !ImageStorageService.isDataImageUrl(_previewImage)) {
-      finalImageName = null;
-      try {
-        final imageStorageService = ImageStorageService();
-        final imageBytes = await imageStorageService.readImageBytes(
-          _previewImage!,
-        );
+      if (_previewImage != null &&
+          !_previewImage!.startsWith('http') &&
+          !ImageStorageService.isDataImageUrl(_previewImage)) {
+        finalImageName = null;
+        try {
+          final imageStorageService = ImageStorageService();
+          final imageBytes = await imageStorageService.readImageBytes(
+            _previewImage!,
+          );
 
-        if (imageBytes != null) {
-          finalImageName = ImageStorageService.imageBytesToDataUrl(imageBytes);
-          promoService.setImageBytes(promoCode, imageBytes);
+          if (imageBytes != null) {
+            finalImageName = ImageStorageService.imageBytesToDataUrl(
+              imageBytes,
+            );
+            promoService.setImageBytes(promoCode, imageBytes);
+          }
+        } catch (e) {
+          debugPrint('Error procesando imagen para promoción: $e');
         }
-      } catch (e) {
-        debugPrint('Error procesando imagen para promoción: $e');
+      }
+
+      final promo = Promocion(
+        codigo: promoCode,
+        titulo: title,
+        descripcion: (draft['description'] as String?)?.trim(),
+        precio: (draft['price'] as num?)?.toDouble() ?? 0,
+        descuento: draft['discount'] as int?,
+        condicionProducto: _normalizeCondition(draft['condition'] as String?),
+        ubicacion: _draftHasPhysicalLocation(draft)
+            ? (draft['location'] as String?)?.trim()
+            : null,
+        url: _draftUrl(draft),
+        foto: finalImageName,
+        fotoEsLocal: isLocalImage,
+        tipoVigencia: (draft['vigenciaType'] == 'permanente')
+            ? 'permanente'
+            : 'por_fecha',
+        fechaInicio: draft['fechaInicio'] as String?,
+        fechaFin: draft['fechaFin'] as String?,
+        estado: 'pendiente',
+        vistas: 0,
+        idUsuario: sessionManager.usuarioActual?.id ?? 1,
+        idSupermercado: await _resolveSupermercadoId(draft),
+        idCategoria: await _resolveCategoriaId(draft['category'] as String?),
+        idTipoPromocion: await _resolveTipoPromocionId(
+          draft['promoType'] as String?,
+        ),
+        lat: _draftHasPhysicalLocation(draft)
+            ? _draftCoordinate(draft, 'lat')
+            : null,
+        lng: _draftHasPhysicalLocation(draft)
+            ? _draftCoordinate(draft, 'lng')
+            : null,
+      );
+
+      final createdPromo = await promotionsController.createPromotion(promo);
+      await _savePromocionHorarios(createdPromo, draft);
+
+      if (!mounted) return;
+      setState(() => _isPublishing = false);
+      _showSuccessDialog();
+    } catch (e) {
+      debugPrint('Error publicando promoción: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No se pudo registrar la promoción: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted && _isPublishing) {
+        setState(() => _isPublishing = false);
       }
     }
-
-    final promo = Promocion(
-      codigo: promoCode,
-      titulo: title,
-      descripcion: (draft['description'] as String?)?.trim(),
-      precio: (draft['price'] as num?)?.toDouble() ?? 0,
-      descuento: draft['discount'] as int?,
-      condicionProducto: _normalizeCondition(draft['condition'] as String?),
-      ubicacion: _draftHasPhysicalLocation(draft)
-          ? (draft['location'] as String?)?.trim()
-          : null,
-      url: _draftUrl(draft),
-      foto: finalImageName,
-      fotoEsLocal: isLocalImage,
-      tipoVigencia: (draft['vigenciaType'] == 'permanente')
-          ? 'permanente'
-          : 'por_fecha',
-      fechaInicio: draft['fechaInicio'] as String?,
-      fechaFin: draft['fechaFin'] as String?,
-      estado: 'pendiente',
-      vistas: 0,
-      idUsuario: sessionManager.usuarioActual?.id ?? 1,
-      idSupermercado: await _resolveSupermercadoId(draft),
-      idCategoria: await _resolveCategoriaId(draft['category'] as String?),
-      idTipoPromocion: await _resolveTipoPromocionId(
-        draft['promoType'] as String?,
-      ),
-      lat: _draftHasPhysicalLocation(draft)
-          ? _draftCoordinate(draft, 'lat')
-          : null,
-      lng: _draftHasPhysicalLocation(draft)
-          ? _draftCoordinate(draft, 'lng')
-          : null,
-    );
-
-    await promotionsController.createPromotion(promo);
-    await _savePromocionHorarios(promo, draft);
-
-    await Future.delayed(const Duration(milliseconds: 600));
-    if (!mounted) return;
-    setState(() => _isPublishing = false);
-
-    _showSuccessDialog();
   }
 
   void _showSuccessDialog() {
@@ -451,7 +405,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: _primary.withOpacity(0.1),
+                color: _primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.check_rounded, color: _primary, size: 34),
@@ -703,7 +657,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -757,7 +711,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
                       gradient: LinearGradient(
                         colors: [
                           Colors.transparent,
-                          Colors.black.withOpacity(0.7),
+                          Colors.black.withValues(alpha: 0.7),
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
@@ -1020,7 +974,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _primary,
                       foregroundColor: Colors.white,
-                      disabledBackgroundColor: _primary.withOpacity(0.5),
+                      disabledBackgroundColor: _primary.withValues(alpha: 0.5),
                       disabledForegroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -1113,7 +1067,7 @@ class _ImpactDivider extends StatelessWidget {
     return Container(
       width: 1,
       height: 48,
-      color: Colors.white.withOpacity(0.08),
+      color: Colors.white.withValues(alpha: 0.08),
     );
   }
 }

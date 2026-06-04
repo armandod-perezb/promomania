@@ -234,6 +234,9 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
         .map((type) => type.name)
         .where((name) => name != 'ambas')
         .toList();
+    final scheduleData = _hasFisica
+        ? PromotionScheduleUtils.parse(_scheduleController.text)
+        : null;
 
     final nextDraft = <String, dynamic>{
       ...widget.draftData,
@@ -246,6 +249,9 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
           ? _locationDescriptionController.text.trim()
           : '',
       'schedule': _hasFisica ? _scheduleController.text.trim() : '',
+      'scheduleDays': scheduleData?.days ?? const <String>[],
+      'scheduleStartTime': scheduleData?.startTime,
+      'scheduleEndTime': scheduleData?.endTime,
       'onlineOnly': _hasVirtual && !_hasFisica,
       'locationTypes': locationTypes,
       'location': _buildLocationLabel(),

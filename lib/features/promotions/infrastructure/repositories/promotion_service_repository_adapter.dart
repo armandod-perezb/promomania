@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:app/core/errors/exceptions.dart';
 import 'package:app/features/promotions/domain/entities/promocion.dart';
@@ -15,10 +13,7 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
   final PromoService promoService;
   final RemoteAdminPromotionDataSource? remoteDataSource;
 
-  PromotionServiceRepositoryAdapter(
-    this.promoService, {
-    this.remoteDataSource,
-  });
+  PromotionServiceRepositoryAdapter(this.promoService, {this.remoteDataSource});
 
   // ── Estado ────────────────────────────────────────────────────────────────
 
@@ -34,7 +29,10 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
   // ── Sync queries ──────────────────────────────────────────────────────────
 
   @override
-  List<Promocion> getActivePromotionsSync({int? categoryId, int? supermarketId}) {
+  List<Promocion> getActivePromotionsSync({
+    int? categoryId,
+    int? supermarketId,
+  }) {
     Iterable<Promocion> result = promoService.getPromocionesAprobadas();
     if (categoryId != null) {
       result = result.where((p) => p.idCategoria == categoryId);
@@ -100,7 +98,8 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
   List<Supermercado> getSupermercadosSync() => promoService.getSupermercados();
 
   @override
-  Uint8List? getCachedImageBytes(String codigo) => promoService.getImageBytes(codigo);
+  Uint8List? getCachedImageBytes(String codigo) =>
+      promoService.getImageBytes(codigo);
 
   // ── Async commands ────────────────────────────────────────────────────────
 
@@ -194,7 +193,9 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
         for (final promo in remoteAll) {
           _upsertLocalPromotion(promo);
         }
-        return remoteAll.where((p) => p.idSupermercado == supermarketId).toList();
+        return remoteAll
+            .where((p) => p.idSupermercado == supermarketId)
+            .toList();
       } catch (e) {
         if (!_shouldFallbackToLocal(e)) rethrow;
       }
@@ -301,23 +302,23 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
 
   @override
   Future<Supermercado> createSupermercado(Supermercado supermercado) async {
-    debugPrint('DEBUG REPO - createSupermercado llamado: ${supermercado.nombre}');
+    debugPrint(
+      'DEBUG REPO - createSupermercado llamado: ${supermercado.nombre}',
+    );
     debugPrint('DEBUG REPO - remoteDataSource: ${remoteDataSource != null}');
-    
+
     if (remoteDataSource != null) {
       try {
         debugPrint('DEBUG REPO - Llamando a API...');
-        final created = await remoteDataSource!.createSupermercado(supermercado);
+        final created = await remoteDataSource!.createSupermercado(
+          supermercado,
+        );
         debugPrint('DEBUG REPO - API respondió con ID: ${created.id}');
         _upsertLocalSupermercado(created);
         return created;
       } catch (e) {
         debugPrint('DEBUG REPO - Error en API: $e');
-        if (!_shouldFallbackToLocal(e)) {
-          debugPrint('DEBUG REPO - Relanzando error: $e');
-          rethrow;
-        }
-        debugPrint('DEBUG REPO - Fallback a local por NetworkException');
+        rethrow;
       }
     }
     // Fallback: asignar ID local temporal y agregar
@@ -338,11 +339,13 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
   Future<void> addSupermercado(Supermercado supermercado) async {
     if (remoteDataSource != null) {
       try {
-        final created = await remoteDataSource!.createSupermercado(supermercado);
+        final created = await remoteDataSource!.createSupermercado(
+          supermercado,
+        );
         _upsertLocalSupermercado(created);
         return;
       } catch (e) {
-        if (!_shouldFallbackToLocal(e)) rethrow;
+        rethrow;
       }
     }
     promoService.addSupermercado(supermercado);
@@ -352,7 +355,9 @@ class PromotionServiceRepositoryAdapter implements PromotionRepository {
   Future<void> updateSupermercado(Supermercado supermercado) async {
     if (remoteDataSource != null) {
       try {
-        final updated = await remoteDataSource!.updateSupermercado(supermercado);
+        final updated = await remoteDataSource!.updateSupermercado(
+          supermercado,
+        );
         _upsertLocalSupermercado(updated);
         return;
       } catch (e) {

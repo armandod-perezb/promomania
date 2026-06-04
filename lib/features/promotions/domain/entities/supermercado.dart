@@ -17,6 +17,12 @@ class Supermercado {
   /// Estado operacional: 'activo' o 'inactivo'.
   final String estado;
 
+  /// Fecha de creación ISO enviada por el backend.
+  final String? createdAt;
+
+  /// Fecha de última actualización ISO enviada por el backend.
+  final String? updatedAt;
+
   /// Constructor principal.
   Supermercado({
     required this.id,
@@ -24,6 +30,8 @@ class Supermercado {
     this.direccion,
     this.ciudad,
     required this.estado,
+    this.createdAt,
+    this.updatedAt,
   });
 
   /// Construye una instancia a partir de un `Map` (parseado desde JSON).
@@ -36,6 +44,8 @@ class Supermercado {
       direccion: json['direccion'] as String?,
       ciudad: json['ciudad'] as String?,
       estado: json['estado'] as String? ?? 'activo',
+      createdAt: json['created_at'] as String?,
+      updatedAt: json['updated_at'] as String?,
     );
   }
 
@@ -47,6 +57,8 @@ class Supermercado {
       'direccion': direccion,
       'ciudad': ciudad,
       'estado': estado,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
     };
   }
 
@@ -58,6 +70,8 @@ class Supermercado {
     String? direccion,
     String? ciudad,
     String? estado,
+    String? createdAt,
+    String? updatedAt,
   }) {
     return Supermercado(
       id: id ?? this.id,
@@ -65,6 +79,8 @@ class Supermercado {
       direccion: direccion ?? this.direccion,
       ciudad: ciudad ?? this.ciudad,
       estado: estado ?? this.estado,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }

@@ -54,11 +54,9 @@ class ApiRemoteAdminPromotionDataSource
   @override
   Future<Promocion> createPromotion(Promocion promocion) async {
     try {
-      final created = await _client.post(
-            '/promociones/',
-            _promotionToApi(promocion),
-          )
-          as Map<String, dynamic>;
+      final created =
+          await _client.post('/promociones/', _promotionToApi(promocion))
+              as Map<String, dynamic>;
       return _promocionFromApi(created);
     } on ApiRequestException catch (e) {
       throw _mapApiException(e);
@@ -68,11 +66,12 @@ class ApiRemoteAdminPromotionDataSource
   @override
   Future<Promocion> updatePromotion(Promocion promocion) async {
     try {
-      final updated = await _client.patch(
-            '/promociones/${promocion.codigo}/',
-            _promotionToApi(promocion),
-          )
-          as Map<String, dynamic>;
+      final updated =
+          await _client.patch(
+                '/promociones/${promocion.codigo}/',
+                _promotionToApi(promocion),
+              )
+              as Map<String, dynamic>;
       return _promocionFromApi(updated);
     } on ApiRequestException catch (e) {
       throw _mapApiException(e);
@@ -112,7 +111,9 @@ class ApiRemoteAdminPromotionDataSource
     final promo = await getPromotionByCode(codigo);
     if (promo == null) return;
     try {
-      await _client.patch('/promociones/$codigo/', {'vistas': promo.vistas + 1});
+      await _client.patch('/promociones/$codigo/', {
+        'vistas': promo.vistas + 1,
+      });
     } on ApiRequestException catch (e) {
       throw _mapApiException(e);
     }
@@ -132,21 +133,22 @@ class ApiRemoteAdminPromotionDataSource
 
   @override
   Future<Supermercado> createSupermercado(Supermercado supermercado) async {
-    debugPrint('DEBUG API - createSupermercado llamado: ${supermercado.nombre}');
+    debugPrint(
+      'DEBUG API - createSupermercado llamado: ${supermercado.nombre}',
+    );
     try {
       final data = _supermercadoToApi(supermercado, includeId: false);
       debugPrint('DEBUG API - Enviando POST /supermercados/ con data: $data');
-      
-      final created = await _client.post(
-            '/supermercados/',
-            data,
-          )
-          as Map<String, dynamic>;
-      
+
+      final created =
+          await _client.post('/supermercados/', data) as Map<String, dynamic>;
+
       debugPrint('DEBUG API - Respuesta recibida: $created');
       return _supermercadoFromApi(created);
     } on ApiRequestException catch (e) {
-      debugPrint('DEBUG API - ApiRequestException: ${e.statusCode} - ${e.message}');
+      debugPrint(
+        'DEBUG API - ApiRequestException: ${e.statusCode} - ${e.message}',
+      );
       throw _mapApiException(e);
     } catch (e) {
       debugPrint('DEBUG API - Error inesperado: $e');
@@ -157,11 +159,12 @@ class ApiRemoteAdminPromotionDataSource
   @override
   Future<Supermercado> updateSupermercado(Supermercado supermercado) async {
     try {
-      final updated = await _client.patch(
-            '/supermercados/${supermercado.id}/',
-            _supermercadoToApi(supermercado),
-          )
-          as Map<String, dynamic>;
+      final updated =
+          await _client.patch(
+                '/supermercados/${supermercado.id}/',
+                _supermercadoToApi(supermercado),
+              )
+              as Map<String, dynamic>;
       return _supermercadoFromApi(updated);
     } on ApiRequestException catch (e) {
       throw _mapApiException(e);
@@ -192,11 +195,12 @@ class ApiRemoteAdminPromotionDataSource
       ubicacion: json['ubicacion']?.toString(),
       url: json['url']?.toString(),
       foto: _sanitizeImageUrl(json['foto']),
-      fotoEsLocal: false,
+      fotoEsLocal: json['foto_es_local'] as bool? ?? false,
       tipoVigencia: _asString(json['tipo_vigencia'], fallback: 'por_fecha'),
       fechaInicio: json['fecha_inicio']?.toString(),
       fechaFin: json['fecha_fin']?.toString(),
       estado: _normalizePromotionStatus(json['estado']),
+      puntuacionOtorgada: json['puntuacion_otorgada'] as bool? ?? false,
       vistas: _asInt(json['vistas']),
       idUsuario: _asId(json['id_usuario'], 'id_usuario'),
       idSupermercado: _asId(json['id_supermercado'], 'id_supermercado'),
@@ -214,24 +218,34 @@ class ApiRemoteAdminPromotionDataSource
       direccion: json['direccion']?.toString(),
       ciudad: json['ciudad']?.toString(),
       estado: _asString(json['estado'], fallback: 'activo'),
+      createdAt: json['created_at']?.toString(),
+      updatedAt: json['updated_at']?.toString(),
     );
   }
 
   Map<String, dynamic> _promotionToApi(Promocion promocion) {
     // Validar que los IDs de claves foráneas sean válidos (> 0)
     if (promocion.idSupermercado <= 0) {
-      throw ValidationException('El supermercado seleccionado no es válido (ID: ${promocion.idSupermercado})');
+      throw ValidationException(
+        'El supermercado seleccionado no es válido (ID: ${promocion.idSupermercado})',
+      );
     }
     if (promocion.idCategoria <= 0) {
-      throw ValidationException('La categoría seleccionada no es válida (ID: ${promocion.idCategoria})');
+      throw ValidationException(
+        'La categoría seleccionada no es válida (ID: ${promocion.idCategoria})',
+      );
     }
     if (promocion.idTipoPromocion <= 0) {
-      throw ValidationException('El tipo de promoción seleccionado no es válido (ID: ${promocion.idTipoPromocion})');
+      throw ValidationException(
+        'El tipo de promoción seleccionado no es válido (ID: ${promocion.idTipoPromocion})',
+      );
     }
     if (promocion.idUsuario <= 0) {
-      throw ValidationException('El usuario no es válido (ID: ${promocion.idUsuario})');
+      throw ValidationException(
+        'El usuario no es válido (ID: ${promocion.idUsuario})',
+      );
     }
-    
+
     return {
       'codigo': promocion.codigo,
       'titulo': promocion.titulo,
@@ -242,10 +256,12 @@ class ApiRemoteAdminPromotionDataSource
       'ubicacion': promocion.ubicacion,
       'url': promocion.url,
       'foto': promocion.foto,
+      'foto_es_local': promocion.fotoEsLocal,
       'tipo_vigencia': promocion.tipoVigencia,
       'fecha_inicio': promocion.fechaInicio,
       'fecha_fin': promocion.fechaFin,
       'estado': promocion.estado,
+      'puntuacion_otorgada': promocion.puntuacionOtorgada,
       'vistas': promocion.vistas,
       'id_usuario': promocion.idUsuario,
       'id_supermercado': promocion.idSupermercado,
@@ -293,7 +309,9 @@ class ApiRemoteAdminPromotionDataSource
   static int _asId(dynamic value, String fieldName) {
     final result = _asInt(value, fallback: 0);
     if (result <= 0) {
-      throw ValidationException('ID inválido para $fieldName: $value (debe ser mayor que 0)');
+      throw ValidationException(
+        'ID inválido para $fieldName: $value (debe ser mayor que 0)',
+      );
     }
     return result;
   }

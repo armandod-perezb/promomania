@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart';
 import 'package:app/core/di/app_scope.dart';
 import 'package:app/features/promotions/domain/entities/supermercado.dart';
 
@@ -77,12 +75,18 @@ class _CrearSupermercadoModalState extends State<CrearSupermercadoModal> {
         estado: 'activo',
       );
 
-      debugPrint('DEBUG - Enviando a crear supermercado: ${supermercadoTemp.nombre}');
-      
+      debugPrint(
+        'DEBUG - Enviando a crear supermercado: ${supermercadoTemp.nombre}',
+      );
+
       // Enviar a la API y obtener el supermercado con ID real
-      final supermercadoCreado = await promoService.createSupermercado(supermercadoTemp);
-      
-      debugPrint('DEBUG - Supermercado recibido de API: ID=${supermercadoCreado.id}, nombre=${supermercadoCreado.nombre}');
+      final supermercadoCreado = await promotionsController.createSupermercado(
+        supermercadoTemp,
+      );
+
+      debugPrint(
+        'DEBUG - Supermercado recibido de API: ID=${supermercadoCreado.id}, nombre=${supermercadoCreado.nombre}',
+      );
 
       // Notificar al padre con el supermercado que tiene ID real
       widget.onSupermercadoCreated(supermercadoCreado);
@@ -91,7 +95,9 @@ class _CrearSupermercadoModalState extends State<CrearSupermercadoModal> {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Supermercado "${supermercadoCreado.nombre}" registrado con ID ${supermercadoCreado.id}'),
+            content: Text(
+              'Supermercado "${supermercadoCreado.nombre}" registrado con ID ${supermercadoCreado.id}',
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -123,7 +129,7 @@ class _CrearSupermercadoModalState extends State<CrearSupermercadoModal> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.3),
+              color: Colors.grey.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -137,7 +143,7 @@ class _CrearSupermercadoModalState extends State<CrearSupermercadoModal> {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: primaryOrange.withOpacity(0.1),
+                    color: primaryOrange.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: const Icon(
@@ -158,10 +164,7 @@ class _CrearSupermercadoModalState extends State<CrearSupermercadoModal> {
                 const SizedBox(height: 6),
                 Text(
                   'Completa la información básica del comercio',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: textGray,
-                  ),
+                  style: TextStyle(fontSize: 14, color: textGray),
                 ),
               ],
             ),
@@ -173,9 +176,9 @@ class _CrearSupermercadoModalState extends State<CrearSupermercadoModal> {
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.08),
+                color: Colors.red.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.red.withOpacity(0.3)),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -184,10 +187,7 @@ class _CrearSupermercadoModalState extends State<CrearSupermercadoModal> {
                   Expanded(
                     child: Text(
                       _errorMessage!,
-                      style: const TextStyle(
-                        color: Colors.red,
-                        fontSize: 13,
-                      ),
+                      style: const TextStyle(color: Colors.red, fontSize: 13),
                     ),
                   ),
                 ],
@@ -256,7 +256,7 @@ class _CrearSupermercadoModalState extends State<CrearSupermercadoModal> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, -4),
                 ),
@@ -295,8 +295,9 @@ class _CrearSupermercadoModalState extends State<CrearSupermercadoModal> {
                             height: 18,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             ),
                           )
                         : const Icon(Icons.add_business, size: 20),
@@ -356,15 +357,11 @@ class _CrearSupermercadoModalState extends State<CrearSupermercadoModal> {
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(
-          color: Colors.grey.withOpacity(0.5),
+          color: Colors.grey.withValues(alpha: 0.5),
           fontSize: 14,
         ),
         prefixIcon: prefixIcon != null
-            ? Icon(
-                prefixIcon,
-                color: const Color(0xFF8A8FA8),
-                size: 20,
-              )
+            ? Icon(prefixIcon, color: const Color(0xFF8A8FA8), size: 20)
             : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -392,10 +389,7 @@ class _CrearSupermercadoModalState extends State<CrearSupermercadoModal> {
           horizontal: 16,
           vertical: 14,
         ),
-        errorStyle: const TextStyle(
-          color: Colors.red,
-          fontSize: 11,
-        ),
+        errorStyle: const TextStyle(color: Colors.red, fontSize: 11),
       ),
     );
   }

@@ -39,10 +39,12 @@ class ApiRemoteLoginDataSource implements RemoteLoginDataSource {
     required String password,
   }) async {
     try {
-      final data = await _client.post(
-        '/auth/login/',
-        {'correo': correo, 'password': password},
-      ) as Map<String, dynamic>;
+      final data =
+          await _client.post('/auth/login/', {
+                'correo': correo,
+                'password': password,
+              })
+              as Map<String, dynamic>;
 
       final token = data['token'] as String;
       final usuarioJson = data['usuario'] as Map<String, dynamic>;
@@ -86,14 +88,6 @@ class ApiRemoteLoginDataSource implements RemoteLoginDataSource {
   /// Construye un [Usuario] desde el JSON de la API.
   /// El campo `password` es write-only en el backend, se deja vacío.
   static Usuario _usuarioFromApi(Map<String, dynamic> json) {
-    return Usuario(
-      id: json['id'] as int,
-      nombre: json['nombre'] as String,
-      correo: json['correo'] as String,
-      password: '',
-      rol: json['rol'] as String? ?? 'usuario',
-      estado: json['estado'] as String? ?? 'activo',
-      ciudad: json['ciudad'] as String?,
-    );
+    return Usuario.fromJson(json);
   }
 }

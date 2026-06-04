@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:app/features/promotions/domain/repositories/promotion_repository.dart';
 import 'package:app/features/promotions/domain/usecases/promotion_usecases.dart';
 import 'package:app/features/promotions/infrastructure/datasources/promo_local_datasource.dart';
@@ -27,7 +25,6 @@ class PromoService extends ChangeNotifier {
   late final InitializePromotionsUseCase _initializePromotionsUseCase;
   late final LoadLocalPromotionsUseCase _loadLocalPromotionsUseCase;
   late final GetActivePromotionsUseCase _getActivePromotionsUseCase;
-  late final GetPromotionByCodeUseCase _getPromotionByCodeUseCase;
   late final CreatePromotionUseCase _createPromotionUseCase;
   late final UpdatePromotionUseCase _updatePromotionUseCase;
   late final DeletePromotionUseCase _deletePromotionUseCase;
@@ -53,9 +50,6 @@ class PromoService extends ChangeNotifier {
       loadLocal: _dataSource.loadLocalPromociones,
     );
     _getActivePromotionsUseCase = GetActivePromotionsUseCase(
-      _promotionRepository,
-    );
-    _getPromotionByCodeUseCase = GetPromotionByCodeUseCase(
       _promotionRepository,
     );
     _createPromotionUseCase = CreatePromotionUseCase(_promotionRepository);
@@ -211,7 +205,14 @@ class PromoService extends ChangeNotifier {
   /// Retorna el supermercado creado con el ID asignado por el backend.
   Future<Supermercado> createSupermercado(Supermercado supermercado) async {
     final created = await _promotionRepository.createSupermercado(supermercado);
-    _dataSource.supermercados.add(created);
+    final index = _dataSource.supermercados.indexWhere(
+      (s) => s.id == created.id,
+    );
+    if (index == -1) {
+      _dataSource.supermercados.add(created);
+    } else {
+      _dataSource.supermercados[index] = created;
+    }
     notifyListeners();
     return created;
   }

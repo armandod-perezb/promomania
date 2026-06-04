@@ -16,7 +16,9 @@ class Promocion {
   static int _asId(dynamic value, String fieldName) {
     final result = _asInt(value, fallback: 0);
     if (result <= 0) {
-      throw FormatException('ID inválido para $fieldName: $value (debe ser mayor que 0)');
+      throw FormatException(
+        'ID inválido para $fieldName: $value (debe ser mayor que 0)',
+      );
     }
     return result;
   }
@@ -80,6 +82,9 @@ class Promocion {
   /// Estado de la promoción en el flujo de revisión: 'pendiente', 'aprobada', 'rechazada'.
   final String estado;
 
+  /// Evita duplicar puntos cuando una promoción ya fue premiada al aprobarse.
+  final bool puntuacionOtorgada;
+
   /// Contador de vistas para métricas internas.
   final int vistas;
 
@@ -116,6 +121,7 @@ class Promocion {
     this.fechaInicio,
     this.fechaFin,
     required this.estado,
+    this.puntuacionOtorgada = false,
     required this.vistas,
     required this.idUsuario,
     required this.idSupermercado,
@@ -151,6 +157,7 @@ class Promocion {
       fechaInicio: json['fecha_inicio'] as String?,
       fechaFin: json['fecha_fin'] as String?,
       estado: json['estado'] as String? ?? 'pendiente',
+      puntuacionOtorgada: json['puntuacion_otorgada'] as bool? ?? false,
       vistas: _asInt(json['vistas']),
       idUsuario: _asId(json['id_usuario'], 'id_usuario'),
       idSupermercado: _asId(json['id_supermercado'], 'id_supermercado'),
@@ -181,6 +188,7 @@ class Promocion {
       'fecha_inicio': fechaInicio,
       'fecha_fin': fechaFin,
       'estado': estado,
+      'puntuacion_otorgada': puntuacionOtorgada,
       'vistas': vistas,
       'id_usuario': idUsuario,
       'id_supermercado': idSupermercado,
@@ -210,6 +218,7 @@ class Promocion {
     String? fechaInicio,
     String? fechaFin,
     String? estado,
+    bool? puntuacionOtorgada,
     int? vistas,
     int? idUsuario,
     int? idSupermercado,
@@ -233,6 +242,7 @@ class Promocion {
       fechaInicio: fechaInicio ?? this.fechaInicio,
       fechaFin: fechaFin ?? this.fechaFin,
       estado: estado ?? this.estado,
+      puntuacionOtorgada: puntuacionOtorgada ?? this.puntuacionOtorgada,
       vistas: vistas ?? this.vistas,
       idUsuario: idUsuario ?? this.idUsuario,
       idSupermercado: idSupermercado ?? this.idSupermercado,

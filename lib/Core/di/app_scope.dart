@@ -247,6 +247,7 @@ class AppScope {
     getPromotionImageBytesUseCase: GetPromotionImageBytesUseCase(
       promotionsRepository,
     ),
+    createSupermercadoUseCase: CreateSupermercadoUseCase(promotionsRepository),
     addSupermercadoUseCase: AddSupermercadoUseCase(promotionsRepository),
     updateSupermercadoUseCase: UpdateSupermercadoUseCase(promotionsRepository),
     deleteSupermercadoUseCase: DeleteSupermercadoUseCase(promotionsRepository),

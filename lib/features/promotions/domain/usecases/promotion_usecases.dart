@@ -146,7 +146,10 @@ class GetActivePromotionsSyncUseCase {
   final PromotionRepository repository;
   GetActivePromotionsSyncUseCase(this.repository);
   List<Promocion> execute({int? categoryId, int? supermarketId}) =>
-      repository.getActivePromotionsSync(categoryId: categoryId, supermarketId: supermarketId);
+      repository.getActivePromotionsSync(
+        categoryId: categoryId,
+        supermarketId: supermarketId,
+      );
 }
 
 class GetAllPromotionsSyncUseCase {
@@ -158,19 +161,22 @@ class GetAllPromotionsSyncUseCase {
 class GetPromotionByCodeSyncUseCase {
   final PromotionRepository repository;
   GetPromotionByCodeSyncUseCase(this.repository);
-  Promocion? execute(String codigo) => repository.getPromotionByCodeSync(codigo);
+  Promocion? execute(String codigo) =>
+      repository.getPromotionByCodeSync(codigo);
 }
 
 class GetFlashDealsSyncUseCase {
   final PromotionRepository repository;
   GetFlashDealsSyncUseCase(this.repository);
-  List<Promocion> execute({int limit = 5}) => repository.getFlashDealsSync(limit: limit);
+  List<Promocion> execute({int limit = 5}) =>
+      repository.getFlashDealsSync(limit: limit);
 }
 
 class GetNearbyStoresSyncUseCase {
   final PromotionRepository repository;
   GetNearbyStoresSyncUseCase(this.repository);
-  List<Map<String, dynamic>> execute({int limit = 5}) => repository.getNearbyStoresSync(limit: limit);
+  List<Map<String, dynamic>> execute({int limit = 5}) =>
+      repository.getNearbyStoresSync(limit: limit);
 }
 
 class GetPromocionUrgencyUseCase {
@@ -182,7 +188,8 @@ class GetPromocionUrgencyUseCase {
 class GetPromocionesByUrgencySyncUseCase {
   final PromotionRepository repository;
   GetPromocionesByUrgencySyncUseCase(this.repository);
-  Map<String, List<Promocion>> execute(int userId) => repository.getPromocionesByUrgencySync(userId);
+  Map<String, List<Promocion>> execute(int userId) =>
+      repository.getPromocionesByUrgencySync(userId);
 }
 
 class GetPromocionRatingSyncUseCase {
@@ -200,7 +207,8 @@ class GetPrecioConDescuentoUseCase {
 class GetPromocionesHorariosByCodigoUseCase {
   final PromotionRepository repository;
   GetPromocionesHorariosByCodigoUseCase(this.repository);
-  List<PromocionHorario> execute(String codigo) => repository.getPromocionesHorariosByCodigoSync(codigo);
+  List<PromocionHorario> execute(String codigo) =>
+      repository.getPromocionesHorariosByCodigoSync(codigo);
 }
 
 class GetNextHorarioIdUseCase {
@@ -232,31 +240,43 @@ class GetCachedImageBytesUseCase {
 class AddPromocionHorarioUseCase {
   final PromotionRepository repository;
   AddPromocionHorarioUseCase(this.repository);
-  Future<void> execute(PromocionHorario horario) => repository.addPromocionHorario(horario);
+  Future<void> execute(PromocionHorario horario) =>
+      repository.addPromocionHorario(horario);
 }
 
 class SavePromotionImageUseCase {
   final PromotionRepository repository;
   SavePromotionImageUseCase(this.repository);
-  Future<String?> execute(String codigo, Uint8List bytes) => repository.savePromotionImage(codigo, bytes);
+  Future<String?> execute(String codigo, Uint8List bytes) =>
+      repository.savePromotionImage(codigo, bytes);
 }
 
 class GetPromotionImageBytesUseCase {
   final PromotionRepository repository;
   GetPromotionImageBytesUseCase(this.repository);
-  Future<Uint8List?> execute(String codigo) => repository.getPromotionImageBytes(codigo);
+  Future<Uint8List?> execute(String codigo) =>
+      repository.getPromotionImageBytes(codigo);
 }
 
 class AddSupermercadoUseCase {
   final PromotionRepository repository;
   AddSupermercadoUseCase(this.repository);
-  Future<void> execute(Supermercado supermercado) => repository.addSupermercado(supermercado);
+  Future<void> execute(Supermercado supermercado) =>
+      repository.addSupermercado(supermercado);
+}
+
+class CreateSupermercadoUseCase {
+  final PromotionRepository repository;
+  CreateSupermercadoUseCase(this.repository);
+  Future<Supermercado> execute(Supermercado supermercado) =>
+      repository.createSupermercado(supermercado);
 }
 
 class UpdateSupermercadoUseCase {
   final PromotionRepository repository;
   UpdateSupermercadoUseCase(this.repository);
-  Future<void> execute(Supermercado supermercado) => repository.updateSupermercado(supermercado);
+  Future<void> execute(Supermercado supermercado) =>
+      repository.updateSupermercado(supermercado);
 }
 
 class DeleteSupermercadoUseCase {

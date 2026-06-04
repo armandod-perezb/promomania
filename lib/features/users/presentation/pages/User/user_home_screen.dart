@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
 
 import '../../../../../Core/Routes/app_routes.dart';
+import '../../../../../Core/config/map_config.dart';
 import '../../../../../Core/di/app_scope.dart';
 import '../../../../../Core/services/manual_location_service.dart';
 import '../../../../../features/promotions/domain/entities/promocion.dart';
@@ -27,7 +28,7 @@ class _HomeMapScreenState extends State<HomeMapScreen>
   int _selectedTab = 0;
   double _zoomLevel = 14;
   String? _selectedPromoCode;
-  bool _isLoadingMapData = true;
+  bool _isLoadingMapData = false;
   bool _isRefreshingLocation = false;
   String? _locationWarning;
 
@@ -65,6 +66,10 @@ class _HomeMapScreenState extends State<HomeMapScreen>
   }
 
   Future<void> _loadMapData() async {
+    if (mounted) {
+      setState(() => _isLoadingMapData = true);
+    }
+
     final locationResult = await _resolveUserLocation();
     final activePromos = await _loadActivePromotions();
     final nearbyPromos = _buildNearbyPromos(
@@ -161,6 +166,37 @@ class _HomeMapScreenState extends State<HomeMapScreen>
         );
       }
 
+      if (!kIsWeb) {
+        final lastKnown = await Geolocator.getLastKnownPosition();
+        if (lastKnown != null) {
+          _getCurrentPositionForPlatform()
+              .then((position) {
+                if (!mounted) return;
+                final preciseLocation = LatLng(
+                  position.latitude,
+                  position.longitude,
+                );
+                final nearbyPromos = _buildNearbyPromos(
+                  activePromotions: _allActivePromotions,
+                  userLocation: preciseLocation,
+                );
+                setState(() {
+                  _userLocation = preciseLocation;
+                  _promos = nearbyPromos;
+                  _selectedPromoCode = nearbyPromos.isEmpty
+                      ? null
+                      : nearbyPromos.first.code;
+                });
+                _mapController.move(preciseLocation, _zoomLevel);
+              })
+              .catchError((_) {});
+
+          return _LocationResult(
+            location: LatLng(lastKnown.latitude, lastKnown.longitude),
+          );
+        }
+      }
+
       final position = await _getCurrentPositionForPlatform();
       return _LocationResult(
         location: LatLng(position.latitude, position.longitude),
@@ -180,19 +216,19 @@ class _HomeMapScreenState extends State<HomeMapScreen>
           // Ignorar y usar fallback por defecto.
         }
       }
-      
+
       // Intentar usar ubicación manual guardada (especialmente útil en web)
       final manualLocation = await ManualLocationService.getSavedLocation();
       if (manualLocation != null) {
         final address = await ManualLocationService.getSavedAddress();
         return _LocationResult(
           location: manualLocation,
-          warning: address != null 
-            ? 'Usando ubicación manual: $address'
-            : 'Usando ubicación manual configurada.',
+          warning: address != null
+              ? 'Usando ubicación manual: $address'
+              : 'Usando ubicación manual configurada.',
         );
       }
-      
+
       return const _LocationResult(
         location: _defaultCenter,
         warning:
@@ -229,7 +265,7 @@ class _HomeMapScreenState extends State<HomeMapScreen>
       return Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 15),
+          timeLimit: Duration(seconds: 20),
         ),
       );
     }
@@ -380,16 +416,14 @@ class _HomeMapScreenState extends State<HomeMapScreen>
   void _showManualLocationDialog() async {
     final savedLocation = await ManualLocationService.getSavedLocation();
     final savedAddress = await ManualLocationService.getSavedAddress();
-    
+
     final latController = TextEditingController(
       text: savedLocation?.latitude.toString() ?? '',
     );
     final lngController = TextEditingController(
       text: savedLocation?.longitude.toString() ?? '',
     );
-    final addressController = TextEditingController(
-      text: savedAddress ?? '',
-    );
+    final addressController = TextEditingController(text: savedAddress ?? '');
 
     if (!mounted) return;
 
@@ -415,7 +449,9 @@ class _HomeMapScreenState extends State<HomeMapScreen>
               const SizedBox(height: 16),
               TextField(
                 controller: latController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(
                   labelText: 'Latitud',
                   hintText: 'Ej: 4.7110',
@@ -426,7 +462,9 @@ class _HomeMapScreenState extends State<HomeMapScreen>
               const SizedBox(height: 12),
               TextField(
                 controller: lngController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(
                   labelText: 'Longitud',
                   hintText: 'Ej: -74.0721',
@@ -484,23 +522,27 @@ class _HomeMapScreenState extends State<HomeMapScreen>
           ),
           ElevatedButton(
             onPressed: () {
-              final lat = double.tryParse(latController.text.replaceAll(',', '.'));
-              final lng = double.tryParse(lngController.text.replaceAll(',', '.'));
-              
+              final lat = double.tryParse(
+                latController.text.replaceAll(',', '.'),
+              );
+              final lng = double.tryParse(
+                lngController.text.replaceAll(',', '.'),
+              );
+
               if (lat == null || lng == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Ingresa coordenadas válidas')),
                 );
                 return;
               }
-              
+
               if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Coordenadas fuera de rango')),
                 );
                 return;
               }
-              
+
               Navigator.pop(context, {
                 'location': LatLng(lat, lng),
                 'address': addressController.text,
@@ -522,10 +564,10 @@ class _HomeMapScreenState extends State<HomeMapScreen>
         result['location'] as LatLng,
         address: address?.isNotEmpty == true ? address : null,
       );
-      
+
       // Recargar con la nueva ubicación
       await _refreshWithCurrentLocation();
-      
+
       if (mounted) {
         _showInfoSnackBar('Ubicación manual guardada y aplicada');
       }
@@ -546,11 +588,11 @@ class _HomeMapScreenState extends State<HomeMapScreen>
             _buildMapControls(),
             _buildBottomPromoSheet(),
             if (_isLoadingMapData)
-              const Positioned.fill(
-                child: ColoredBox(
-                  color: Color(0x66FFFFFF),
-                  child: Center(child: CircularProgressIndicator()),
-                ),
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 126,
+                left: 16,
+                right: 16,
+                child: const LinearProgressIndicator(minHeight: 3),
               ),
           ],
         ),
@@ -571,8 +613,9 @@ class _HomeMapScreenState extends State<HomeMapScreen>
         ),
         children: [
           TileLayer(
-            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            userAgentPackageName: 'com.promomania.app',
+            urlTemplate: AppMapConfig.tileUrlTemplate,
+            subdomains: AppMapConfig.tileSubdomains,
+            userAgentPackageName: AppMapConfig.userAgentPackageName,
           ),
           MarkerLayer(markers: _buildPromoMarkers()),
           MarkerLayer(markers: [_buildUserPin()]),

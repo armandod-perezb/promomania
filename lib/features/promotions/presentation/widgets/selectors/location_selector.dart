@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:app/Core/config/map_config.dart';
 import 'browser_geolocation_bridge.dart';
 
 /// Tipos de ubicación soportados
@@ -642,6 +643,18 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
         }
       }
 
+      if (!kIsWeb) {
+        final lastKnownPosition = await Geolocator.getLastKnownPosition();
+        if (lastKnownPosition != null && mounted) {
+          final lastKnownLocation = LatLng(
+            lastKnownPosition.latitude,
+            lastKnownPosition.longitude,
+          );
+          setState(() => _selectedLocation = lastKnownLocation);
+          _mapController.move(lastKnownLocation, 16);
+        }
+      }
+
       final position = await _getCurrentPositionWithWatchdog();
 
       final newLocation = LatLng(position.latitude, position.longitude);
@@ -702,7 +715,7 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
     return Future.any<Position>([
       _getCurrentPositionForPlatform(),
       Future<Position>.delayed(
-        const Duration(seconds: 25),
+        const Duration(seconds: 22),
         () => throw TimeoutException('Hard timeout waiting for location'),
       ),
     ]);
@@ -713,7 +726,7 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
       return Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 15),
+          timeLimit: Duration(seconds: 20),
         ),
       );
     }
@@ -1041,9 +1054,10 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
                       ),
                       children: [
                         TileLayer(
-                          urlTemplate:
-                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName: 'com.promomania.app',
+                          urlTemplate: AppMapConfig.tileUrlTemplate,
+                          subdomains: AppMapConfig.tileSubdomains,
+                          userAgentPackageName:
+                              AppMapConfig.userAgentPackageName,
                         ),
                         MarkerLayer(
                           markers: [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 import '../../../../../Core/di/app_scope.dart';
+import '../../../../../features/promotions/domain/entities/promocion.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PANTALLA DE PERFIL
@@ -17,13 +18,18 @@ class UserProfileScreen extends StatefulWidget {
 class _UserProfileScreenState extends State<UserProfileScreen>
     with TickerProviderStateMixin {
   static const Color _primary = Color(0xFFFF4D2E);
-  static const Color _darkBg = Color(0xFF1A1F2E);
   static const Color _green = Color(0xFF10B981);
-  static const Color _amber = Color(0xFFF59E0B);
   static const Color _lightBg = Color(0xFFF5F6FA);
 
   int _selectedTab = 0; // 0=Publicaciones 1=Guardados 2=Logros
   int _selectedNavTab = 3; // Perfil activo
+  
+  List<Promocion> _promocionesPublicadas = [];
+  List<Promocion> _promocionesFavoritas = [];
+  bool _cargandoPublicadas = false;
+  bool _cargandoFavoritas = false;
+
+  @override
 
   @override
   Widget build(BuildContext context) {
@@ -889,171 +895,278 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _cargarPromocionesPublicadas();
+    _cargarPromocionesFavoritas();
+  }
+
+  Future<void> _cargarPromocionesPublicadas() async {
+    final usuario = AppScope.sessionManager.usuarioActual;
+    if (usuario == null) return;
+
+    setState(() => _cargandoPublicadas = true);
+    try {
+      final promos = await AppScope.promotionsController.getPromotionsByUser(usuario.id);
+      setState(() => _promocionesPublicadas = promos);
+    } catch (e) {
+      debugPrint('Error al cargar promociones: $e');
+    } finally {
+      setState(() => _cargandoPublicadas = false);
+    }
+  }
+
+  Future<void> _cargarPromocionesFavoritas() async {
+    final usuario = AppScope.sessionManager.usuarioActual;
+    if (usuario == null) return;
+
+    setState(() => _cargandoFavoritas = true);
+    try {
+      final favoritos = await AppScope.interactionsRepository.getFavoritosByUsuario(usuario.id);
+      final promociones = <Promocion>[];
+      for (final fav in favoritos) {
+        final promo = AppScope.promotionsController.getPromotionByCodeSync(fav.codigoPromocion);
+        if (promo != null) {
+          promociones.add(promo);
+        }
+      }
+      setState(() => _promocionesFavoritas = promociones);
+    } catch (e) {
+      debugPrint('Error al cargar favoritos: $e');
+    } finally {
+      setState(() => _cargandoFavoritas = false);
+    }
+  }
+
   Widget _buildPublicaciones() {
-    final posts = [
-      _PostItem(
-        title: '50% OFF Nike',
-        category: 'Deportes',
-        views: '1,234',
-        likes: '89',
-        imageUrl:
-            'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=900&q=80',
-      ),
-      _PostItem(
-        title: '2x1 Burgers',
-        category: 'Comida',
-        views: '892',
-        likes: '56',
-        imageUrl:
-            'https://images.unsplash.com/photo-1596662951482-0c4ba74a6df6?auto=format&fit=crop&w=900&q=80',
-      ),
-    ];
+    if (_cargandoPublicadas) {
+      return const Padding(
+        padding: EdgeInsets.all(40),
+        child: Center(
+          child: CircularProgressIndicator(color: _primary),
+        ),
+      );
+    }
+
+    if (_promocionesPublicadas.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(40),
+        child: Center(
+          child: Column(
+            children: const [
+              SizedBox(height: 20),
+              Text('📢', style: TextStyle(fontSize: 40)),
+              SizedBox(height: 10),
+              Text(
+                'Sin publicaciones',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1A1F2E),
+                ),
+              ),
+              SizedBox(height: 6),
+              Text(
+                'Publica tu primera promoción',
+                style: TextStyle(fontSize: 13, color: Color(0xFF8A8FA8)),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: posts.length,
+        itemCount: _promocionesPublicadas.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
           childAspectRatio: 0.88,
         ),
-        itemBuilder: (context, index) => _buildPostCard(posts[index]),
+        itemBuilder: (context, index) => _buildPromoCard(_promocionesPublicadas[index]),
       ),
     );
   }
 
-  Widget _buildPostCard(_PostItem p) {
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.14),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.network(p.imageUrl, fit: BoxFit.cover),
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0x22000000), Color(0xB5000000)],
+  Widget _buildPromoCard(Promocion promo) {
+    final fotoUrl = promo.foto ?? 'https://via.placeholder.com/300x300?text=${promo.titulo}';
+    
+    return GestureDetector(
+      onTap: () {
+        // Navegar a detalle de promoción si es necesario
+        debugPrint('Tap en promoción: ${promo.codigo}');
+      },
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.14),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.network(
+              fotoUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: const Color(0xFFF5F6FA),
+                  child: const Icon(
+                    Icons.image_not_supported_outlined,
+                    color: Color(0xFF8A8FA8),
+                  ),
+                );
+              },
+            ),
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0x22000000), Color(0xB5000000)],
+                ),
               ),
             ),
-          ),
-          Positioned(
-            top: 12,
-            right: 12,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.55),
-                borderRadius: BorderRadius.circular(16),
+            Positioned(
+              top: 12,
+              right: 12,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.55),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  '${promo.descuento ?? 0}% OFF',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
+            ),
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 40,
               child: Text(
-                p.category,
+                promo.titulo,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  height: 1.1,
+                  shadows: [Shadow(color: Colors.black38, blurRadius: 4)],
                 ),
               ),
             ),
-          ),
-          Positioned(
-            left: 12,
-            right: 12,
-            bottom: 40,
-            child: Text(
-              p.title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-                height: 1,
-                shadows: [Shadow(color: Colors.black38, blurRadius: 4)],
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 10,
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.remove_red_eye_outlined,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '${promo.vistas}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '\$${promo.precio.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          Positioned(
-            left: 12,
-            right: 12,
-            bottom: 10,
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.remove_red_eye_outlined,
-                  size: 20,
-                  color: Colors.white,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  p.views,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const Spacer(),
-                const Icon(
-                  Icons.favorite_border_rounded,
-                  size: 20,
-                  color: Colors.white,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  p.likes,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildGuardados() {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Center(
-        child: Column(
-          children: const [
-            SizedBox(height: 20),
-            Text('❤️', style: TextStyle(fontSize: 40)),
-            SizedBox(height: 10),
-            Text(
-              'Tus guardados',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF1A1F2E),
-              ),
-            ),
-            SizedBox(height: 6),
-            Text(
-              'Accede desde "Mis Favoritos"',
-              style: TextStyle(fontSize: 13, color: Color(0xFF8A8FA8)),
-            ),
-            SizedBox(height: 20),
-          ],
+    if (_cargandoFavoritas) {
+      return const Padding(
+        padding: EdgeInsets.all(40),
+        child: Center(
+          child: CircularProgressIndicator(color: _primary),
         ),
+      );
+    }
+
+    if (_promocionesFavoritas.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(40),
+        child: Center(
+          child: Column(
+            children: const [
+              SizedBox(height: 20),
+              Text('❤️', style: TextStyle(fontSize: 40)),
+              SizedBox(height: 10),
+              Text(
+                'Sin guardados',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1A1F2E),
+                ),
+              ),
+              SizedBox(height: 6),
+              Text(
+                'Guarda tus promociones favoritas',
+                style: TextStyle(fontSize: 13, color: Color(0xFF8A8FA8)),
+              ),
+              SizedBox(height: 20),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: _promocionesFavoritas.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.88,
+        ),
+        itemBuilder: (context, index) => _buildPromoCard(_promocionesFavoritas[index]),
       ),
     );
   }
@@ -1507,21 +1620,6 @@ class _QuickAction {
     required this.color,
     required this.bgColor,
     this.badge,
-  });
-}
-
-class _PostItem {
-  final String title;
-  final String category;
-  final String views;
-  final String likes;
-  final String imageUrl;
-  const _PostItem({
-    required this.title,
-    required this.category,
-    required this.views,
-    required this.likes,
-    required this.imageUrl,
   });
 }
 

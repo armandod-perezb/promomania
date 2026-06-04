@@ -490,7 +490,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 ),
                                 SizedBox(width: 4),
                                 Text(
-                                  'Nivel 5',
+                                  'Nivel 1',
                                   style: TextStyle(
                                     color: Color(0xFFF59E0B),
                                     fontSize: 11,

@@ -25,9 +25,6 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   int _selectedTab = 0; // 0=Publicaciones 1=Guardados 2=Logros
   int _selectedNavTab = 3; // Perfil activo
 
-  // Actividad semanal (L M X J V S D)
-  final List<String> _weekDays = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
-
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -427,9 +424,36 @@ class _UserProfileScreenState extends State<UserProfileScreen>
   // ── Nivel y XP ───────────────────────────────────────────────────────────────
 
   Widget _buildLevelSection() {
-    const currentXP = 1250.0;
-    const nextXP = 1600.0;
-    const pct = currentXP / nextXP;
+    final usuario = sessionManager.usuarioActual;
+    final nivel = usuario?.nivel ?? 1;
+    final puntuacion = usuario?.puntuacion ?? 0;
+
+    // Calcula cuántos puntos se necesitan para el siguiente nivel
+    // Fórmula del backend: 200 * nivel
+    final puntosParaSiguiente = 200 * nivel;
+
+    // Calcula el progreso acumulado hasta el nivel actual
+    int puntosAcumulados = 0;
+    for (int i = 1; i < nivel; i++) {
+      puntosAcumulados += 200 * i;
+    }
+
+    // Calcula cuántos puntos tiene en el nivel actual
+    final puntosEnNivelActual = puntuacion - puntosAcumulados;
+    final pct = (puntosEnNivelActual / puntosParaSiguiente).clamp(0.0, 1.0);
+
+    // Etiquetas por nivel
+    final Map<int, String> nivelLabels = {
+      1: 'Nivel 1 – Principiante',
+      2: 'Nivel 2 – Aprendiz',
+      3: 'Nivel 3 – Intermedio',
+      4: 'Nivel 4 – Avanzado',
+      5: 'Nivel 5 – Experto',
+      6: 'Nivel 6 – Maestro',
+    };
+
+    final nivelLabel = nivelLabels[nivel] ?? 'Nivel $nivel';
+    final puntosRestantes = puntosParaSiguiente - puntosEnNivelActual;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12),
@@ -475,40 +499,40 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 ),
               ),
               const SizedBox(width: 14),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Nivel 5 – Experto',
-                      style: TextStyle(
+                      nivelLabel,
+                      style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w900,
                         color: Color(0xFF131A2F),
                       ),
                     ),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
-                      '750 XP para Nivel 6',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+                      '$puntosRestantes XP para Nivel ${nivel + 1}',
+                      style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
                     ),
                   ],
                 ),
               ),
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '1,250',
-                    style: TextStyle(
+                    '$puntuacion',
+                    style: const TextStyle(
                       fontSize: 40,
                       fontWeight: FontWeight.w900,
                       color: _primary,
                       height: 1,
                     ),
                   ),
-                  SizedBox(height: 2),
-                  Text(
+                  const SizedBox(height: 2),
+                  const Text(
                     'XP Total',
                     style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
                   ),
@@ -539,11 +563,11 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                   ),
                 ),
               ),
-              const Positioned(
+              Positioned(
                 right: 10,
                 child: Text(
-                  '62.5%',
-                  style: TextStyle(
+                  '${(pct * 100).toStringAsFixed(1)}%',
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF6B7280),
@@ -552,73 +576,13 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               ),
             ],
           ),
-          const SizedBox(height: 18),
-          const Divider(color: Color(0xFFE9EDF3), height: 1),
-          const SizedBox(height: 14),
-          _buildWeeklyActivity(),
+
         ],
       ),
     );
   }
 
-  // ── Actividad semanal ─────────────────────────────────────────────────────────
 
-  Widget _buildWeeklyActivity() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text(
-                'Actividad Semanal',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                  color: Color(0xFF131A2F),
-                ),
-              ),
-              Row(
-                children: [
-                  Icon(
-                    Icons.local_fire_department_outlined,
-                    size: 18,
-                    color: _primary,
-                  ),
-                  SizedBox(width: 6),
-                  Text(
-                    '7 días',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: _primary,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: _weekDays
-                .map(
-                  (d) => Text(
-                    d,
-                    style: const TextStyle(
-                      fontSize: 30,
-                      color: Color(0xFF9CA3AF),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
-        ],
-      ),
-    );
-  }
 
   // ── Métricas ──────────────────────────────────────────────────────────────────
 
@@ -1110,8 +1074,8 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       ),
       _Badge(
         emoji: '⭐',
-        title: 'Nivel 5',
-        sub: 'Alcanzaste nivel Experto',
+        title: 'Nivel 1',
+        sub: 'Alcanzaste nivel Principiante',
         done: true,
       ),
       _Badge(

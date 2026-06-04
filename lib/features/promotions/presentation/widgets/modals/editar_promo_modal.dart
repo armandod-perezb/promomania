@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:provider/provider.dart';
 
 import 'package:app/Core/di/app_scope.dart';
-import 'package:app/features/catalog/domain/entities/categoria.dart';
 import 'package:app/features/catalog/domain/entities/tipo_promocion.dart';
 import 'package:app/features/promotions/domain/entities/promocion.dart';
 import 'package:app/features/promotions/domain/entities/supermercado.dart';
-import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 import '../selectors/category_selector.dart';
 import '../selectors/location_selector.dart';
 import '../selectors/supermarket_selector.dart';
@@ -395,13 +390,26 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
       builder: (context) => CrearSupermercadoModal(
         initialName: initialName,
         onSupermercadoCreated: (supermercado) {
-          // El supermercado ya fue agregado al servicio por el repository adapter
+          _upsertSupermercado(supermercado);
+
           setState(() {
             _supermercadoId = supermercado.id;
+            _errors.remove('supermercado');
           });
         },
       ),
     );
+  }
+
+  void _upsertSupermercado(Supermercado supermercado) {
+    final index = promoService.supermercados.indexWhere(
+      (item) => item.id == supermercado.id,
+    );
+    if (index == -1) {
+      promoService.addSupermercado(supermercado);
+    } else {
+      promoService.updateSupermercado(supermercado);
+    }
   }
 
   @override

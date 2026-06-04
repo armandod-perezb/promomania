@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:provider/provider.dart';
 
 import 'package:app/Core/di/app_scope.dart';
-import 'package:app/features/catalog/domain/entities/categoria.dart';
-import 'package:app/features/catalog/domain/entities/tipo_promocion.dart';
 import 'package:app/features/promotions/domain/entities/promocion.dart';
 import 'package:app/features/promotions/domain/entities/supermercado.dart';
-import 'package:app/features/promotions/infrastructure/services/promo_service.dart';
 import '../selectors/category_selector.dart';
 import '../selectors/location_selector.dart';
 import '../selectors/supermarket_selector.dart';
@@ -124,9 +118,11 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
     if (_tiposUbicacion.isEmpty) {
       _errors['ubicacion'] = 'Selecciona al menos una opción de ubicación';
     } else {
-      final tieneFisica = _tiposUbicacion.contains(TipoUbicacion.fisica) ||
+      final tieneFisica =
+          _tiposUbicacion.contains(TipoUbicacion.fisica) ||
           _tiposUbicacion.contains(TipoUbicacion.ambas);
-      final tieneVirtual = _tiposUbicacion.contains(TipoUbicacion.virtual) ||
+      final tieneVirtual =
+          _tiposUbicacion.contains(TipoUbicacion.virtual) ||
           _tiposUbicacion.contains(TipoUbicacion.ambas);
 
       if (tieneFisica) {
@@ -203,7 +199,9 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
 
     // Validación adicional: verificar que los IDs sean válidos (> 0)
     if (_supermercadoId == null || _supermercadoId! <= 0) {
-      setState(() => _errors['supermercado'] = 'Selecciona un supermercado válido');
+      setState(
+        () => _errors['supermercado'] = 'Selecciona un supermercado válido',
+      );
       _scrollToFirstError();
       return;
     }
@@ -224,15 +222,18 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
       if (tipoEnum != null) {
         // Buscar el tipo en la lista del servicio
         final tipos = promoService.tiposPromocion;
+        if (tipos.isEmpty) {
+          throw Exception('No hay tipos de promoción disponibles');
+        }
         final tipoEncontrado = tipos.firstWhere(
           (t) => t.nombre.toLowerCase().contains(
-                tipoEnum.displayName.toLowerCase(),
-              ),
-          orElse: () => tipos.isNotEmpty ? tipos.first : null as TipoPromocion,
+            tipoEnum.displayName.toLowerCase(),
+          ),
+          orElse: () => tipos.first,
         );
         idTipoPromocion = tipoEncontrado.id;
       }
-      
+
       // Validar que el ID de tipo de promoción sea válido
       if (idTipoPromocion <= 0) {
         throw Exception('Tipo de promoción no válido');
@@ -261,8 +262,9 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
         fechaInicio: _tipoVigencia == 'por_fecha'
             ? _fechaInicioController.text
             : null,
-        fechaFin:
-            _tipoVigencia == 'por_fecha' ? _fechaFinController.text : null,
+        fechaFin: _tipoVigencia == 'por_fecha'
+            ? _fechaFinController.text
+            : null,
         estado: 'pendiente',
         vistas: 0,
         idUsuario: sessionManager.usuarioActual?.id ?? 1,
@@ -302,14 +304,18 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
 
   void _scrollToFirstError() {
     // Construir mensaje específico con los errores actuales
-    final errorMessages = _errors.entries.map((e) => '${e.key}: ${e.value}').join('\n');
+    final errorMessages = _errors.entries
+        .map((e) => '${e.key}: ${e.value}')
+        .join('\n');
     final mensaje = errorMessages.isNotEmpty
         ? 'Errores:\n$errorMessages'
         : 'Por favor completa todos los campos obligatorios';
-    
-    debugPrint('DEBUG - _supermercadoId: $_supermercadoId, _categoriaId: $_categoriaId');
+
+    debugPrint(
+      'DEBUG - _supermercadoId: $_supermercadoId, _categoriaId: $_categoriaId',
+    );
     debugPrint('DEBUG - Errores: $_errors');
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(mensaje),
@@ -350,11 +356,15 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
       builder: (context) => CrearSupermercadoModal(
         initialName: initialName,
         onSupermercadoCreated: (supermercado) {
-          debugPrint('DEBUG - Supermercado creado recibido: ID=${supermercado.id}, nombre=${supermercado.nombre}');
-          
+          debugPrint(
+            'DEBUG - Supermercado creado recibido: ID=${supermercado.id}, nombre=${supermercado.nombre}',
+          );
+
           // Verificar que tenga ID válido
           if (supermercado.id <= 0) {
-            debugPrint('ERROR - Supermercado sin ID válido: ${supermercado.id}');
+            debugPrint(
+              'ERROR - Supermercado sin ID válido: ${supermercado.id}',
+            );
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Error: El supermercado no tiene ID válido'),
@@ -364,16 +374,28 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
             return;
           }
 
-          // El supermercado ya fue agregado al servicio por el repository adapter
-          // Solo necesitamos seleccionarlo
+          _upsertSupermercado(supermercado);
+
           setState(() {
             _supermercadoId = supermercado.id;
+            _errors.remove('supermercado');
           });
-          
+
           debugPrint('DEBUG - _supermercadoId actualizado a: $_supermercadoId');
         },
       ),
     );
+  }
+
+  void _upsertSupermercado(Supermercado supermercado) {
+    final index = promoService.supermercados.indexWhere(
+      (item) => item.id == supermercado.id,
+    );
+    if (index == -1) {
+      promoService.addSupermercado(supermercado);
+    } else {
+      promoService.updateSupermercado(supermercado);
+    }
   }
 
   @override
@@ -435,10 +457,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                       ),
                       Text(
                         'Completa todos los campos obligatorios',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: textGray,
-                        ),
+                        style: TextStyle(fontSize: 13, color: textGray),
                       ),
                     ],
                   ),
@@ -507,7 +526,8 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                     tipoPromocionId: _tipoPromocionId,
                     descuentoController: _descuentoController,
                     descripcionTipoController: _descripcionTipoController,
-                    errorText: _errors['descuento'] ?? _errors['descripcion_tipo'],
+                    errorText:
+                        _errors['descuento'] ?? _errors['descripcion_tipo'],
                   ),
 
                   const SizedBox(height: 20),
@@ -555,8 +575,8 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                     },
                     urlController: _urlController,
                     urlError: _errors['url'],
-                    ubicacionError: _errors['ubicacion'] ??
-                        _errors['ubicacion_fisica'],
+                    ubicacionError:
+                        _errors['ubicacion'] ?? _errors['ubicacion_fisica'],
                   ),
                   const SizedBox(height: 20),
 
@@ -693,8 +713,9 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
                             height: 18,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             ),
                           )
                         : const Icon(Icons.add_outlined, size: 20),
@@ -734,12 +755,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
       decoration: BoxDecoration(
         color: primaryOrange.withOpacity(0.05),
         borderRadius: BorderRadius.circular(8),
-        border: Border(
-          left: BorderSide(
-            color: primaryOrange,
-            width: 3,
-          ),
-        ),
+        border: Border(left: BorderSide(color: primaryOrange, width: 3)),
       ),
       child: Text(
         title,
@@ -832,10 +848,7 @@ class _CrearPromoModalState extends State<CrearPromoModal> {
             padding: const EdgeInsets.only(top: 4, left: 4),
             child: Text(
               errorText,
-              style: const TextStyle(
-                color: Colors.red,
-                fontSize: 11,
-              ),
+              style: const TextStyle(color: Colors.red, fontSize: 11),
             ),
           ),
       ],

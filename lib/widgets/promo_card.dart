@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app/Core/storage/image_storage_service.dart';
 import '../features/promotions/domain/entities/promocion.dart';
 import '../features/users/domain/entities/usuario.dart';
 import '../features/promotions/domain/entities/supermercado.dart';
@@ -21,13 +22,25 @@ class PromoCard extends StatelessWidget {
     this.isFavorite = false,
   });
 
-  bool _shouldUseRemoteImage(String? url) {
-    if (url == null || url.trim().isEmpty) return false;
-    return !url.toLowerCase().contains('via.placeholder.com');
+  ImageProvider? _imageProvider(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+
+    final dataUrlBytes = ImageStorageService.dataUrlToBytes(value);
+    if (dataUrlBytes != null) return MemoryImage(dataUrlBytes);
+
+    final url = value.trim();
+    if (url.toLowerCase().contains('via.placeholder.com')) return null;
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return NetworkImage(url);
+    }
+
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
+    final imageProvider = _imageProvider(promocion.foto);
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: InkWell(
@@ -41,9 +54,9 @@ class PromoCard extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.grey[300],
-                image: _shouldUseRemoteImage(promocion.foto)
+                image: imageProvider != null
                     ? DecorationImage(
-                        image: NetworkImage(promocion.foto!),
+                        image: imageProvider,
                         fit: BoxFit.cover,
                         onError: (exception, stackTrace) {
                           // Fallback

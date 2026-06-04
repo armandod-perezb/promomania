@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:app/core/network/api_client.dart';
-import 'package:app/core/storage/image_storage_service.dart';
+import 'package:app/Core/storage/image_storage_service.dart';
 import 'package:app/features/catalog/domain/entities/categoria.dart';
 import 'package:app/features/comments/domain/entities/comentario.dart';
 import 'package:app/features/interactions/domain/entities/favorito.dart';
@@ -41,7 +41,8 @@ class PromoLocalDataSource {
     try {
       await _initFromApi();
     } catch (e) {
-      loadError = 'No se pudieron convertir correctamente los datos de la API. Detalle: $e';
+      loadError =
+          'No se pudieron convertir correctamente los datos de la API. Detalle: $e';
       loaded = false;
     }
   }
@@ -120,7 +121,9 @@ class PromoLocalDataSource {
     // Evita hosts de placeholder que suelen fallar en web y generan ruido.
     if (lowered.contains('via.placeholder.com')) return null;
 
-    if (url.startsWith('http://') || url.startsWith('https://')) {
+    if (url.startsWith('http://') ||
+        url.startsWith('https://') ||
+        ImageStorageService.isDataImageUrl(url)) {
       return url;
     }
     return null;
@@ -174,7 +177,10 @@ class PromoLocalDataSource {
       descripcion: json['descripcion']?.toString(),
       precio: _asDouble(json['precio']),
       descuento: json['descuento'] == null ? null : _asInt(json['descuento']),
-      condicionProducto: _asString(json['condicion_producto'], fallback: 'nuevo'),
+      condicionProducto: _asString(
+        json['condicion_producto'],
+        fallback: 'nuevo',
+      ),
       ubicacion: json['ubicacion']?.toString(),
       url: json['url']?.toString(),
       foto: _sanitizeImageUrl(json['foto']),
@@ -640,6 +646,12 @@ class PromoLocalDataSource {
         return null;
       }
 
+      final dataUrlBytes = ImageStorageService.dataUrlToBytes(promocion.foto);
+      if (dataUrlBytes != null) {
+        imageCache[codigoPromocion] = dataUrlBytes;
+        return dataUrlBytes;
+      }
+
       if (promocion.fotoEsLocal || !_isUrl(promocion.foto!)) {
         return await imageStorage.readImageBytes(promocion.foto!);
       }
@@ -674,7 +686,9 @@ class PromoLocalDataSource {
   }
 
   bool _isUrl(String str) {
-    return str.startsWith('http://') || str.startsWith('https://');
+    return str.startsWith('http://') ||
+        str.startsWith('https://') ||
+        ImageStorageService.isDataImageUrl(str);
   }
 
   bool _isValidImageBytes(Uint8List bytes) {

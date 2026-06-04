@@ -1,11 +1,11 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import '../../../../../Core/di/app_scope.dart';
 import '../../../../../features/promotions/domain/entities/promocion.dart';
 import '../../../../../features/promotions/domain/entities/promocion_horario.dart';
 import '../../../../../features/promotions/domain/entities/supermercado.dart';
-import '../../../../../core/storage/image_storage_service.dart';
+import 'package:app/Core/storage/image_storage_service.dart';
 import '../../../../../Core/Routes/app_routes.dart';
 
 /// Pantalla paso 5 (final) del wizard de creación de promociones: Vista previa
@@ -142,11 +142,18 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
 
   Future<int> _resolveSupermercadoId(Map<String, dynamic> draft) async {
     // Resuelve un `idSupermercado` para la promoción:
+    // - Si el paso 4 ya envió un ID seleccionado, lo usa directamente.
     // - Si la promo es online o no se proporcionó nombre, devuelve el primer
     //   supermercado conocido (fallback).
     // - Si encuentra una tienda con el mismo nombre, devuelve su id.
     // - Si no existe, crea un nuevo `Supermercado` en `promoService` y
     //   devuelve el id recién generado.
+    final selectedId =
+        _draftId(draft['supermarketId']) ?? _draftId(draft['idSupermercado']);
+    if (selectedId != null && selectedId > 0) {
+      return selectedId;
+    }
+
     final allStores = promotionsController.getSupermercadosSync();
     final onlineOnly = (draft['onlineOnly'] as bool?) ?? false;
     final storeName = (draft['storeName'] as String?)?.trim() ?? '';
@@ -180,7 +187,8 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
     // - Si el usuario pidió un código y no existe, lo usa.
     // - En caso contrario, genera `PROMO###` buscando un candidato libre.
     final raw = requestedCode?.trim().toUpperCase() ?? '';
-    if (raw.isNotEmpty && promotionsController.getPromotionByCodeSync(raw) == null) {
+    if (raw.isNotEmpty &&
+        promotionsController.getPromotionByCodeSync(raw) == null) {
       return raw;
     }
 
@@ -196,6 +204,36 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
 
   int _nextHorarioId() {
     return promotionsController.getNextHorarioId();
+  }
+
+  int? _draftId(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString());
+  }
+
+  bool _draftHasPhysicalLocation(Map<String, dynamic> draft) {
+    final locationTypes = draft['locationTypes'];
+    if (locationTypes is Iterable) {
+      return locationTypes.map((type) => type.toString()).contains('fisica');
+    }
+    return !((draft['onlineOnly'] as bool?) ?? false);
+  }
+
+  double? _draftCoordinate(Map<String, dynamic> draft, String key) {
+    final value = draft[key];
+    if (value == null) return null;
+    if (value is num) return double.parse(value.toDouble().toStringAsFixed(6));
+    final parsed = double.tryParse(value.toString());
+    if (parsed == null) return null;
+    return double.parse(parsed.toStringAsFixed(6));
+  }
+
+  String? _draftUrl(Map<String, dynamic> draft) {
+    final url = ((draft['url'] as String?) ?? (draft['website'] as String?))
+        ?.trim();
+    return url == null || url.isEmpty ? null : url;
   }
 
   String _normalizeHourTo24h(String rawHour, String? period) {
@@ -287,11 +325,13 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
     return [start, end];
   }
 
-  Future<void> _savePromocionHorarios(Promocion promo, Map<String, dynamic> draft) async {
+  Future<void> _savePromocionHorarios(
+    Promocion promo,
+    Map<String, dynamic> draft,
+  ) async {
     // Crea entradas `PromocionHorario` a partir del campo `schedule` del
-    // draft. Si la promo es solo online, no crea horarios.
-    final onlineOnly = (draft['onlineOnly'] as bool?) ?? false;
-    if (onlineOnly) return;
+    // draft. Si la promo no tiene local físico, no crea horarios.
+    if (!_draftHasPhysicalLocation(draft)) return;
 
     final schedule = (draft['schedule'] as String?)?.trim() ?? '';
     final days = _extractDaysFromSchedule(schedule);
@@ -330,32 +370,27 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
     // Generar código de promoción primero
     final promoCode = _buildPromoCode(draft['code'] as String?);
 
-    // Guardar la imagen si existe
+    // Preparar la imagen para persistencia remota. El backend guarda `foto`
+    // como texto, así que en móvil se adjunta como data URL base64.
     String? finalImageName = _previewImage;
     bool isLocalImage = false;
 
-    if (_previewImage != null && !_previewImage!.startsWith('http')) {
-      // Es una imagen local (guardada previamente), procesarla con el servicio
+    if (_previewImage != null &&
+        !_previewImage!.startsWith('http') &&
+        !ImageStorageService.isDataImageUrl(_previewImage)) {
+      finalImageName = null;
       try {
-        // Leer los bytes de la imagen guardada
         final imageStorageService = ImageStorageService();
         final imageBytes = await imageStorageService.readImageBytes(
           _previewImage!,
         );
 
         if (imageBytes != null) {
-          final savedName = await promotionsController.savePromotionImage(
-            promoCode,
-            imageBytes,
-          );
-          if (savedName != null) {
-            finalImageName = savedName;
-            isLocalImage = true;
-            print('✅ Imagen procesada para promoción $promoCode: $savedName');
-          }
+          finalImageName = ImageStorageService.imageBytesToDataUrl(imageBytes);
+          promoService.setImageBytes(promoCode, imageBytes);
         }
       } catch (e) {
-        print('❌ Error procesando imagen para promoción: $e');
+        debugPrint('Error procesando imagen para promoción: $e');
       }
     }
 
@@ -366,8 +401,10 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
       precio: (draft['price'] as num?)?.toDouble() ?? 0,
       descuento: draft['discount'] as int?,
       condicionProducto: _normalizeCondition(draft['condition'] as String?),
-      ubicacion: (draft['location'] as String?)?.trim(),
-      url: (draft['website'] as String?)?.trim(),
+      ubicacion: _draftHasPhysicalLocation(draft)
+          ? (draft['location'] as String?)?.trim()
+          : null,
+      url: _draftUrl(draft),
       foto: finalImageName,
       fotoEsLocal: isLocalImage,
       tipoVigencia: (draft['vigenciaType'] == 'permanente')
@@ -380,19 +417,25 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
       idUsuario: sessionManager.usuarioActual?.id ?? 1,
       idSupermercado: await _resolveSupermercadoId(draft),
       idCategoria: await _resolveCategoriaId(draft['category'] as String?),
-      idTipoPromocion: await _resolveTipoPromocionId(draft['promoType'] as String?),
+      idTipoPromocion: await _resolveTipoPromocionId(
+        draft['promoType'] as String?,
+      ),
+      lat: _draftHasPhysicalLocation(draft)
+          ? _draftCoordinate(draft, 'lat')
+          : null,
+      lng: _draftHasPhysicalLocation(draft)
+          ? _draftCoordinate(draft, 'lng')
+          : null,
     );
 
     await promotionsController.createPromotion(promo);
-    _savePromocionHorarios(promo, draft);
+    await _savePromocionHorarios(promo, draft);
 
     await Future.delayed(const Duration(milliseconds: 600));
+    if (!mounted) return;
     setState(() => _isPublishing = false);
 
-    if (mounted) {
-      // Navegar a pantalla de éxito
-      _showSuccessDialog();
-    }
+    _showSuccessDialog();
   }
 
   void _showSuccessDialog() {
@@ -789,7 +832,7 @@ class _AddPromotion5ScreenState extends State<AddPromotion5Screen> {
         return await imageStorageService.readImageBytes(_previewImage!);
       }
     } catch (e) {
-      print('❌ Error obteniendo imagen de vista previa: $e');
+      debugPrint('Error obteniendo imagen de vista previa: $e');
     }
 
     return null;

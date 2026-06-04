@@ -1,4 +1,4 @@
-﻿// Importaciones necesarias para la pantalla de detalles de promoción
+// Importaciones necesarias para la pantalla de detalles de promoción
 import 'dart:async'; // Para manejo de operaciones asíncronas y timers
 import 'dart:typed_data'; // Para manejo de datos binarios (imágenes)
 import 'package:flutter/material.dart';
@@ -11,7 +11,7 @@ import '../../../../../features/promotions/domain/entities/promocion_horario.dar
 import '../../../../../features/moderation/domain/entities/reporte.dart'; // Entity reportes
 import '../../../../../features/comments/domain/entities/comentario.dart'; // Entity comentarios
 import '../../../../../features/interactions/domain/entities/valoracion.dart'; // Entity valoraciones
-import '../../../../../core/storage/image_storage_service.dart'; // Servicio para manejo de imágenes locales
+import 'package:app/Core/storage/image_storage_service.dart'; // Servicio para manejo de imágenes locales
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODELOS (Importados arriba)
@@ -113,7 +113,8 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     final promoByCode = codigo != null
         ? promotionsController.getPromotionByCodeSync(codigo)
         : null;
-    final fallbackPromo = promotionsController.getActivePromotionsSync().isNotEmpty
+    final fallbackPromo =
+        promotionsController.getActivePromotionsSync().isNotEmpty
         ? promotionsController.getActivePromotionsSync().first
         : (promotionsController.getAllPromotionsSync().isNotEmpty
               ? promotionsController.getAllPromotionsSync().first
@@ -306,6 +307,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     final promoImage = _promo?.foto?.trim() ?? '';
     final hasPromoImage = _promo?.foto?.trim().isNotEmpty ?? false;
     final isRemoteImage = promoImage.startsWith('http');
+    final dataUrlBytes = ImageStorageService.dataUrlToBytes(promoImage);
 
     return SizedBox(
       height: 290,
@@ -320,12 +322,24 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
               fit: BoxFit.cover,
               alignment: Alignment.center,
             )
+          else if (dataUrlBytes != null)
+            Image.memory(
+              dataUrlBytes,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              alignment: Alignment.center,
+              gaplessPlayback: true,
+              errorBuilder: (context, error, stackTrace) {
+                return _buildHeroPlaceholder();
+              },
+            )
           else if (isRemoteImage)
             // Caso 2: Imagen remota - cargar desde URL con manejo de errores
             Image.network(
               promoImage,
               fit: BoxFit.cover,
               alignment: Alignment.center,
+              gaplessPlayback: true,
               errorBuilder: (context, error, stackTrace) {
                 return _buildHeroPlaceholder();
               },
@@ -356,6 +370,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                     fit: BoxFit.cover,
                     width: double.infinity,
                     alignment: Alignment.center,
+                    gaplessPlayback: true,
                     errorBuilder: (context, error, stackTrace) {
                       return _buildHeroPlaceholder();
                     },
@@ -420,18 +435,19 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                           );
                           if (!mounted) return;
                           setState(
-                            () => _isFavorite = interactionsController.isFavoritoSync(
-                              _activeUserId,
-                              _promo!.codigo,
-                            ),
+                            () => _isFavorite = interactionsController
+                                .isFavoritoSync(_activeUserId, _promo!.codigo),
                           );
                           HapticFeedback.lightImpact(); // Feedback háptico
                         } catch (e) {
                           if (!mounted) return;
-                          final message = e.toString().replaceFirst('Exception: ', '');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(message)),
+                          final message = e.toString().replaceFirst(
+                            'Exception: ',
+                            '',
                           );
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(message)));
                         }
                       },
                     ),
@@ -1093,7 +1109,9 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   /// Muestra: logo, nombre, rating, verificación y botón de acción
   Widget _buildStoreSection() {
     final promo = _promo!;
-    final supermercado = promotionsController.getSupermercadoSync(promo.idSupermercado);
+    final supermercado = promotionsController.getSupermercadoSync(
+      promo.idSupermercado,
+    );
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
@@ -1293,7 +1311,9 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   /// Muestra: dirección, horario, teléfono, mapa placeholder y navegación
   Widget _buildLocationSection() {
     final promo = _promo!;
-    final supermercado = promotionsController.getSupermercadoSync(promo.idSupermercado);
+    final supermercado = promotionsController.getSupermercadoSync(
+      promo.idSupermercado,
+    );
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
@@ -1466,7 +1486,9 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     if (_promo == null) return const SizedBox.shrink();
 
     // Obtener comentarios de esta promoción
-    final comentarios = commentsController.getComentariosByPromocionSync(_promo!.codigo);
+    final comentarios = commentsController.getComentariosByPromocionSync(
+      _promo!.codigo,
+    );
     final total = comentarios.length;
 
     return Padding(
@@ -1653,9 +1675,8 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     if (_promo == null) return const SizedBox.shrink();
 
     // Get current user's valoracion for this promotion (if any)
-    final userValoraciones = interactionsController.getValoracionesByPromocionSync(
-      _promo!.codigo,
-    );
+    final userValoraciones = interactionsController
+        .getValoracionesByPromocionSync(_promo!.codigo);
     final userValoracion = userValoraciones.firstWhere(
       (v) => v.idUsuario == _activeUserId,
       orElse: () =>
@@ -1701,7 +1722,11 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                     } catch (e) {
                       if (!mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+                        SnackBar(
+                          content: Text(
+                            e.toString().replaceFirst('Exception: ', ''),
+                          ),
+                        ),
                       );
                     }
                   },
@@ -1759,7 +1784,11 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                     } catch (e) {
                       if (!mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+                        SnackBar(
+                          content: Text(
+                            e.toString().replaceFirst('Exception: ', ''),
+                          ),
+                        ),
                       );
                     }
                   },
@@ -1818,9 +1847,8 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
   Future<void> _toggleValoracion(String tipo) async {
     if (_promo == null) return;
 
-    final userValoraciones = interactionsController.getValoracionesByPromocionSync(
-      _promo!.codigo,
-    );
+    final userValoraciones = interactionsController
+        .getValoracionesByPromocionSync(_promo!.codigo);
     final existingValoracion = userValoraciones.firstWhere(
       (v) => v.idUsuario == _activeUserId,
       orElse: () =>
@@ -1884,7 +1912,11 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                 } catch (e) {
                   if (!mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+                    SnackBar(
+                      content: Text(
+                        e.toString().replaceFirst('Exception: ', ''),
+                      ),
+                    ),
                   );
                 }
                 Navigator.pop(context);
@@ -2008,9 +2040,9 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
                 } catch (e) {
                   if (!mounted) return;
                   final message = e.toString().replaceFirst('Exception: ', '');
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(message)),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(message)));
                 }
               },
               child: Container(

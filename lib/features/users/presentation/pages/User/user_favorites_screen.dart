@@ -1,12 +1,12 @@
-﻿// Importaciones necesarias para la pantalla de favoritos de usuarios
+// Importaciones necesarias para la pantalla de favoritos de usuarios
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:app/features/promotions/infrastructure/services/promo_service.dart'; // UI framework principal
 import 'package:flutter/services.dart'; // Para feedback háptico y estilo de sistema
 import '../../../../../Core/Routes/app_routes.dart'; // Definición de rutas de navegación
 import '../../../../../Core/di/app_scope.dart'; // Para acceso a servicios globales (promoService)
+import 'package:app/Core/storage/image_storage_service.dart';
 import '../../../../../features/promotions/domain/entities/promocion.dart'; // Entity de promociones
-import '../../../../../features/promotions/domain/entities/supermercado.dart'; // Entity de supermercados
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODELOS (Importados arriba)
@@ -97,7 +97,9 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
             ? usersController.getUsersSync().first.id
             : 1;
         // Obtener promociones favoritas del usuario actual
-        final favoritePromos = interactionsController.getFavoritosByUsuarioSync(currentUser);
+        final favoritePromos = interactionsController.getFavoritosByUsuarioSync(
+          currentUser,
+        );
 
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle
@@ -141,7 +143,9 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
         ? usersController.getUsersSync().first.id
         : 1;
     // Obtener promociones favoritas del usuario
-    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(currentUser);
+    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(
+      currentUser,
+    );
 
     return Container(
       color: Colors.white,
@@ -207,12 +211,16 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
         ? usersController.getUsersSync().first.id
         : 1;
     // Obtener promociones favoritas del usuario
-    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(currentUser);
+    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(
+      currentUser,
+    );
 
     // Calcular total de ahorros potenciales
     double totalSavings = 0;
     for (final favorito in favoritePromos) {
-      final promo = promotionsController.getPromotionByCodeSync(favorito.codigoPromocion);
+      final promo = promotionsController.getPromotionByCodeSync(
+        favorito.codigoPromocion,
+      );
       if (promo != null && promo.descuento != null) {
         // Calcular monto de descuento: precio * (descuento / 100)
         final discountAmount = promo.precio * (promo.descuento! / 100);
@@ -226,7 +234,9 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
     // Calcular promociones urgentes (que vencen hoy)
     int urgent = 0;
     for (final favorito in favoritePromos) {
-      final promo = promotionsController.getPromotionByCodeSync(favorito.codigoPromocion);
+      final promo = promotionsController.getPromotionByCodeSync(
+        favorito.codigoPromocion,
+      );
       if (promo != null) {
         final urgency = promotionsController.getPromocionUrgency(promo);
         if (urgency == 'today') urgent++; // Contar solo las que vencen hoy
@@ -545,10 +555,14 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
         ? usersController.getUsersSync().first.id
         : 1;
     // Obtener promociones favoritas del usuario
-    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(currentUser);
+    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(
+      currentUser,
+    );
 
     // Obtener promociones agrupadas por urgencia
-    final promosByUrgency = promotionsController.getPromocionesByUrgencySync(currentUser);
+    final promosByUrgency = promotionsController.getPromocionesByUrgencySync(
+      currentUser,
+    );
 
     // Filtrar y mostrar según tab seleccionado
     switch (_selectedTab) {
@@ -570,10 +584,14 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   /// Parámetro: userId - ID del usuario actual
   List<Promocion> _getPromotionsExpiringIn3Days(int userId) {
     // Obtener promociones favoritas del usuario
-    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(userId);
+    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(
+      userId,
+    );
     // Convertir favoritos a objetos Promocion completos
     final promocionesFavoritas = favoritePromos
-        .map((f) => promotionsController.getPromotionByCodeSync(f.codigoPromocion))
+        .map(
+          (f) => promotionsController.getPromotionByCodeSync(f.codigoPromocion),
+        )
         .where((p) => p != null) // Filtrar nulos
         .cast<Promocion>();
 
@@ -634,10 +652,14 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   /// Parámetro: userId - ID del usuario actual
   Widget _buildByCategories(int userId) {
     // Obtener promociones favoritas del usuario
-    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(userId);
+    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(
+      userId,
+    );
     // Convertir a objetos Promocion completos
     final promocionesFavoritas = favoritePromos
-        .map((f) => promotionsController.getPromotionByCodeSync(f.codigoPromocion))
+        .map(
+          (f) => promotionsController.getPromotionByCodeSync(f.codigoPromocion),
+        )
         .where((p) => p != null)
         .cast<Promocion>();
 
@@ -646,7 +668,9 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
 
     for (final promo in promocionesFavoritas) {
       // Obtener información de la categoría
-      final categoria = catalogController.getCategoriaByIdSync(promo.idCategoria);
+      final categoria = catalogController.getCategoriaByIdSync(
+        promo.idCategoria,
+      );
       final categoryName = categoria?.nombre ?? 'Sin categoría';
 
       // Inicializar lista para la categoría si no existe
@@ -848,10 +872,16 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
   /// Parámetro: promo - objeto promoción a mostrar
   Widget _buildPromoCard(Promocion promo) {
     // Obtener datos relacionados del service
-    final supermercado = promotionsController.getSupermercadoSync(promo.idSupermercado);
+    final supermercado = promotionsController.getSupermercadoSync(
+      promo.idSupermercado,
+    );
     final categoria = catalogController.getCategoriaByIdSync(promo.idCategoria);
-    final categoriaStyle = catalogController.getCategoriaStyleSync(promo.idCategoria);
-    final precioConDescuento = promotionsController.getPrecioConDescuento(promo);
+    final categoriaStyle = catalogController.getCategoriaStyleSync(
+      promo.idCategoria,
+    );
+    final precioConDescuento = promotionsController.getPrecioConDescuento(
+      promo,
+    );
     final rating = promotionsController.getPromocionRatingSync(promo.codigo);
     final urgency = promotionsController.getPromocionUrgency(promo);
 
@@ -1199,8 +1229,12 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
     final currentUser = usersController.getUsersSync().isNotEmpty
         ? usersController.getUsersSync().first.id
         : 1;
-    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(currentUser);
-    final promosByUrgency = promotionsController.getPromocionesByUrgencySync(currentUser);
+    final favoritePromos = interactionsController.getFavoritosByUsuarioSync(
+      currentUser,
+    );
+    final promosByUrgency = promotionsController.getPromocionesByUrgencySync(
+      currentUser,
+    );
 
     // Calculate badge counts
     String? badge;
@@ -1318,8 +1352,22 @@ class _MisFavoritosScreenState extends State<MisFavoritosScreen>
       );
     }
 
+    final dataUrlBytes = ImageStorageService.dataUrlToBytes(promo.foto);
+    if (dataUrlBytes != null) {
+      return Image.memory(
+        dataUrlBytes,
+        height: height,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) =>
+            _buildImageFallback(emoji, height),
+      );
+    }
+
     // Try network image if available
-    if (promo.foto != null && promo.foto!.isNotEmpty) {
+    if (promo.foto != null &&
+        promo.foto!.isNotEmpty &&
+        !promo.foto!.toLowerCase().contains('via.placeholder.com')) {
       return Image.network(
         promo.foto!,
         height: height,

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
@@ -94,6 +95,9 @@ class ImageStorageService {
   /// Lee una imagen como bytes
   Future<Uint8List?> readImageBytes(String fileName) async {
     try {
+      final dataUrlBytes = dataUrlToBytes(fileName);
+      if (dataUrlBytes != null) return dataUrlBytes;
+
       if (kIsWeb) {
         // WEB: Leer desde cache en memoria
         if (_webImageCache.containsKey(fileName)) {
@@ -275,5 +279,59 @@ class ImageStorageService {
         .convert('$timestamp${DateTime.now().microsecond}'.codeUnits)
         .toString();
     return 'img_${hash.substring(0, 8)}_$timestamp.jpg';
+  }
+
+  static bool isDataImageUrl(String? value) {
+    if (value == null) return false;
+    return value.trim().toLowerCase().startsWith('data:image/');
+  }
+
+  static String imageBytesToDataUrl(Uint8List bytes) {
+    final mimeType = _detectMimeType(bytes);
+    return 'data:$mimeType;base64,${base64Encode(bytes)}';
+  }
+
+  static Uint8List? dataUrlToBytes(String? value) {
+    if (!isDataImageUrl(value)) return null;
+
+    final dataUrl = value!.trim();
+    final commaIndex = dataUrl.indexOf(',');
+    if (commaIndex == -1) return null;
+
+    final metadata = dataUrl.substring(0, commaIndex).toLowerCase();
+    final payload = dataUrl.substring(commaIndex + 1);
+
+    try {
+      if (metadata.contains(';base64')) {
+        return base64Decode(payload);
+      }
+      return Uint8List.fromList(utf8.encode(Uri.decodeComponent(payload)));
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static String _detectMimeType(Uint8List bytes) {
+    if (bytes.length >= 4) {
+      if (bytes[0] == 0x89 &&
+          bytes[1] == 0x50 &&
+          bytes[2] == 0x4E &&
+          bytes[3] == 0x47) {
+        return 'image/png';
+      }
+      if (bytes[0] == 0x47 &&
+          bytes[1] == 0x49 &&
+          bytes[2] == 0x46 &&
+          bytes[3] == 0x38) {
+        return 'image/gif';
+      }
+      if (bytes[0] == 0x52 &&
+          bytes[1] == 0x49 &&
+          bytes[2] == 0x46 &&
+          bytes[3] == 0x46) {
+        return 'image/webp';
+      }
+    }
+    return 'image/jpeg';
   }
 }

@@ -1,2 +1,2 @@
 // Legacy compatibility layer.
-export 'package:app/core/storage/image_storage_service.dart';
+export 'package:app/Core/storage/image_storage_service.dart';

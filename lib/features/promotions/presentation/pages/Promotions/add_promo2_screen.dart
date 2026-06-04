@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../../Core/di/app_scope.dart';
 import 'add_promo3_screen.dart';
-import 'dart:io';
-import 'dart:typed_data';
-import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../../core/storage/image_storage_service.dart';
+import 'package:app/Core/storage/image_storage_service.dart';
 
 /// Pantalla paso 2 del wizard de creación de promociones.
 ///
@@ -80,7 +77,9 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
   Future<void> _pickImage(int index) async {
     final XFile? image = await _picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 80,
+      maxWidth: 900,
+      maxHeight: 900,
+      imageQuality: 65,
     );
 
     if (image == null) return;
@@ -149,6 +148,15 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
 
   bool get _canContinue =>
       _titleController.text.isNotEmpty && _descController.text.isNotEmpty;
+
+  String _normalizedCode() => _codeController.text.trim().toUpperCase();
+
+  bool _promotionCodeExists(String code) {
+    if (code.isEmpty) return false;
+    return promotionsController.getAllPromotionsSync().any(
+      (promo) => promo.codigo.trim().toUpperCase() == code,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -788,6 +796,19 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
   }
 
   Future<void> _onNext() async {
+    final code = _normalizedCode();
+    if (_promotionCodeExists(code)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Ese código de promoción ya existe. Ingresa otro código.',
+          ),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
@@ -798,15 +819,17 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
         savedImageName = await imageStorageService.saveImageFromBytes(
           _photos.first!,
         );
-        print('Imagen guardada: $savedImageName');
+        debugPrint('Imagen guardada: $savedImageName');
       }
+
+      if (!mounted) return;
 
       final nextDraft = <String, dynamic>{
         ...widget.draftData,
         'promoType': widget.promoType,
         'title': _titleController.text.trim(),
         'description': _descController.text.trim(),
-        'code': _codeController.text.trim(),
+        'code': code,
         'condition': _condition,
         'category': _category,
         'imageFileName': savedImageName, // ✅ Nombre del archivo guardado
@@ -820,7 +843,8 @@ class _AddPromotion2ScreenState extends State<AddPromotion2Screen> {
         ),
       );
     } catch (e) {
-      print('Error guardando imagen: $e');
+      debugPrint('Error guardando imagen: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error al guardar la imagen')),
       );

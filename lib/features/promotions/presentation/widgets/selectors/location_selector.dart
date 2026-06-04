@@ -148,8 +148,10 @@ class _LocationSelectorState extends State<LocationSelector> {
   }
 
   Widget _buildTipoUbicacionSelector(Color primaryColor, Color textDark) {
+    const tiposVisibles = [TipoUbicacion.fisica, TipoUbicacion.virtual];
+
     return Column(
-      children: TipoUbicacion.values.map((tipo) {
+      children: tiposVisibles.map((tipo) {
         final isSelected =
             widget.selectedTypes.contains(tipo) ||
             (tipo == TipoUbicacion.fisica &&
@@ -157,31 +159,23 @@ class _LocationSelectorState extends State<LocationSelector> {
             (tipo == TipoUbicacion.virtual &&
                 widget.selectedTypes.contains(TipoUbicacion.ambas));
 
-        // Para "ambas" se comporta como checkbox, los demás como radio
-        final isAmbas = tipo == TipoUbicacion.ambas;
-
         return GestureDetector(
           onTap: () {
             final newSet = Set<TipoUbicacion>.from(widget.selectedTypes);
-            if (isAmbas) {
-              // Si selecciona ambas, limpiamos las individuales
-              if (newSet.contains(TipoUbicacion.ambas)) {
-                newSet.remove(TipoUbicacion.ambas);
-              } else {
-                newSet
-                  ..remove(TipoUbicacion.fisica)
-                  ..remove(TipoUbicacion.virtual)
-                  ..add(TipoUbicacion.ambas);
-              }
-            } else {
-              // Si selecciona una individual, quitamos ambas
-              newSet.remove(TipoUbicacion.ambas);
-              if (newSet.contains(tipo)) {
-                newSet.remove(tipo);
-              } else {
-                newSet.add(tipo);
-              }
+
+            // Compatibilidad con promociones antiguas guardadas como "ambas".
+            if (newSet.remove(TipoUbicacion.ambas)) {
+              newSet
+                ..add(TipoUbicacion.fisica)
+                ..add(TipoUbicacion.virtual);
             }
+
+            if (newSet.contains(tipo)) {
+              newSet.remove(tipo);
+            } else {
+              newSet.add(tipo);
+            }
+
             widget.onTypesChanged(newSet);
           },
           child: Container(

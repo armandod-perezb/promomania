@@ -9,6 +9,7 @@ import '../../../../../Core/Routes/app_routes.dart';
 import '../../../../../Core/config/map_config.dart';
 import '../../../../../Core/di/app_scope.dart';
 import '../../../../../Core/services/manual_location_service.dart';
+import '../../../../../Core/storage/image_storage_service.dart';
 import '../../../../../features/promotions/domain/entities/promocion.dart';
 import '../../../../../features/promotions/domain/entities/supermercado.dart';
 
@@ -316,12 +317,14 @@ class _HomeMapScreenState extends State<HomeMapScreen>
           color: categoryColor,
           latLng: LatLng(promo.lat!, promo.lng!),
           detail: _PromoDetail(
+            code: promo.codigo,
             category: categoria?.nombre ?? 'General',
             categoryColor: categoryColor,
             discount: discountLabel,
             title: promo.titulo,
             store: _resolveStoreLabel(supermercado, promo),
             emoji: categoriaStyle['emoji'] ?? '📦',
+            image: promo.foto,
           ),
           distanceKm: distanceKm,
         ),
@@ -908,11 +911,7 @@ class _HomeMapScreenState extends State<HomeMapScreen>
               ),
             ],
           ),
-          child: const Icon(
-            Icons.add_rounded,
-            color: Colors.white,
-            size: 30,
-          ),
+          child: const Icon(Icons.add_rounded, color: Colors.white, size: 30),
         ),
       ),
     );
@@ -971,17 +970,7 @@ class _HomeMapScreenState extends State<HomeMapScreen>
       padding: const EdgeInsets.all(14),
       child: Row(
         children: [
-          Container(
-            width: 68,
-            height: 68,
-            decoration: BoxDecoration(
-              color: promo.categoryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Center(
-              child: Text(promo.emoji, style: const TextStyle(fontSize: 30)),
-            ),
-          ),
+          _buildSelectedPromoImage(promo),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -1052,6 +1041,44 @@ class _HomeMapScreenState extends State<HomeMapScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSelectedPromoImage(_PromoDetail promo) {
+    final dataUrlBytes = ImageStorageService.dataUrlToBytes(promo.image);
+    final cachedBytes = promotionsController.getCachedImageBytes(promo.code);
+    final imageBytes = cachedBytes ?? dataUrlBytes;
+    final imageUrl = promo.image?.trim();
+    final canUseNetworkImage =
+        imageUrl != null &&
+        (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) &&
+        !imageUrl.toLowerCase().contains('via.placeholder.com');
+
+    Widget child;
+    if (imageBytes != null) {
+      child = Image.memory(imageBytes, fit: BoxFit.cover);
+    } else if (canUseNetworkImage) {
+      child = Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _buildSelectedPromoImageFallback(promo),
+      );
+    } else {
+      child = _buildSelectedPromoImageFallback(promo);
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: SizedBox(width: 68, height: 68, child: child),
+    );
+  }
+
+  Widget _buildSelectedPromoImageFallback(_PromoDetail promo) {
+    return Container(
+      color: promo.categoryColor.withValues(alpha: 0.1),
+      child: Center(
+        child: Text(promo.emoji, style: const TextStyle(fontSize: 30)),
       ),
     );
   }
@@ -1205,20 +1232,24 @@ class _MapPromo {
 }
 
 class _PromoDetail {
+  final String code;
   final String category;
   final Color categoryColor;
   final String discount;
   final String title;
   final String store;
   final String emoji;
+  final String? image;
 
   const _PromoDetail({
+    required this.code,
     required this.category,
     required this.categoryColor,
     required this.discount,
     required this.title,
     required this.store,
     required this.emoji,
+    this.image,
   });
 }
 

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+
+import '../../../../../Core/di/app_scope.dart';
+import '../../../../../features/promotions/domain/entities/supermercado.dart';
+import '../../widgets/modals/crear_supermercado_modal.dart';
+import '../../widgets/selectors/location_selector.dart';
+import '../../widgets/selectors/supermarket_selector.dart';
 import 'add_promo5_screen.dart';
 
-/// Pantalla paso 4 del wizard de creación de promociones: Tienda y ubicación.
+/// Pantalla paso 4 del wizard de creación de promociones: tienda y ubicación.
 ///
-/// Responsabilidades principales:
-/// - Recoger la información de la tienda donde se ofrece la promoción
-///   (nombre, teléfono, sitio web, dirección, ciudad, horario).
-/// - Permitir marcar la promo como "solo en línea" (oculta campos de ubicación).
-/// - Validar los campos mínimos necesarios antes de avanzar.
-/// - Construir y pasar el `draftData` al paso final (`AddPromotion5Screen`).
-
+/// Permite escoger un supermercado existente o crear uno nuevo, y seleccionar
+/// si la promoción aplica en local físico, virtual o en ambos canales.
 class AddPromotion4Screen extends StatefulWidget {
   final Map<String, dynamic> draftData;
 
@@ -27,72 +28,232 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
   static const Color _darkBg = Color(0xFF1A1F2E);
   static const Color _lightBg = Color(0xFFF5F6FA);
 
-  final TextEditingController _storeNameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _websiteController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _cityController = TextEditingController(
-    text: 'Barranquilla',
-  );
+  final TextEditingController _urlController = TextEditingController();
+  final TextEditingController _locationDescriptionController =
+      TextEditingController();
   final TextEditingController _scheduleController = TextEditingController(
     text: 'Lun-Sáb 9-7pm',
   );
 
-  bool _onlineOnly = false;
+  int? _supermercadoId;
+  Set<TipoUbicacion> _tiposUbicacion = {TipoUbicacion.fisica};
+  double? _latitud;
+  double? _longitud;
   bool _isLoading = false;
+
+  final Map<String, String?> _errors = {};
 
   @override
   void initState() {
     super.initState();
     final draft = widget.draftData;
 
-    _storeNameController.text = (draft['storeName'] as String?) ?? '';
+    _urlController.addListener(_onLocationFieldsChanged);
+    _locationDescriptionController.addListener(_onLocationFieldsChanged);
+
     _phoneController.text = (draft['phone'] as String?) ?? '';
-    _websiteController.text = (draft['website'] as String?) ?? '';
-    _addressController.text = (draft['address'] as String?) ?? '';
-    _cityController.text = (draft['city'] as String?) ?? _cityController.text;
+    _urlController.text =
+        (draft['url'] as String?) ?? (draft['website'] as String?) ?? '';
+    _locationDescriptionController.text =
+        (draft['locationDescription'] as String?) ??
+        (draft['address'] as String?) ??
+        '';
     _scheduleController.text =
         (draft['schedule'] as String?) ?? _scheduleController.text;
-    _onlineOnly = (draft['onlineOnly'] as bool?) ?? false;
+    _supermercadoId =
+        _draftInt(draft['supermarketId']) ?? _draftInt(draft['idSupermercado']);
+    _latitud = (draft['lat'] as num?)?.toDouble();
+    _longitud = (draft['lng'] as num?)?.toDouble();
+
+    final savedTypes = draft['locationTypes'];
+    if (savedTypes is Iterable) {
+      _tiposUbicacion = savedTypes
+          .map((value) => value.toString())
+          .map(_tipoUbicacionFromName)
+          .whereType<TipoUbicacion>()
+          .toSet();
+    } else if ((draft['onlineOnly'] as bool?) == true) {
+      _tiposUbicacion = {TipoUbicacion.virtual};
+    }
+
+    if (_tiposUbicacion.isEmpty) {
+      _tiposUbicacion = {TipoUbicacion.fisica};
+    }
   }
 
   @override
   void dispose() {
-    _storeNameController.dispose();
+    _urlController.removeListener(_onLocationFieldsChanged);
+    _locationDescriptionController.removeListener(_onLocationFieldsChanged);
     _phoneController.dispose();
-    _websiteController.dispose();
-    _addressController.dispose();
-    _cityController.dispose();
+    _urlController.dispose();
+    _locationDescriptionController.dispose();
     _scheduleController.dispose();
     super.dispose();
   }
 
+  TipoUbicacion? _tipoUbicacionFromName(String value) {
+    switch (value) {
+      case 'fisica':
+        return TipoUbicacion.fisica;
+      case 'virtual':
+        return TipoUbicacion.virtual;
+      case 'ambas':
+        return TipoUbicacion.ambas;
+    }
+    return null;
+  }
+
+  int? _draftInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString());
+  }
+
+  bool get _hasFisica =>
+      _tiposUbicacion.contains(TipoUbicacion.fisica) ||
+      _tiposUbicacion.contains(TipoUbicacion.ambas);
+
+  bool get _hasVirtual =>
+      _tiposUbicacion.contains(TipoUbicacion.virtual) ||
+      _tiposUbicacion.contains(TipoUbicacion.ambas);
+
+  bool get _hasCoordinates => _latitud != null && _longitud != null;
+
+  bool get _hasValidUrl {
+    final url = _urlController.text.trim();
+    return url.isNotEmpty && url.startsWith('https://');
+  }
+
+  void _onLocationFieldsChanged() {
+    if (!mounted) return;
+    setState(() {
+      if (_locationDescriptionController.text.trim().isNotEmpty) {
+        _errors.remove('ubicacion_fisica');
+      }
+      if (_hasValidUrl) {
+        _errors.remove('url');
+      }
+    });
+  }
+
   bool get _canContinue {
-    if (_onlineOnly) return true;
-    return _storeNameController.text.isNotEmpty &&
-        _addressController.text.isNotEmpty;
+    if (_supermercadoId == null) return false;
+    if (_tiposUbicacion.isEmpty) return false;
+    if (_hasFisica &&
+        _locationDescriptionController.text.trim().isEmpty &&
+        !_hasCoordinates) {
+      return false;
+    }
+    if (_hasVirtual && _urlController.text.trim().isEmpty) return false;
+    return true;
+  }
+
+  Supermercado? get _selectedSupermercado {
+    if (_supermercadoId == null) return null;
+    try {
+      return promoService.supermercados.firstWhere(
+        (store) => store.id == _supermercadoId,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _validateForSubmit() {
+    _errors.clear();
+
+    if (_supermercadoId == null) {
+      _errors['supermercado'] = 'Selecciona un supermercado';
+    }
+
+    if (_tiposUbicacion.isEmpty) {
+      _errors['ubicacion'] = 'Selecciona al menos una opción de ubicación';
+    }
+
+    if (_hasFisica &&
+        _locationDescriptionController.text.trim().isEmpty &&
+        !_hasCoordinates) {
+      _errors['ubicacion_fisica'] =
+          'Describe la ubicación o selecciónala en el mapa';
+    }
+
+    if (_hasVirtual) {
+      final url = _urlController.text.trim();
+      if (url.isEmpty) {
+        _errors['url'] = 'Ingresa la URL del sitio web';
+      } else if (!url.startsWith('https://')) {
+        _errors['url'] = 'La URL debe comenzar con https://';
+      }
+    }
+  }
+
+  double? _roundCoordinate(double? value) {
+    if (value == null) return null;
+    return double.parse(value.toStringAsFixed(6));
+  }
+
+  String _buildLocationLabel() {
+    if (_hasFisica) {
+      final text = _locationDescriptionController.text.trim();
+      if (text.isNotEmpty) return text;
+
+      final store = _selectedSupermercado;
+      final parts = [
+        store?.direccion,
+        store?.ciudad,
+      ].whereType<String>().where((part) => part.trim().isNotEmpty);
+
+      final fallback = parts.join(', ');
+      if (fallback.isNotEmpty) return fallback;
+      if (_hasCoordinates) {
+        return 'Lat: ${_latitud!.toStringAsFixed(6)}, Lng: ${_longitud!.toStringAsFixed(6)}';
+      }
+    }
+
+    return 'Promoción virtual';
   }
 
   Future<void> _onNext() async {
+    setState(_validateForSubmit);
+
+    if (_errors.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Completa la tienda y la ubicación de la promoción'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
-    final location = _onlineOnly
-        ? 'Solo en línea'
-        : [
-            _addressController.text.trim(),
-            _cityController.text.trim(),
-          ].where((e) => e.isNotEmpty).join(', ');
+    final store = _selectedSupermercado;
+    final locationTypes = _tiposUbicacion
+        .map((type) => type.name)
+        .where((name) => name != 'ambas')
+        .toList();
 
     final nextDraft = <String, dynamic>{
       ...widget.draftData,
-      'storeName': _storeNameController.text.trim(),
+      'supermarketId': _supermercadoId,
+      'idSupermercado': _supermercadoId,
+      'storeName': store?.nombre ?? '',
       'phone': _phoneController.text.trim(),
-      'website': _websiteController.text.trim(),
-      'address': _addressController.text.trim(),
-      'city': _cityController.text.trim(),
-      'schedule': _scheduleController.text.trim(),
-      'onlineOnly': _onlineOnly,
-      'location': location,
+      'website': _hasVirtual ? _urlController.text.trim() : '',
+      'url': _hasVirtual ? _urlController.text.trim() : null,
+      'locationDescription': _hasFisica
+          ? _locationDescriptionController.text.trim()
+          : '',
+      'schedule': _hasFisica ? _scheduleController.text.trim() : '',
+      'onlineOnly': _hasVirtual && !_hasFisica,
+      'locationTypes': locationTypes,
+      'location': _buildLocationLabel(),
+      'lat': _hasFisica ? _roundCoordinate(_latitud) : null,
+      'lng': _hasFisica ? _roundCoordinate(_longitud) : null,
     };
 
     await Navigator.push(
@@ -102,7 +263,7 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
           draftData: nextDraft,
           promoTitle: nextDraft['title'] as String?,
           location: nextDraft['location'] as String?,
-          imageFileName: nextDraft['imageFileName'] as String?, // ✅ Usar imageFileName
+          imageFileName: nextDraft['imageFileName'] as String?,
         ),
       ),
     );
@@ -112,8 +273,39 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
     }
   }
 
+  void _showCreateSupermarket([String? initialName]) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => CrearSupermercadoModal(
+        initialName: initialName,
+        onSupermercadoCreated: (supermercado) {
+          _upsertSupermercado(supermercado);
+          setState(() {
+            _supermercadoId = supermercado.id;
+            _errors.remove('supermercado');
+          });
+        },
+      ),
+    );
+  }
+
+  void _upsertSupermercado(Supermercado supermercado) {
+    final index = promoService.supermercados.indexWhere(
+      (item) => item.id == supermercado.id,
+    );
+    if (index == -1) {
+      promoService.addSupermercado(supermercado);
+    } else {
+      promoService.updateSupermercado(supermercado);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final supermercados = promoService.supermercados;
+
     return Scaffold(
       backgroundColor: _lightBg,
       body: Column(
@@ -125,7 +317,6 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Encabezado
                   const Text(
                     'Tienda y ubicación',
                     style: TextStyle(
@@ -140,107 +331,66 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
                     style: TextStyle(fontSize: 13.5, color: Color(0xFF8A8FA8)),
                   ),
                   const SizedBox(height: 20),
-
-                  // Toggle solo en línea
-                  _buildOnlineToggle(),
-                  const SizedBox(height: 20),
-
-                  // Campos (ocultos si es solo en línea)
-                  AnimatedCrossFade(
-                    duration: const Duration(milliseconds: 250),
-                    crossFadeState: _onlineOnly
-                        ? CrossFadeState.showSecond
-                        : CrossFadeState.showFirst,
-                    firstChild: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Nombre de la tienda
-                        _buildLabeledField(
-                          label: 'Nombre de la tienda',
-                          required: true,
-                          child: _buildTextField(
-                            controller: _storeNameController,
-                            hint: 'Ej: Nike Store Andino',
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-
-                        // Teléfono + Sitio web
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildLabeledField(
-                                label: 'Teléfono',
-                                child: _buildTextField(
-                                  controller: _phoneController,
-                                  hint: '300 000 0000',
-                                  keyboardType: TextInputType.phone,
-                                  prefixIcon: Icons.phone_outlined,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: _buildLabeledField(
-                                label: 'Sitio web',
-                                child: _buildTextField(
-                                  controller: _websiteController,
-                                  hint: 'www.tienda.co',
-                                  keyboardType: TextInputType.url,
-                                  prefixIcon: Icons.language_rounded,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 18),
-
-                        // Mapa placeholder
-                        _buildMapPlaceholder(),
-                        const SizedBox(height: 18),
-
-                        // Dirección exacta
-                        _buildLabeledField(
-                          label: 'Dirección exacta',
-                          required: true,
-                          child: _buildTextField(
-                            controller: _addressController,
-                            hint: 'Cra 11 #82-01, Barranquilla',
-                            prefixIcon: Icons.location_on_outlined,
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-
-                        // Ciudad + Horario
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildLabeledField(
-                                label: 'Ciudad',
-                                child: _buildTextField(
-                                  controller: _cityController,
-                                  hint: 'Barranquilla',
-                                  prefixIcon: Icons.location_city_outlined,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: _buildLabeledField(
-                                label: 'Horario',
-                                child: _buildTextField(
-                                  controller: _scheduleController,
-                                  hint: 'Lun-Sáb 9-7pm',
-                                  prefixIcon: Icons.access_time_rounded,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    secondChild: _buildOnlineOnlyMessage(),
+                  SupermarketSelector(
+                    supermercados: supermercados,
+                    selectedId: _supermercadoId,
+                    onChanged: (id) {
+                      setState(() {
+                        _supermercadoId = id;
+                        _errors.remove('supermercado');
+                      });
+                    },
+                    onCreateNew: _showCreateSupermarket,
+                    errorText: _errors['supermercado'],
                   ),
+                  const SizedBox(height: 18),
+                  _buildLabeledField(
+                    label: 'Teléfono',
+                    child: _buildTextField(
+                      controller: _phoneController,
+                      hint: '300 000 0000',
+                      keyboardType: TextInputType.phone,
+                      prefixIcon: Icons.phone_outlined,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  LocationSelector(
+                    selectedTypes: _tiposUbicacion,
+                    onTypesChanged: (types) {
+                      setState(() {
+                        _tiposUbicacion = types;
+                        _errors.remove('ubicacion');
+                        _errors.remove('ubicacion_fisica');
+                        _errors.remove('url');
+                      });
+                    },
+                    descripcionUbicacionController:
+                        _locationDescriptionController,
+                    latitud: _latitud,
+                    longitud: _longitud,
+                    onLocationSelected: (latLng) {
+                      setState(() {
+                        _latitud = latLng?.latitude;
+                        _longitud = latLng?.longitude;
+                        _errors.remove('ubicacion_fisica');
+                      });
+                    },
+                    urlController: _urlController,
+                    urlError: _errors['url'],
+                    ubicacionError:
+                        _errors['ubicacion'] ?? _errors['ubicacion_fisica'],
+                  ),
+                  if (_hasFisica) ...[
+                    const SizedBox(height: 18),
+                    _buildLabeledField(
+                      label: 'Horario',
+                      child: _buildTextField(
+                        controller: _scheduleController,
+                        hint: 'Lun-Sáb 9-7pm',
+                        prefixIcon: Icons.access_time_rounded,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 100),
                 ],
               ),
@@ -251,8 +401,6 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
       bottomNavigationBar: _buildBottomBar(),
     );
   }
-
-  // ── Top bar ──────────────────────────────────────────────────────────────────
 
   Widget _buildTopBar() {
     return Container(
@@ -413,184 +561,6 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
     );
   }
 
-  // ── Toggle solo en línea ─────────────────────────────────────────────────────
-
-  Widget _buildOnlineToggle() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE8EAF0), width: 1.5),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF0F1F5),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(
-              Icons.language_rounded,
-              color: Color(0xFF8A8FA8),
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Solo disponible en línea',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF1A1F2E),
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Sin ubicación física requerida',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF8A8FA8)),
-                ),
-              ],
-            ),
-          ),
-          Switch(
-            value: _onlineOnly,
-            onChanged: (v) => setState(() => _onlineOnly = v),
-            activeColor: _primary,
-            activeTrackColor: _primary.withOpacity(0.3),
-            inactiveThumbColor: Colors.white,
-            inactiveTrackColor: const Color(0xFFE0E2EA),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Mapa placeholder ─────────────────────────────────────────────────────────
-
-  Widget _buildMapPlaceholder() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Ubicación en el mapa',
-          style: TextStyle(
-            fontSize: 13.5,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF1A1F2E),
-          ),
-        ),
-        const SizedBox(height: 10),
-        Container(
-          height: 150,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: const Color(0xFFE8F0FE),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFD0DCF8), width: 1.5),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: _primary,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: _primary.withOpacity(0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.location_on_rounded,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(height: 14),
-              GestureDetector(
-                onTap: () {
-                  // Abrir selector de mapa
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _darkBg,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.location_on_rounded,
-                        color: _primary,
-                        size: 16,
-                      ),
-                      SizedBox(width: 6),
-                      Text(
-                        'Seleccionar en mapa',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ── Mensaje solo en línea ────────────────────────────────────────────────────
-
-  Widget _buildOnlineOnlyMessage() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: _primary.withOpacity(0.06),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: _primary.withOpacity(0.2), width: 1.2),
-      ),
-      child: Row(
-        children: const [
-          Icon(Icons.check_circle_rounded, color: _primary, size: 22),
-          SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'Esta promo estará disponible solo en línea. No se requiere dirección física.',
-              style: TextStyle(
-                fontSize: 13,
-                color: Color(0xFF92300A),
-                height: 1.45,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Helpers ──────────────────────────────────────────────────────────────────
-
   Widget _buildLabeledField({
     required String label,
     bool required = false,
@@ -657,8 +627,6 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
       ),
     );
   }
-
-  // ── Bottom bar ───────────────────────────────────────────────────────────────
 
   Widget _buildBottomBar() {
     return Container(
@@ -762,8 +730,6 @@ class _AddPromotion4ScreenState extends State<AddPromotion4Screen> {
     );
   }
 }
-
-// ── Modelo auxiliar ────────────────────────────────────────────────────────────
 
 class _WizardStep {
   final IconData icon;

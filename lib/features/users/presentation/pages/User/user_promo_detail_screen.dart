@@ -1856,17 +1856,33 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
       orElse: () =>
           Valoracion(id: -1, tipo: '', idUsuario: -1, codigoPromocion: ''),
     );
+    final hasExisting = existingValoracion.id != -1;
+    final isSameType = hasExisting && existingValoracion.tipo == tipo;
 
-    if (existingValoracion.id != -1) {
-      // User has already rated, remove existing rating
+    if (isSameType) {
+      await interactionsController.deleteValoracion(existingValoracion.id);
+      HapticFeedback.lightImpact();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Tu reacción se eliminó'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+      return;
+    }
+
+    if (hasExisting) {
       await interactionsController.deleteValoracion(existingValoracion.id);
     }
 
-    // Add new valoracion
+    final allValoraciones = interactionsController.getAllValoracionesSync();
+    final nextId = allValoraciones.isNotEmpty
+        ? allValoraciones.last.id + 1
+        : 1;
+
     final newValoracion = Valoracion(
-      id: interactionsController.getAllValoracionesSync().isNotEmpty
-          ? interactionsController.getAllValoracionesSync().last.id + 1
-          : 1,
+      id: nextId,
       tipo: tipo,
       idUsuario: _activeUserId,
       codigoPromocion: _promo!.codigo,
@@ -1875,6 +1891,7 @@ class _PromoDetailScreenState extends State<PromoDetailScreen>
     await interactionsController.addValoracion(newValoracion);
     HapticFeedback.lightImpact();
 
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(

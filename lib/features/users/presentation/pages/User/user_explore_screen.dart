@@ -197,12 +197,18 @@ class _ExploreScreenState extends State<ExploreScreen>
   /// Construye el header superior con saludo personalizado y ubicación
   /// Muestra: ciudad, saludo personalizado, notificaciones y avatar del usuario
   Widget _buildHeader() {
-    // Obtener usuario actual (para demo: primer usuario de la lista)
-    final currentUser = usersController.getUsersSync().isNotEmpty
+    final loggedUser = sessionManager.usuarioActual;
+    final fallbackUser = usersController.getUsersSync().isNotEmpty
         ? usersController.getUsersSync().first
         : null;
+    final currentUser = loggedUser ?? fallbackUser;
     final userCity =
         currentUser?.ciudad ?? 'Bogotá'; // Ciudad del usuario o fallback
+    final displayName = () {
+      final rawName = currentUser?.nombre.trim();
+      if (rawName == null || rawName.isEmpty) return 'Usuario';
+      return rawName;
+    }();
 
     return Container(
       color: Colors.white,
@@ -239,7 +245,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                 const SizedBox(height: 4),
                 // Saludo personalizado
                 Text(
-                  'Buenos días${currentUser != null ? ', ${currentUser.nombre.split(' ').first}' : ''}',
+                  'Hola, $displayName',
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,

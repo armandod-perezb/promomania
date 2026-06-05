@@ -119,6 +119,14 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
     }
   }
 
+  void _closeModalIfPossible() {
+    if (!mounted) return;
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+    }
+  }
+
   @override
   void dispose() {
     _codigoController.dispose();
@@ -327,13 +335,13 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
       await promotionsController.updatePromotion(promoActualizada);
 
       if (mounted) {
-        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Promoción actualizada exitosamente'),
             backgroundColor: Colors.green,
           ),
         );
+        _closeModalIfPossible();
       }
     } catch (e) {
       if (mounted) {
@@ -474,7 +482,7 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: _closeModalIfPossible,
                   icon: const Icon(Icons.close),
                   color: textGray,
                 ),
@@ -696,7 +704,7 @@ class _EditarPromoModalState extends State<EditarPromoModal> {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: _isLoading ? null : () => Navigator.pop(context),
+                    onPressed: _isLoading ? null : _closeModalIfPossible,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: textGray,
                       side: const BorderSide(color: Color(0xFFEEEEF2)),
